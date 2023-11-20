@@ -1,5 +1,5 @@
-#ifndef SO_INTERNAL_OVERRIDE_ARGS_DATA_HPP
-#define SO_INTERNAL_OVERRIDE_ARGS_DATA_HPP
+#ifndef CO_INTERNAL_OVERRIDE_ARGS_DATA_HPP
+#define CO_INTERNAL_OVERRIDE_ARGS_DATA_HPP
 
 #include "./Internal_ConditionInfo.hpp"
 #include "./Internal_ActionInfo.hpp"
@@ -7,7 +7,7 @@
 #include "./Internal_ArgsDataActionInfo.hpp"
 
 
-namespace SimpleOverride
+namespace CppOverride
 {
     struct Internal_OverrideArgsData
     {

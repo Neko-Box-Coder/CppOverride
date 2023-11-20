@@ -1,7 +1,7 @@
-#ifndef SO_PROXY_TYPE_HPP
-#define SO_PROXY_TYPE_HPP
+#ifndef CO_PROXY_TYPE_HPP
+#define CO_PROXY_TYPE_HPP
 
-namespace SimpleOverride
+namespace CppOverride
 {
     enum class ProxyType
     {

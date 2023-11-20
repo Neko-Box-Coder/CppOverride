@@ -1,5 +1,5 @@
-#ifndef SO_INTERNAL_RETURN_DATA_SETTER_HPP
-#define SO_INTERNAL_RETURN_DATA_SETTER_HPP
+#ifndef CO_INTERNAL_RETURN_DATA_SETTER_HPP
+#define CO_INTERNAL_RETURN_DATA_SETTER_HPP
 
 #include "./ProxiesDeclarations.hpp"
 #include "./Internal_OverrideReturnData.hpp"
@@ -11,7 +11,7 @@
 #include <iostream>
 #include <unordered_map>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     class Internal_ReturnDataSetter
     {

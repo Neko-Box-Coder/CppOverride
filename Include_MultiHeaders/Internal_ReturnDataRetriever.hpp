@@ -1,5 +1,5 @@
-#ifndef SO_INTERNAL_RETURN_DATA_RETRIEVER_HPP
-#define SO_INTERNAL_RETURN_DATA_RETRIEVER_HPP
+#ifndef CO_INTERNAL_RETURN_DATA_RETRIEVER_HPP
+#define CO_INTERNAL_RETURN_DATA_RETRIEVER_HPP
 
 #include "./Internal_OverrideReturnDataList.hpp"
 #include "./PureType.hpp"
@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <iostream>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     class Internal_ReturnDataRetriever
     {
@@ -25,7 +25,7 @@ namespace SimpleOverride
             Internal_ArgsTypesChecker& ArgsTypesChecker;
             Internal_ArgsValuesChecker& ArgsValuesChecker;
         
-            #define SO_LOG_GetCorrectReturnDataInfo 0
+            #define CO_LOG_GetCorrectReturnDataInfo 0
 
             template<typename T, typename... Args>
             inline int GetCorrectReturnDataInfo(T& returnRef, std::string functionName, Args&... args)
@@ -37,7 +37,7 @@ namespace SimpleOverride
                     exit(1);
                 }
                 
-                #if SO_LOG_GetCorrectReturnDataInfo
+                #if CO_LOG_GetCorrectReturnDataInfo
                     std::cout <<"GetCorrectReturnDataInfo called\n";
                 #endif
 
@@ -50,7 +50,7 @@ namespace SimpleOverride
                 int returnIndex = -1;
                 for(int i = 0; i < curReturnDatas.size(); i++)
                 {
-                    #if SO_LOG_GetCorrectReturnDataInfo
+                    #if CO_LOG_GetCorrectReturnDataInfo
                         std::cout << "Checking return data["<<i<<"]\n";
                     #endif
 
@@ -60,9 +60,9 @@ namespace SimpleOverride
                     {
                         //Check return type match
                         if(curReturnDatas[i].ReturnDataInfo.DataType != 
-                            typeid(INTERNAL_SO_NON_CONST_T).hash_code())
+                            typeid(INTERNAL_CO_NON_CONST_T).hash_code())
                         {
-                            #if SO_LOG_GetCorrectReturnDataInfo
+                            #if CO_LOG_GetCorrectReturnDataInfo
                                 std::cout << "Failed at return type\n";
                             #endif
                             
@@ -79,7 +79,7 @@ namespace SimpleOverride
                                                                 0, 
                                                                 args...))
                     {
-                        #if SO_LOG_GetCorrectReturnDataInfo
+                        #if CO_LOG_GetCorrectReturnDataInfo
                             std::cout << "Failed at Check parameter\n";
                         #endif
                         continue;
@@ -93,7 +93,7 @@ namespace SimpleOverride
                                                                 0, 
                                                                 args...))
                     {
-                        #if SO_LOG_GetCorrectReturnDataInfo
+                        #if CO_LOG_GetCorrectReturnDataInfo
                             std::cout << "Failed at Check parameter\n";
                         #endif
                         if(curReturnDatas[i].ReturnActionInfo.OtherwiseActionSet)
@@ -107,7 +107,7 @@ namespace SimpleOverride
                     if( curReturnDatas[i].ReturnConditionInfo.DataConditionSet && 
                         !curReturnDatas[i].ReturnConditionInfo.DataCondition(argumentsList))
                     {
-                        #if SO_LOG_GetCorrectReturnDataInfo
+                        #if CO_LOG_GetCorrectReturnDataInfo
                             std::cout << "Failed at Check condition\n";
                         #endif
                         if(curReturnDatas[i].ReturnActionInfo.OtherwiseActionSet)
@@ -121,7 +121,7 @@ namespace SimpleOverride
                         curReturnDatas[i].ReturnConditionInfo.CalledTimes >= 
                             curReturnDatas[i].ReturnConditionInfo.Times)
                     {
-                        #if SO_LOG_GetCorrectReturnDataInfo
+                        #if CO_LOG_GetCorrectReturnDataInfo
                             std::cout << "Failed at Check times\n";
                         #endif
                         if(curReturnDatas[i].ReturnActionInfo.OtherwiseActionSet)
@@ -130,7 +130,7 @@ namespace SimpleOverride
                         continue;
                     }
                     
-                    #if SO_LOG_GetCorrectReturnDataInfo
+                    #if CO_LOG_GetCorrectReturnDataInfo
                         std::cout << "Return data found: "<<i<<"\n";
                     #endif
                     returnIndex = i;

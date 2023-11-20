@@ -1,5 +1,5 @@
-#ifndef SO_INTERNAL_ARGS_TYPES_CHECKER_HPP
-#define SO_INTERNAL_ARGS_TYPES_CHECKER_HPP
+#ifndef CO_INTERNAL_ARGS_TYPES_CHECKER_HPP
+#define CO_INTERNAL_ARGS_TYPES_CHECKER_HPP
 
 #include "./Any.hpp"
 #include "./ArgsInfo.hpp"
@@ -7,7 +7,7 @@
 #include <vector>
 #include <iostream>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     class Internal_ArgsTypesChecker
     {
@@ -18,7 +18,7 @@ namespace SimpleOverride
             inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
                                             int argIndex) { return true; };
 
-            #define SO_LOG_CheckArguments 0
+            #define CO_LOG_CheckArguments 0
 
             //Check Value or reference
             template<typename T, typename... Args>
@@ -27,7 +27,7 @@ namespace SimpleOverride
                                             T& arg, 
                                             Args&... args)
             {
-                #if SO_LOG_CheckArguments
+                #if CO_LOG_CheckArguments
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsTypes index: "<<argIndex<<"\n";
                 #endif
@@ -37,22 +37,22 @@ namespace SimpleOverride
 
                 if(validArgumentsList[argIndex].ArgSet)
                 {
-                    if( sizeof(INTERNAL_SO_NON_CONST_T) != validArgumentsList[argIndex].ArgSize &&
-                        sizeof(INTERNAL_SO_NON_CONST_T*) != validArgumentsList[argIndex].ArgSize)
+                    if( sizeof(INTERNAL_CO_NON_CONST_T) != validArgumentsList[argIndex].ArgSize &&
+                        sizeof(INTERNAL_CO_NON_CONST_T*) != validArgumentsList[argIndex].ArgSize)
                     {
                         return false;
                     }
 
-                    if( typeid(INTERNAL_SO_NON_CONST_T).hash_code() != 
+                    if( typeid(INTERNAL_CO_NON_CONST_T).hash_code() != 
                             validArgumentsList[argIndex].ArgTypeHash &&
-                        typeid(INTERNAL_SO_NON_CONST_T*).hash_code() != 
+                        typeid(INTERNAL_CO_NON_CONST_T*).hash_code() != 
                             validArgumentsList[argIndex].ArgTypeHash)
                     {
                         return false;
                     }
                 }
                 
-                #if SO_LOG_CheckArguments
+                #if CO_LOG_CheckArguments
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsTypes index: "<<argIndex<<" passed\n";
                 #endif
@@ -70,7 +70,7 @@ namespace SimpleOverride
                                             T*& arg, 
                                             Args&... args)
             {
-                #if SO_LOG_CheckArguments
+                #if CO_LOG_CheckArguments
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsTypes index: "<<argIndex<<"\n";
                 #endif
@@ -80,12 +80,12 @@ namespace SimpleOverride
 
                 if(validArgumentsList[argIndex].ArgSet)
                 {
-                    if( sizeof(INTERNAL_SO_NON_CONST_T*) != validArgumentsList[argIndex].ArgSize &&
-                        sizeof(INTERNAL_SO_NON_CONST_T) != validArgumentsList[argIndex].ArgSize)
+                    if( sizeof(INTERNAL_CO_NON_CONST_T*) != validArgumentsList[argIndex].ArgSize &&
+                        sizeof(INTERNAL_CO_NON_CONST_T) != validArgumentsList[argIndex].ArgSize)
                     {
-                        #if SO_LOG_CheckArguments
-                            std::cout <<    "sizeof(INTERNAL_SO_NON_CONST_T): " <<
-                                            sizeof(INTERNAL_SO_NON_CONST_T) <<
+                        #if CO_LOG_CheckArguments
+                            std::cout <<    "sizeof(INTERNAL_CO_NON_CONST_T): " <<
+                                            sizeof(INTERNAL_CO_NON_CONST_T) <<
                                             "\n";
                             
                             std::cout << "sizeof(T): "<<sizeof(T)<<"\n";
@@ -98,14 +98,14 @@ namespace SimpleOverride
                         return false;
                     }
 
-                    if( typeid(INTERNAL_SO_NON_CONST_T*).hash_code() != 
+                    if( typeid(INTERNAL_CO_NON_CONST_T*).hash_code() != 
                             validArgumentsList[argIndex].ArgTypeHash &&
-                        typeid(INTERNAL_SO_NON_CONST_T).hash_code() != 
+                        typeid(INTERNAL_CO_NON_CONST_T).hash_code() != 
                             validArgumentsList[argIndex].ArgTypeHash)
                     {
-                        #if SO_LOG_CheckArguments
-                            std::cout <<    "typeid(INTERNAL_SO_NON_CONST_T).hash_code(): " <<
-                                            typeid(INTERNAL_SO_NON_CONST_T).hash_code() << 
+                        #if CO_LOG_CheckArguments
+                            std::cout <<    "typeid(INTERNAL_CO_NON_CONST_T).hash_code(): " <<
+                                            typeid(INTERNAL_CO_NON_CONST_T).hash_code() << 
                                             "\n";
                             
                             std::cout <<    "validArgumentsList["
@@ -118,7 +118,7 @@ namespace SimpleOverride
                     }
                 }
                 
-                #if SO_LOG_CheckArguments
+                #if CO_LOG_CheckArguments
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsTypes index: "<<argIndex<<" passed\n";
                 #endif
@@ -134,7 +134,7 @@ namespace SimpleOverride
             {
                 return CheckArgumentsTypes( validArgumentsList, 
                                             argIndex, 
-                                            const_cast<INTERNAL_SO_NON_CONST_T&>(arg), 
+                                            const_cast<INTERNAL_CO_NON_CONST_T&>(arg), 
                                             args...);
             }
     };

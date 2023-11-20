@@ -1,10 +1,10 @@
-#ifndef SO_INTERNAL_ARGS_VALUES_APPENDER_HPP
-#define SO_INTERNAL_ARGS_VALUES_APPENDER_HPP
+#ifndef CO_INTERNAL_ARGS_VALUES_APPENDER_HPP
+#define CO_INTERNAL_ARGS_VALUES_APPENDER_HPP
 
 #include "./PureType.hpp"
 #include <vector>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     class Internal_ArgsValuesAppender
     {
@@ -18,7 +18,7 @@ namespace SimpleOverride
             template<typename T, typename... Args>
             inline void AppendArgsValues(std::vector<void*>& argumentsList, T& arg, Args&... args)
             {
-                argumentsList.push_back((INTERNAL_SO_NON_CONST_T*)&arg);
+                argumentsList.push_back((INTERNAL_CO_NON_CONST_T*)&arg);
                 AppendArgsValues(argumentsList, args...);
             }
     };

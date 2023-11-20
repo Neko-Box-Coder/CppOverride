@@ -1,10 +1,10 @@
-#ifndef SO_INTERNAL_ARGS_DATA_ACTION_INFO_HPP
-#define SO_INTERNAL_ARGS_DATA_ACTION_INFO_HPP
+#ifndef CO_INTERNAL_ARGS_DATA_ACTION_INFO_HPP
+#define CO_INTERNAL_ARGS_DATA_ACTION_INFO_HPP
 
 #include <functional>
 #include <vector>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     struct Internal_ArgsDataActionInfo
     {

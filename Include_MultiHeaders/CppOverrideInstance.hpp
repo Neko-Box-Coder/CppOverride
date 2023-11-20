@@ -1,5 +1,5 @@
-#ifndef SO_SIMPLE_OVERRIDE_INSTANCE_HPP
-#define SO_SIMPLE_OVERRIDE_INSTANCE_HPP
+#ifndef CO_CPP_OVERRIDE_INSTANCE_HPP
+#define CO_CPP_OVERRIDE_INSTANCE_HPP
 
 //#include "./Internal_OverrideReturnDataList.hpp"
 //#include "./Internal_OverrideArgsData.hpp"
@@ -19,7 +19,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     class Overrider :   public Internal_ReturnDataSetter, 
                         public Internal_ArgsDataSetter,
@@ -211,11 +211,11 @@ namespace SimpleOverride
             //------------------------------------------------------------------------------
             //Overrding Returns
             //------------------------------------------------------------------------------
-            #define SO_LOG_OverrideReturns 0
+            #define CO_LOG_OverrideReturns 0
 
             inline ReturnProxy Internal_OverrideReturns(std::string functionName)
             {
-                #if SO_LOG_OverrideReturns
+                #if CO_LOG_OverrideReturns
                     std::cout << "OverrideReturns\n";
                     std::cout << "functionName: "<<functionName << "\n";
                     std::cout << "functionName.size(): " << functionName.size() << "\n";
@@ -236,14 +236,14 @@ namespace SimpleOverride
                 OverrideReturnInfos.clear();
             }
 
-            #define SO_LOG_CheckOverrideAndReturn 0
+            #define CO_LOG_CheckOverrideAndReturn 0
 
             template<typename T, typename... Args>
             inline bool Internal_CheckOverrideAndReturn(T& returnRef, 
                                                         std::string functionName, 
                                                         Args&... args)
             {
-                #if SO_LOG_CheckOverrideAndReturn
+                #if CO_LOG_CheckOverrideAndReturn
                     std::cout << "CheckOverrideAndReturn\n";
                     std::cout << "functionName: "<<functionName << "\n";
                     std::cout << "functionName.size(): " << functionName.size() << "\n";
@@ -286,11 +286,11 @@ namespace SimpleOverride
             //------------------------------------------------------------------------------
             //Overrding Arguments
             //------------------------------------------------------------------------------
-            #define SO_LOG_OverrideArgs 0
+            #define CO_LOG_OverrideArgs 0
 
             inline ArgumentsProxy Internal_OverrideArgs(std::string functionName)
             {
-                #if SO_LOG_OverrideArgs
+                #if CO_LOG_OverrideArgs
                     std::cout << "OverrideArgs\n";
                     std::cout << "functionName: "<<functionName << "\n";
                 #endif
@@ -312,12 +312,12 @@ namespace SimpleOverride
                 OverrideArgumentsInfos.clear();
             }
 
-            #define SO_LOG_CheckOverrideAndSetArgs 0
+            #define CO_LOG_CheckOverrideAndSetArgs 0
 
             template<typename... Args>
             inline bool Internal_CheckOverrideAndSetArgs(std::string functionName, Args&... args)
             {
-                #if SO_LOG_CheckOverrideAndSetArgs
+                #if CO_LOG_CheckOverrideAndSetArgs
                     std::cout << "CheckOverrideAndSetArgs\n";
                     std::cout << "functionName: "<<functionName << "\n";
                 #endif

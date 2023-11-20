@@ -1,12 +1,12 @@
-#ifndef SO_STATIC_ASSERT_FALSE
-#define SO_STATIC_ASSERT_FALSE
+#ifndef CO_STATIC_ASSERT_FALSE
+#define CO_STATIC_ASSERT_FALSE
 
 #include <type_traits>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     template<typename T>
-    struct SO_ASSERT_FALSE : std::false_type { };
+    struct CO_ASSERT_FALSE : std::false_type { };
 }
 
 #endif

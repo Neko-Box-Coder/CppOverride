@@ -1,16 +1,16 @@
-#include "SimpleOverride.hpp"
+#include "CppOverride.hpp"
 #include "ssTest.hpp"
 #include "./FileFunctions.hpp"
 #include "./ClassFunctions.hpp"
 
-SimpleOverride::Overrider OverrideObj;
+CppOverride::Overrider OverrideObj;
 
 int main()
 {
     ssTEST_INIT();
     ssTEST_SET_UP
     {
-        OverrideObj = SimpleOverride::Overrider();
+        OverrideObj = CppOverride::Overrider();
     };
     
     ssTEST("Returns Test")
@@ -19,7 +19,7 @@ int main()
         
         bool otherwiseDoCalled = false;
         
-        SO_OVERRIDE_RETURNS (rect, GetWidth(float))
+        CO_OVERRIDE_RETURNS (rect, GetWidth(float))
                             .WhenCalledWith(2.f)
                             .Returns(6.f)
                             .Otherwise_Do
@@ -41,11 +41,11 @@ int main()
     {
         bool otherwiseDoCalled = false;
         
-        SO_OVERRIDE_ARGS(OverrideObj, FuncWithConstArgsAndArgsToSet(    const int, 
+        CO_OVERRIDE_ARGS(OverrideObj, FuncWithConstArgsAndArgsToSet(    const int, 
                                                                         const float, 
                                                                         std::string&))
-                        .WhenCalledWith(1, 2.f, SO_ANY)
-                        .SetArgs(SO_DONT_SET, SO_DONT_SET, std::string("test"))
+                        .WhenCalledWith(1, 2.f, CO_ANY)
+                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("test"))
                         .Otherwise_Do
                         (
                             [&otherwiseDoCalled] (const std::vector<void *>& args)

@@ -1,5 +1,5 @@
-#ifndef SO_INTERNAL_REQUIREMENT_SETTER_HPP
-#define SO_INTERNAL_REQUIREMENT_SETTER_HPP
+#ifndef CO_INTERNAL_REQUIREMENT_SETTER_HPP
+#define CO_INTERNAL_REQUIREMENT_SETTER_HPP
 
 #include "./ProxiesDeclarations.hpp"
 #include "./Internal_OverrideArgsDataList.hpp"
@@ -13,7 +13,7 @@
 #include <iostream>
 
 
-namespace SimpleOverride
+namespace CppOverride
 {
     class Internal_RequirementSetter
     {

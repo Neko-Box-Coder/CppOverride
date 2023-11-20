@@ -1,9 +1,9 @@
-#ifndef SO_MACROS_HPP
-#define SO_MACROS_HPP
+#ifndef CO_MACROS_HPP
+#define CO_MACROS_HPP
 
 #include <set>
 #include <string>
-namespace SimpleOverride
+namespace CppOverride
 {
     inline std::string Internal_RemoveNewlines(std::string functionSig)
     {
@@ -116,26 +116,26 @@ namespace SimpleOverride
     //Macro argument expandsion
     //==============================================================================
 
-    #define SO_INTERNAL_APPEND_ARGS_NOT_EMPTY(...) , __VA_ARGS__
-    #define SO_INTERNAL_APPEND_ARGS_EMPTY(...)
+    #define CO_INTERNAL_APPEND_ARGS_NOT_EMPTY(...) , __VA_ARGS__
+    #define CO_INTERNAL_APPEND_ARGS_EMPTY(...)
 
     //NOTE: Up to 20 arguments
-    #define SO_INTERNAL_EXPAND_IF_EMPTY() ,,,,,,,,,,,,,,,,,,,,
-    #define SO_INTERNAL_ESCAPE_BRACKET(...) __VA_ARGS__ ()
-    #define SO_INTERNAL_TEST_EMPTY(...)\
-        SO_INTERNAL_CAT_ALLOW_GARBAGE(  SO_INTERNAL_EXPAND_IF_EMPTY, \
-                                        SO_INTERNAL_ESCAPE_BRACKET __VA_ARGS__ ())
+    #define CO_INTERNAL_EXPAND_IF_EMPTY() ,,,,,,,,,,,,,,,,,,,,
+    #define CO_INTERNAL_ESCAPE_BRACKET(...) __VA_ARGS__ ()
+    #define CO_INTERNAL_TEST_EMPTY(...)\
+        CO_INTERNAL_CAT_ALLOW_GARBAGE(  CO_INTERNAL_EXPAND_IF_EMPTY, \
+                                        CO_INTERNAL_ESCAPE_BRACKET __VA_ARGS__ ())
     
-    #define SO_INTERNAL_SELECT_TAG( _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, \
+    #define CO_INTERNAL_SELECT_TAG( _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, \
                                     _15, _16, _17, _18, _19, _20, _21, _TAG, ...) _TAG
     
-    #define SO_INTERNAL_CAT_ALLOW_GARBAGE(a, b, ...) a b
-    #define SO_INTERNAL_CAT(a, b) a b
-    #define SO_INTERNAL_FUNC_CAT(a, b) a ## b
+    #define CO_INTERNAL_CAT_ALLOW_GARBAGE(a, b, ...) a b
+    #define CO_INTERNAL_CAT(a, b) a b
+    #define CO_INTERNAL_FUNC_CAT(a, b) a ## b
 
-    #define SO_INTERNAL_GET_TAG(...)\
-        SO_INTERNAL_CAT(    SO_INTERNAL_SELECT_TAG, \
-                            (SO_INTERNAL_TEST_EMPTY(__VA_ARGS__), \
+    #define CO_INTERNAL_GET_TAG(...)\
+        CO_INTERNAL_CAT(    CO_INTERNAL_SELECT_TAG, \
+                            (CO_INTERNAL_TEST_EMPTY(__VA_ARGS__), \
                             _EMPTY, \
                             _NOT_EMPTY, _NOT_EMPTY, _NOT_EMPTY, _NOT_EMPTY, _NOT_EMPTY, _NOT_EMPTY,\
                             _NOT_EMPTY, _NOT_EMPTY, _NOT_EMPTY, _NOT_EMPTY, _NOT_EMPTY, _NOT_EMPTY,\
@@ -143,28 +143,28 @@ namespace SimpleOverride
                             _NOT_EMPTY, _NOT_EMPTY) )
 
     //Debug
-    //#define SO_INTERNAL_GET_TAG(...) SO_INTERNAL_CAT( SO_INTERNAL_SELECT_TAG, ( SO_INTERNAL_EXPAND_IF_EMPTY __VA_ARGS__ (), _0,
+    //#define CO_INTERNAL_GET_TAG(...) CO_INTERNAL_CAT( CO_INTERNAL_SELECT_TAG, ( CO_INTERNAL_EXPAND_IF_EMPTY __VA_ARGS__ (), _0,
     //                                                    _20, _19, _18, _17, _16, _15, _14, _13, _12, _11,
     //                                                    _10, _9, _8, _7, _6, _5, _4, _3, _2, _1) )
 
     //MSVC workaround: https://stackoverflow.com/questions/48710758/how-to-fix-variadic-macro-related-issues-with-macro-overloading-in-msvc-mic
 
     #ifndef _MSC_VER
-        #define SO_INTERNAL_APPEND_ARGS(...)\
-            SO_INTERNAL_CAT( SO_INTERNAL_FUNC_CAT,\
-                            (SO_INTERNAL_APPEND_ARGS, SO_INTERNAL_GET_TAG(__VA_ARGS__) (__VA_ARGS__)) )
+        #define CO_INTERNAL_APPEND_ARGS(...)\
+            CO_INTERNAL_CAT( CO_INTERNAL_FUNC_CAT,\
+                            (CO_INTERNAL_APPEND_ARGS, CO_INTERNAL_GET_TAG(__VA_ARGS__) (__VA_ARGS__)) )
     #else
-        #define SO_INTERNAL_VA_ARGS_FIX( macro, args ) macro args
-        #define SO_INTERNAL_APPEND_ARGS(...)\
-            SO_INTERNAL_VA_ARGS_FIX(    SO_INTERNAL_CAT, \
-                                        ( SO_INTERNAL_FUNC_CAT, (SO_INTERNAL_APPEND_ARGS,\
-                                        SO_INTERNAL_GET_TAG(__VA_ARGS__) (__VA_ARGS__)) ) )
+        #define CO_INTERNAL_VA_ARGS_FIX( macro, args ) macro args
+        #define CO_INTERNAL_APPEND_ARGS(...)\
+            CO_INTERNAL_VA_ARGS_FIX(    CO_INTERNAL_CAT, \
+                                        ( CO_INTERNAL_FUNC_CAT, (CO_INTERNAL_APPEND_ARGS,\
+                                        CO_INTERNAL_GET_TAG(__VA_ARGS__) (__VA_ARGS__)) ) )
     #endif
 
-    #define SO_INTERNAL_STR(x) #x
+    #define CO_INTERNAL_STR(x) #x
 
-    #define SO_INTERNAL_FUNC_SIG(functionSig) \
-        SimpleOverride::Internal_ProcessFunctionSig(SO_INTERNAL_STR(functionSig))
+    #define CO_INTERNAL_FUNC_SIG(functionSig) \
+        CppOverride::Internal_ProcessFunctionSig(CO_INTERNAL_STR(functionSig))
 
     //==============================================================================
     //Public Macros
@@ -174,76 +174,76 @@ namespace SimpleOverride
     //-------------------------------------------------------
     //Return Modifying Macros for implementations
     //-------------------------------------------------------
-    #define SO_RETURN_IF_FOUND(overrideObjName, functionSig, returnType, ...)\
+    #define CO_RETURN_IF_FOUND(overrideObjName, functionSig, returnType, ...)\
     do\
     {\
         returnType returnVal;\
-        if(SO_CHECK_RETURN_OVERRIDE(overrideObjName, returnVal, functionSig, __VA_ARGS__))\
+        if(CO_CHECK_RETURN_OVERRIDE(overrideObjName, returnVal, functionSig, __VA_ARGS__))\
             return returnVal;\
     } while(0)
 
-    #define SO_RETURN_REF_IF_FOUND(overrideObjName, functionSig, returnType, ...)\
+    #define CO_RETURN_REF_IF_FOUND(overrideObjName, functionSig, returnType, ...)\
     do\
     {\
-        INTERNAL_SO_PURE_TYPE(returnType)* returnVal;\
-        if(SO_CHECK_RETURN_OVERRIDE(overrideObjName, returnVal, functionSig, __VA_ARGS__))\
+        INTERNAL_CO_PURE_TYPE(returnType)* returnVal;\
+        if(CO_CHECK_RETURN_OVERRIDE(overrideObjName, returnVal, functionSig, __VA_ARGS__))\
             return *returnVal;\
     } while(0)
 
-    #define SO_CHECK_RETURN_OVERRIDE(overrideObjName, returnRef, functionSig, ...)\
+    #define CO_CHECK_RETURN_OVERRIDE(overrideObjName, returnRef, functionSig, ...)\
         overrideObjName.Internal_CheckOverrideAndReturn(returnRef, \
-            SO_INTERNAL_FUNC_SIG(functionSig)\
-            SO_INTERNAL_APPEND_ARGS(__VA_ARGS__) )
+            CO_INTERNAL_FUNC_SIG(functionSig)\
+            CO_INTERNAL_APPEND_ARGS(__VA_ARGS__) )
 
     //-------------------------------------------------------
     //Returns Overriding Macros
     //-------------------------------------------------------
 
-    #define SO_OVERRIDE_RETURNS(overrideObjName, functionSig) \
-        overrideObjName.Internal_OverrideReturns(SO_INTERNAL_FUNC_SIG(functionSig))
+    #define CO_OVERRIDE_RETURNS(overrideObjName, functionSig) \
+        overrideObjName.Internal_OverrideReturns(CO_INTERNAL_FUNC_SIG(functionSig))
     
-    #define SO_CLEAR_OVERRIDE_RETURNS(overrideObjName, functionSig)\
-        overrideObjName.Internal_ClearOverrideReturns(SO_INTERNAL_FUNC_SIG(functionSig))
+    #define CO_CLEAR_OVERRIDE_RETURNS(overrideObjName, functionSig)\
+        overrideObjName.Internal_ClearOverrideReturns(CO_INTERNAL_FUNC_SIG(functionSig))
 
 
     //-------------------------------------------------------
     //Argument Modifying Macros for implementations
     //-------------------------------------------------------
 
-    #define SO_MODIFY_ARGS_IF_FOUND(overrideObjName, functionSig, ...)\
-        SO_CHECK_ARGS_OVERRIDE(overrideObjName, functionSig, __VA_ARGS__)
+    #define CO_MODIFY_ARGS_IF_FOUND(overrideObjName, functionSig, ...)\
+        CO_CHECK_ARGS_OVERRIDE(overrideObjName, functionSig, __VA_ARGS__)
             
-    #define SO_MODIFY_ARGS_AND_RETURN_IF_FOUND(overrideObjName, returnValue, functionSig, ...)\
+    #define CO_MODIFY_ARGS_AND_RETURN_IF_FOUND(overrideObjName, returnValue, functionSig, ...)\
     do\
     {\
-        if(SO_CHECK_ARGS_OVERRIDE(overrideObjName, functionSig, __VA_ARGS__))\
+        if(CO_CHECK_ARGS_OVERRIDE(overrideObjName, functionSig, __VA_ARGS__))\
             return returnValue;\
     } while(0)
 
-    #define SO_CHECK_ARGS_OVERRIDE(overrideObjName, functionSig, ...)\
-            overrideObjName.Internal_CheckOverrideAndSetArgs(   SO_INTERNAL_FUNC_SIG(functionSig)\
-                                                                SO_INTERNAL_APPEND_ARGS(__VA_ARGS__) )
+    #define CO_CHECK_ARGS_OVERRIDE(overrideObjName, functionSig, ...)\
+            overrideObjName.Internal_CheckOverrideAndSetArgs(   CO_INTERNAL_FUNC_SIG(functionSig)\
+                                                                CO_INTERNAL_APPEND_ARGS(__VA_ARGS__) )
 
 
     //-------------------------------------------------------
     //Argumetns Overriding Macros
     //-------------------------------------------------------
 
-    #define SO_OVERRIDE_ARGS(overrideObjName, functionSig)\
-        overrideObjName.Internal_OverrideArgs(SO_INTERNAL_FUNC_SIG(functionSig))
+    #define CO_OVERRIDE_ARGS(overrideObjName, functionSig)\
+        overrideObjName.Internal_OverrideArgs(CO_INTERNAL_FUNC_SIG(functionSig))
 
-    #define SO_CLEAR_OVERRIDE_ARGS(overrideObjName, functionSig)\
-        overrideObjName.Internal_ClearOverrideArgs(SO_INTERNAL_FUNC_SIG(functionSig))
+    #define CO_CLEAR_OVERRIDE_ARGS(overrideObjName, functionSig)\
+        overrideObjName.Internal_ClearOverrideArgs(CO_INTERNAL_FUNC_SIG(functionSig))
 
 
     //-------------------------------------------------------
     //Delacration Macros
     //-------------------------------------------------------
-    #define SO_DECLARE_MEMBER_INSTNACE(OverrideObjName) mutable SimpleOverride::Overrider OverrideObjName
-    #define SO_DECLARE_INSTNACE(OverrideObjName) SimpleOverride::Overrider OverrideObjName
+    #define CO_DECLARE_MEMBER_INSTNACE(OverrideObjName) mutable CppOverride::Overrider OverrideObjName
+    #define CO_DECLARE_INSTNACE(OverrideObjName) CppOverride::Overrider OverrideObjName
             
-    #define SO_DECLARE_OVERRIDE_METHODS(OverrideObjName)\
-    inline SimpleOverride::ArgumentsProxy Internal_OverrideArgs(std::string functionName)\
+    #define CO_DECLARE_OVERRIDE_METHODS(OverrideObjName)\
+    inline CppOverride::ArgumentsProxy Internal_OverrideArgs(std::string functionName)\
     {\
         return OverrideObjName.Internal_OverrideArgs(functionName);\
     }\
@@ -255,7 +255,7 @@ namespace SimpleOverride
     {\
         OverrideObjName.ClearAllOverrideArgs();\
     }\
-    inline SimpleOverride::ReturnProxy Internal_OverrideReturns(std::string functionName)\
+    inline CppOverride::ReturnProxy Internal_OverrideReturns(std::string functionName)\
     {\
         return OverrideObjName.Internal_OverrideReturns(functionName);\
     }\
@@ -267,36 +267,36 @@ namespace SimpleOverride
     {\
         OverrideObjName.ClearAllOverrideReturns();\
     }\
-    inline SimpleOverride::Overrider* GetOverrideObject()\
+    inline CppOverride::Overrider* GetOverrideObject()\
     {\
         return &OverrideObjName;\
     }
     
     //#if 1
-    #ifdef SO_NO_OVERRIDE
-        #undef SO_RETURN_IF_FOUND
-        #undef SO_CHECK_RETURN_OVERRIDE
-        #undef SO_OVERRIDE_RETURNS
-        #undef SO_CLEAR_OVERRIDE_RETURNS
-        #undef SO_MODIFY_ARGS_IF_FOUND
-        #undef SO_MODIFY_ARGS_AND_RETURN_IF_FOUND
-        #undef SO_CHECK_ARGS_OVERRIDE
-        #undef SO_OVERRIDE_ARGS
-        #undef SO_CLEAR_OVERRIDE_ARGS
-        #undef SO_DECLARE_INSTNACE
-        #undef SO_DECLARE_OVERRIDE_METHODS
+    #ifdef CO_NO_OVERRIDE
+        #undef CO_RETURN_IF_FOUND
+        #undef CO_CHECK_RETURN_OVERRIDE
+        #undef CO_OVERRIDE_RETURNS
+        #undef CO_CLEAR_OVERRIDE_RETURNS
+        #undef CO_MODIFY_ARGS_IF_FOUND
+        #undef CO_MODIFY_ARGS_AND_RETURN_IF_FOUND
+        #undef CO_CHECK_ARGS_OVERRIDE
+        #undef CO_OVERRIDE_ARGS
+        #undef CO_CLEAR_OVERRIDE_ARGS
+        #undef CO_DECLARE_INSTNACE
+        #undef CO_DECLARE_OVERRIDE_METHODS
     
-        #define SO_RETURN_IF_FOUND(...)
-        #define SO_CHECK_RETURN_OVERRIDE(...) SO_CHECK_RETURN_OVERRIDE
-        #define SO_OVERRIDE_RETURNS(...)
-        #define SO_CLEAR_OVERRIDE_RETURNS(...)
-        #define SO_MODIFY_ARGS_IF_FOUND(...)
-        #define SO_MODIFY_ARGS_AND_RETURN_IF_FOUND(...)
-        #define SO_CHECK_ARGS_OVERRIDE(...) false
-        #define SO_OVERRIDE_ARGS(...)
-        #define SO_CLEAR_OVERRIDE_ARGS(...)
-        #define SO_DECLARE_INSTNACE(...)
-        #define SO_DECLARE_OVERRIDE_METHODS(...)
+        #define CO_RETURN_IF_FOUND(...)
+        #define CO_CHECK_RETURN_OVERRIDE(...) CO_CHECK_RETURN_OVERRIDE
+        #define CO_OVERRIDE_RETURNS(...)
+        #define CO_CLEAR_OVERRIDE_RETURNS(...)
+        #define CO_MODIFY_ARGS_IF_FOUND(...)
+        #define CO_MODIFY_ARGS_AND_RETURN_IF_FOUND(...)
+        #define CO_CHECK_ARGS_OVERRIDE(...) false
+        #define CO_OVERRIDE_ARGS(...)
+        #define CO_CLEAR_OVERRIDE_ARGS(...)
+        #define CO_DECLARE_INSTNACE(...)
+        #define CO_DECLARE_OVERRIDE_METHODS(...)
     #endif
 }
 

@@ -1,9 +1,9 @@
-#ifndef SO_INTERNAL_RETURN_DATA_INFO_HPP
-#define SO_INTERNAL_RETURN_DATA_INFO_HPP
+#ifndef CO_INTERNAL_RETURN_DATA_INFO_HPP
+#define CO_INTERNAL_RETURN_DATA_INFO_HPP
 
 #include "./Internal_DataInfo.hpp"
 
-namespace SimpleOverride
+namespace CppOverride
 {
     struct Internal_ReturnDataInfo : public Internal_DataInfo
     {

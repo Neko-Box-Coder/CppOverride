@@ -1,10 +1,10 @@
-#ifndef SO_ARGS_INFO_HPP
-#define SO_ARGS_INFO_HPP
+#ifndef CO_ARGS_INFO_HPP
+#define CO_ARGS_INFO_HPP
 
 #include <cstddef>
 #include <functional>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     struct ArgInfo
     {

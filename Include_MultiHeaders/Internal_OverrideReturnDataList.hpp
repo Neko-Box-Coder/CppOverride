@@ -1,10 +1,10 @@
-#ifndef SO_INTERNAL_OVERRIDE_RETURN_DATA_LIST_HPP
-#define SO_INTERNAL_OVERRIDE_RETURN_DATA_LIST_HPP
+#ifndef CO_INTERNAL_OVERRIDE_RETURN_DATA_LIST_HPP
+#define CO_INTERNAL_OVERRIDE_RETURN_DATA_LIST_HPP
 
 #include <vector>
 #include "./Internal_OverrideReturnData.hpp"
 
-namespace SimpleOverride
+namespace CppOverride
 {
     struct Internal_OverrideReturnDataList
     {

@@ -1,11 +1,11 @@
-#ifndef SO_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
-#define SO_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
+#ifndef CO_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
+#define CO_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
 
 #include "./Any.hpp"
 #include "./ArgsInfo.hpp"
 #include "./PureType.hpp"
 #include <vector>
-namespace SimpleOverride
+namespace CppOverride
 {
     class Internal_ArgsTypeInfoAppender
     {
@@ -22,8 +22,8 @@ namespace SimpleOverride
                 ArgInfo curArgInfo;
                 if(!std::is_same<T, Any>())
                 {
-                    curArgInfo.ArgSize = sizeof(INTERNAL_SO_NON_CONST_T);
-                    curArgInfo.ArgTypeHash = typeid(INTERNAL_SO_NON_CONST_T).hash_code();
+                    curArgInfo.ArgSize = sizeof(INTERNAL_CO_NON_CONST_T);
+                    curArgInfo.ArgTypeHash = typeid(INTERNAL_CO_NON_CONST_T).hash_code();
                     curArgInfo.ArgSet = true;
                 }
 

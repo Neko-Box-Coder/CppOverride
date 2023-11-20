@@ -1,5 +1,5 @@
-#ifndef SO_DUMMY_CLASS_HPP
-#define SO_DUMMY_CLASS_HPP
+#ifndef CO_DUMMY_CLASS_HPP
+#define CO_DUMMY_CLASS_HPP
 
 #include <iostream>
 

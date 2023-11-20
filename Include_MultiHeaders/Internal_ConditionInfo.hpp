@@ -1,12 +1,12 @@
-#ifndef SO_INTERNAL_CONDITION_INFO_HPP
-#define SO_INTERNAL_CONDITION_INFO_HPP
+#ifndef CO_INTERNAL_CONDITION_INFO_HPP
+#define CO_INTERNAL_CONDITION_INFO_HPP
 
 #include "./ArgsInfo.hpp"
 
 #include <functional>
 #include <vector>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     struct Internal_ConditionInfo
     {

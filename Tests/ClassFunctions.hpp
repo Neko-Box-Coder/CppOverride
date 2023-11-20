@@ -1,7 +1,7 @@
-#ifndef SO_CLASS_FUNCTIONS_HPP
-#define SO_CLASS_FUNCTIONS_HPP
+#ifndef CO_CLASS_FUNCTIONS_HPP
+#define CO_CLASS_FUNCTIONS_HPP
 
-#include "SimpleOverride.hpp"
+#include "CppOverride.hpp"
 
 class Shape
 {
@@ -16,8 +16,8 @@ class Rectangle : public Shape
         float Width;
         float Height;
     public:
-        SO_DECLARE_MEMBER_INSTNACE(Overrider);
-        SO_DECLARE_OVERRIDE_METHODS(Overrider)
+        CO_DECLARE_MEMBER_INSTNACE(Overrider);
+        CO_DECLARE_OVERRIDE_METHODS(Overrider)
         
         inline bool operator ==(const Rectangle& other) const
         {
@@ -35,7 +35,7 @@ class Rectangle : public Shape
         
         inline virtual void SetWidth(float width)
         {
-            SO_MODIFY_ARGS_IF_FOUND(Overrider, 
+            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
                                     SetWidth(float), 
                                     width);
 
@@ -44,7 +44,7 @@ class Rectangle : public Shape
         
         inline virtual void SetWidth(int width)
         {
-            SO_MODIFY_ARGS_IF_FOUND(Overrider, 
+            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
                                     SetWidth(int), 
                                     width);
 
@@ -53,7 +53,7 @@ class Rectangle : public Shape
         
         inline virtual float GetWidth(float multiplier = 1.f) const
         {
-            SO_RETURN_IF_FOUND( Overrider, 
+            CO_RETURN_IF_FOUND( Overrider, 
                                 GetWidth(float), 
                                 float,
                                 multiplier);
@@ -63,7 +63,7 @@ class Rectangle : public Shape
         
         inline virtual void SetHeight(float height)
         {
-            SO_MODIFY_ARGS_IF_FOUND(Overrider, 
+            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
                                     SetHeight(float), 
                                     height);
             
@@ -72,7 +72,7 @@ class Rectangle : public Shape
         
         inline virtual void SetHeight(int height)
         {
-            SO_MODIFY_ARGS_IF_FOUND(Overrider, 
+            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
                                     SetHeight(int), 
                                     height);
             
@@ -81,7 +81,7 @@ class Rectangle : public Shape
         
         inline virtual float GetHeight(float multiplier = 1.f) const
         {
-            SO_RETURN_IF_FOUND( Overrider, 
+            CO_RETURN_IF_FOUND( Overrider, 
                                 GetHeight(float), 
                                 float,
                                 multiplier);
@@ -91,7 +91,7 @@ class Rectangle : public Shape
         
         inline virtual float GetArea(float multiplier = 1.f) const override
         {
-            SO_RETURN_IF_FOUND( Overrider, 
+            CO_RETURN_IF_FOUND( Overrider, 
                                 GetArea(float), 
                                 float,
                                 multiplier);
@@ -101,7 +101,7 @@ class Rectangle : public Shape
         
         inline virtual float GetPerimeter(float multiplier = 1.f) const override
         {
-            SO_RETURN_IF_FOUND( Overrider, 
+            CO_RETURN_IF_FOUND( Overrider, 
                                 GetPerimeter(float), 
                                 float,
                                 multiplier);
@@ -117,8 +117,8 @@ class Square : public Rectangle
         T MetaData;
     
     public:
-        SO_DECLARE_MEMBER_INSTNACE(Overrider);
-        SO_DECLARE_OVERRIDE_METHODS(Overrider)
+        CO_DECLARE_MEMBER_INSTNACE(Overrider);
+        CO_DECLARE_OVERRIDE_METHODS(Overrider)
         
         inline bool operator ==(const Square& other) const
         {
@@ -136,7 +136,7 @@ class Square : public Rectangle
         
         inline virtual void SetSize(float size)
         {
-            SO_MODIFY_ARGS_IF_FOUND(Overrider, 
+            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
                                     SetSize(float), 
                                     size);
             
@@ -146,7 +146,7 @@ class Square : public Rectangle
         
         inline virtual void SetSize(int size)
         {
-            SO_MODIFY_ARGS_IF_FOUND(Overrider, 
+            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
                                     SetSize(int), 
                                     size);
             
@@ -156,7 +156,7 @@ class Square : public Rectangle
         
         inline virtual float GetSize(float multiplier = 1.f) const
         {
-            SO_RETURN_IF_FOUND( Overrider, 
+            CO_RETURN_IF_FOUND( Overrider, 
                                 GetSize(float), 
                                 float,
                                 multiplier);
@@ -166,7 +166,7 @@ class Square : public Rectangle
         
         void SetMetaData(T metaData)
         {
-            SO_MODIFY_ARGS_IF_FOUND(Overrider, 
+            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
                                     SetMetaData(T), 
                                     metaData);
             
@@ -175,7 +175,7 @@ class Square : public Rectangle
         
         inline virtual T GetMetaData() const
         {
-            SO_RETURN_IF_FOUND( Overrider, 
+            CO_RETURN_IF_FOUND( Overrider, 
                                 GetMetaData(), 
                                 T);
             

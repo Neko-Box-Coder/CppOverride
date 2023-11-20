@@ -1,21 +1,21 @@
-#include "SimpleOverride.hpp"
+#include "CppOverride.hpp"
 #include "ssTest.hpp"
 #include "./FileFunctions.hpp"
 #include "./ClassFunctions.hpp"
 
-SimpleOverride::Overrider OverrideObj;
+CppOverride::Overrider OverrideObj;
 
 int main()
 {
     ssTEST_INIT();
     ssTEST_SET_UP
     {
-        OverrideObj = SimpleOverride::Overrider();
+        OverrideObj = CppOverride::Overrider();
     };
     
     ssTEST("Return Test")
     {
-        SO_OVERRIDE_RETURNS (OverrideObj, FuncWithConstArgs(const int, const bool, float))
+        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithConstArgs(const int, const bool, float))
                             .If
                             (
                                 [] (const std::vector<void *>& args) -> bool
@@ -39,7 +39,7 @@ int main()
     
     ssTEST("SetArgs Test")
     {
-        SO_OVERRIDE_ARGS(OverrideObj, FuncWithConstArgsAndArgsToSet(const int, 
+        CO_OVERRIDE_ARGS(OverrideObj, FuncWithConstArgsAndArgsToSet(const int, 
                                                                     const float, 
                                                                     std::string&))
                         .If
@@ -56,7 +56,7 @@ int main()
                                 return false;
                             }
                         )
-                        .SetArgs(SO_DONT_SET, SO_DONT_SET, std::string("Test String 2"));
+                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("Test String 2"));
 
         std::string testString = "";
         

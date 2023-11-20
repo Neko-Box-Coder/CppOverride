@@ -1,5 +1,5 @@
-#ifndef SO_INTERNAL_ARGS_MODIFIER_HPP
-#define SO_INTERNAL_ARGS_MODIFIER_HPP
+#ifndef CO_INTERNAL_ARGS_MODIFIER_HPP
+#define CO_INTERNAL_ARGS_MODIFIER_HPP
 
 #include "./Internal_DataInfo.hpp"
 #include "./PureType.hpp"
@@ -10,12 +10,12 @@
 #include <vector>
 #include <iostream>
 
-namespace SimpleOverride 
+namespace CppOverride 
 {
     class Internal_ArgsModifier
     {
         protected:
-            #define SO_LOG_ModifyArgs 0
+            #define CO_LOG_ModifyArgs 0
         
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
@@ -30,9 +30,9 @@ namespace SimpleOverride
             {
                 if(argsData[index].DataSet)
                 {
-                    INTERNAL_SO_NON_CONST_T& pureArg = const_cast<INTERNAL_SO_NON_CONST_T&>(arg); 
-                    pureArg = *static_cast<INTERNAL_SO_NON_CONST_T*>(argsData[index].Data);
-                    #if SO_LOG_ModifyArgs
+                    INTERNAL_CO_NON_CONST_T& pureArg = const_cast<INTERNAL_CO_NON_CONST_T&>(arg); 
+                    pureArg = *static_cast<INTERNAL_CO_NON_CONST_T*>(argsData[index].Data);
+                    #if CO_LOG_ModifyArgs
                         std::cout << "modified index: "<<index << std::endl;
                         std::cout << "typeid(arg).name(): " << typeid(arg).name() <<std::endl;
                         std::cout <<    "typeid(arg).hash_code(): " << 
@@ -79,7 +79,7 @@ namespace SimpleOverride
                                     const T& arg, 
                                     Args&... args)
             {
-                #if SO_LOG_ModifyArgs
+                #if CO_LOG_ModifyArgs
                     std::cout << "modified index: "<<index << std::endl;
                     std::cout << "typeid(arg).name(): " << typeid(arg).name() <<std::endl;
                     std::cout << "typeid(arg).hash_code(): " << typeid(arg).hash_code() <<std::endl;
@@ -104,7 +104,7 @@ namespace SimpleOverride
                                     const Any& arg, 
                                     Args&... args)
             {
-                #if SO_LOG_ModifyArgs
+                #if CO_LOG_ModifyArgs
                     std ::cout <<"Skipping ModifyArgs for index "<<index << " for Any\n";
                 #endif
                 ModifyArgs(argumentsList, argsData, ++index, args...);

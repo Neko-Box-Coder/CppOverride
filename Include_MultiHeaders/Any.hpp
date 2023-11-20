@@ -1,9 +1,9 @@
-#ifndef SO_ANY_HPP
-#define SO_ANY_HPP
+#ifndef CO_ANY_HPP
+#define CO_ANY_HPP
 
 #include <ostream>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     struct Any
     {

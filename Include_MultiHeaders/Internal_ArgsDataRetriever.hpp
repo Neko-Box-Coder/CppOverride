@@ -1,5 +1,5 @@
-#ifndef SO_INTERNAL_ARGS_DATA_RETRIEVER_HPP
-#define SO_INTERNAL_ARGS_DATA_RETRIEVER_HPP
+#ifndef CO_INTERNAL_ARGS_DATA_RETRIEVER_HPP
+#define CO_INTERNAL_ARGS_DATA_RETRIEVER_HPP
 
 #include "./Internal_ArgsTypeInfoAppender.hpp"
 #include "./Internal_ArgsValuesAppender.hpp"
@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <iostream>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     class Internal_ArgsDataRetriever
     {
@@ -26,7 +26,7 @@ namespace SimpleOverride
             Internal_ArgsTypesChecker& ArgsTypesChecker;
             Internal_ArgsValuesChecker& ArgsValuesChecker;
             
-            #define SO_LOG_GetCorrectArgumentsDataInfo 0
+            #define CO_LOG_GetCorrectArgumentsDataInfo 0
 
             template<typename... Args>
             inline int GetCorrectArgumentsDataInfo(std::string functionName, Args&... args)
@@ -38,7 +38,7 @@ namespace SimpleOverride
                     exit(1);
                 }
                 
-                #if SO_LOG_GetCorrectArgumentsDataInfo
+                #if CO_LOG_GetCorrectArgumentsDataInfo
                     std::cout <<"GetCorrectArgumentsDataInfo called\n";
                 #endif
                 
@@ -54,7 +54,7 @@ namespace SimpleOverride
                 int returnIndex = -1;
                 for(int i = 0; i < curArgData.size(); i++)
                 {
-                    #if SO_LOG_GetCorrectArgumentsDataInfo
+                    #if CO_LOG_GetCorrectArgumentsDataInfo
                         std::cout << "Checking arg data["<<i<<"]\n";
                     #endif
                     
@@ -74,7 +74,7 @@ namespace SimpleOverride
                             {
                                 argumentTypeFailedIndex = j;
                                 
-                                #if SO_LOG_GetCorrectArgumentsDataInfo
+                                #if CO_LOG_GetCorrectArgumentsDataInfo
                                     std::cout <<    "argTypeHashes.at(" << j << "): " << 
                                                     argTypeHashes.at(j) << std::endl;
                                     std::cout <<    "deRefArgumentsList[" << j << "].ArgTypeHash: " <<
@@ -103,7 +103,7 @@ namespace SimpleOverride
                     }
                     else
                     {
-                        #if SO_LOG_GetCorrectArgumentsDataInfo
+                        #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check set argument data exist\n";
                         #endif
                         continue;
@@ -111,7 +111,7 @@ namespace SimpleOverride
                     
                     if(argumentTypeFailedIndex >= 0)
                     {
-                        #if SO_LOG_GetCorrectArgumentsDataInfo
+                        #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout <<    "Failed at Check set argument data types at index " <<
                                             argumentTypeFailedIndex << std::endl;
                         #endif
@@ -125,7 +125,7 @@ namespace SimpleOverride
                                                                 0, 
                                                                 args...))
                     {
-                        #if SO_LOG_GetCorrectArgumentsDataInfo
+                        #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check parameter type\n";
                         #endif
                         continue;
@@ -138,7 +138,7 @@ namespace SimpleOverride
                                                                 0, 
                                                                 args...))
                     {
-                        #if SO_LOG_GetCorrectArgumentsDataInfo
+                        #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check parameter value\n";
                         #endif
                         
@@ -152,7 +152,7 @@ namespace SimpleOverride
                     if( curArgData[i].ArgumentsConditionInfo.DataConditionSet && 
                         !curArgData[i].ArgumentsConditionInfo.DataCondition(argumentsList))
                     {
-                        #if SO_LOG_GetCorrectArgumentsDataInfo
+                        #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check condition\n";
                         #endif
                         if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
@@ -166,7 +166,7 @@ namespace SimpleOverride
                         curArgData[i].ArgumentsConditionInfo.CalledTimes >= 
                             curArgData[i].ArgumentsConditionInfo.Times)
                     {
-                        #if SO_LOG_GetCorrectArgumentsDataInfo
+                        #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check times\n";
                         #endif
                         if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
@@ -174,7 +174,7 @@ namespace SimpleOverride
                         continue;
                     }
                     
-                    #if SO_LOG_GetCorrectArgumentsDataInfo
+                    #if CO_LOG_GetCorrectArgumentsDataInfo
                         std::cout << "Argument data found: "<<i<<"\n";
                     #endif
                     

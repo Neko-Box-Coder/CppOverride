@@ -1,5 +1,5 @@
-#ifndef SO_PROXIES_DECLARATIONS_HPP
-#define SO_PROXIES_DECLARATIONS_HPP
+#ifndef CO_PROXIES_DECLARATIONS_HPP
+#define CO_PROXIES_DECLARATIONS_HPP
 
 #include "./ProxyType.hpp"
 
@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     class Overrider;
     
@@ -22,14 +22,14 @@ namespace SimpleOverride
         
         protected:
             std::string FunctionSignatureName;
-            Overrider& SimpleOverrideObj;
+            Overrider& CppOverrideObj;
             const ProxyType FunctionProxyType;
 
         public:
             CommonProxy(std::string functionSignatureName, 
                         Overrider& SimpleOverrideObj, 
                         ProxyType functionProxyType) :  FunctionSignatureName(functionSignatureName),
-                                                        SimpleOverrideObj(SimpleOverrideObj),
+                                                        CppOverrideObj(SimpleOverrideObj),
                                                         FunctionProxyType(functionProxyType)
             {}
 
@@ -81,65 +81,65 @@ namespace SimpleOverride
             template<typename... Args>
             ArgumentsProxy& SetArgs(Args... args);
             
-            #ifndef SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL
-            #define SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(...) \
+            #ifndef CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL
+            #define CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(...) \
                 template<__VA_ARGS__>\
                 ArgumentsProxy& SetArgsByAction(std::function<void( std::vector<void*>& args)> setArgsAction);
             #endif
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(typename Arg1Type)
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(typename Arg1Type, typename Arg2Type)
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(typename Arg1Type)
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(typename Arg1Type, typename Arg2Type)
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type)
             
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type)
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type)
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type)
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type,
                                                         typename Arg7Type)
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type,
                                                         typename Arg7Type, typename Arg8Type)
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type,
                                                         typename Arg7Type, typename Arg8Type,
                                                         typename Arg9Type)
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type,
                                                         typename Arg7Type, typename Arg8Type,
                                                         typename Arg9Type, typename Arg10Type)
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type,
                                                         typename Arg7Type, typename Arg8Type,
                                                         typename Arg9Type, typename Arg10Type,
                                                         typename Arg11Type)
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type,
                                                         typename Arg7Type, typename Arg8Type,
                                                         typename Arg9Type, typename Arg10Type,
                                                         typename Arg11Type, typename Arg12Type)
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type,
                                                         typename Arg7Type, typename Arg8Type,
@@ -147,7 +147,7 @@ namespace SimpleOverride
                                                         typename Arg11Type, typename Arg12Type,
                                                         typename Arg13Type)
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type,
                                                         typename Arg7Type, typename Arg8Type,
@@ -155,7 +155,7 @@ namespace SimpleOverride
                                                         typename Arg11Type, typename Arg12Type,
                                                         typename Arg13Type, typename Arg14Type);
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type,
                                                         typename Arg7Type, typename Arg8Type,
@@ -164,7 +164,7 @@ namespace SimpleOverride
                                                         typename Arg13Type, typename Arg14Type,
                                                         typename Arg15Type);
 
-            SO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
+            CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
                                                         typename Arg5Type, typename Arg6Type,
                                                         typename Arg7Type, typename Arg8Type,

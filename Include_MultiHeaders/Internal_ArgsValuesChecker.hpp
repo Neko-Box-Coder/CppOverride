@@ -1,5 +1,5 @@
-#ifndef SO_INTERNAL_ARGS_VALUES_CHECKER_HPP
-#define SO_INTERNAL_ARGS_VALUES_CHECKER_HPP
+#ifndef CO_INTERNAL_ARGS_VALUES_CHECKER_HPP
+#define CO_INTERNAL_ARGS_VALUES_CHECKER_HPP
 
 #include "./Any.hpp"
 #include "./ArgsInfo.hpp"
@@ -7,7 +7,7 @@
 #include <vector>
 #include <iostream>
 
-namespace SimpleOverride
+namespace CppOverride
 {
     class Internal_ArgsValuesChecker
     {
@@ -18,7 +18,7 @@ namespace SimpleOverride
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex) { return true; };
 
-            #define SO_LOG_CheckArgumentsValues 0
+            #define CO_LOG_CheckArgumentsValues 0
 
             template<typename T, typename... Args>
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
@@ -26,7 +26,7 @@ namespace SimpleOverride
                                                 T& arg, 
                                                 Args&... args)
             {
-                #if SO_LOG_CheckArgumentsValues
+                #if CO_LOG_CheckArgumentsValues
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
                 #endif
@@ -37,19 +37,19 @@ namespace SimpleOverride
                 if(validArgumentsList[argIndex].ArgSet)
                 {
                     //Check Reference (Which is converted to pointer when checking)
-                    if( sizeof(INTERNAL_SO_NON_CONST_T*) == validArgumentsList[argIndex].ArgSize &&
-                        typeid(INTERNAL_SO_NON_CONST_T*).hash_code() == 
+                    if( sizeof(INTERNAL_CO_NON_CONST_T*) == validArgumentsList[argIndex].ArgSize &&
+                        typeid(INTERNAL_CO_NON_CONST_T*).hash_code() == 
                             validArgumentsList[argIndex].ArgTypeHash)
                     {
-                        if(&arg != *(INTERNAL_SO_NON_CONST_T**)(validArgumentsList[argIndex].ArgDataPointer))
+                        if(&arg != *(INTERNAL_CO_NON_CONST_T**)(validArgumentsList[argIndex].ArgDataPointer))
                             return false;
                     }
                     //Check Value
-                    else if(arg != *static_cast<INTERNAL_SO_NON_CONST_T*>(validArgumentsList[argIndex].ArgDataPointer))
+                    else if(arg != *static_cast<INTERNAL_CO_NON_CONST_T*>(validArgumentsList[argIndex].ArgDataPointer))
                         return false;
                 }
                 
-                #if SO_LOG_CheckArgumentsValues
+                #if CO_LOG_CheckArgumentsValues
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
                 #endif
@@ -66,7 +66,7 @@ namespace SimpleOverride
                                                 T*& arg, 
                                                 Args&... args)
             {
-                #if SO_LOG_CheckArgumentsValues
+                #if CO_LOG_CheckArgumentsValues
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
                 #endif
@@ -77,11 +77,11 @@ namespace SimpleOverride
                 if(validArgumentsList[argIndex].ArgSet)
                 {
                     //Check Pointer
-                    if( sizeof(INTERNAL_SO_NON_CONST_T*) == validArgumentsList[argIndex].ArgSize &&
-                        typeid(INTERNAL_SO_NON_CONST_T*).hash_code() == 
+                    if( sizeof(INTERNAL_CO_NON_CONST_T*) == validArgumentsList[argIndex].ArgSize &&
+                        typeid(INTERNAL_CO_NON_CONST_T*).hash_code() == 
                             validArgumentsList[argIndex].ArgTypeHash)
                     {
-                        if(arg != *(INTERNAL_SO_NON_CONST_T**)(validArgumentsList[argIndex].ArgDataPointer))
+                        if(arg != *(INTERNAL_CO_NON_CONST_T**)(validArgumentsList[argIndex].ArgDataPointer))
                             return false;
                     }
                     //Check Value
@@ -89,7 +89,7 @@ namespace SimpleOverride
                         return CheckArgumentsValues(validArgumentsList, argIndex, *arg, args...);
                 }
                 
-                #if SO_LOG_CheckArgumentsValues
+                #if CO_LOG_CheckArgumentsValues
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
                 #endif
@@ -103,7 +103,7 @@ namespace SimpleOverride
                                                 void*& arg, 
                                                 Args&... args)
             {
-                #if SO_LOG_CheckArgumentsValues
+                #if CO_LOG_CheckArgumentsValues
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
                 #endif
@@ -123,7 +123,7 @@ namespace SimpleOverride
                     }
                 }
                 
-                #if SO_LOG_CheckArgumentsValues
+                #if CO_LOG_CheckArgumentsValues
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
                 #endif
@@ -139,7 +139,7 @@ namespace SimpleOverride
             {
                 return CheckArgumentsValues(validArgumentsList, 
                                             argIndex, 
-                                            const_cast<INTERNAL_SO_NON_CONST_T&>(arg), 
+                                            const_cast<INTERNAL_CO_NON_CONST_T&>(arg), 
                                             args...);
             }
     };

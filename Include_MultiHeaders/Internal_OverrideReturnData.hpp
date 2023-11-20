@@ -1,11 +1,11 @@
-#ifndef SO_INTERNAL_OVERRIDE_RETURN_DATA_HPP
-#define SO_INTERNAL_OVERRIDE_RETURN_DATA_HPP
+#ifndef CO_INTERNAL_OVERRIDE_RETURN_DATA_HPP
+#define CO_INTERNAL_OVERRIDE_RETURN_DATA_HPP
 
 #include "./Internal_ConditionInfo.hpp"
 #include "./Internal_ReturnDataInfo.hpp"
 #include "./Internal_ActionInfo.hpp"
 
-namespace SimpleOverride
+namespace CppOverride
 {
     struct Internal_OverrideReturnData
     {

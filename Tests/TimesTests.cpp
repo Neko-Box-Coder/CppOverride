@@ -1,21 +1,21 @@
-#include "SimpleOverride.hpp"
+#include "CppOverride.hpp"
 #include "ssTest.hpp"
 #include "./FileFunctions.hpp"
 #include "./ClassFunctions.hpp"
 
-SimpleOverride::Overrider OverrideObj;
+CppOverride::Overrider OverrideObj;
 
 int main()
 {
     ssTEST_INIT();
     ssTEST_SET_UP
     {
-        OverrideObj = SimpleOverride::Overrider();
+        OverrideObj = CppOverride::Overrider();
     };
     
     ssTEST("Return With One Override Test")
     {
-        SO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
+        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
                             .Times(3)
                             .Returns(1);
 
@@ -30,17 +30,17 @@ int main()
     
     ssTEST("Return With Multiple Overrides Test")
     {
-        SO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
+        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
                             .WhenCalledWith(1, true, 2.f)
                             .Times(1)
                             .Returns(1);
         
-        SO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
+        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
                             .Times(1)
                             .WhenCalledWith(2, false, 3.f)
                             .Returns(2);
         
-        SO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
+        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
                             .Times(2)
                             .WhenCalledWith(3, true, 4.f)
                             .Returns(3);
@@ -60,10 +60,10 @@ int main()
     {
         DummyClass assignObject = DummyClass(2, 3.0, "test2");
         
-        SO_OVERRIDE_ARGS(OverrideObj, SetObjectFunc(int, double, std::string, DummyClass&))
-                        .WhenCalledWith(10, 20.0, std::string("test10"), SO_ANY)
+        CO_OVERRIDE_ARGS(OverrideObj, SetObjectFunc(int, double, std::string, DummyClass&))
+                        .WhenCalledWith(10, 20.0, std::string("test10"), CO_ANY)
                         .Times(2)
-                        .SetArgs(SO_DONT_SET, SO_DONT_SET, SO_DONT_SET, assignObject);
+                        .SetArgs(CO_DONT_SET, CO_DONT_SET, CO_DONT_SET, assignObject);
 
         
         DummyClass testObject;
@@ -81,20 +81,20 @@ int main()
     
     ssTEST("SetArg With Multiple Overrides Test")
     {
-        SO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
-                        .WhenCalledWith(1, 2.f, SO_ANY)
+        CO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
+                        .WhenCalledWith(1, 2.f, CO_ANY)
                         .Times(1)
-                        .SetArgs(SO_DONT_SET, SO_DONT_SET, std::string("test"));
+                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("test"));
 
-        SO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
-                        .WhenCalledWith(2, 3.f, SO_ANY)
+        CO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
+                        .WhenCalledWith(2, 3.f, CO_ANY)
                         .Times(1)
-                        .SetArgs(SO_DONT_SET, SO_DONT_SET, std::string("test2"));
+                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("test2"));
 
-        SO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
-                        .WhenCalledWith(3, 4.f, SO_ANY)
+        CO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
+                        .WhenCalledWith(3, 4.f, CO_ANY)
                         .Times(2)
-                        .SetArgs(SO_DONT_SET, SO_DONT_SET, std::string("test3"));
+                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("test3"));
 
         float testFloat = 4.f;
         std::string testString = "";
