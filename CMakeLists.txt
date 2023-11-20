@@ -72,7 +72,7 @@ if(CPP_OVERRIDE_BUILD_TEST)
 endif()
 
 if(CPP_OVERRIDE_BUILD_EXAMPLE)
-    #add_executable(CppOverrideExample "${CMAKE_CURRENT_LIST_DIR}/Example.cpp")
-    #target_link_libraries(CppOverrideExample PUBLIC CppOverride)
+    add_executable(CppOverrideExample "${CMAKE_CURRENT_LIST_DIR}/Example.cpp")
+    target_link_libraries(CppOverrideExample PUBLIC CppOverride)
 endif()
 

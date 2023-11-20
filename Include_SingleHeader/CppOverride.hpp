@@ -2646,6 +2646,8 @@ namespace CppOverride
     #define CO_CLEAR_OVERRIDE_RETURNS(overrideObjName, functionSig)\
         overrideObjName.Internal_ClearOverrideReturns(CO_INTERNAL_FUNC_SIG(functionSig))
 
+    #define CO_CLEAR_ALL_OVERRIDE_RETURNS(overrideObjName) \
+        overrideObjName.ClearAllOverrideReturns()
 
     //-------------------------------------------------------
     //Argument Modifying Macros for implementations
@@ -2676,6 +2678,8 @@ namespace CppOverride
     #define CO_CLEAR_OVERRIDE_ARGS(overrideObjName, functionSig)\
         overrideObjName.Internal_ClearOverrideArgs(CO_INTERNAL_FUNC_SIG(functionSig))
 
+    #define CO_CLEAR_ALL_OVERRIDE_ARGS(overrideObjName)\
+        overrideObjName.ClearAllOverrideArgs()
 
     //-------------------------------------------------------
     //Delacration Macros

@@ -1,8 +1,17 @@
 ## Cpp Override
 
-A simple framework for overriding function behaviours.
+A Framework that allows you to override function behaviours
 
-This allows overriding return value or setting arguments, similar to mocking but more flexible
+Which allows you to mock classes without:
+- Virtual Classes
+- Crowding your project with Mock Classes
+- Breaking C++ Standard
+
+Or just to alter the behaviour of a function you want. 
+
+This is like mocking but more flexible.
+
+Of course, you can still have a mock class using this framework.
 
 ---
 
@@ -13,14 +22,17 @@ CO_DECLARE_INSTNACE(OverrideInstanceName);
 ```
 #### Class Member Variable
 ```cpp
-class DummyClassMock
+class YourClass
 {
     private:
         CO_DECLARE_MEMBER_INSTNACE(OverrideInstanceName);
-    //...
+        
+        //Other variables for your class...
+    
     public:
         CO_DECLARE_OVERRIDE_METHODS(OverrideInstanceName);
-    //...
+        
+        //Other methods for your class...
 };
 ```
 
@@ -29,34 +41,58 @@ class DummyClassMock
 ### Override Implementations
 #### Override Implementation Return Value
 ```cpp
-CO_RETURN_IF_FOUND( [Override Instance Name], 
-                    [Function Name]([Args Types...]), 
-                    [Args Names...]);
+CO_RETURN_IF_FOUND( <Override Instance Name>, 
+                    <Function Name>(<Args Types...>), 
+                    <Return Type>,
+                    <Args Names...>);
+//or
+CO_RETURN_REF_IF_FOUND( <Override Instance Name>)
+                        <Function Name>(<Args Types...>), 
+                        <Return Type>,
+                        <Args Names...>);
 ```
 
 Example:
 ```cpp
 int OverrideMyReturnValue(int value1, float value2)
 {
-    CO_RETURN_IF_FOUND(OverrideInstanceName, 
-                       OverrideMyReturnValue(int, float), 
-                       value, 
-                       value2);
+    CO_RETURN_IF_FOUND( OverrideInstanceName, 
+                        OverrideMyReturnValue(int, float), 
+                        int,
+                        value1, 
+                        value2);
+    
+    //The rest of the implementations...
+    
     return 0;
 }
 ```
+or
+```cpp
+int& OverrideMyReturnRef(int value1, float value2)
+{
+    CO_RETURN_REF_IF_FOUND( OverrideInstanceName, 
+                            OverrideMyReturnRef(int, float), 
+                            int,
+                            value1, 
+                            value2);
+    
+    //The rest of the implementations...
+    
+    return SomeRef;
+}
+```
+
 #### Override Implementation Argument Values
 ```cpp
-CO_MODIFY_ARGS_IF_FOUND([Override Instance Name], 
-                        [Function Name]([Args Types...]), 
-                        [Args Names...]);
-
+CO_MODIFY_ARGS_IF_FOUND(<Override Instance Name>, 
+                        <Function Name>(<Args Types...>), 
+                        <Args Names...>);
 //or
-
-CO_MODIFY_ARGS_AND_RETURN_IF_FOUND( [Override Instance Name], 
-                                    [Return Value],
-                                    [Function Name]([Args Types...]), 
-                                    [Args Names...]);
+CO_MODIFY_ARGS_AND_RETURN_IF_FOUND( <Override Instance Name>, 
+                                    <Return Value>,
+                                    <Function Name>(<Args Types...>), 
+                                    <Args Names...>);
 ```
 
 Examples:
@@ -87,30 +123,44 @@ bool OverrideMyArgsWithStstus(float& value1, int* value2)
 ---
 
 ### Override Functions
+
 #### Override Returns
 ```cpp
-CO_OVERRIDE_RETURNS([Override Instance Name], [Function Name]([Args Types...]))
-                   .Returns([Return Value]);
+CO_OVERRIDE_RETURNS (<Override Instance Name>, <Function Name>(<Args Types...>))
+                    .Returns(<Return Value>);
+//or
+CO_OVERRIDE_RETURNS (<Override Instance Name>, <Function Name>(<Args Types...>))
+                    .ReturnsReference(<Return Reference>);
 ```
 Example:
 ```cpp
-CO_OVERRIDE_RETURNS(OverrideInstanceName, OverrideMyReturnValue(int, float))
-                   .Returns(1);
+CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+                    .Returns(1);
+//or
+int returnRef = 1;
+CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnRef(int, float))
+                    .ReturnsReference(returnRef);
 ```
 #### Override Arguments Values
 ```cpp
-CO_OVERRIDE_ARGS([Override Instance Name], [Function Name]([Args Types...]))
-                .SetArgs([Args Values...]);
+CO_OVERRIDE_ARGS(<Override Instance Name>, <Function Name>(<Args Types...>))
+                .SetArgs(<Args Values...>);
 ```
 Example:
 ```cpp
 CO_OVERRIDE_ARGS(OverrideInstanceName, OverrideMyArgs(float&, int*))
                 .SetArgs(1.f, 3);
 ```
+
+> When Overriding types that can promote/demote, match the type **exactly**
+
+> For example, `std::string("test")` instead of `"test"` for a function that accepts string
+> Similarly, `2.f` instaed of `2.0` for a function that accepts float
+
 #### Override Returns With Action Lambda
 ```cpp
-CO_OVERRIDE_RETURNS(OverrideInstanceName, OverrideMyReturnValue(int, float))
-                   .ReturnsByAction
+CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+                    .ReturnsByAction<int>
                     ( 
                         [](const std::vector<void*>& args, void* out)
                         { 
@@ -118,33 +168,28 @@ CO_OVERRIDE_RETURNS(OverrideInstanceName, OverrideMyReturnValue(int, float))
                         }
                     );
 ```
+
 #### Override Arguments With Action Lambda
 ```cpp
 CO_OVERRIDE_ARGS(OverrideInstanceName, OverrideMyArgs(float&, int*))
-                .SetArgByAction //First Argument
+                .SetArgsByAction<float&, int*>
                 (
-                    [](const std::vector<void*>& args, void* currentArg)
+                    [](std::vector<void*>& args)
                     {
-                        *static_cast<float*>(currentArg) = 1.f;
-                    }
-                )
-                .SetArgByAction //Second Argument
-                (
-                    [](const std::vector<void*>& args, void* currentArg)
-                    {
-                        *static_cast<float*>(currentArg) = 2;
+                        *static_cast<float*>(args.at(0)) = 1.f;
+                        **static_cast<int**>(args.at(1)) = 2;
                     }
                 );
 ```
 
 ---
 
-### Specify Override Rules
+### Override Rules
 #### When Called With
 ```cpp
-CO_OVERRIDE_RETURNS(OverrideInstanceName, OverrideMyReturnValue(int, float))
-                   .WhenCalledWith(2, 3.f)
-                   .Returns(1);
+CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+                    .WhenCalledWith(2, 3.f)
+                    .Returns(1);
 
 int ret1 = OverrideMyReturnValue(2, 3.f);   //Returns 1
 int ret2 = OverrideMyReturnValue(1, 2.f);   //Won't return 1
@@ -167,12 +212,12 @@ OverrideMyArgs(testFloat, &testInt);    //The argument values are still 2.f and 
 
 #### If Condition Lambda
 ```cpp
-CO_OVERRIDE_RETURNS(OverrideInstanceName, OverrideMyReturnValue(int, float))
-                   .If
+CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+                    .If
                     (
                         [](const std::vector<void*>& args)
                         {
-                            if(*static_cast<int*>(args.at(0) == 1)
+                            if(*static_cast<int*>(args.at(0)) == 1)
                                 return true;
                             else
                                 return false;
@@ -185,11 +230,34 @@ int ret2 = OverrideMyReturnValue(2, 3.f);   //Won't return 1
 ```
 
 #### When Called Expectedly Do Lambda
-
-
+```cpp
+bool called = false;
+CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+                    .WhenCalledWith(2, 3.f)
+                    .Returns(1)
+                    .WhenCalledExpectedly_Do
+                    (
+                        [&called](const std::vector<void*>& args)
+                        {
+                            called = true;
+                        }
+                    );
+```
 
 #### Otherwise Do Lambda
-
+```cpp
+bool called = false;
+CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+                    .WhenCalledWith(2, 3.f)
+                    .Returns(1)
+                    .Otherwise_Do
+                    (
+                        [&called](const std::vector<void*>& args)
+                        {
+                            called = true;
+                        }
+                    );
+```
 
 
 
