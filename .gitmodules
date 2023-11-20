@@ -1,0 +1,3 @@
+[submodule "External/ssTest"]
+	path = External/ssTest
+	url = https://github.com/Neko-Box-Coder/ssTest.git
