@@ -19,8 +19,9 @@ set(CPP_OVERRIDE_BUILD_EXAMPLE "ON" CACHE BOOL "Build tests for CppOverride")
 set(CPP_OVERRIDE_BUILD_TEST "OFF" CACHE BOOL "Build tests for CppOverride")
 set(CPP_OVERRIDE_USE_SINGLE_HEADER "ON" CACHE BOOL "Use single header version instead")
 
-
 add_library(CppOverride INTERFACE)
+
+add_executable(GenerateSingleHeader "${CMAKE_CURRENT_LIST_DIR}/Scripts/GenerateSingleHeader.cpp")
 
 if(CPP_OVERRIDE_USE_SINGLE_HEADER)
     target_include_directories(CppOverride INTERFACE "${CMAKE_CURRENT_LIST_DIR}/Include_SingleHeader")
@@ -56,6 +57,17 @@ if(CPP_OVERRIDE_BUILD_TEST)
     
     add_executable(WhenCalledExpectedly_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledExpectedly_DoTests.cpp")
     target_link_libraries(WhenCalledExpectedly_DoTests PUBLIC CppOverride ssTest)
+
+    if(WIN32)
+        file(   COPY "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat"
+                DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+        #execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${CMAKE_CURRENT_LIST_DIR}/AutoTests/RunAllTests.bat" "${CMAKE_CURRENT_BINARY_DIR}/AutoTests/RunAllTests.bat")
+    else()
+        file(   CHMOD "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.sh"
+                PERMISSIONS  OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink  "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.sh" 
+                                                                    "${CMAKE_CURRENT_BINARY_DIR}/RunAllTests.sh")
+    endif()
 
 endif()
 
