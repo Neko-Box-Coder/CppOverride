@@ -2,18 +2,93 @@
 
 A Framework that allows you to override function behaviours
 
-Which allows you to mock classes without:
-- Virtual Classes
-- Crowding your project with Mock Classes
-- Breaking C++ Standard
+- Which allows you to mock classes without:
+    - Virtual Classes
+    - Crowding your project with Mock Classes
+    - Breaking C++ Standard
 
-Or just to alter the behaviour of a function you want. 
+You can also just alter the behaviour of a function you want.
 
 This is like mocking but more flexible.
 
-Of course, you can still have a mock class using this framework.
+Of course, you still have the flexibility to create mock classes
 
 ---
+
+<!-- Links to all the headings -->
+### Table of Contents
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+    - [Declare Override Instance](#declare-override-instance)
+        - [Global / File Scope](#global-file-scope)
+        - [Class Member Variable](#class-member-variable)
+    - [Add Override Implementations](#add-override-implementations)
+        - [Add Override Return Value](#add-override-return-value)
+        - [Add Override Argument Values](#add-override-argument-values)
+    - [Disable Overrides](#disable-overrides)
+    - [Control Override Functions](#control-override-functions)
+        - [Override Returns](#override-returns)
+        - [Override Arguments Values](#override-arguments-values)
+        - [Override Returns With Action Lambda](#override-returns-with-action-lambda)
+        - [Override Arguments With Action Lambda](#override-arguments-with-action-lambda)
+    - [Override Rules](#override-rules)
+        - [When Called With](#when-called-with)
+        - [Times](#times)
+        - [If Condition Lambda](#if-condition-lambda)
+        - [When Called Expectedly Do Lambda](#when-called-expectedly-do-lambda)
+        - [Otherwise Do Lambda](#otherwise-do-lambda)
+
+---
+
+### Installation
+
+- Header Only
+    - Just include `CppOverride.hpp` in `Include_SingleHeader` or `Include_MultiHeader`
+- CMake
+    - `AddSubDirectory(CppOverride)`
+    - `TargetLinkLibrary(YourTarget CppOverride)`
+
+- C++ 11 Compatible
+
+---
+
+### Quick Start
+
+```cpp
+int DummyFunction(int value1)
+{
+    CO_RETURN_IF_FOUND( OverrideInstanceName, 
+                        DummyFunction(int), 
+                        int,
+                        value1);
+    
+    return value1;
+}
+
+int main()
+{
+    CO_OVERRIDE_RETURNS (OverrideInstanceName, DummyFunction(int))
+                        .WhenCalledWith(5)
+                        .Time(1)
+                        .Returns(1);
+    
+    //DummyFunction(0): 0
+    std::cout << "DummyFunction(0): " << DummyFunction(0) << std::endl;
+    
+    //DummyFunction(5): 1
+    std::cout << "DummyFunction(5): " << DummyFunction(5) << std::endl;
+    
+    //DummyFunction(5): 5
+    std::cout << "DummyFunction(5): " << DummyFunction(5) << std::endl;
+    
+    return 0;
+}
+```
+
+---
+
+### Usage
 
 ### Declare Override Instance
 #### Global / File Scope
@@ -38,8 +113,8 @@ class YourClass
 
 ---
 
-### Override Implementations
-#### Override Implementation Return Value
+### Add Override Implementations
+#### Add Override Return Value
 ```cpp
 CO_RETURN_IF_FOUND( <Override Instance Name>, 
                     <Function Name>(<Args Types...>), 
@@ -83,7 +158,7 @@ int& OverrideMyReturnRef(int value1, float value2)
 }
 ```
 
-#### Override Implementation Argument Values
+#### Add Override Argument Values
 ```cpp
 CO_MODIFY_ARGS_IF_FOUND(<Override Instance Name>, 
                         <Function Name>(<Args Types...>), 
@@ -120,9 +195,15 @@ bool OverrideMyArgsWithStstus(float& value1, int* value2)
 }
 ```
 
+### Disable Overrides
+```cpp
+//Just define CO_NO_OVERRIDE before including "CppOverride.hpp" or in compile definitions
+#define CO_NO_OVERRIDE
+```
+
 ---
 
-### Override Functions
+### Control Override Functions
 
 #### Override Returns
 ```cpp
@@ -155,6 +236,7 @@ CO_OVERRIDE_ARGS(OverrideInstanceName, OverrideMyArgs(float&, int*))
 > When Overriding types that can promote/demote, match the type **exactly**
 
 > For example, `std::string("test")` instead of `"test"` for a function that accepts string
+
 > Similarly, `2.f` instaed of `2.0` for a function that accepts float
 
 #### Override Returns With Action Lambda
