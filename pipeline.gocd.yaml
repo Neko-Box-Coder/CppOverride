@@ -1,0 +1,162 @@
+format_version: 10
+pipelines:
+  CppOverridePipeline:
+    group: MainGroup
+    label_template: ${COUNT}
+    lock_behavior: none
+    display_order: -1
+    environment_variables:
+      USER_ORIGIN: "Neko-Box-Coder"
+      BRANCH: "master"
+    materials:
+      DummyMaterial:
+        git: https://github.com/Neko-Box-Coder/CppOverride.git
+        branch: Dummy
+        shallow_clone: true
+        auto_update: false
+        destination: ""
+    stages:
+    - CheckoutStage:
+        fetch_materials: false
+        keep_artifacts: false
+        clean_workspace: true
+        approval:
+          type: success
+          allow_only_on_success: true
+        jobs:
+          CheckoutJob:
+            artifacts:
+            - build:
+                source: CppOverride/*
+                destination: CppOverride
+            tasks:
+            - exec:
+                run_if: passed
+                command: echo
+                arguments:
+                - Fetching/Creating cache...
+            - exec:
+                run_if: passed
+                command: sh
+                arguments:
+                - -c
+                - mkdir -p ~/.gitcache
+            - plugin:
+                configuration:
+                  id: script-executor
+                  version: "1"
+                options:
+                  script: |+
+                    set -e
+
+                    if [[] ! -d ~/.gitcache/CppOverride ]]; then
+                      cd ~/.gitcache && git clone --verbose --recursive "https://github.com/neko-box-coder/CppOverride.git"
+                    fi
+                    
+                    ls -lah ~/.gitcache
+                  shtype: bash
+                run_if: passed
+            - exec:
+                run_if: passed
+                command: sh
+                arguments:
+                - -c
+                - cd ~/.gitcache/CppOverride && git pull --verbose --no-edit --ff-only origin $(git branch --show-current)
+            - exec:
+                run_if: passed
+                command: sh
+                arguments:
+                - -c
+                - echo Checking out branch "$BRANCH" at user "$USER_ORIGIN"
+            - exec:
+                run_if: passed
+                command: sh
+                arguments:
+                - -c
+                - git clone --verbose --reference ~/.gitcache/CppOverride --recursive -b "$BRANCH" "https://github.com/$USER_ORIGIN/CppOverride.git"
+    - BuildStage:
+        fetch_materials: false
+        keep_artifacts: false
+        clean_workspace: true
+        approval:
+          type: success
+          allow_only_on_success: true
+        jobs:
+          LinuxBuildJob:
+            artifacts:
+            - build:
+                source: CppOverride/Build/*
+                destination: CppOverrideLinucBuild
+            tasks:
+            - fetch:
+                is_file: false
+                run_if: passed
+                source: CppOverride
+                destination: ''
+                pipeline: CppOverridePipeline
+                stage: CheckoutStage
+                job: CheckoutJob
+                artifact_origin: gocd
+            - exec:
+                run_if: passed
+                command: mkdir
+                working_directory: ./CppOverride
+                arguments:
+                - ./Build
+            - exec:
+                run_if: passed
+                command: cmake
+                working_directory: ./CppOverride/Build
+                arguments:
+                - ".."
+                - "-DCPP_OVERRIDE_BUILD_EXAMPLE=ON"
+                - "-DCPP_OVERRIDE_BUILD_TEST=ON"
+                - "-DCPP_OVERRIDE_USE_SINGLE_HEADER=ON"
+            - exec:
+                run_if: passed
+                command: cmake
+                working_directory: ./CppOverride/Build
+                arguments:
+                - "--build"
+                - "."
+                - "-j"
+                - "16"
+    - TestStage:
+        fetch_materials: false
+        keep_artifacts: false
+        clean_workspace: true
+        approval:
+          type: success
+          allow_only_on_success: true
+        jobs:
+          LinuxTest:
+            tasks:
+            - fetch:
+                is_file: false
+                run_if: passed
+                source: CppOverrideLinucBuild
+                destination: ''
+                pipeline: CppOverridePipeline
+                stage: BuildStage
+                job: LinuxBuildJob
+                artifact_origin: gocd
+            - exec:
+                run_if: passed
+                command: chmod
+                working_directory: ./CppOverrideLinucBuild/
+                arguments:
+                - "+x"
+                - "./RunAllTests.sh"
+            - exec:
+                run_if: passed
+                command: ls
+                working_directory: ./CppOverrideLinucBuild/
+                arguments:
+                - "-lah"
+            - exec:
+                run_if: passed
+                command: sh
+                working_directory: ./CppOverrideLinucBuild/
+                arguments:
+                - "-c"
+                - "./RunAllTests.sh"
