@@ -18,7 +18,7 @@ project(CppOverrideProject)
 set(CPP_OVERRIDE_BUILD_EXAMPLE "ON" CACHE BOOL "Build tests for CppOverride")
 set(CPP_OVERRIDE_BUILD_TEST "OFF" CACHE BOOL "Build tests for CppOverride")
 set(CPP_OVERRIDE_USE_SINGLE_HEADER "ON" CACHE BOOL "Use single header version instead")
-
+ 
 add_library(CppOverride INTERFACE)
 
 add_executable(GenerateSingleHeader "${CMAKE_CURRENT_LIST_DIR}/Scripts/GenerateSingleHeader.cpp")
