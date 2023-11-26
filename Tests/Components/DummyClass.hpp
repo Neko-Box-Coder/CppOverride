@@ -82,7 +82,7 @@ class TemplateDummy : public DummyClass
         {}
         
         //Copy constructor using assignment operator
-        inline TemplateDummy(const TemplateDummy<T>& other)
+        inline TemplateDummy(const TemplateDummy<T>& other) : DummyClass()
         {
             *this = other;
         }

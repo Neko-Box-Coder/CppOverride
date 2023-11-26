@@ -31,6 +31,12 @@ else()
     #target_sources(CppOverride INTERFACE "${CMAKE_CURRENT_LIST_DIR}/Include/CppOverride.hpp")
 endif()
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(STANDARD_COMPILE_FLAGS "/utf-8;/W1")
+else()
+    set(STANDARD_COMPILE_FLAGS "-Wall;-Wno-return-local-addr;-Wno-sign-compare;-Wno-unused-variable;-Wno-unused-parameter;-Wno-switch;-Wextra;-pedantic;-Werror")
+endif()
+
 if(CPP_OVERRIDE_BUILD_TEST)
     if(NOT TARGET ssTest)
         add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/ssTest" "${CMAKE_CURRENT_BINARY_DIR}/ssTest")
@@ -58,10 +64,18 @@ if(CPP_OVERRIDE_BUILD_TEST)
     add_executable(WhenCalledExpectedly_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledExpectedly_DoTests.cpp")
     target_link_libraries(WhenCalledExpectedly_DoTests PUBLIC CppOverride ssTest)
 
+    target_compile_options(ModifyReturnsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    target_compile_options(ModifyArgsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    target_compile_options(WhenCalledWithTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    target_compile_options(TimesTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    target_compile_options(IfTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    target_compile_options(Otherwise_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    target_compile_options(WhenCalledExpectedly_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+
+
     if(WIN32)
         file(   COPY "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat"
                 DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-        #execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${CMAKE_CURRENT_LIST_DIR}/AutoTests/RunAllTests.bat" "${CMAKE_CURRENT_BINARY_DIR}/AutoTests/RunAllTests.bat")
     else()
         file(   CHMOD "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.sh"
                 PERMISSIONS  OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
@@ -73,6 +87,7 @@ endif()
 
 if(CPP_OVERRIDE_BUILD_EXAMPLE)
     add_executable(CppOverrideExample "${CMAKE_CURRENT_LIST_DIR}/Example.cpp")
+    target_compile_options(CppOverrideExample PUBLIC ${STANDARD_COMPILE_FLAGS})
     target_link_libraries(CppOverrideExample PUBLIC CppOverride)
 endif()
 

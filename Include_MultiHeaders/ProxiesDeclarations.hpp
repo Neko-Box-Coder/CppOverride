@@ -153,7 +153,7 @@ namespace CppOverride
                                                         typename Arg7Type, typename Arg8Type,
                                                         typename Arg9Type, typename Arg10Type,
                                                         typename Arg11Type, typename Arg12Type,
-                                                        typename Arg13Type, typename Arg14Type);
+                                                        typename Arg13Type, typename Arg14Type)
 
             CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
@@ -162,7 +162,7 @@ namespace CppOverride
                                                         typename Arg9Type, typename Arg10Type,
                                                         typename Arg11Type, typename Arg12Type,
                                                         typename Arg13Type, typename Arg14Type,
-                                                        typename Arg15Type);
+                                                        typename Arg15Type)
 
             CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_DECL(  typename Arg1Type, typename Arg2Type, 
                                                         typename Arg3Type, typename Arg4Type,
@@ -171,7 +171,7 @@ namespace CppOverride
                                                         typename Arg9Type, typename Arg10Type,
                                                         typename Arg11Type, typename Arg12Type,
                                                         typename Arg13Type, typename Arg14Type,
-                                                        typename Arg15Type, typename Arg16Type);
+                                                        typename Arg15Type, typename Arg16Type)
     };
 }
 
