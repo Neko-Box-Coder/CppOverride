@@ -1,7 +1,6 @@
 #ifndef CO_FILE_FUNCTIONS_HPP
 #define CO_FILE_FUNCTIONS_HPP
 
-#include "./Components/ComplexClass.hpp"
 #include "./Components/DummyClass.hpp"
 #include "CppOverride.hpp"
 
@@ -35,12 +34,6 @@ inline int FuncWithConstArgs(const int testArg, const bool testArg2, float testA
     return -1;
 }
 
-inline void* FuncWIthVoidPointer(int testArg, void* testArg2)
-{
-    CO_RETURN_IF_FOUND(OverrideObj, FuncWIthVoidPointer(int, void*), void*, testArg, testArg2);
-    return nullptr;
-}
-
 inline void FuncWithArgsToSet(int testArg, float* testArg2, std::string& testArg3)
 {
     CO_MODIFY_ARGS_IF_FOUND(OverrideObj, 
@@ -61,17 +54,6 @@ inline void FuncWithConstArgsAndArgsToSet(  const int testArg,
                             testArg, 
                             testArg2, 
                             testArg3);
-}
-
-template<typename T>
-inline int TemplateFunction(T testArg)
-{
-    CO_RETURN_IF_FOUND( OverrideObj, 
-                        template<typename T> int TemplateFunctionTest(T),
-                        int,
-                        testArg);
-
-    return -1;
 }
 
 inline DummyClass ReturnObjectFunc(int data, double value, std::string name)
@@ -141,25 +123,6 @@ inline T ReturnTemplateObjectFunc(T testArg)
                         T, 
                         testArg);
 
-    #if 0
-    do {
-      constexpr bool isFundamental = std::is_fundamental<T>::value;
-      constexpr bool checkSuccess = isFundamental ? 
-                                    true :
-                                    std::is_default_constructible<T>::value &&
-                                    std::is_copy_constructible<T>::value;
-      static_assert(checkSuccess, "Test");
-      
-      T returnVal;
-      if (OverrideObj.Internal_CheckOverrideAndReturn(
-              returnVal,
-              SimpleOverride ::Internal_ProcessFunctionSig(
-                  "ReturnTemplateObjectFunc(T)"),
-              testArg))
-        return returnVal;
-    } while (0);
-    #endif
-
     return testArg;
 }
 
@@ -192,6 +155,33 @@ inline int* ReturnPointerFunc(int a)
                         a);
 
     return nullptr;
+}
+
+inline void SetNonAssignableArgFunc(NonCopyAssignableDummy* testArg)
+{
+    CO_MODIFY_ARGS_IF_FOUND(OverrideObj, 
+                            SetNonAssignableArgFunc(NonCopyAssignableDummy*), 
+                            testArg);
+}
+
+inline void SetArgWithConstArgFunc(int* testArg, bool* testArg2, const float* testArg3)
+{
+    CO_MODIFY_ARGS_IF_FOUND(OverrideObj, 
+                            SetArgWithConstArgFunc(int*, bool*, const float*), 
+                            testArg, 
+                            testArg2, 
+                            testArg3);
+}
+
+inline int ConstVoidPointerFunc(const void* testArg, int testArg2)
+{
+    CO_RETURN_IF_FOUND( OverrideObj, 
+                        ConstVoidPointerFunc(const void*, int), 
+                        int, 
+                        testArg, 
+                        testArg2);
+
+    return -1;
 }
 
 #endif

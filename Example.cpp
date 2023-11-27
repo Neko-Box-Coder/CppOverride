@@ -240,6 +240,23 @@ void OtherwiseDoLambdaExample()
     ResetAll();
 }
 
+void AssignStatusExample()
+{
+    CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
+    CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+                        .WhenCalledWith(2, 3.f)
+                        .Returns(1)
+                        .AssignStatus(status);
+    
+    int ret1 = OverrideMyReturnValue(1, 2.f);
+    
+    //status will be OverrideStatus::MATCHING_CONDITION_VALUE_FAILED
+    
+    CO_QUICK_ASSERT(status == CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
+
+    ResetAll();
+}
+
 int main(int argc, char** argv)
 {
     OverrideReturnsExample();
@@ -257,6 +274,8 @@ int main(int argc, char** argv)
     WhenCalledExpectedlyDoLambdaExample();
     
     OtherwiseDoLambdaExample();
+    
+    AssignStatusExample();
     
     std::cout << "All examples are running correctly" << std::endl;
     

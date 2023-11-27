@@ -1,7 +1,7 @@
 #ifndef CO_PROXIES_DECLARATIONS_HPP
 #define CO_PROXIES_DECLARATIONS_HPP
 
-#include "./ProxyType.hpp"
+#include "./OverrideStatus.hpp"
 
 #include <functional>
 #include <string>
@@ -23,14 +23,11 @@ namespace CppOverride
         protected:
             std::string FunctionSignatureName;
             Overrider& CppOverrideObj;
-            const ProxyType FunctionProxyType;
 
         public:
             CommonProxy(std::string functionSignatureName, 
-                        Overrider& SimpleOverrideObj, 
-                        ProxyType functionProxyType) :  FunctionSignatureName(functionSignatureName),
-                                                        CppOverrideObj(SimpleOverrideObj),
-                                                        FunctionProxyType(functionProxyType)
+                        Overrider& SimpleOverrideObj) : FunctionSignatureName(functionSignatureName),
+                                                        CppOverrideObj(SimpleOverrideObj)
             {}
 
             DeriveType& Times(int times);
@@ -42,7 +39,10 @@ namespace CppOverride
 
             DeriveType& Otherwise_Do(std::function<void(const std::vector<void*>& args)> action);
 
-            DeriveType& WhenCalledExpectedly_Do(std::function<void(const std::vector<void*>& args)> action);
+            DeriveType& 
+                WhenCalledExpectedly_Do(std::function<void(const std::vector<void*>& args)> action);
+            
+            DeriveType& AssignStatus(OverrideStatus& status);
     };
 
     //Override return proxy class for method chaining
@@ -50,10 +50,8 @@ namespace CppOverride
     {
         public:
             ReturnProxy(std::string functionSignatureName, 
-                        Overrider& SimpleOverrideObj, 
-                        ProxyType functionProxyType) : CommonProxy( functionSignatureName, 
-                                                                    SimpleOverrideObj, 
-                                                                    functionProxyType) 
+                        Overrider& SimpleOverrideObj) : CommonProxy(functionSignatureName, 
+                                                                    SimpleOverrideObj) 
             {}
             
             template<typename ReturnType>
@@ -72,10 +70,8 @@ namespace CppOverride
     {
         public:
             ArgumentsProxy( std::string functionSignatureName, 
-                            Overrider& SimpleOverrideObj, 
-                            ProxyType functionProxyType) :  CommonProxy(functionSignatureName, 
-                                                            SimpleOverrideObj, 
-                                                            functionProxyType) 
+                            Overrider& SimpleOverrideObj) :  CommonProxy(   functionSignatureName, 
+                                                                            SimpleOverrideObj) 
             {}
             
             template<typename... Args>

@@ -129,6 +129,38 @@ int main()
         ssTEST_OUTPUT_ASSERT(assignFloat == 3.f);
     };
     
+    ssTEST("Const void* Test")
+    {
+        float testArg = 1;
+        
+        CO_OVERRIDE_RETURNS (OverrideObj, ConstVoidPointerFunc(const void*, int))
+                            .WhenCalledWith(static_cast<void*>(&testArg), 2)
+                            .Returns(1);
+        
+        ssTEST_OUTPUT_ASSERT(ConstVoidPointerFunc(&testArg, 2));
+        
+    };
+    
+    ssTEST("Object Missing inequality operator Test")
+    {
+        NonComparableDummy testDummy(2);
+        NonComparableDummy returnDummy(3);
+        
+        CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
+        
+        CO_OVERRIDE_RETURNS (OverrideObj, ReturnTemplateObjectFunc(T))
+                            .WhenCalledWith(testDummy)
+                            .Returns(returnDummy)
+                            .AssignStatus(status);
+        
+        NonComparableDummy resultDummy = ReturnTemplateObjectFunc(testDummy);
+        
+        ssTEST_OUTPUT_ASSERT(status == 
+            CppOverride::OverrideStatus::CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR);
+        
+        ssTEST_OUTPUT_ASSERT(resultDummy.GetTestData() == testDummy.GetTestData());
+    };
+    
     ssTEST_END();
     
     return 0;

@@ -50,6 +50,13 @@ namespace CppOverride
         return CppOverrideObj.WhenCalledExpectedly_Do(*this, action);
     }
 
+    template<typename DeriveType>
+    inline DeriveType& 
+        CommonProxy<DeriveType>::AssignStatus(OverrideStatus& status)
+    {
+        return CppOverrideObj.AssignStatus(*this, status);
+    }
+
     template<typename ReturnType>
     inline ReturnProxy& ReturnProxy::ReturnsByAction(std::function<void(const std::vector<void*>& args, 
                                                                         void* out)> returnAction)

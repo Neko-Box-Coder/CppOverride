@@ -6,6 +6,7 @@
 #include "./Internal_OverrideArgsDataList.hpp"
 #include "./Internal_ArgsTypesChecker.hpp"
 #include "./Internal_ArgsValuesChecker.hpp"
+#include "./OverrideStatus.hpp"
 
 #include <cassert>
 #include <string>
@@ -29,13 +30,15 @@ namespace CppOverride
             #define CO_LOG_GetCorrectArgumentsDataInfo 0
 
             template<typename... Args>
-            inline int GetCorrectArgumentsDataInfo(std::string functionName, Args&... args)
+            inline int GetCorrectArgumentsDataInfo( std::string functionName, 
+                                                    OverrideStatus& status,
+                                                    Args&... args)
             {
                 if(OverrideArgsDatas.find(functionName) == OverrideArgsDatas.end())
                 {
-                    std::cout << "[ERROR] This should be checked before calling this" << std::endl;
-                    assert(false);
-                    exit(1);
+                    //NOTE: This should be checked before calling this
+                    status = OverrideStatus::INTERNAL_MISSING_CHECK_ERROR;
+                    return -1;
                 }
                 
                 #if CO_LOG_GetCorrectArgumentsDataInfo
@@ -136,11 +139,18 @@ namespace CppOverride
                         !ArgsValuesChecker.CheckArgumentsValues(curArgData[i]   .ArgumentsConditionInfo
                                                                                 .ArgsCondition, 
                                                                 0, 
+                                                                status,
                                                                 args...))
                     {
                         #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check parameter value\n";
                         #endif
+                        
+                        if(curArgData.at(i).Status != nullptr)
+                        {
+                            *curArgData.at(i).Status = 
+                                OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
+                        }
                         
                         if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
                             curArgData[i].ArgumentsActionInfo.OtherwiseAction(argumentsList);
@@ -155,6 +165,13 @@ namespace CppOverride
                         #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check condition\n";
                         #endif
+                        
+                        if(curArgData.at(i).Status != nullptr)
+                        {
+                            *curArgData.at(i).Status = 
+                                OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
+                        }
+                        
                         if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
                             curArgData[i].ArgumentsActionInfo.OtherwiseAction(argumentsList);
                         
@@ -169,6 +186,13 @@ namespace CppOverride
                         #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check times\n";
                         #endif
+                        
+                        if(curArgData.at(i).Status != nullptr)
+                        {
+                            *curArgData.at(i).Status = 
+                                OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
+                        }
+                        
                         if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
                             curArgData[i].ArgumentsActionInfo.OtherwiseAction(argumentsList);
                         continue;

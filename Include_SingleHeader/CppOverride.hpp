@@ -137,6 +137,58 @@ namespace CppOverride
 
 #endif
 
+//=================================================================
+//../Include_MultiHeaders/././././OverrideStatus.hpp
+//=================================================================
+#ifndef CO_OVERRIDE_STATUS_HPP
+#define CO_OVERRIDE_STATUS_HPP
+
+namespace CppOverride
+{
+    enum class OverrideStatus
+    {
+        //------------------------------------------
+        //Override status
+        //------------------------------------------
+        //Default status.
+        //  Any matching overrde will modify the status to not be this value.
+        //  If the status is not modified (i.e. staying in this value), 
+        //  Could be one of these reasons:
+        //  - Function name not matching
+        //  - Argument types not matching
+        //  - Return type not matching
+        NO_OVERRIDE,
+        
+        //The last override was successful. 
+        //  Please reset the status to NO_OVERRIDE before every expected override. 
+        //  If the status is not reset, it will not be modified if no matching override is found.
+        OVERRIDE_SUCCESS,
+        
+        MATCHING_CONDITION_VALUE_FAILED,
+        MATCHING_CONDITION_ACTION_FAILED,
+        MATCHING_OVERRIDE_TIMES_FAILED,
+        
+        //------------------------------------------
+        //Internal error
+        //------------------------------------------
+        INTERNAL_MISSING_CHECK_ERROR,
+        
+        //------------------------------------------
+        //Unsupported operation errors
+        //------------------------------------------
+        MODIFY_NON_ASSIGNABLE_ARG_ERROR,
+        MODIFY_CONST_ARG_ERROR,
+        CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR
+    };
+    
+    
+    const OverrideStatus DEFAULT_STATUS = OverrideStatus::NO_OVERRIDE;
+}
+
+
+
+#endif
+
 
 namespace CppOverride
 {
@@ -145,6 +197,7 @@ namespace CppOverride
         Internal_ConditionInfo ReturnConditionInfo;
         Internal_ReturnDataInfo ReturnDataInfo;
         Internal_ActionInfo ReturnActionInfo;
+        OverrideStatus* Status = nullptr;
     };
 }
 
@@ -199,6 +252,7 @@ namespace CppOverride
         std::vector<Internal_DataInfo> ArgumentsDataInfo;
         Internal_ArgsDataActionInfo  ArgumentsDataActionInfo;
         Internal_ActionInfo ArgumentsActionInfo;
+        OverrideStatus* Status = nullptr;
     };
 }
 
@@ -209,24 +263,6 @@ namespace CppOverride
 //=================================================================
 #ifndef CO_PROXIES_DECLARATIONS_HPP
 #define CO_PROXIES_DECLARATIONS_HPP
-
-//=================================================================
-//../Include_MultiHeaders/./././ProxyType.hpp
-//=================================================================
-#ifndef CO_PROXY_TYPE_HPP
-#define CO_PROXY_TYPE_HPP
-
-namespace CppOverride
-{
-    enum class ProxyType
-    {
-        COMMON,
-        RETURN,
-        ARGS
-    };
-}
-
-#endif
 
 
 #include <functional>
@@ -249,14 +285,11 @@ namespace CppOverride
         protected:
             std::string FunctionSignatureName;
             Overrider& CppOverrideObj;
-            const ProxyType FunctionProxyType;
 
         public:
             CommonProxy(std::string functionSignatureName, 
-                        Overrider& SimpleOverrideObj, 
-                        ProxyType functionProxyType) :  FunctionSignatureName(functionSignatureName),
-                                                        CppOverrideObj(SimpleOverrideObj),
-                                                        FunctionProxyType(functionProxyType)
+                        Overrider& SimpleOverrideObj) : FunctionSignatureName(functionSignatureName),
+                                                        CppOverrideObj(SimpleOverrideObj)
             {}
 
             DeriveType& Times(int times);
@@ -268,7 +301,10 @@ namespace CppOverride
 
             DeriveType& Otherwise_Do(std::function<void(const std::vector<void*>& args)> action);
 
-            DeriveType& WhenCalledExpectedly_Do(std::function<void(const std::vector<void*>& args)> action);
+            DeriveType& 
+                WhenCalledExpectedly_Do(std::function<void(const std::vector<void*>& args)> action);
+            
+            DeriveType& AssignStatus(OverrideStatus& status);
     };
 
     //Override return proxy class for method chaining
@@ -276,10 +312,8 @@ namespace CppOverride
     {
         public:
             ReturnProxy(std::string functionSignatureName, 
-                        Overrider& SimpleOverrideObj, 
-                        ProxyType functionProxyType) : CommonProxy( functionSignatureName, 
-                                                                    SimpleOverrideObj, 
-                                                                    functionProxyType) 
+                        Overrider& SimpleOverrideObj) : CommonProxy(functionSignatureName, 
+                                                                    SimpleOverrideObj) 
             {}
             
             template<typename ReturnType>
@@ -298,10 +332,8 @@ namespace CppOverride
     {
         public:
             ArgumentsProxy( std::string functionSignatureName, 
-                            Overrider& SimpleOverrideObj, 
-                            ProxyType functionProxyType) :  CommonProxy(functionSignatureName, 
-                                                            SimpleOverrideObj, 
-                                                            functionProxyType) 
+                            Overrider& SimpleOverrideObj) :  CommonProxy(   functionSignatureName, 
+                                                                            SimpleOverrideObj) 
             {}
             
             template<typename... Args>
@@ -481,7 +513,7 @@ namespace CppOverride
                                                 std::function<void( const std::vector<void*>& args, 
                                                                     void* out)> returnAction)
             {
-                static_assert(  !std::is_same<T, Any>(), "You can't return nothing in return action");
+                static_assert(!std::is_same<T, Any>(), "You can't return nothing in return action");
 
                 Internal_OverrideReturnData& lastData = 
                     OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas.back();
@@ -613,7 +645,22 @@ namespace CppOverride
                 } while(0)
             #endif
             
-            template<typename T, typename... Args>
+            template<   typename T, 
+                        typename =  typename std::enable_if<!std::is_copy_assignable<T>::value>::type,
+                        typename... Args>
+            inline ArgumentsProxy& SetArgs( ArgumentsProxy& proxy,
+                                            T arg, Args&... args)
+            {
+                static_assert(  CO_ASSERT_FALSE<T>::value, 
+                                "Cannot modify a non copy assignable object. "
+                                "Please use SetArgsByAction instead.");
+
+                return SetArgs(proxy, args...);
+            }
+            
+            template<   typename T, 
+                        typename =  typename std::enable_if<std::is_copy_assignable<T>::value>::type,
+                        typename... Args>
             inline ArgumentsProxy& SetArgs( ArgumentsProxy& proxy,
                                             T arg, Args... args)
             {
@@ -793,7 +840,7 @@ namespace CppOverride
 #include <cassert>
 #include <unordered_map>
 #include <iostream>
-
+#include <type_traits>
 
 namespace CppOverride
 {
@@ -809,46 +856,44 @@ namespace CppOverride
             ArgumentInfosType& OverrideArgumentsInfos;
             ReturnInfosType& OverrideReturnInfos;
         
+            #define CO_INTERNAL_CHECK_IS_DERIVED_TYPE(checkType) \
+                typename std::enable_if<std::is_same<checkType, ReturnProxy>::value ||\
+                                        std::is_same<checkType, ArgumentsProxy>::value>::type\
+            
             //------------------------------------------------------------------------------
             //Methods for setting requirements
             //------------------------------------------------------------------------------
-            template<typename DeriveType>
+            template<   typename DeriveType,
+                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
             inline DeriveType& Times(CommonProxy<DeriveType>& proxy, int times)
             {
-                switch(proxy.FunctionProxyType)
+                if(std::is_same<DeriveType, ReturnProxy>::value)
                 {
-                    case ProxyType::RETURN:
-                        OverrideReturnInfos[proxy.FunctionSignatureName]
-                            .ReturnDatas.back()
-                            .ReturnConditionInfo
-                            .Times = times;
-                        
-                        break;
-                    
-                    case ProxyType::ARGS:
-                        OverrideArgumentsInfos[proxy.FunctionSignatureName]
-                            .ArgumentsDatas.back()
-                            .ArgumentsConditionInfo
-                            .Times = times;
-                        
-                        break;
-                    
-                    case ProxyType::COMMON:
-                        std::cout << "[ERROR] This should be checked before calling this" << std::endl;
-                        assert(false);
-                        exit(1);
-                        break;
+                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas.back()
+                                                                    .ReturnConditionInfo
+                                                                    .Times = times;
                 }
+                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
+                {
+                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas.back()
+                                                                        .ArgumentsConditionInfo
+                                                                        .Times = times;
+                }
+                
                 return *static_cast<DeriveType*>(&proxy);
             }
             
-            template<typename DeriveType>
+            template<   typename DeriveType,
+                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
             inline DeriveType& WhenCalledWith(CommonProxy<DeriveType>& proxy)
             {
                 return *static_cast<DeriveType*>(&proxy);
             }
 
-            template<typename DeriveType, typename T, typename... Args>
+            template<   typename DeriveType, 
+                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType),
+                        typename T, 
+                        typename... Args>
             inline DeriveType& WhenCalledWith(  CommonProxy<DeriveType>& proxy, 
                                                 T arg, 
                                                 Args... args)
@@ -870,164 +915,147 @@ namespace CppOverride
                     #endif
                 }
 
-                switch(proxy.FunctionProxyType)
+                if(std::is_same<DeriveType, ReturnProxy>::value)
                 {
-                    case ProxyType::RETURN:
-                        OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas.back()
-                            .ReturnConditionInfo.ArgsCondition.push_back(curArg);
-                        break;
-                    case ProxyType::ARGS:
-                        OverrideArgumentsInfos[proxy.FunctionSignatureName].ArgumentsDatas.back()
-                            .ArgumentsConditionInfo.ArgsCondition.push_back(curArg);
-                        break;
-                    case ProxyType::COMMON:
-                        std::cout << "[ERROR] This should be checked before calling this" << std::endl;
-                        assert(false);
-                        exit(1);
-                        break;
+                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
+                                                                    .back()
+                                                                    .ReturnConditionInfo
+                                                                    .ArgsCondition
+                                                                    .push_back(curArg);
+                }
+                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
+                {
+                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
+                                                                        .back()
+                                                                        .ArgumentsConditionInfo
+                                                                        .ArgsCondition
+                                                                        .push_back(curArg);
                 }
 
                 return WhenCalledWith(proxy, args...);
             }
             
-            template<typename DeriveType>
+            template<   typename DeriveType,
+                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
             inline DeriveType& If(  CommonProxy<DeriveType>& proxy, 
                                     std::function<bool(const std::vector<void*>& args)> condition)
             {
-                switch(proxy.FunctionProxyType)
+                if(std::is_same<DeriveType, ReturnProxy>::value)
                 {
-                    case ProxyType::RETURN:
-                        OverrideReturnInfos[proxy.FunctionSignatureName]
-                            .ReturnDatas
-                            .back()
-                            .ReturnConditionInfo
-                            .DataCondition = condition;
+                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
+                                                                    .back()
+                                                                    .ReturnConditionInfo
+                                                                    .DataCondition = condition;
                         
-                        OverrideReturnInfos[proxy.FunctionSignatureName]
-                            .ReturnDatas
-                            .back()
-                            .ReturnConditionInfo
-                            .DataConditionSet = true;
-                        
-                        break;
-                    
-                    case ProxyType::ARGS:
-                        OverrideArgumentsInfos[proxy.FunctionSignatureName]
-                            .ArgumentsDatas
-                            .back()
-                            .ArgumentsConditionInfo
-                            .DataCondition = condition;
-                        
-                        OverrideArgumentsInfos[proxy.FunctionSignatureName]
-                            .ArgumentsDatas
-                            .back()
-                            .ArgumentsConditionInfo
-                            .DataConditionSet = true;
-                        
-                        break;
-                    
-                    case ProxyType::COMMON:
-                        std::cout << "[ERROR] This should be checked before calling this" << std::endl;
-                        assert(false);
-                        exit(1);
-                        break;
+                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
+                                                                    .back()
+                                                                    .ReturnConditionInfo
+                                                                    .DataConditionSet = true;
                 }
-            
-                return *static_cast<DeriveType*>(&proxy);
-            }
-            
-            template<typename DeriveType>
-            inline DeriveType& Otherwise_Do(CommonProxy<DeriveType>& proxy, 
-                                            std::function<void(const std::vector<void*>& args)> action)
-            {
-                switch(proxy.FunctionProxyType)
+                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
                 {
-                    case ProxyType::RETURN:
-                        OverrideReturnInfos[proxy.FunctionSignatureName]
-                            .ReturnDatas
-                            .back()
-                            .ReturnActionInfo
-                            .OtherwiseAction = action;
+                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
+                                                                        .back()
+                                                                        .ArgumentsConditionInfo
+                                                                        .DataCondition = condition;
                         
-                        OverrideReturnInfos[proxy.FunctionSignatureName]
-                            .ReturnDatas
-                            .back()
-                            .ReturnActionInfo
-                            .OtherwiseActionSet = true;
-                        
-                        break;
-                    
-                    case ProxyType::ARGS:
-                        OverrideArgumentsInfos[proxy.FunctionSignatureName]
-                            .ArgumentsDatas
-                            .back()
-                            .ArgumentsActionInfo
-                            .OtherwiseAction = action;
-                        
-                        OverrideArgumentsInfos[proxy.FunctionSignatureName]
-                            .ArgumentsDatas
-                            .back()
-                            .ArgumentsActionInfo
-                            .OtherwiseActionSet = true;
-                        
-                        break;
-                    
-                    case ProxyType::COMMON:
-                        std::cout << "[ERROR] This should be checked before calling this" << std::endl;
-                        assert(false);
-                        exit(1);
-                        break;
-                }
-                
-                return *static_cast<DeriveType*>(&proxy);
-            }
-            
-            template<typename DeriveType>
-            inline DeriveType& 
-                WhenCalledExpectedly_Do(CommonProxy<DeriveType>& proxy, 
-                                        std::function<void(const std::vector<void*>& args)> action)
-            {
-                switch(proxy.FunctionProxyType)
-                {
-                    case ProxyType::RETURN:
-                        OverrideReturnInfos[proxy.FunctionSignatureName]
-                            .ReturnDatas
-                            .back()
-                            .ReturnActionInfo
-                            .CorrectAction = action;
-                        
-                        OverrideReturnInfos[proxy.FunctionSignatureName]
-                            .ReturnDatas
-                            .back()
-                            .ReturnActionInfo
-                            .CorrectActionSet = true;
-                        
-                        break;
-                    
-                    case ProxyType::ARGS:
-                        OverrideArgumentsInfos[proxy.FunctionSignatureName]
-                            .ArgumentsDatas
-                            .back()
-                            .ArgumentsActionInfo
-                            .CorrectAction = action;
-                        
-                        OverrideArgumentsInfos[proxy.FunctionSignatureName]
-                            .ArgumentsDatas
-                            .back()
-                            .ArgumentsActionInfo
-                            .CorrectActionSet = true;
-                        
-                        break;
-                    
-                    case ProxyType::COMMON:
-                        std::cout << "[ERROR] This should be checked before calling this" << std::endl;
-                        assert(false);
-                        exit(1);
-                        break;
+                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
+                                                                        .back()
+                                                                        .ArgumentsConditionInfo
+                                                                        .DataConditionSet = true;
                 }
 
                 return *static_cast<DeriveType*>(&proxy);
             }
+            
+            template<   typename DeriveType,
+                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
+            inline DeriveType& Otherwise_Do(CommonProxy<DeriveType>& proxy, 
+                                            std::function<void(const std::vector<void*>& args)> action)
+            {
+                if(std::is_same<DeriveType, ReturnProxy>::value)
+                {
+                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
+                                                                    .back()
+                                                                    .ReturnActionInfo
+                                                                    .OtherwiseAction = action;
+                    
+                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
+                                                                    .back()
+                                                                    .ReturnActionInfo
+                                                                    .OtherwiseActionSet = true;
+                }
+                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
+                {
+                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
+                                                                        .back()
+                                                                        .ArgumentsActionInfo
+                                                                        .OtherwiseAction = action;
+                        
+                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
+                                                                        .back()
+                                                                        .ArgumentsActionInfo
+                                                                        .OtherwiseActionSet = true;
+                }
+
+                return *static_cast<DeriveType*>(&proxy);
+            }
+            
+            template<   typename DeriveType,
+                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
+            inline DeriveType& 
+                WhenCalledExpectedly_Do(CommonProxy<DeriveType>& proxy, 
+                                        std::function<void(const std::vector<void*>& args)> action)
+            {
+                if(std::is_same<DeriveType, ReturnProxy>::value)
+                {
+                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
+                                                                    .back()
+                                                                    .ReturnActionInfo
+                                                                    .CorrectAction = action;
+                    
+                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
+                                                                    .back()
+                                                                    .ReturnActionInfo
+                                                                    .CorrectActionSet = true;
+                }
+                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
+                {
+                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
+                                                                        .back()
+                                                                        .ArgumentsActionInfo
+                                                                        .CorrectAction = action;
+                    
+                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
+                                                                        .back()
+                                                                        .ArgumentsActionInfo
+                                                                        .CorrectActionSet = true;
+                }
+
+                return *static_cast<DeriveType*>(&proxy);
+            }
+            
+            template<   typename DeriveType,
+                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
+            inline DeriveType& AssignStatus(CommonProxy<DeriveType>& proxy, 
+                                            OverrideStatus& status)
+            {
+                if(std::is_same<DeriveType, ReturnProxy>::value)
+                {
+                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
+                                                                    .back()
+                                                                    .Status = &status;
+                }
+                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
+                {
+                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
+                                                                        .back()
+                                                                        .Status = &status;
+                }
+
+                return *static_cast<DeriveType*>(&proxy);
+            }
+            
         
         public:
             Internal_RequirementSetter( ArgumentInfosType& overrideArgumentsInfos, 
@@ -1183,7 +1211,7 @@ namespace CppOverride
             //Check Pointer or value
             template<   typename T, 
                         typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
-                        //typename = typename std::enable_if<!std::is_same<T, const void>::value>::type, 
+                        typename = typename std::enable_if<!std::is_same<T, const void>::value>::type, 
                         typename... Args>
             inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
                                             int argIndex, 
@@ -1268,8 +1296,30 @@ namespace CppOverride
 #ifndef CO_INTERNAL_ARGS_VALUES_CHECKER_HPP
 #define CO_INTERNAL_ARGS_VALUES_CHECKER_HPP
 
+//=================================================================
+//../Include_MultiHeaders/./././TypeCheck.hpp
+//=================================================================
+#ifndef CO_TYPE_CHECK_HPP
+#define CO_TYPE_CHECK_HPP
+
+#include <type_traits>
+namespace CppOverride
+{
+    template<typename T, typename = void>
+    struct InequalExists : std::false_type {};
+    
+    template<typename T>
+    struct InequalExists<T, decltype(std::declval<T>() != std::declval<T>(), void())> : std::true_type {};
+}
+
+#endif
+
+
+#include <cassert>
+#include <type_traits>
 #include <vector>
 #include <iostream>
+
 
 namespace CppOverride
 {
@@ -1280,13 +1330,50 @@ namespace CppOverride
         
         protected:
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
-                                                int argIndex) { return true; };
+                                                int argIndex,
+                                                OverrideStatus& status) { return true; };
 
             #define CO_LOG_CheckArgumentsValues 0
 
-            template<typename T, typename... Args>
+            template<   typename T, 
+                        typename = typename std::enable_if<!InequalExists<T>::value>::type,
+                        typename... Args>
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex, 
+                                                OverrideStatus& status,
+                                                T& arg, 
+                                                Args&... args)
+            {
+                #if CO_LOG_CheckArgumentsValues
+                    std::cout << "Line: " << __LINE__ << std::endl;
+                    std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
+                #endif
+            
+                if(argIndex >= validArgumentsList.size())
+                    return false;
+
+                if(validArgumentsList[argIndex].ArgSet)
+                {
+                    //NOTE: Cannot check data that doesn't have inequal operator
+                    status = OverrideStatus::CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR;
+                    return false;
+                }
+                
+                #if CO_LOG_CheckArgumentsValues
+                    std::cout << "Line: " << __LINE__ << std::endl;
+                    std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
+                #endif
+                
+                return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
+            }
+            
+            template<   typename T, 
+                        typename = typename std::enable_if<InequalExists<T>::value>::type,
+                        typename... Args,
+                        typename = void()>
+            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
+                                                int argIndex, 
+                                                OverrideStatus& status,
                                                 T& arg, 
                                                 Args&... args)
             {
@@ -1318,15 +1405,17 @@ namespace CppOverride
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
                 #endif
                 
-                return CheckArgumentsValues(validArgumentsList, ++argIndex, args...);
+                return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
             template<   typename T, 
                         typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
-                        //typename = typename std::enable_if<!std::is_same<T, const void>::value>::type,
+                        typename = typename std::enable_if<!std::is_same<T, const void>::value>::type,
+                        typename = typename std::enable_if<InequalExists<T>::value>::type,
                         typename... Args>
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex, 
+                                                OverrideStatus& status,
                                                 T*& arg, 
                                                 Args&... args)
             {
@@ -1345,12 +1434,21 @@ namespace CppOverride
                         typeid(INTERNAL_CO_NON_CONST_T*).hash_code() == 
                             validArgumentsList[argIndex].ArgTypeHash)
                     {
-                        if(arg != *(INTERNAL_CO_NON_CONST_T**)(validArgumentsList[argIndex].ArgDataPointer))
+                        if(arg != *(INTERNAL_CO_NON_CONST_T**)
+                                    (validArgumentsList[argIndex].ArgDataPointer))
+                        {
                             return false;
+                        }
                     }
                     //Check Value
                     else
-                        return CheckArgumentsValues(validArgumentsList, argIndex, *arg, args...);
+                    {
+                        return CheckArgumentsValues(validArgumentsList, 
+                                                    argIndex, 
+                                                    status, 
+                                                    *arg, 
+                                                    args...);
+                    }
                 }
                 
                 #if CO_LOG_CheckArgumentsValues
@@ -1358,12 +1456,13 @@ namespace CppOverride
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
                 #endif
                 
-                return CheckArgumentsValues(validArgumentsList, ++argIndex, args...);
+                return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
             template<typename... Args>
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex, 
+                                                OverrideStatus& status,
                                                 void*& arg, 
                                                 Args&... args)
             {
@@ -1392,17 +1491,19 @@ namespace CppOverride
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
                 #endif
                 
-                return CheckArgumentsValues(validArgumentsList, ++argIndex, args...);
+                return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
             template<typename T, typename... Args>
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex, 
+                                                OverrideStatus& status,
                                                 const T& arg, 
                                                 Args&... args)
             {
                 return CheckArgumentsValues(validArgumentsList, 
                                             argIndex, 
+                                            status,
                                             const_cast<INTERNAL_CO_NON_CONST_T&>(arg), 
                                             args...);
             }
@@ -1421,6 +1522,7 @@ namespace CppOverride
 #include <cassert>
 #include <vector>
 #include <iostream>
+#include <type_traits>
 
 namespace CppOverride 
 {
@@ -1431,12 +1533,40 @@ namespace CppOverride
         
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
-                                    int index) {}
+                                    int index,
+                                    OverrideStatus* status) {}
 
-            template<typename T, typename... Args>
+            template<   typename T, 
+                        typename = typename std::enable_if<!std::is_copy_assignable<T>::value>::type,
+                        typename... Args
+                        >
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
+                                    OverrideStatus* status,
+                                    T& arg, 
+                                    Args&... args)
+            {
+                if(argsData[index].DataSet)
+                {
+                    //NOTE: Cannot modify data that are not copy assignable
+                    if(status != nullptr)
+                        *status = OverrideStatus::MODIFY_NON_ASSIGNABLE_ARG_ERROR;
+                    
+                    return;
+                }
+                
+                ModifyArgs(argumentsList, argsData, ++index, status, args...);
+            }
+            
+            template<   typename T, 
+                        typename = typename std::enable_if<std::is_copy_assignable<T>::value>::type,
+                        typename... Args,
+                        typename = void()>
+            inline void ModifyArgs( std::vector<void*>& argumentsList, 
+                                    std::vector<Internal_DataInfo>& argsData, 
+                                    int index, 
+                                    OverrideStatus* status,
                                     T& arg, 
                                     Args&... args)
             {
@@ -1468,7 +1598,7 @@ namespace CppOverride
                     #endif
                 }
 
-                ModifyArgs(argumentsList, argsData, ++index, args...);
+                ModifyArgs(argumentsList, argsData, ++index, status, args...);
             }
             
             template<   typename T, 
@@ -1478,16 +1608,18 @@ namespace CppOverride
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
+                                    OverrideStatus* status,
                                     T*& arg, 
                                     Args&... args)
             {
-                ModifyArgs(argumentsList, argsData, index, *arg, args...);
+                ModifyArgs(argumentsList, argsData, index, status, *arg, args...);
             }
             
             template<typename T, typename... Args>
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
+                                    OverrideStatus* status,
                                     const T& arg, 
                                     Args&... args)
             {
@@ -1501,25 +1633,28 @@ namespace CppOverride
                 
                 if(argsData[index].DataSet)
                 {
-                    std::cout << "[ERROR] Data cannot be set for const arguments" << std::endl;
-                    assert(false);
-                    exit(1);
+                    //NOTE: Data cannot be set for const arguments
+                    if(status != nullptr)
+                        *status = OverrideStatus::MODIFY_CONST_ARG_ERROR;
+                    
+                    return;
                 }
 
-                ModifyArgs(argumentsList, argsData, ++index, args...);
+                ModifyArgs(argumentsList, argsData, ++index, status, args...);
             }
 
             template<typename... Args>
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
+                                    OverrideStatus* status,
                                     const Any& arg, 
                                     Args&... args)
             {
                 #if CO_LOG_ModifyArgs
                     std ::cout <<"Skipping ModifyArgs for index "<<index << " for Any\n";
                 #endif
-                ModifyArgs(argumentsList, argsData, ++index, args...);
+                ModifyArgs(argumentsList, argsData, ++index, status, args...);
             }
             
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
@@ -1560,14 +1695,18 @@ namespace CppOverride
         
             #define CO_LOG_GetCorrectReturnDataInfo 0
 
-            template<typename T, typename... Args>
-            inline int GetCorrectReturnDataInfo(T& returnRef, std::string functionName, Args&... args)
+            template<   typename T, 
+                        typename... Args>
+            inline int GetCorrectReturnDataInfo(T& returnRef, 
+                                                std::string functionName, 
+                                                OverrideStatus& status,
+                                                Args&... args)
             {
                 if(OverrideReturnInfos.find(functionName) == OverrideReturnInfos.end())
                 {
-                    std::cout << "[ERROR] This should be checked before calling this" << std::endl;
-                    assert(false);
-                    exit(1);
+                    //NOTE: This should be checked before calling this
+                    status = OverrideStatus::INTERNAL_MISSING_CHECK_ERROR;
+                    return -1;
                 }
                 
                 #if CO_LOG_GetCorrectReturnDataInfo
@@ -1618,17 +1757,24 @@ namespace CppOverride
                         continue;
                     }
                     
-                    
                     //Check parameter values
                     if( !curReturnDatas[i].ReturnConditionInfo.ArgsCondition.empty() && 
                         !ArgsValuesChecker.CheckArgumentsValues(curReturnDatas[i]   .ReturnConditionInfo
                                                                                     .ArgsCondition, 
                                                                 0, 
+                                                                status,
                                                                 args...))
                     {
                         #if CO_LOG_GetCorrectReturnDataInfo
                             std::cout << "Failed at Check parameter\n";
                         #endif
+                        
+                        if(curReturnDatas.at(i).Status != nullptr)
+                        {
+                            *curReturnDatas.at(i).Status = 
+                                OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
+                        }
+                        
                         if(curReturnDatas[i].ReturnActionInfo.OtherwiseActionSet)
                             curReturnDatas[i].ReturnActionInfo.OtherwiseAction(argumentsList);
                         
@@ -1643,6 +1789,13 @@ namespace CppOverride
                         #if CO_LOG_GetCorrectReturnDataInfo
                             std::cout << "Failed at Check condition\n";
                         #endif
+                        
+                        if(curReturnDatas.at(i).Status != nullptr)
+                        {
+                            *curReturnDatas.at(i).Status = 
+                                OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
+                        }
+                        
                         if(curReturnDatas[i].ReturnActionInfo.OtherwiseActionSet)
                             curReturnDatas[i].ReturnActionInfo.OtherwiseAction(argumentsList);
                         
@@ -1657,6 +1810,13 @@ namespace CppOverride
                         #if CO_LOG_GetCorrectReturnDataInfo
                             std::cout << "Failed at Check times\n";
                         #endif
+                        
+                        if(curReturnDatas.at(i).Status != nullptr)
+                        {
+                            *curReturnDatas.at(i).Status = 
+                                OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
+                        }
+                        
                         if(curReturnDatas[i].ReturnActionInfo.OtherwiseActionSet)
                             curReturnDatas[i].ReturnActionInfo.OtherwiseAction(argumentsList);
 
@@ -1718,13 +1878,15 @@ namespace CppOverride
             #define CO_LOG_GetCorrectArgumentsDataInfo 0
 
             template<typename... Args>
-            inline int GetCorrectArgumentsDataInfo(std::string functionName, Args&... args)
+            inline int GetCorrectArgumentsDataInfo( std::string functionName, 
+                                                    OverrideStatus& status,
+                                                    Args&... args)
             {
                 if(OverrideArgsDatas.find(functionName) == OverrideArgsDatas.end())
                 {
-                    std::cout << "[ERROR] This should be checked before calling this" << std::endl;
-                    assert(false);
-                    exit(1);
+                    //NOTE: This should be checked before calling this
+                    status = OverrideStatus::INTERNAL_MISSING_CHECK_ERROR;
+                    return -1;
                 }
                 
                 #if CO_LOG_GetCorrectArgumentsDataInfo
@@ -1825,11 +1987,18 @@ namespace CppOverride
                         !ArgsValuesChecker.CheckArgumentsValues(curArgData[i]   .ArgumentsConditionInfo
                                                                                 .ArgsCondition, 
                                                                 0, 
+                                                                status,
                                                                 args...))
                     {
                         #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check parameter value\n";
                         #endif
+                        
+                        if(curArgData.at(i).Status != nullptr)
+                        {
+                            *curArgData.at(i).Status = 
+                                OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
+                        }
                         
                         if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
                             curArgData[i].ArgumentsActionInfo.OtherwiseAction(argumentsList);
@@ -1844,6 +2013,13 @@ namespace CppOverride
                         #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check condition\n";
                         #endif
+                        
+                        if(curArgData.at(i).Status != nullptr)
+                        {
+                            *curArgData.at(i).Status = 
+                                OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
+                        }
+                        
                         if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
                             curArgData[i].ArgumentsActionInfo.OtherwiseAction(argumentsList);
                         
@@ -1858,6 +2034,13 @@ namespace CppOverride
                         #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check times\n";
                         #endif
+                        
+                        if(curArgData.at(i).Status != nullptr)
+                        {
+                            *curArgData.at(i).Status = 
+                                OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
+                        }
+                        
                         if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
                             curArgData[i].ArgumentsActionInfo.OtherwiseAction(argumentsList);
                         continue;
@@ -2101,7 +2284,7 @@ namespace CppOverride
                 #endif
 
                 OverrideReturnInfos[functionName].ReturnDatas.push_back(Internal_OverrideReturnData());
-                return ReturnProxy(functionName, *this, ProxyType::RETURN);
+                return ReturnProxy(functionName, *this);
             }
             
             inline void Internal_ClearOverrideReturns(std::string functionName)
@@ -2130,7 +2313,24 @@ namespace CppOverride
                 if(OverrideReturnInfos.find(functionName) == OverrideReturnInfos.end())
                     return false;
             
-                int correctDataIndex = GetCorrectReturnDataInfo(returnRef, functionName, args...);
+                OverrideStatus retrieveStatus = OverrideStatus::NO_OVERRIDE;
+                int correctDataIndex = GetCorrectReturnDataInfo(returnRef, 
+                                                                functionName, 
+                                                                retrieveStatus, 
+                                                                args...);
+                
+                auto& currentReturnDatas = OverrideReturnInfos.at(functionName).ReturnDatas;
+                
+                if(retrieveStatus != OverrideStatus::NO_OVERRIDE)
+                {
+                    for(int i = 0; i < currentReturnDatas.size(); i++)
+                    {
+                        if(currentReturnDatas.at(i).Status != nullptr)
+                            *currentReturnDatas.at(i).Status = retrieveStatus;
+                    }
+                    
+                    return false;
+                }
                 
                 std::vector<void*> argumentsList;
                 AppendArgsValues(argumentsList, args...);
@@ -2140,12 +2340,15 @@ namespace CppOverride
                 if(correctDataIndex != -1)
                 {
                     Internal_OverrideReturnData& correctData = 
-                        OverrideReturnInfos[functionName].ReturnDatas[correctDataIndex];
+                        currentReturnDatas.at(correctDataIndex);
                     
                     correctData.ReturnConditionInfo.CalledTimes++;
                     
                     if(correctData.ReturnActionInfo.CorrectActionSet)
                         correctData.ReturnActionInfo.CorrectAction(argumentsList);
+                    
+                    if(correctData.Status != nullptr)
+                        *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
                     
                     if(correctData.ReturnDataInfo.DataSet)
                         returnRef = *reinterpret_cast<T*>(correctData.ReturnDataInfo.Data);
@@ -2177,7 +2380,7 @@ namespace CppOverride
                 OverrideArgumentsInfos[functionName].ArgumentsDatas
                                                     .push_back(Internal_OverrideArgsData());
                 
-                return ArgumentsProxy(functionName, *this, ProxyType::ARGS);
+                return ArgumentsProxy(functionName, *this);
             }
             
             inline void Internal_ClearOverrideArgs(std::string functionName)
@@ -2203,7 +2406,23 @@ namespace CppOverride
                 if(OverrideArgumentsInfos.find(functionName) == OverrideArgumentsInfos.end())
                     return false;
             
-                int correctDataIndex = GetCorrectArgumentsDataInfo(functionName, args...);
+                OverrideStatus retrieveStatus = OverrideStatus::NO_OVERRIDE;
+                int correctDataIndex = GetCorrectArgumentsDataInfo( functionName, 
+                                                                    retrieveStatus, 
+                                                                    args...);
+                
+                auto& currentArgsDatas = OverrideArgumentsInfos.at(functionName).ArgumentsDatas;
+                
+                if(retrieveStatus != OverrideStatus::NO_OVERRIDE)
+                {
+                    for(int i = 0; i < currentArgsDatas.size(); i++)
+                    {
+                        if(currentArgsDatas.at(i).Status != nullptr)
+                            *currentArgsDatas.at(i).Status = retrieveStatus;
+                    }
+                    
+                    return false;
+                }
                 
                 std::vector<void*> argumentsList;
                 AppendArgsValues(argumentsList, args...);
@@ -2220,14 +2439,23 @@ namespace CppOverride
                     if(correctData.ArgumentsActionInfo.CorrectActionSet)
                         correctData.ArgumentsActionInfo.CorrectAction(argumentsList);
 
+                    if(correctData.Status != nullptr)
+                        *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
+
                     if(correctData.ArgumentsDataActionInfo.DataActionSet)
                         ModifyArgs(argumentsList, correctData.ArgumentsDataActionInfo);
                     else
-                        ModifyArgs(argumentsList, correctData.ArgumentsDataInfo, 0, args...);
+                    {
+                        ModifyArgs( argumentsList, 
+                                    correctData.ArgumentsDataInfo, 
+                                    0, 
+                                    correctData.Status, 
+                                    args...);
+                    }
                         
                     returnResult = true;
                 }
-
+                
                 //Deallocating argumentsList
                 //for(int i = 0; i < argumentsList.size(); i++)
                 //    argumentsList[i].Destructor(argumentsList[i].ArgData);
@@ -2290,6 +2518,13 @@ namespace CppOverride
         CommonProxy<DeriveType>::WhenCalledExpectedly_Do(std::function<void(const std::vector<void*>& args)> action)
     {
         return CppOverrideObj.WhenCalledExpectedly_Do(*this, action);
+    }
+
+    template<typename DeriveType>
+    inline DeriveType& 
+        CommonProxy<DeriveType>::AssignStatus(OverrideStatus& status)
+    {
+        return CppOverrideObj.AssignStatus(*this, status);
     }
 
     template<typename ReturnType>

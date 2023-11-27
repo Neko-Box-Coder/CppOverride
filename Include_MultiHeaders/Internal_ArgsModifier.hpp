@@ -5,10 +5,12 @@
 #include "./PureType.hpp"
 #include "./Any.hpp"
 #include "./Internal_ArgsDataActionInfo.hpp"
+#include "./OverrideStatus.hpp"
 
 #include <cassert>
 #include <vector>
 #include <iostream>
+#include <type_traits>
 
 namespace CppOverride 
 {
@@ -19,12 +21,40 @@ namespace CppOverride
         
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
-                                    int index) {}
+                                    int index,
+                                    OverrideStatus* status) {}
 
-            template<typename T, typename... Args>
+            template<   typename T, 
+                        typename = typename std::enable_if<!std::is_copy_assignable<T>::value>::type,
+                        typename... Args
+                        >
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
+                                    OverrideStatus* status,
+                                    T& arg, 
+                                    Args&... args)
+            {
+                if(argsData[index].DataSet)
+                {
+                    //NOTE: Cannot modify data that are not copy assignable
+                    if(status != nullptr)
+                        *status = OverrideStatus::MODIFY_NON_ASSIGNABLE_ARG_ERROR;
+                    
+                    return;
+                }
+                
+                ModifyArgs(argumentsList, argsData, ++index, status, args...);
+            }
+            
+            template<   typename T, 
+                        typename = typename std::enable_if<std::is_copy_assignable<T>::value>::type,
+                        typename... Args,
+                        typename = void()>
+            inline void ModifyArgs( std::vector<void*>& argumentsList, 
+                                    std::vector<Internal_DataInfo>& argsData, 
+                                    int index, 
+                                    OverrideStatus* status,
                                     T& arg, 
                                     Args&... args)
             {
@@ -56,7 +86,7 @@ namespace CppOverride
                     #endif
                 }
 
-                ModifyArgs(argumentsList, argsData, ++index, args...);
+                ModifyArgs(argumentsList, argsData, ++index, status, args...);
             }
             
             template<   typename T, 
@@ -66,16 +96,18 @@ namespace CppOverride
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
+                                    OverrideStatus* status,
                                     T*& arg, 
                                     Args&... args)
             {
-                ModifyArgs(argumentsList, argsData, index, *arg, args...);
+                ModifyArgs(argumentsList, argsData, index, status, *arg, args...);
             }
             
             template<typename T, typename... Args>
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
+                                    OverrideStatus* status,
                                     const T& arg, 
                                     Args&... args)
             {
@@ -89,25 +121,28 @@ namespace CppOverride
                 
                 if(argsData[index].DataSet)
                 {
-                    std::cout << "[ERROR] Data cannot be set for const arguments" << std::endl;
-                    assert(false);
-                    exit(1);
+                    //NOTE: Data cannot be set for const arguments
+                    if(status != nullptr)
+                        *status = OverrideStatus::MODIFY_CONST_ARG_ERROR;
+                    
+                    return;
                 }
 
-                ModifyArgs(argumentsList, argsData, ++index, args...);
+                ModifyArgs(argumentsList, argsData, ++index, status, args...);
             }
 
             template<typename... Args>
             inline void ModifyArgs( std::vector<void*>& argumentsList, 
                                     std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
+                                    OverrideStatus* status,
                                     const Any& arg, 
                                     Args&... args)
             {
                 #if CO_LOG_ModifyArgs
                     std ::cout <<"Skipping ModifyArgs for index "<<index << " for Any\n";
                 #endif
-                ModifyArgs(argumentsList, argsData, ++index, args...);
+                ModifyArgs(argumentsList, argsData, ++index, status, args...);
             }
             
             inline void ModifyArgs( std::vector<void*>& argumentsList, 

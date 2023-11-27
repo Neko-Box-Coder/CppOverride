@@ -63,7 +63,7 @@ namespace CppOverride
             //Check Pointer or value
             template<   typename T, 
                         typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
-                        //typename = typename std::enable_if<!std::is_same<T, const void>::value>::type, 
+                        typename = typename std::enable_if<!std::is_same<T, const void>::value>::type, 
                         typename... Args>
             inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
                                             int argIndex, 

@@ -6,6 +6,8 @@
 #include "./Internal_ArgsValuesAppender.hpp"
 #include "./Internal_ArgsTypesChecker.hpp"
 #include "./Internal_ArgsValuesChecker.hpp"
+#include "./TypeCheck.hpp"
+#include "./OverrideStatus.hpp"
 
 #include <cassert>
 #include <string>
@@ -27,14 +29,18 @@ namespace CppOverride
         
             #define CO_LOG_GetCorrectReturnDataInfo 0
 
-            template<typename T, typename... Args>
-            inline int GetCorrectReturnDataInfo(T& returnRef, std::string functionName, Args&... args)
+            template<   typename T, 
+                        typename... Args>
+            inline int GetCorrectReturnDataInfo(T& returnRef, 
+                                                std::string functionName, 
+                                                OverrideStatus& status,
+                                                Args&... args)
             {
                 if(OverrideReturnInfos.find(functionName) == OverrideReturnInfos.end())
                 {
-                    std::cout << "[ERROR] This should be checked before calling this" << std::endl;
-                    assert(false);
-                    exit(1);
+                    //NOTE: This should be checked before calling this
+                    status = OverrideStatus::INTERNAL_MISSING_CHECK_ERROR;
+                    return -1;
                 }
                 
                 #if CO_LOG_GetCorrectReturnDataInfo
@@ -85,17 +91,24 @@ namespace CppOverride
                         continue;
                     }
                     
-                    
                     //Check parameter values
                     if( !curReturnDatas[i].ReturnConditionInfo.ArgsCondition.empty() && 
                         !ArgsValuesChecker.CheckArgumentsValues(curReturnDatas[i]   .ReturnConditionInfo
                                                                                     .ArgsCondition, 
                                                                 0, 
+                                                                status,
                                                                 args...))
                     {
                         #if CO_LOG_GetCorrectReturnDataInfo
                             std::cout << "Failed at Check parameter\n";
                         #endif
+                        
+                        if(curReturnDatas.at(i).Status != nullptr)
+                        {
+                            *curReturnDatas.at(i).Status = 
+                                OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
+                        }
+                        
                         if(curReturnDatas[i].ReturnActionInfo.OtherwiseActionSet)
                             curReturnDatas[i].ReturnActionInfo.OtherwiseAction(argumentsList);
                         
@@ -110,6 +123,13 @@ namespace CppOverride
                         #if CO_LOG_GetCorrectReturnDataInfo
                             std::cout << "Failed at Check condition\n";
                         #endif
+                        
+                        if(curReturnDatas.at(i).Status != nullptr)
+                        {
+                            *curReturnDatas.at(i).Status = 
+                                OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
+                        }
+                        
                         if(curReturnDatas[i].ReturnActionInfo.OtherwiseActionSet)
                             curReturnDatas[i].ReturnActionInfo.OtherwiseAction(argumentsList);
                         
@@ -124,6 +144,13 @@ namespace CppOverride
                         #if CO_LOG_GetCorrectReturnDataInfo
                             std::cout << "Failed at Check times\n";
                         #endif
+                        
+                        if(curReturnDatas.at(i).Status != nullptr)
+                        {
+                            *curReturnDatas.at(i).Status = 
+                                OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
+                        }
+                        
                         if(curReturnDatas[i].ReturnActionInfo.OtherwiseActionSet)
                             curReturnDatas[i].ReturnActionInfo.OtherwiseAction(argumentsList);
 

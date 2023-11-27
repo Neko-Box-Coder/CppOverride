@@ -31,7 +31,7 @@ namespace CppOverride
                                                 std::function<void( const std::vector<void*>& args, 
                                                                     void* out)> returnAction)
             {
-                static_assert(  !std::is_same<T, Any>(), "You can't return nothing in return action");
+                static_assert(!std::is_same<T, Any>(), "You can't return nothing in return action");
 
                 Internal_OverrideReturnData& lastData = 
                     OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas.back();
