@@ -34,7 +34,16 @@ endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(STANDARD_COMPILE_FLAGS "/utf-8;/W1")
 else()
-    set(STANDARD_COMPILE_FLAGS "-Wall;-Wno-return-local-addr;-Wno-sign-compare;-Wno-unused-variable;-Wno-unused-parameter;-Wno-switch;-Wextra;-pedantic;-Werror")
+    set(STANDARD_COMPILE_FLAGS  "-Wall"
+                                "-Wno-return-local-addr"
+                                "-Wno-sign-compare"
+                                "-Wno-unused-variable"
+                                "-Wno-unused-parameter"
+                                "-Wno-switch"
+                                "-Wno-gnu-zero-variadic-macro-arguments"
+                                "-Wextra"
+                                "-pedantic"
+                                "-Werror")
 endif()
 
 if(CPP_OVERRIDE_BUILD_TEST)

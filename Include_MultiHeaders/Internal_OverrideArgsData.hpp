@@ -5,6 +5,7 @@
 #include "./Internal_ActionInfo.hpp"
 #include "./Internal_DataInfo.hpp"
 #include "./Internal_ArgsDataActionInfo.hpp"
+#include "./OverrideStatus.hpp"
 
 
 namespace CppOverride
@@ -15,6 +16,7 @@ namespace CppOverride
         std::vector<Internal_DataInfo> ArgumentsDataInfo;
         Internal_ArgsDataActionInfo  ArgumentsDataActionInfo;
         Internal_ActionInfo ArgumentsActionInfo;
+        OverrideStatus* Status = nullptr;
     };
 }
 

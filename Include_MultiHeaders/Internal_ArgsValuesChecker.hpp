@@ -4,8 +4,14 @@
 #include "./Any.hpp"
 #include "./ArgsInfo.hpp"
 #include "./PureType.hpp"
+#include "./TypeCheck.hpp"
+#include "./OverrideStatus.hpp"
+
+#include <cassert>
+#include <type_traits>
 #include <vector>
 #include <iostream>
+
 
 namespace CppOverride
 {
@@ -16,13 +22,50 @@ namespace CppOverride
         
         protected:
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
-                                                int argIndex) { return true; };
+                                                int argIndex,
+                                                OverrideStatus& status) { return true; };
 
             #define CO_LOG_CheckArgumentsValues 0
 
-            template<typename T, typename... Args>
+            template<   typename T, 
+                        typename = typename std::enable_if<!InequalExists<T>::value>::type,
+                        typename... Args>
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex, 
+                                                OverrideStatus& status,
+                                                T& arg, 
+                                                Args&... args)
+            {
+                #if CO_LOG_CheckArgumentsValues
+                    std::cout << "Line: " << __LINE__ << std::endl;
+                    std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
+                #endif
+            
+                if(argIndex >= validArgumentsList.size())
+                    return false;
+
+                if(validArgumentsList[argIndex].ArgSet)
+                {
+                    //NOTE: Cannot check data that doesn't have inequal operator
+                    status = OverrideStatus::CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR;
+                    return false;
+                }
+                
+                #if CO_LOG_CheckArgumentsValues
+                    std::cout << "Line: " << __LINE__ << std::endl;
+                    std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
+                #endif
+                
+                return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
+            }
+            
+            template<   typename T, 
+                        typename = typename std::enable_if<InequalExists<T>::value>::type,
+                        typename... Args,
+                        typename = void()>
+            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
+                                                int argIndex, 
+                                                OverrideStatus& status,
                                                 T& arg, 
                                                 Args&... args)
             {
@@ -54,15 +97,17 @@ namespace CppOverride
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
                 #endif
                 
-                return CheckArgumentsValues(validArgumentsList, ++argIndex, args...);
+                return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
             template<   typename T, 
                         typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
-                        //typename = typename std::enable_if<!std::is_same<T, const void>::value>::type,
+                        typename = typename std::enable_if<!std::is_same<T, const void>::value>::type,
+                        typename = typename std::enable_if<InequalExists<T>::value>::type,
                         typename... Args>
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex, 
+                                                OverrideStatus& status,
                                                 T*& arg, 
                                                 Args&... args)
             {
@@ -81,12 +126,21 @@ namespace CppOverride
                         typeid(INTERNAL_CO_NON_CONST_T*).hash_code() == 
                             validArgumentsList[argIndex].ArgTypeHash)
                     {
-                        if(arg != *(INTERNAL_CO_NON_CONST_T**)(validArgumentsList[argIndex].ArgDataPointer))
+                        if(arg != *(INTERNAL_CO_NON_CONST_T**)
+                                    (validArgumentsList[argIndex].ArgDataPointer))
+                        {
                             return false;
+                        }
                     }
                     //Check Value
                     else
-                        return CheckArgumentsValues(validArgumentsList, argIndex, *arg, args...);
+                    {
+                        return CheckArgumentsValues(validArgumentsList, 
+                                                    argIndex, 
+                                                    status, 
+                                                    *arg, 
+                                                    args...);
+                    }
                 }
                 
                 #if CO_LOG_CheckArgumentsValues
@@ -94,12 +148,13 @@ namespace CppOverride
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
                 #endif
                 
-                return CheckArgumentsValues(validArgumentsList, ++argIndex, args...);
+                return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
             template<typename... Args>
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex, 
+                                                OverrideStatus& status,
                                                 void*& arg, 
                                                 Args&... args)
             {
@@ -128,17 +183,19 @@ namespace CppOverride
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
                 #endif
                 
-                return CheckArgumentsValues(validArgumentsList, ++argIndex, args...);
+                return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
             template<typename T, typename... Args>
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex, 
+                                                OverrideStatus& status,
                                                 const T& arg, 
                                                 Args&... args)
             {
                 return CheckArgumentsValues(validArgumentsList, 
                                             argIndex, 
+                                            status,
                                             const_cast<INTERNAL_CO_NON_CONST_T&>(arg), 
                                             args...);
             }

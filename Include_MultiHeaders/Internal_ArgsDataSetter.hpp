@@ -42,7 +42,22 @@ namespace CppOverride
                 } while(0)
             #endif
             
-            template<typename T, typename... Args>
+            template<   typename T, 
+                        typename =  typename std::enable_if<!std::is_copy_assignable<T>::value>::type,
+                        typename... Args>
+            inline ArgumentsProxy& SetArgs( ArgumentsProxy& proxy,
+                                            T arg, Args&... args)
+            {
+                static_assert(  CO_ASSERT_FALSE<T>::value, 
+                                "Cannot modify a non copy assignable object. "
+                                "Please use SetArgsByAction instead.");
+
+                return SetArgs(proxy, args...);
+            }
+            
+            template<   typename T, 
+                        typename =  typename std::enable_if<std::is_copy_assignable<T>::value>::type,
+                        typename... Args>
             inline ArgumentsProxy& SetArgs( ArgumentsProxy& proxy,
                                             T arg, Args... args)
             {

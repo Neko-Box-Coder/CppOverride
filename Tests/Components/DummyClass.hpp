@@ -126,5 +126,79 @@ class TemplateDummy : public DummyClass
         }
 };
 
+class NonCopyAssignableDummy
+{
+    private:
+        int TestData;
+    
+    public:
+        inline NonCopyAssignableDummy() :    
+                                              TestData(0)
+        {}
+        
+        inline NonCopyAssignableDummy(int testData) :   
+                                                        TestData(testData)
+        {}
+        
+        inline NonCopyAssignableDummy(const NonCopyAssignableDummy& other)
+        {
+            TestData = other.TestData;
+        }
+        
+        inline NonCopyAssignableDummy& operator=(const NonCopyAssignableDummy& other) = delete;
+        
+        inline bool operator!=(const NonCopyAssignableDummy& other) = delete;
+        
+        inline void SetTestData(int testData)
+        {
+            TestData = testData;
+        }
+        
+        inline int GetTestData() const
+        {
+            return TestData;
+        }
+};
+
+class NonComparableDummy
+{
+    private:
+        int TestData;
+    
+    public:
+        inline NonComparableDummy() :   
+                                        TestData(0)
+        {}
+        
+        inline NonComparableDummy(int testData) :   
+                                                    TestData(testData)
+        {}
+        
+        inline NonComparableDummy(const NonComparableDummy& other)
+        {
+            *this = other.TestData;
+        }
+        
+        inline NonComparableDummy& operator=(const NonComparableDummy& other) 
+        {
+            
+            TestData = other.TestData;
+            return *this;
+        }
+        
+        inline bool operator==(const NonComparableDummy& other) = delete;
+        inline bool operator!=(const NonComparableDummy& other) = delete;
+        
+        inline void SetTestData(int testData)
+        {
+            TestData = testData;
+        }
+        
+        inline int GetTestData() const
+        {
+            return TestData;
+        }
+};
+
 
 #endif

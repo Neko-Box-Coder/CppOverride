@@ -1,0 +1,12 @@
+CompileFlags:                     # Tweak the parse settings
+  Add: -ferror-limit=0
+
+Diagnostics:
+  Suppress: [   -Wreturn-local-addr, 
+                -Wsign-compare, 
+                -Wunused-variable, 
+                -Wunused-parameter, 
+                -Wreturn-stack-address, 
+                -Wdefaulted-function-deleted, 
+                -Wgnu-zero-variadic-macro-arguments,
+                -Wunused-includes]

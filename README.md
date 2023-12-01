@@ -2,7 +2,7 @@
 
 ![](./Logo.png)
 
-A Framework that allows you to override function behaviours
+A C++ 11 Compatible Framework that allows you to override function behaviours
 
 - Which allows you to mock classes without:
     - Virtual Classes
@@ -40,6 +40,7 @@ Of course, you still have the flexibility to create mock classes
         - [If Condition Lambda](#if-condition-lambda)
         - [When Called Expectedly Do Lambda](#when-called-expectedly-do-lambda)
         - [Otherwise Do Lambda](#otherwise-do-lambda)
+        - [Assign Status](#assign-status)
 
 ---
 
@@ -51,13 +52,13 @@ Of course, you still have the flexibility to create mock classes
     - `AddSubDirectory(CppOverride)`
     - `TargetLinkLibrary(YourTarget CppOverride)`
 
-- C++ 11 Compatible
-
 ---
 
 ### Quick Start
 
 ```cpp
+CO_DECLARE_INSTNACE(OverrideInstanceName);
+
 int DummyFunction(int value1)
 {
     CO_RETURN_IF_FOUND( OverrideInstanceName, 
@@ -93,6 +94,9 @@ int main()
 ### Usage
 
 ### Declare Override Instance
+
+In order to override anything, we will first need an override instance to store all the override infomations that the function can reference from. 
+
 #### Global / File Scope
 ```cpp
 CO_DECLARE_INSTNACE(OverrideInstanceName);
@@ -116,6 +120,8 @@ class YourClass
 ---
 
 ### Add Override Implementations
+In order to override a function, we will need to hijack the function using override implementations macros
+
 #### Add Override Return Value
 ```cpp
 CO_RETURN_IF_FOUND( <Override Instance Name>, 
@@ -198,6 +204,8 @@ bool OverrideMyArgsWithStstus(float& value1, int* value2)
 ```
 
 ### Disable Overrides
+The override implementations macros are there so that you can enable/disable the override functionalities easily in your codebase.
+
 ```cpp
 //Just define CO_NO_OVERRIDE before including "CppOverride.hpp" or in compile definitions
 #define CO_NO_OVERRIDE
@@ -206,6 +214,8 @@ bool OverrideMyArgsWithStstus(float& value1, int* value2)
 ---
 
 ### Control Override Functions
+Now we have the override implementations in place, we will just need to interact with the override instance to control the override functions when called.
+
 
 #### Override Returns
 ```cpp
@@ -269,6 +279,9 @@ CO_OVERRIDE_ARGS(OverrideInstanceName, OverrideMyArgs(float&, int*))
 ---
 
 ### Override Rules
+
+Just like any mocking library, you can also control when and how the override functions will behave.
+
 #### When Called With
 ```cpp
 CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
@@ -343,6 +356,22 @@ CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
                     );
 ```
 
+
+#### Assign Status
+```cpp
+void AssignStatusExample()
+{
+    CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
+    CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+                        .WhenCalledWith(2, 3.f)
+                        .Returns(1)
+                        .AssignStatus(status);
+    
+    int ret1 = OverrideMyReturnValue(1, 2.f);
+    
+    //status will be OverrideStatus::MATCHING_CONDITION_VALUE_FAILED
+}
+```
 
 
 

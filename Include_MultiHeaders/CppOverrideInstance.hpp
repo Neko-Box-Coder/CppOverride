@@ -15,6 +15,7 @@
 #include "./Internal_ArgsModifier.hpp"
 #include "./Internal_ReturnDataRetriever.hpp"
 #include "./Internal_ArgsDataRetriever.hpp"
+#include "./OverrideStatus.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -222,7 +223,7 @@ namespace CppOverride
                 #endif
 
                 OverrideReturnInfos[functionName].ReturnDatas.push_back(Internal_OverrideReturnData());
-                return ReturnProxy(functionName, *this, ProxyType::RETURN);
+                return ReturnProxy(functionName, *this);
             }
             
             inline void Internal_ClearOverrideReturns(std::string functionName)
@@ -251,7 +252,24 @@ namespace CppOverride
                 if(OverrideReturnInfos.find(functionName) == OverrideReturnInfos.end())
                     return false;
             
-                int correctDataIndex = GetCorrectReturnDataInfo(returnRef, functionName, args...);
+                OverrideStatus retrieveStatus = OverrideStatus::NO_OVERRIDE;
+                int correctDataIndex = GetCorrectReturnDataInfo(returnRef, 
+                                                                functionName, 
+                                                                retrieveStatus, 
+                                                                args...);
+                
+                auto& currentReturnDatas = OverrideReturnInfos.at(functionName).ReturnDatas;
+                
+                if(retrieveStatus != OverrideStatus::NO_OVERRIDE)
+                {
+                    for(int i = 0; i < currentReturnDatas.size(); i++)
+                    {
+                        if(currentReturnDatas.at(i).Status != nullptr)
+                            *currentReturnDatas.at(i).Status = retrieveStatus;
+                    }
+                    
+                    return false;
+                }
                 
                 std::vector<void*> argumentsList;
                 AppendArgsValues(argumentsList, args...);
@@ -261,12 +279,15 @@ namespace CppOverride
                 if(correctDataIndex != -1)
                 {
                     Internal_OverrideReturnData& correctData = 
-                        OverrideReturnInfos[functionName].ReturnDatas[correctDataIndex];
+                        currentReturnDatas.at(correctDataIndex);
                     
                     correctData.ReturnConditionInfo.CalledTimes++;
                     
                     if(correctData.ReturnActionInfo.CorrectActionSet)
                         correctData.ReturnActionInfo.CorrectAction(argumentsList);
+                    
+                    if(correctData.Status != nullptr)
+                        *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
                     
                     if(correctData.ReturnDataInfo.DataSet)
                         returnRef = *reinterpret_cast<T*>(correctData.ReturnDataInfo.Data);
@@ -298,7 +319,7 @@ namespace CppOverride
                 OverrideArgumentsInfos[functionName].ArgumentsDatas
                                                     .push_back(Internal_OverrideArgsData());
                 
-                return ArgumentsProxy(functionName, *this, ProxyType::ARGS);
+                return ArgumentsProxy(functionName, *this);
             }
             
             inline void Internal_ClearOverrideArgs(std::string functionName)
@@ -324,7 +345,23 @@ namespace CppOverride
                 if(OverrideArgumentsInfos.find(functionName) == OverrideArgumentsInfos.end())
                     return false;
             
-                int correctDataIndex = GetCorrectArgumentsDataInfo(functionName, args...);
+                OverrideStatus retrieveStatus = OverrideStatus::NO_OVERRIDE;
+                int correctDataIndex = GetCorrectArgumentsDataInfo( functionName, 
+                                                                    retrieveStatus, 
+                                                                    args...);
+                
+                auto& currentArgsDatas = OverrideArgumentsInfos.at(functionName).ArgumentsDatas;
+                
+                if(retrieveStatus != OverrideStatus::NO_OVERRIDE)
+                {
+                    for(int i = 0; i < currentArgsDatas.size(); i++)
+                    {
+                        if(currentArgsDatas.at(i).Status != nullptr)
+                            *currentArgsDatas.at(i).Status = retrieveStatus;
+                    }
+                    
+                    return false;
+                }
                 
                 std::vector<void*> argumentsList;
                 AppendArgsValues(argumentsList, args...);
@@ -341,14 +378,23 @@ namespace CppOverride
                     if(correctData.ArgumentsActionInfo.CorrectActionSet)
                         correctData.ArgumentsActionInfo.CorrectAction(argumentsList);
 
+                    if(correctData.Status != nullptr)
+                        *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
+
                     if(correctData.ArgumentsDataActionInfo.DataActionSet)
                         ModifyArgs(argumentsList, correctData.ArgumentsDataActionInfo);
                     else
-                        ModifyArgs(argumentsList, correctData.ArgumentsDataInfo, 0, args...);
+                    {
+                        ModifyArgs( argumentsList, 
+                                    correctData.ArgumentsDataInfo, 
+                                    0, 
+                                    correctData.Status, 
+                                    args...);
+                    }
                         
                     returnResult = true;
                 }
-
+                
                 //Deallocating argumentsList
                 //for(int i = 0; i < argumentsList.size(); i++)
                 //    argumentsList[i].Destructor(argumentsList[i].ArgData);
