@@ -113,7 +113,7 @@ namespace CppOverride
     }
 
     //==============================================================================
-    //Macro argument expandsion
+    //Macro argument expansion
     //==============================================================================
 
     #define CO_INTERNAL_APPEND_ARGS_NOT_EMPTY(...) , __VA_ARGS__
@@ -169,7 +169,6 @@ namespace CppOverride
     //==============================================================================
     //Public Macros
     //==============================================================================
-
 
     //-------------------------------------------------------
     //Return Modifying Macros for implementations
@@ -228,7 +227,7 @@ namespace CppOverride
 
 
     //-------------------------------------------------------
-    //Argumetns Overriding Macros
+    //Arguments Overriding Macros
     //-------------------------------------------------------
 
     #define CO_OVERRIDE_ARGS(overrideObjName, functionSig)\
@@ -241,10 +240,10 @@ namespace CppOverride
         overrideObjName.ClearAllOverrideArgs()
 
     //-------------------------------------------------------
-    //Delacration Macros
+    //Declaration Macros
     //-------------------------------------------------------
-    #define CO_DECLARE_MEMBER_INSTNACE(OverrideObjName) mutable CppOverride::Overrider OverrideObjName
-    #define CO_DECLARE_INSTNACE(OverrideObjName) CppOverride::Overrider OverrideObjName
+    #define CO_DECLARE_MEMBER_INSTANCE(OverrideObjName) mutable CppOverride::Overrider OverrideObjName
+    #define CO_DECLARE_INSTANCE(OverrideObjName) CppOverride::Overrider OverrideObjName
             
     #define CO_DECLARE_OVERRIDE_METHODS(OverrideObjName)\
     inline CppOverride::ArgumentsProxy Internal_OverrideArgs(std::string functionName)\
@@ -287,7 +286,7 @@ namespace CppOverride
         #undef CO_CHECK_ARGS_OVERRIDE
         #undef CO_OVERRIDE_ARGS
         #undef CO_CLEAR_OVERRIDE_ARGS
-        #undef CO_DECLARE_INSTNACE
+        #undef CO_DECLARE_INSTANCE
         #undef CO_DECLARE_OVERRIDE_METHODS
     
         #define CO_RETURN_IF_FOUND(...)
@@ -299,7 +298,7 @@ namespace CppOverride
         #define CO_CHECK_ARGS_OVERRIDE(...) false
         #define CO_OVERRIDE_ARGS(...)
         #define CO_CLEAR_OVERRIDE_ARGS(...)
-        #define CO_DECLARE_INSTNACE(...)
+        #define CO_DECLARE_INSTANCE(...)
         #define CO_DECLARE_OVERRIDE_METHODS(...)
     #endif
 }

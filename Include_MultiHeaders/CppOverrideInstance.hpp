@@ -1,20 +1,19 @@
 #ifndef CO_CPP_OVERRIDE_INSTANCE_HPP
 #define CO_CPP_OVERRIDE_INSTANCE_HPP
 
-//#include "./Internal_OverrideReturnDataList.hpp"
-//#include "./Internal_OverrideArgsData.hpp"
 #include "./ProxiesDeclarations.hpp"
 #include "./Any.hpp"
-#include "./Internal_ReturnDataSetter.hpp"
-#include "./Internal_ArgsDataSetter.hpp"
-#include "./Internal_RequirementSetter.hpp"
-#include "./Internal_ArgsValuesAppender.hpp"
-#include "./Internal_ArgsTypeInfoAppender.hpp"
-#include "./Internal_ArgsTypesChecker.hpp"
-#include "./Internal_ArgsValuesChecker.hpp"
-#include "./Internal_ArgsModifier.hpp"
-#include "./Internal_ReturnDataRetriever.hpp"
-#include "./Internal_ArgsDataRetriever.hpp"
+#include "./OverriderComponents/Internal_ReturnDataSetter.hpp"
+#include "./OverriderComponents/Internal_ArgsDataSetter.hpp"
+#include "./OverriderComponents/Internal_RequirementSetter.hpp"
+#include "./OverriderComponents/Internal_ArgsValuesAppender.hpp"
+#include "./OverriderComponents/Internal_ArgsTypeInfoAppender.hpp"
+#include "./OverriderComponents/Internal_ArgsTypesChecker.hpp"
+#include "./OverriderComponents/Internal_ArgsValuesChecker.hpp"
+#include "./OverriderComponents/Internal_ArgsModifier.hpp"
+#include "./OverriderComponents/Internal_ReturnDataRetriever.hpp"
+#include "./OverriderComponents/Internal_ArgsDataRetriever.hpp"
+#include "./Internal_OverrideData.hpp"
 #include "./OverrideStatus.hpp"
 
 #include <string>
@@ -34,8 +33,10 @@ namespace CppOverride
                         public Internal_ArgsDataRetriever
     {
         private:
-            std::unordered_map<std::string, Internal_OverrideReturnDataList> OverrideReturnInfos;
-            std::unordered_map<std::string, Internal_OverrideArgsDataList> OverrideArgumentsInfos;
+            //std::unordered_map<std::string, Internal_OverrideReturnDataList> OverrideReturnInfos;
+            //std::unordered_map<std::string, Internal_OverrideDataList> OverrideArgumentsInfos;
+            std::unordered_map<std::string, Internal_OverrideDataList> OverrideDataInfos;
+
 
         //==============================================================================
         //Public facing methods for overriding returns or arguments
@@ -210,7 +211,7 @@ namespace CppOverride
             }
 
             //------------------------------------------------------------------------------
-            //Overrding Returns
+            //Overriding Returns
             //------------------------------------------------------------------------------
             #define CO_LOG_OverrideReturns 0
 

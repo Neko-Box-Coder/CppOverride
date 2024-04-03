@@ -1,9 +1,10 @@
-#ifndef CO_INTERNAL_RETURN_DATA_SETTER_HPP
-#define CO_INTERNAL_RETURN_DATA_SETTER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_SETTER_HPP
+#define CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_SETTER_HPP
 
 #include "./ProxiesDeclarations.hpp"
-#include "./Internal_OverrideReturnData.hpp"
-#include "./Internal_OverrideReturnDataList.hpp"
+//#include "./Internal_OverrideReturnData.hpp"
+//#include "./Internal_OverrideReturnDataList.hpp"
+#include "../Internal_OverrideData.hpp"
 #include "./ProxiesDeclarations.hpp"
 #include "./StaticAssertFalse.hpp"
 #include "./Any.hpp"
@@ -18,10 +19,10 @@ namespace CppOverride
         friend class ReturnProxy;
     
         public:
-            using ReturnInfosType = std::unordered_map<std::string, Internal_OverrideReturnDataList>;
+            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
         
         protected:
-            ReturnInfosType& OverrideReturnInfos;
+            OverrideDatas& CurrentOverrideDatas;
             
             //------------------------------------------------------------------------------
             //Methods for setting return data

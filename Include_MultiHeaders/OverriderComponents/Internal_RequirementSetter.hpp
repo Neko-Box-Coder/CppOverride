@@ -1,5 +1,5 @@
-#ifndef CO_INTERNAL_REQUIREMENT_SETTER_HPP
-#define CO_INTERNAL_REQUIREMENT_SETTER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_REQUIREMENT_SETTER_HPP
+#define CO_OVERRIDER_COMPONENTS_INTERNAL_REQUIREMENT_SETTER_HPP
 
 #include "./ProxiesDeclarations.hpp"
 #include "./Internal_OverrideArgsDataList.hpp"
@@ -22,7 +22,7 @@ namespace CppOverride
 
         protected:
             using ReturnInfosType = std::unordered_map<std::string, Internal_OverrideReturnDataList>;
-            using ArgumentInfosType = std::unordered_map<std::string, Internal_OverrideArgsDataList>;
+            using ArgumentInfosType = std::unordered_map<std::string, Internal_OverrideDataList>;
             
             ArgumentInfosType& OverrideArgumentsInfos;
             ReturnInfosType& OverrideReturnInfos;

@@ -16,7 +16,7 @@ class Rectangle : public Shape
         float Width;
         float Height;
     public:
-        CO_DECLARE_MEMBER_INSTNACE(Overrider);
+        CO_DECLARE_MEMBER_INSTANCE(Overrider);
         CO_DECLARE_OVERRIDE_METHODS(Overrider)
         
         inline bool operator ==(const Rectangle& other) const
@@ -117,7 +117,7 @@ class Square : public Rectangle
         T MetaData;
     
     public:
-        CO_DECLARE_MEMBER_INSTNACE(Overrider);
+        CO_DECLARE_MEMBER_INSTANCE(Overrider);
         CO_DECLARE_OVERRIDE_METHODS(Overrider)
         
         inline bool operator ==(const Square& other) const

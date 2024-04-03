@@ -1,12 +1,12 @@
-#ifndef CO_INTERNAL_ARGS_DATA_RETRIEVER_HPP
-#define CO_INTERNAL_ARGS_DATA_RETRIEVER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_DATA_RETRIEVER_HPP
+#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_DATA_RETRIEVER_HPP
 
 #include "./Internal_ArgsTypeInfoAppender.hpp"
 #include "./Internal_ArgsValuesAppender.hpp"
-#include "./Internal_OverrideArgsDataList.hpp"
 #include "./Internal_ArgsTypesChecker.hpp"
 #include "./Internal_ArgsValuesChecker.hpp"
 #include "./OverrideStatus.hpp"
+#include "./Internal_OverrideData.hpp"
 
 #include <cassert>
 #include <string>
@@ -18,10 +18,10 @@ namespace CppOverride
     class Internal_ArgsDataRetriever
     {
         public:
-            using OverrideArgsDataType = std::unordered_map<std::string, Internal_OverrideArgsDataList>;
+            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
         
         protected:
-            OverrideArgsDataType& OverrideArgsDatas;
+            OverrideDatas& CurrentOverrideDatas;
             Internal_ArgsValuesAppender& ArgsValuesAppender;
             Internal_ArgsTypeInfoAppender& ArgsTypeInfoAppender;
             Internal_ArgsTypesChecker& ArgsTypesChecker;
@@ -34,7 +34,7 @@ namespace CppOverride
                                                     OverrideStatus& status,
                                                     Args&... args)
             {
-                if(OverrideArgsDatas.find(functionName) == OverrideArgsDatas.end())
+                if(CurrentOverrideDatas.find(functionName) == CurrentOverrideDatas.end())
                 {
                     //NOTE: This should be checked before calling this
                     status = OverrideStatus::INTERNAL_MISSING_CHECK_ERROR;
@@ -51,11 +51,10 @@ namespace CppOverride
                 std::vector<ArgInfo> deRefArgumentsList;
                 ArgsTypeInfoAppender.AppendArgsPureTypeInfo(deRefArgumentsList, args...);
                 
-                std::vector<Internal_OverrideArgsData>& curArgData = 
-                    OverrideArgsDatas[functionName].ArgumentsDatas;
+                std::vector<Internal_OverrideData>& curData = CurrentOverrideDatas[functionName];
                 
                 int returnIndex = -1;
-                for(int i = 0; i < curArgData.size(); i++)
+                for(int i = 0; i < curData.size(); i++)
                 {
                     #if CO_LOG_GetCorrectArgumentsDataInfo
                         std::cout << "Checking arg data["<<i<<"]\n";
@@ -64,12 +63,12 @@ namespace CppOverride
                     //Check override argument data types match
                     int argumentTypeFailedIndex = -1;
                     
-                    if( curArgData[i].ArgumentsDataActionInfo.DataActionSet && 
-                        curArgData[i].ArgumentsDataActionInfo.DataTypes.size() == 
+                    if( curData[i].ArgumentsDataActionInfo.DataActionSet && 
+                        curData[i].ArgumentsDataActionInfo.DataTypes.size() == 
                             deRefArgumentsList.size())
                     {
                         std::vector<std::size_t>& argTypeHashes = 
-                            curArgData[i].ArgumentsDataActionInfo.DataTypes;
+                            curData[i].ArgumentsDataActionInfo.DataTypes;
                         
                         for(int j = 0; j < argTypeHashes.size(); j++)
                         {
@@ -89,14 +88,14 @@ namespace CppOverride
                         }
                     }
                     //Check set argument data counts match
-                    else if(curArgData[i].ArgumentsDataInfo.size() == deRefArgumentsList.size())
+                    else if(curData[i].ArgumentsDataInfo.size() == deRefArgumentsList.size())
                     {
-                        for(int j = 0; j < curArgData[i].ArgumentsDataInfo.size(); j++)
+                        for(int j = 0; j < curData[i].ArgumentsDataInfo.size(); j++)
                         {
-                            bool overrideArg =  curArgData[i].ArgumentsDataInfo[j].DataSet;
+                            bool overrideArg =  curData[i].ArgumentsDataInfo[j].DataSet;
 
                             if( overrideArg && 
-                                curArgData[i].ArgumentsDataInfo[j].DataType != 
+                                curData[i].ArgumentsDataInfo[j].DataType != 
                                     deRefArgumentsList[j].ArgTypeHash)
                             {
                                 argumentTypeFailedIndex = j;
@@ -122,9 +121,9 @@ namespace CppOverride
                     }
                     
                     //Check parameter condition types/count match
-                    if( !curArgData[i].ArgumentsConditionInfo.ArgsCondition.empty() && 
-                        !ArgsTypesChecker.CheckArgumentsTypes(  curArgData[i]   .ArgumentsConditionInfo
-                                                                                .ArgsCondition, 
+                    if( !curData[i].ConditionInfo.ArgsCondition.empty() && 
+                        !ArgsTypesChecker.CheckArgumentsTypes(  curData[i]  .ConditionInfo
+                                                                            .ArgsCondition, 
                                                                 0, 
                                                                 args...))
                     {
@@ -135,9 +134,9 @@ namespace CppOverride
                     }
                     
                     //Check parameter values
-                    if( !curArgData[i].ArgumentsConditionInfo.ArgsCondition.empty() && 
-                        !ArgsValuesChecker.CheckArgumentsValues(curArgData[i]   .ArgumentsConditionInfo
-                                                                                .ArgsCondition, 
+                    if( !curData[i].ConditionInfo.ArgsCondition.empty() && 
+                        !ArgsValuesChecker.CheckArgumentsValues(curData[i]  .ConditionInfo
+                                                                            .ArgsCondition, 
                                                                 0, 
                                                                 status,
                                                                 args...))
@@ -146,55 +145,55 @@ namespace CppOverride
                             std::cout << "Failed at Check parameter value\n";
                         #endif
                         
-                        if(curArgData.at(i).Status != nullptr)
+                        if(curData.at(i).Status != nullptr)
                         {
-                            *curArgData.at(i).Status = 
+                            *curData.at(i).Status = 
                                 OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
                         }
                         
-                        if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
-                            curArgData[i].ArgumentsActionInfo.OtherwiseAction(argumentsList);
+                        if(curData[i].ResultActionInfo.OtherwiseActionSet)
+                            curData[i].ResultActionInfo.OtherwiseAction(argumentsList);
                         
                         continue;
                     }
                     
                     //Check condition lambda
-                    if( curArgData[i].ArgumentsConditionInfo.DataConditionSet && 
-                        !curArgData[i].ArgumentsConditionInfo.DataCondition(argumentsList))
+                    if( curData[i].ConditionInfo.DataConditionSet && 
+                        !curData[i].ConditionInfo.DataCondition(argumentsList))
                     {
                         #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check condition\n";
                         #endif
                         
-                        if(curArgData.at(i).Status != nullptr)
+                        if(curData.at(i).Status != nullptr)
                         {
-                            *curArgData.at(i).Status = 
+                            *curData.at(i).Status = 
                                 OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
                         }
                         
-                        if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
-                            curArgData[i].ArgumentsActionInfo.OtherwiseAction(argumentsList);
+                        if(curData[i].ResultActionInfo.OtherwiseActionSet)
+                            curData[i].ResultActionInfo.OtherwiseAction(argumentsList);
                         
                         continue;
                     }
                     
                     //Check times
-                    if( curArgData[i].ArgumentsConditionInfo.Times >= 0 && 
-                        curArgData[i].ArgumentsConditionInfo.CalledTimes >= 
-                            curArgData[i].ArgumentsConditionInfo.Times)
+                    if( curData[i].ConditionInfo.Times >= 0 && 
+                        curData[i].ConditionInfo.CalledTimes >= 
+                            curData[i].ConditionInfo.Times)
                     {
                         #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check times\n";
                         #endif
                         
-                        if(curArgData.at(i).Status != nullptr)
+                        if(curData.at(i).Status != nullptr)
                         {
-                            *curArgData.at(i).Status = 
+                            *curData.at(i).Status = 
                                 OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
                         }
                         
-                        if(curArgData[i].ArgumentsActionInfo.OtherwiseActionSet)
-                            curArgData[i].ArgumentsActionInfo.OtherwiseAction(argumentsList);
+                        if(curData[i].ResultActionInfo.OtherwiseActionSet)
+                            curData[i].ResultActionInfo.OtherwiseAction(argumentsList);
                         continue;
                     }
                     
@@ -212,12 +211,12 @@ namespace CppOverride
             }
         
         public:
-            Internal_ArgsDataRetriever( OverrideArgsDataType& overrideArgumentsInfos,
+            Internal_ArgsDataRetriever( OverrideDatas& overrideArgumentsInfos,
                                         Internal_ArgsValuesAppender& argsValuesAppender,
                                         Internal_ArgsTypeInfoAppender& argsTypeInfoAppender,
                                         Internal_ArgsTypesChecker& argsTypesChecker,
                                         Internal_ArgsValuesChecker& argsValuesChecker) : 
-                                                OverrideArgsDatas(overrideArgumentsInfos),
+                                                CurrentOverrideDatas(overrideArgumentsInfos),
                                                 ArgsValuesAppender(argsValuesAppender),
                                                 ArgsTypeInfoAppender(argsTypeInfoAppender),
                                                 ArgsTypesChecker(argsTypesChecker),
