@@ -9,7 +9,7 @@ namespace CppOverride
         //Override status
         //------------------------------------------
         //Default status.
-        //  Any matching overrde will modify the status to not be this value.
+        //  Any matching override will modify the status to not be this value.
         //  If the status is not modified (i.e. staying in this value), 
         //  Could be one of these reasons:
         //  - Function name not matching

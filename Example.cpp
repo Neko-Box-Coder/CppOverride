@@ -1,6 +1,6 @@
 #include "CppOverride.hpp"
 
-CO_DECLARE_INSTNACE(OverrideInstanceName);
+CO_DECLARE_INSTANCE(OverrideInstanceName);
 
 int OverrideMyReturnValue(int value1, float value2)
 {

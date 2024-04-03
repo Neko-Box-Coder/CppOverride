@@ -14,6 +14,7 @@ namespace CppOverride
         std::function<void*(void*)> CopyConstructor;
         std::function<void(void*)> Destructor;
         bool DataSet = false;
+        bool ReturnReference = false;
     };
 }
 

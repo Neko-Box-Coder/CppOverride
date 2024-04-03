@@ -57,7 +57,7 @@ Of course, you still have the flexibility to create mock classes
 ### Quick Start
 
 ```cpp
-CO_DECLARE_INSTNACE(OverrideInstanceName);
+CO_DECLARE_INSTANCE(OverrideInstanceName);
 
 int DummyFunction(int value1)
 {
@@ -99,14 +99,14 @@ In order to override anything, we will first need an override instance to store 
 
 #### Global / File Scope
 ```cpp
-CO_DECLARE_INSTNACE(OverrideInstanceName);
+CO_DECLARE_INSTANCE(OverrideInstanceName);
 ```
 #### Class Member Variable
 ```cpp
 class YourClass
 {
     private:
-        CO_DECLARE_MEMBER_INSTNACE(OverrideInstanceName);
+        CO_DECLARE_MEMBER_INSTANCE(OverrideInstanceName);
         
         //Other variables for your class...
     

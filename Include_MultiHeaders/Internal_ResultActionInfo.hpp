@@ -1,12 +1,12 @@
-#ifndef CO_INTERNAL_ACTION_INFO_HPP
-#define CO_INTERNAL_ACTION_INFO_HPP
+#ifndef CO_INTERNAL_RESULT_ACTION_INFO_HPP
+#define CO_INTERNAL_RESULT_ACTION_INFO_HPP
 
 #include <functional>
 #include <vector>
 
 namespace CppOverride
 {
-    struct Internal_ActionInfo
+    struct Internal_ResultActionInfo
     {
         std::function<void(const std::vector<void*>& args)> OtherwiseAction;
         std::function<void(const std::vector<void*>& args)> CorrectAction;

@@ -15,8 +15,8 @@ int main()
     
     ssTEST("Primitive Type Test")
     {
-        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
-                            .Returns(1)
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgs)
+                            .Returns<int>(1)
                             .WhenCalledWith(1, true, 2.f);
         
         ssTEST_OUTPUT_ASSERT(FuncWithArgs(1, true, 2.f) == 1);
@@ -27,9 +27,15 @@ int main()
         DummyClass testObject(1, 2.0, "test");
         DummyClass assignObject(2, 3.0, "test2");
         
-        CO_OVERRIDE_ARGS(OverrideObj, SetObjectFunc(int, double, std::string, DummyClass&))
-                        .WhenCalledWith(10, 20.0, std::string("test10"), testObject)
-                        .SetArgs(CO_DONT_SET, CO_DONT_SET, CO_DONT_SET, assignObject);
+        CO_SETUP_OVERRIDE   (OverrideObj, SetObjectFunc)
+                            .WhenCalledWith(10, 20.0, std::string("test10"), testObject)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        DummyClass>(CO_DONT_SET, 
+                                                    CO_DONT_SET, 
+                                                    CO_DONT_SET, 
+                                                    assignObject);
 
         SetObjectFunc(10, 20.0, "test10", testObject);
         
@@ -38,9 +44,9 @@ int main()
     
     ssTEST("String Value Test")
     {
-        CO_OVERRIDE_RETURNS (OverrideObj, ConstStringRefArgFunc(const std::string&))
+        CO_SETUP_OVERRIDE   (OverrideObj, ConstStringRefArgFunc)
                             .WhenCalledWith(std::string("test"))
-                            .Returns(1);
+                            .Returns<int>(1);
 
         ssTEST_OUTPUT_ASSERT(ConstStringRefArgFunc("test") == 1);
     };
@@ -50,18 +56,18 @@ int main()
         TemplateDummy<int> testDummy(1, 2, 3.f, "test");
         TemplateDummy<int> testDummy2(2, 3, 4.f, "test2");
         
-        CO_OVERRIDE_RETURNS (OverrideObj, ReturnTemplateObjectFunc(T))
+        CO_SETUP_OVERRIDE   (OverrideObj, ReturnTemplateObjectFunc)
                             .WhenCalledWith(testDummy)
-                            .Returns(testDummy2);
+                            .Returns<TemplateDummy<int>>(testDummy2);
 
         ssTEST_OUTPUT_ASSERT(ReturnTemplateObjectFunc(testDummy) == testDummy2);
     };
     
     ssTEST("No Comparison Test")
     {
-        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgs)
                             .WhenCalledWith(CO_ANY, CO_ANY, CO_ANY)
-                            .Returns(1);
+                            .Returns<int>(1);
 
         ssTEST_OUTPUT_ASSERT(FuncWithArgs(1, false, 2.f) == 1);
     };
@@ -70,9 +76,13 @@ int main()
     {
         float testFloat = 2.f;
         
-        CO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
-                        .WhenCalledWith(1, testFloat, CO_ANY)
-                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("test"));
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
+                            .WhenCalledWith(1, testFloat, CO_ANY)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string>(   CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "test");
 
         float assignFloat = 2.f;
         std::string assignString = "";
@@ -81,9 +91,9 @@ int main()
         
         ssTEST_OUTPUT_ASSERT("Pointer", assignString == "test");
         
-        CO_OVERRIDE_RETURNS (OverrideObj, ConstStringRefArgFunc(const std::string&))
+        CO_SETUP_OVERRIDE   (OverrideObj, ConstStringRefArgFunc)
                             .WhenCalledWith(std::string("test"))
-                            .Returns(1);
+                            .Returns<int>(1);
 
         ssTEST_OUTPUT_ASSERT("Reference", ConstStringRefArgFunc("test") == 1);
     };
@@ -92,9 +102,9 @@ int main()
     {
         Rectangle rect(1.5, 1.5);
         
-        CO_OVERRIDE_RETURNS (rect, GetWidth(float))
+        CO_SETUP_OVERRIDE   (rect, GetWidth)
                             .WhenCalledWith(2.f)
-                            .Returns(5.f);
+                            .Returns<float>(5.f);
         
         ssTEST_OUTPUT_ASSERT(rect.GetWidth(2.f) == 5.f);
     };
@@ -103,9 +113,13 @@ int main()
     {
         float testFloat = 1.f;
         
-        CO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
-                        .WhenCalledWith(1, &testFloat, std::string("test"))
-                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("pass"));
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
+                            .WhenCalledWith(1, &testFloat, std::string("test"))
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string>(   CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "pass");
 
         std::string assignString = "test";
         
@@ -118,9 +132,13 @@ int main()
     {
         std::string testString = "test";
         
-        CO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
-                        .WhenCalledWith(1, 2.f, &testString)
-                        .SetArgs(CO_DONT_SET, 3.f, CO_DONT_SET);
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
+                            .WhenCalledWith(1, 2.f, &testString)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        float, 
+                                        CO_ANY_TYPE>(   CO_DONT_SET, 
+                                                        3.f, 
+                                                        CO_DONT_SET);
 
         float assignFloat = 2.f;
         
@@ -133,9 +151,9 @@ int main()
     {
         float testArg = 1;
         
-        CO_OVERRIDE_RETURNS (OverrideObj, ConstVoidPointerFunc(const void*, int))
+        CO_SETUP_OVERRIDE   (OverrideObj, ConstVoidPointerFunc)
                             .WhenCalledWith(static_cast<void*>(&testArg), 2)
-                            .Returns(1);
+                            .Returns<int>(1);
         
         ssTEST_OUTPUT_ASSERT(ConstVoidPointerFunc(&testArg, 2));
         
@@ -148,9 +166,9 @@ int main()
         
         CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
         
-        CO_OVERRIDE_RETURNS (OverrideObj, ReturnTemplateObjectFunc(T))
+        CO_SETUP_OVERRIDE   (OverrideObj, ReturnTemplateObjectFunc)
                             .WhenCalledWith(testDummy)
-                            .Returns(returnDummy)
+                            .Returns<NonComparableDummy>(returnDummy)
                             .AssignStatus(status);
         
         NonComparableDummy resultDummy = ReturnTemplateObjectFunc(testDummy);

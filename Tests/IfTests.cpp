@@ -15,7 +15,7 @@ int main()
     
     ssTEST("Return Test")
     {
-        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithConstArgs(const int, const bool, float))
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithConstArgs)
                             .If
                             (
                                 [] (const std::vector<void *>& args) -> bool
@@ -30,7 +30,7 @@ int main()
                                     return false;
                                 }
                             )
-                            .Returns(1);
+                            .Returns<int>(1);
     
         ssTEST_OUTPUT_ASSERT(FuncWithConstArgs(1, true, 2.f) == 1);
         
@@ -39,24 +39,26 @@ int main()
     
     ssTEST("SetArgs Test")
     {
-        CO_OVERRIDE_ARGS(OverrideObj, FuncWithConstArgsAndArgsToSet(const int, 
-                                                                    const float, 
-                                                                    std::string&))
-                        .If
-                        (
-                            [] (const std::vector<void *>& args) -> bool
-                            {
-                                if( *static_cast<const int*>(args.at(0)) == 1 &&
-                                    *static_cast<const float*>(args.at(1)) == 2.f &&
-                                    *static_cast<std::string*>(args.at(2)) == "Test String")
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithConstArgsAndArgsToSet)
+                            .If
+                            (
+                                [] (const std::vector<void *>& args) -> bool
                                 {
-                                    return true;
+                                    if( *static_cast<const int*>(args.at(0)) == 1 &&
+                                        *static_cast<const float*>(args.at(1)) == 2.f &&
+                                        *static_cast<std::string*>(args.at(2)) == "Test String")
+                                    {
+                                        return true;
+                                    }
+                                    
+                                    return false;
                                 }
-                                
-                                return false;
-                            }
-                        )
-                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("Test String 2"));
+                            )
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string>(   CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "Test String 2");
 
         std::string testString = "";
         

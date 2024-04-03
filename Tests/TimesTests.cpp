@@ -15,9 +15,9 @@ int main()
     
     ssTEST("Return With One Override Test")
     {
-        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgs)
                             .Times(3)
-                            .Returns(1);
+                            .Returns<int>(1);
 
         ssTEST_OUTPUT_ASSERT(FuncWithArgs(1, true, 2.f) == 1);
         
@@ -30,20 +30,20 @@ int main()
     
     ssTEST("Return With Multiple Overrides Test")
     {
-        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgs)
                             .WhenCalledWith(1, true, 2.f)
                             .Times(1)
-                            .Returns(1);
+                            .Returns<int>(1);
         
-        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgs)
                             .Times(1)
                             .WhenCalledWith(2, false, 3.f)
-                            .Returns(2);
+                            .Returns<int>(2);
         
-        CO_OVERRIDE_RETURNS (OverrideObj, FuncWithArgs(int, bool, float))
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgs)
                             .Times(2)
                             .WhenCalledWith(3, true, 4.f)
-                            .Returns(3);
+                            .Returns<int>(3);
         
         ssTEST_OUTPUT_ASSERT("3rd Override", FuncWithArgs(3, true, 4.f) == 3);
         ssTEST_OUTPUT_ASSERT("3rd Override", FuncWithArgs(3, true, 4.f) == 3);
@@ -60,10 +60,16 @@ int main()
     {
         DummyClass assignObject = DummyClass(2, 3.0, "test2");
         
-        CO_OVERRIDE_ARGS(OverrideObj, SetObjectFunc(int, double, std::string, DummyClass&))
-                        .WhenCalledWith(10, 20.0, std::string("test10"), CO_ANY)
-                        .Times(2)
-                        .SetArgs(CO_DONT_SET, CO_DONT_SET, CO_DONT_SET, assignObject);
+        CO_SETUP_OVERRIDE   (OverrideObj, SetObjectFunc)
+                            .WhenCalledWith(10, 20.0, std::string("test10"), CO_ANY)
+                            .Times(2)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        DummyClass>(    CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        assignObject);
 
         
         DummyClass testObject;
@@ -81,20 +87,32 @@ int main()
     
     ssTEST("SetArg With Multiple Overrides Test")
     {
-        CO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
-                        .WhenCalledWith(1, 2.f, CO_ANY)
-                        .Times(1)
-                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("test"));
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
+                            .WhenCalledWith(1, 2.f, CO_ANY)
+                            .Times(1)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string>(   CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "test");
 
-        CO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
-                        .WhenCalledWith(2, 3.f, CO_ANY)
-                        .Times(1)
-                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("test2"));
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
+                            .WhenCalledWith(2, 3.f, CO_ANY)
+                            .Times(1)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string>(   CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "test2");
 
-        CO_OVERRIDE_ARGS(OverrideObj, FuncWithArgsToSet(int, float*, std::string&))
-                        .WhenCalledWith(3, 4.f, CO_ANY)
-                        .Times(2)
-                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("test3"));
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
+                            .WhenCalledWith(3, 4.f, CO_ANY)
+                            .Times(2)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string>(   CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "test3");
 
         float testFloat = 4.f;
         std::string testString = "";
