@@ -27,10 +27,11 @@ namespace CppOverride
                                             T& arg, 
                                             Args&... args)
             {
-                #if CO_LOG_CheckArguments
+                if(CO_LOG_CheckArguments)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsTypes index: "<<argIndex<<"\n";
-                #endif
+                }
             
                 if(argIndex >= validArgumentsList.size())
                     return false;
@@ -52,10 +53,11 @@ namespace CppOverride
                     }
                 }
                 
-                #if CO_LOG_CheckArguments
+                if(CO_LOG_CheckArguments)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsTypes index: "<<argIndex<<" passed\n";
-                #endif
+                }
                 
                 return CheckArgumentsTypes(validArgumentsList, ++argIndex, args...);
             }
@@ -70,10 +72,11 @@ namespace CppOverride
                                             T*& arg, 
                                             Args&... args)
             {
-                #if CO_LOG_CheckArguments
+                if(CO_LOG_CheckArguments)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsTypes index: "<<argIndex<<"\n";
-                #endif
+                }
             
                 if(argIndex >= validArgumentsList.size())
                     return false;
@@ -83,7 +86,8 @@ namespace CppOverride
                     if( sizeof(INTERNAL_CO_NON_CONST_T*) != validArgumentsList[argIndex].ArgSize &&
                         sizeof(INTERNAL_CO_NON_CONST_T) != validArgumentsList[argIndex].ArgSize)
                     {
-                        #if CO_LOG_CheckArguments
+                        if(CO_LOG_CheckArguments)
+                        {
                             std::cout <<    "sizeof(INTERNAL_CO_NON_CONST_T): " <<
                                             sizeof(INTERNAL_CO_NON_CONST_T) <<
                                             "\n";
@@ -94,7 +98,7 @@ namespace CppOverride
                                             "].ArgSize: " << 
                                             validArgumentsList[argIndex].ArgSize <<
                                             "\n";
-                        #endif
+                        }
                         return false;
                     }
 
@@ -103,7 +107,8 @@ namespace CppOverride
                         typeid(INTERNAL_CO_NON_CONST_T).hash_code() != 
                             validArgumentsList[argIndex].ArgTypeHash)
                     {
-                        #if CO_LOG_CheckArguments
+                        if(CO_LOG_CheckArguments)
+                        {
                             std::cout <<    "typeid(INTERNAL_CO_NON_CONST_T).hash_code(): " <<
                                             typeid(INTERNAL_CO_NON_CONST_T).hash_code() << 
                                             "\n";
@@ -113,15 +118,16 @@ namespace CppOverride
                                             "].ArgTypeHash: " <<
                                             validArgumentsList[argIndex].ArgTypeHash <<
                                             "\n";
-                        #endif
+                        }
                         return false;
                     }
                 }
                 
-                #if CO_LOG_CheckArguments
+                if(CO_LOG_CheckArguments)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsTypes index: "<<argIndex<<" passed\n";
-                #endif
+                }
                 
                 return CheckArgumentsTypes(validArgumentsList, ++argIndex, args...);
             }

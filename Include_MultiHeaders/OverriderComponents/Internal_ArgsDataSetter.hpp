@@ -1,13 +1,15 @@
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGUMENT_DATA_SETTER_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGUMENT_DATA_SETTER_HPP
 
-#include "./ProxiesDeclarations.hpp"
+//#include "./ProxiesDeclarations.hpp"
+#include "./OverrideInfoSetterDeclaration.hpp"
 #include "./Any.hpp"
 #include "./StaticAssertFalse.hpp"
 #include "./PureType.hpp"
 #include "./Internal_OverrideData.hpp"
 #include "../../External/MacroPowerToys/MacroPowerToy.h"
 
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <unordered_map>
@@ -16,7 +18,7 @@ namespace CppOverride
 {
     class Internal_ArgsDataSetter
     {
-        friend class ArgumentsProxy;
+        friend class OverrideInfoSetter;
         
         public:
             using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
@@ -24,46 +26,46 @@ namespace CppOverride
         protected:
             OverrideDatas& CurrentOverrideDatas;
             
-            inline ArgumentsProxy& SetArgs(ArgumentsProxy& proxy)
+            inline OverrideInfoSetter& SetArgs(OverrideInfoSetter& infoSetter)
             {
-                return proxy;
+                return infoSetter;
             }
             
             #define CO_LOG_SetArgs 0
             
-            #if 0 | CO_LOG_SetArgs
-                #define PRINT_BYTES(val)\
-                do\
-                {\
-                    for(int byteIdx = 0; byteIdx < sizeof(val); byteIdx++)\
-                    {\
-                        std::cout<<(int)((uint8_t*)&val)[byteIdx] <<", ";\
-                    }\
-                    std::cout << std::endl;\
-                } while(0)
+            #ifndef PRINT_BYTES
+                #define PRINT_BYTES(val) \
+                    do \
+                    { \
+                        for(int byteIdx = 0; byteIdx < sizeof(val); byteIdx++) \
+                        { \
+                            std::cout<<(int)((uint8_t*)&val)[byteIdx] <<", "; \
+                        } \
+                        std::cout << std::endl; \
+                    } while(0)
             #endif
             
             template<   typename T, 
                         typename =  typename std::enable_if<!std::is_copy_assignable<T>::value>::type,
                         typename... Args>
-            inline ArgumentsProxy& SetArgs( ArgumentsProxy& proxy,
-                                            T arg, Args&... args)
+            inline OverrideInfoSetter& SetArgs( OverrideInfoSetter& infoSetter,
+                                                T arg, Args&... args)
             {
                 static_assert(  CO_ASSERT_FALSE<T>::value, 
                                 "Cannot modify a non copy assignable object. "
                                 "Please use SetArgsByAction instead.");
 
-                return SetArgs(proxy, args...);
+                return SetArgs(infoSetter, args...);
             }
             
             template<   typename T, 
                         typename =  typename std::enable_if<std::is_copy_assignable<T>::value>::type,
                         typename... Args>
-            inline ArgumentsProxy& SetArgs( ArgumentsProxy& proxy,
-                                            T arg, Args... args)
+            inline OverrideInfoSetter& SetArgs( OverrideInfoSetter& infoSetter,
+                                                T arg, Args... args)
             {
                 Internal_OverrideData& lastData = 
-                    CurrentOverrideDatas[proxy.FunctionSignatureName].back();
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 lastData.ArgumentsDataInfo.push_back(Internal_DataInfo());
                 
@@ -79,7 +81,8 @@ namespace CppOverride
                     lastData.ArgumentsDataInfo.back().DataSet = true;
                     lastData.ArgumentsDataInfo.back().DataType = typeid(T).hash_code();
 
-                    #if CO_LOG_SetArgs
+                    if(CO_LOG_SetArgs)
+                    {
                         std::cout << "Set args index: "<< 
                             lastData.ArgumentsDataInfo.size() - 1 << std::endl;
                         
@@ -100,26 +103,26 @@ namespace CppOverride
                         std::cout << "Copied Data: "<<std::endl;
                         PRINT_BYTES((*static_cast<T*>(lastData.ArgumentsDataInfo.back().Data)));
                         std::cout << std::endl;
-                    #endif
+                    }
                 }
                 
-                return SetArgs(proxy, args...);
+                return SetArgs(infoSetter, args...);
             }
             
             template<typename Arg1Type>
-            inline ArgumentsProxy& 
-                SetArgsByAction(ArgumentsProxy& proxy,
-                                std::function<void(std::vector<void*>& args)> setArgsAction)
+            inline OverrideInfoSetter& 
+            SetArgsByAction(OverrideInfoSetter& infoSetter,
+                            std::function<void(std::vector<void*>& args)> setArgsAction)
             {
                 Internal_OverrideData& lastData = 
-                    CurrentOverrideDatas[proxy.FunctionSignatureName].back();
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 lastData.ArgumentsDataActionInfo.DataAction = setArgsAction;
                 lastData.ArgumentsDataActionInfo.DataActionSet = true;
                 lastData.ArgumentsDataActionInfo.DataTypes
                         .push_back(typeid(INTERNAL_CO_PURE_TYPE(Arg1Type)).hash_code());
                 
-                return proxy;
+                return infoSetter;
             }
             
             
@@ -130,9 +133,9 @@ namespace CppOverride
                 template<MPT_PREPEND_APPEND_ARGS(   typename, \
                                                     /* no append */, \
                                                     INTERNAL_CO_COUNT_TO(__VA_ARGS__) (Arg, Type))> \
-                inline ArgumentsProxy& \
-                    SetArgsByAction(ArgumentsProxy& proxy, \
-                                    std::function<void(std::vector<void*>& args)> setArgsAction) \
+                inline OverrideInfoSetter& \
+                SetArgsByAction(OverrideInfoSetter& infoSetter, \
+                                std::function<void(std::vector<void*>& args)> setArgsAction) \
                 { \
                     SetArgsByAction<MPT_COMPOSE \
                                     ( \
@@ -141,10 +144,10 @@ namespace CppOverride
                                             INTERNAL_CO_COUNT_TO(__VA_ARGS__), \
                                             _MINUS_1 \
                                         ) \
-                                    ) (Arg, Type)>(proxy, setArgsAction); \
+                                    ) (Arg, Type)>(infoSetter, setArgsAction); \
                     \
                     Internal_OverrideData& lastData = \
-                        CurrentOverrideDatas[proxy.FunctionSignatureName].back(); \
+                        CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back(); \
                     \
                     lastData.ArgumentsDataActionInfo \
                             .DataTypes \
@@ -161,7 +164,7 @@ namespace CppOverride
                                             ) \
                                         ).hash_code()); \
                     \
-                    return proxy; \
+                    return infoSetter; \
                 }
             
             INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_2(_, _));

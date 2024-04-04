@@ -36,10 +36,11 @@ namespace CppOverride
                                                 T& arg, 
                                                 Args&... args)
             {
-                #if CO_LOG_CheckArgumentsValues
+                if(CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
-                #endif
+                }
             
                 if(argIndex >= validArgumentsList.size())
                     return false;
@@ -51,10 +52,11 @@ namespace CppOverride
                     return false;
                 }
                 
-                #if CO_LOG_CheckArgumentsValues
+                if(CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
-                #endif
+                }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
@@ -92,10 +94,11 @@ namespace CppOverride
                         return false;
                 }
                 
-                #if CO_LOG_CheckArgumentsValues
+                if(CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
-                #endif
+                }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
@@ -111,10 +114,11 @@ namespace CppOverride
                                                 T*& arg, 
                                                 Args&... args)
             {
-                #if CO_LOG_CheckArgumentsValues
+                if(CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
-                #endif
+                }
             
                 if(argIndex >= validArgumentsList.size())
                     return false;
@@ -143,10 +147,11 @@ namespace CppOverride
                     }
                 }
                 
-                #if CO_LOG_CheckArgumentsValues
+                if(CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
-                #endif
+                }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
@@ -158,10 +163,11 @@ namespace CppOverride
                                                 void*& arg, 
                                                 Args&... args)
             {
-                #if CO_LOG_CheckArgumentsValues
+                if(CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
-                #endif
+                }
                 
                 if(argIndex >= validArgumentsList.size())
                     return false;
@@ -178,10 +184,11 @@ namespace CppOverride
                     }
                 }
                 
-                #if CO_LOG_CheckArgumentsValues
+                if(CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
-                #endif
+                }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }

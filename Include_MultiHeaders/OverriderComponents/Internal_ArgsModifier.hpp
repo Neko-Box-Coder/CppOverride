@@ -8,6 +8,7 @@
 #include "./OverrideStatus.hpp"
 
 #include <cassert>
+#include <cstdint>
 #include <vector>
 #include <iostream>
 #include <type_traits>
@@ -62,7 +63,20 @@ namespace CppOverride
                 {
                     INTERNAL_CO_NON_CONST_T& pureArg = const_cast<INTERNAL_CO_NON_CONST_T&>(arg); 
                     pureArg = *static_cast<INTERNAL_CO_NON_CONST_T*>(argsData[index].Data);
-                    #if CO_LOG_ModifyArgs
+                    if(CO_LOG_ModifyArgs)
+                    {
+                        #ifndef PRINT_BYTES
+                            #define PRINT_BYTES(val) \
+                                do \
+                                { \
+                                    for(int byteIdx = 0; byteIdx < sizeof(val); byteIdx++) \
+                                    { \
+                                        std::cout<<(int)((uint8_t*)&val)[byteIdx] <<", "; \
+                                    } \
+                                    std::cout << std::endl; \
+                                } while(0)
+                        #endif
+                        
                         std::cout << "modified index: "<<index << std::endl;
                         std::cout << "typeid(arg).name(): " << typeid(arg).name() <<std::endl;
                         std::cout <<    "typeid(arg).hash_code(): " << 
@@ -83,7 +97,7 @@ namespace CppOverride
                         
                         PRINT_BYTES((*static_cast<T*>(argsData[index].Data)));
                         std::cout << std::endl;
-                    #endif
+                    }
                 }
 
                 ModifyArgs(argumentsList, argsData, ++index, status, args...);

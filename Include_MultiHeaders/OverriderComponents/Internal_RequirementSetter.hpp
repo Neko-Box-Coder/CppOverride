@@ -1,9 +1,9 @@
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_REQUIREMENT_SETTER_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_REQUIREMENT_SETTER_HPP
 
-#include "./ProxiesDeclarations.hpp"
-#include "./Internal_OverrideArgsDataList.hpp"
-#include "./Internal_OverrideReturnDataList.hpp"
+#include "../OverrideInfoSetterDeclaration.hpp"
+#include "./Internal_OverrideData.hpp"
+
 #include "./StaticAssertFalse.hpp"
 #include "./Any.hpp"
 #include "./PureType.hpp"
@@ -17,57 +17,31 @@ namespace CppOverride
 {
     class Internal_RequirementSetter
     {
-        friend class CommonProxy<ReturnProxy>;
-        friend class CommonProxy<ArgumentsProxy>;
-
         protected:
-            using ReturnInfosType = std::unordered_map<std::string, Internal_OverrideReturnDataList>;
-            using ArgumentInfosType = std::unordered_map<std::string, Internal_OverrideDataList>;
-            
-            ArgumentInfosType& OverrideArgumentsInfos;
-            ReturnInfosType& OverrideReturnInfos;
+            using OverrideDataLists = std::unordered_map<std::string, Internal_OverrideDataList>;
+            OverrideDataLists& CurrentOverrideDataLists;
         
-            #define CO_INTERNAL_CHECK_IS_DERIVED_TYPE(checkType) \
-                typename std::enable_if<std::is_same<checkType, ReturnProxy>::value ||\
-                                        std::is_same<checkType, ArgumentsProxy>::value>::type\
-            
             //------------------------------------------------------------------------------
             //Methods for setting requirements
             //------------------------------------------------------------------------------
-            template<   typename DeriveType,
-                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
-            inline DeriveType& Times(CommonProxy<DeriveType>& proxy, int times)
+            inline OverrideInfoSetter& Times(OverrideInfoSetter& infoSetter, int times)
             {
-                if(std::is_same<DeriveType, ReturnProxy>::value)
-                {
-                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas.back()
-                                                                    .ReturnConditionInfo
-                                                                    .Times = times;
-                }
-                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
-                {
-                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas.back()
-                                                                        .ArgumentsConditionInfo
-                                                                        .Times = times;
-                }
+                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .ConditionInfo
+                                                                                .Times = times;
                 
-                return *static_cast<DeriveType*>(&proxy);
+                return infoSetter;
             }
             
-            template<   typename DeriveType,
-                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
-            inline DeriveType& WhenCalledWith(CommonProxy<DeriveType>& proxy)
+            inline OverrideInfoSetter& WhenCalledWith(OverrideInfoSetter& infoSetter)
             {
-                return *static_cast<DeriveType*>(&proxy);
+                return infoSetter;
             }
 
-            template<   typename DeriveType, 
-                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType),
-                        typename T, 
-                        typename... Args>
-            inline DeriveType& WhenCalledWith(  CommonProxy<DeriveType>& proxy, 
-                                                T arg, 
-                                                Args... args)
+            template<typename T, typename... Args>
+            inline OverrideInfoSetter& WhenCalledWith(  OverrideInfoSetter& infoSetter,
+                                                        T arg, 
+                                                        Args... args)
             {
                 ArgInfo curArg;
                 if(!std::is_same<T, Any>())
@@ -86,153 +60,72 @@ namespace CppOverride
                     #endif
                 }
 
-                if(std::is_same<DeriveType, ReturnProxy>::value)
-                {
-                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
-                                                                    .back()
-                                                                    .ReturnConditionInfo
-                                                                    .ArgsCondition
-                                                                    .push_back(curArg);
-                }
-                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
-                {
-                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
-                                                                        .back()
-                                                                        .ArgumentsConditionInfo
-                                                                        .ArgsCondition
-                                                                        .push_back(curArg);
-                }
+                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .ConditionInfo
+                                                                                .ArgsCondition
+                                                                                .push_back(curArg);
 
-                return WhenCalledWith(proxy, args...);
+                return WhenCalledWith(infoSetter, args...);
             }
             
-            template<   typename DeriveType,
-                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
-            inline DeriveType& If(  CommonProxy<DeriveType>& proxy, 
-                                    std::function<bool(const std::vector<void*>& args)> condition)
+            inline OverrideInfoSetter& 
+            If( OverrideInfoSetter& infoSetter, 
+                std::function<bool(const std::vector<void*>& args)> condition)
             {
-                if(std::is_same<DeriveType, ReturnProxy>::value)
-                {
-                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
-                                                                    .back()
-                                                                    .ReturnConditionInfo
-                                                                    .DataCondition = condition;
+                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .ConditionInfo
+                                                                                .DataCondition = condition;
                         
-                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
-                                                                    .back()
-                                                                    .ReturnConditionInfo
-                                                                    .DataConditionSet = true;
-                }
-                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
-                {
-                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
-                                                                        .back()
-                                                                        .ArgumentsConditionInfo
-                                                                        .DataCondition = condition;
-                        
-                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
-                                                                        .back()
-                                                                        .ArgumentsConditionInfo
-                                                                        .DataConditionSet = true;
-                }
+                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .ConditionInfo
+                                                                                .DataConditionSet = true;
 
-                return *static_cast<DeriveType*>(&proxy);
+                return infoSetter;
             }
             
-            template<   typename DeriveType,
-                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
-            inline DeriveType& Otherwise_Do(CommonProxy<DeriveType>& proxy, 
-                                            std::function<void(const std::vector<void*>& args)> action)
+            inline OverrideInfoSetter& 
+            Otherwise_Do(   OverrideInfoSetter& infoSetter, 
+                            std::function<void(const std::vector<void*>& args)> action)
             {
-                if(std::is_same<DeriveType, ReturnProxy>::value)
-                {
-                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
-                                                                    .back()
-                                                                    .ReturnActionInfo
-                                                                    .OtherwiseAction = action;
+                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .ResultActionInfo
+                                                                                .OtherwiseAction = action;
                     
-                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
-                                                                    .back()
-                                                                    .ReturnActionInfo
-                                                                    .OtherwiseActionSet = true;
-                }
-                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
-                {
-                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
-                                                                        .back()
-                                                                        .ArgumentsActionInfo
-                                                                        .OtherwiseAction = action;
-                        
-                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
-                                                                        .back()
-                                                                        .ArgumentsActionInfo
-                                                                        .OtherwiseActionSet = true;
-                }
-
-                return *static_cast<DeriveType*>(&proxy);
+                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .ResultActionInfo
+                                                                                .OtherwiseActionSet = true;
+                
+                return infoSetter;
             }
             
-            template<   typename DeriveType,
-                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
-            inline DeriveType& 
-                WhenCalledExpectedly_Do(CommonProxy<DeriveType>& proxy, 
-                                        std::function<void(const std::vector<void*>& args)> action)
+            inline OverrideInfoSetter& 
+            WhenCalledExpectedly_Do(OverrideInfoSetter& infoSetter, 
+                                    std::function<void(const std::vector<void*>& args)> action)
             {
-                if(std::is_same<DeriveType, ReturnProxy>::value)
-                {
-                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
-                                                                    .back()
-                                                                    .ReturnActionInfo
-                                                                    .CorrectAction = action;
-                    
-                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
-                                                                    .back()
-                                                                    .ReturnActionInfo
-                                                                    .CorrectActionSet = true;
-                }
-                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
-                {
-                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
-                                                                        .back()
-                                                                        .ArgumentsActionInfo
-                                                                        .CorrectAction = action;
-                    
-                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
-                                                                        .back()
-                                                                        .ArgumentsActionInfo
-                                                                        .CorrectActionSet = true;
-                }
+                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .ResultActionInfo
+                                                                                .CorrectAction = action;
+                
+                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .ResultActionInfo
+                                                                                .CorrectActionSet = true;
 
-                return *static_cast<DeriveType*>(&proxy);
+                return infoSetter;
             }
             
-            template<   typename DeriveType,
-                        typename = CO_INTERNAL_CHECK_IS_DERIVED_TYPE(DeriveType)>
-            inline DeriveType& AssignStatus(CommonProxy<DeriveType>& proxy, 
-                                            OverrideStatus& status)
+            inline OverrideInfoSetter& AssignStatus(OverrideInfoSetter& infoSetter, 
+                                                    OverrideStatus& status)
             {
-                if(std::is_same<DeriveType, ReturnProxy>::value)
-                {
-                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas
-                                                                    .back()
-                                                                    .Status = &status;
-                }
-                else if(std::is_same<DeriveType, ArgumentsProxy>::value)
-                {
-                    OverrideArgumentsInfos[proxy.FunctionSignatureName] .ArgumentsDatas
-                                                                        .back()
-                                                                        .Status = &status;
-                }
-
-                return *static_cast<DeriveType*>(&proxy);
+                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .Status = &status;
+                
+                return infoSetter;
             }
             
         
         public:
-            Internal_RequirementSetter( ArgumentInfosType& overrideArgumentsInfos, 
-                                        ReturnInfosType& overrideReturnInfos) : 
-                                            OverrideArgumentsInfos(overrideArgumentsInfos),
-                                            OverrideReturnInfos(overrideReturnInfos)
+            Internal_RequirementSetter(OverrideDataLists& overrideDataLists) :
+                CurrentOverrideDataLists(overrideDataLists)
             {}
     };
 }
