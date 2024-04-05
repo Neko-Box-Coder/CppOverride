@@ -25,49 +25,44 @@ namespace CppOverride
             //------------------------------------------------------------------------------
             //Methods for setting return data
             //------------------------------------------------------------------------------
-            template<typename T>
+            template<typename ReturnType>
             inline OverrideInfoSetter& 
             ReturnsByAction(OverrideInfoSetter& infoSetter, 
                             std::function<void( const std::vector<void*>& args, 
                                                 void* out)> returnAction)
             {
-                static_assert(!std::is_same<T, Any>(), "You can't return nothing in return action");
+                static_assert(  !std::is_same<ReturnType, Any>(), 
+                                "You can't return nothing in return action");
 
                 Internal_OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
 
                 lastData.ReturnDataActionInfo.DataAction = returnAction;
                 lastData.ReturnDataActionInfo.DataActionSet = true;
-                lastData.ReturnDataActionInfo.DataType = typeid(T).hash_code();
+                lastData.ReturnDataActionInfo.DataType = typeid(ReturnType).hash_code();
                 return infoSetter;
             }
             
-            template<typename T>
-            inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter, T returnData)
+            template<typename ReturnType>
+            inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter, ReturnType returnData)
             {
-                if(!std::is_same<T, Any>())
+                if(!std::is_same<ReturnType, Any>())
                 {
                     Internal_OverrideData& lastData = 
                         CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                     
-                    lastData.ReturnDataInfo.Data = new T(returnData);
+                    lastData.ReturnDataInfo.Data = new ReturnType(returnData);
                     lastData.ReturnDataInfo.CopyConstructor = 
-                        [](void* data) { return new T(*static_cast<T*>(data)); };
+                        [](void* data) { return new ReturnType(*static_cast<ReturnType*>(data)); };
                     
                     lastData.ReturnDataInfo.Destructor = 
-                        [](void* data) { delete static_cast<T*>(data); }; 
+                        [](void* data) { delete static_cast<ReturnType*>(data); }; 
                     
                     lastData.ReturnDataInfo.DataSet = true;
-                    lastData.ReturnDataInfo.DataType = typeid(T).hash_code();
+                    lastData.ReturnDataInfo.DataType = typeid(ReturnType).hash_code();
                 }
                 
                 return infoSetter;
-            }
-            
-            template<typename T>
-            inline OverrideInfoSetter& ReturnsReference(OverrideInfoSetter& infoSetter, T& returnData)
-            {
-                return Returns(infoSetter, &returnData);
             }
             
         public:

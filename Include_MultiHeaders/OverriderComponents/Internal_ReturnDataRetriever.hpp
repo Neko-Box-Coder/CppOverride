@@ -29,10 +29,9 @@ namespace CppOverride
         
             #define CO_LOG_GetCorrectReturnDataInfo 0
 
-            template<   typename T, 
+            template<   typename ReturnType, 
                         typename... Args>
-            inline int GetCorrectReturnDataInfo(T& returnRef, 
-                                                std::string functionName, 
+            inline int GetCorrectReturnDataInfo(std::string functionName, 
                                                 OverrideStatus& status,
                                                 Args&... args)
             {
@@ -44,7 +43,7 @@ namespace CppOverride
                 }
                 
                 if(CO_LOG_GetCorrectReturnDataInfo)
-                    std::cout <<"GetCorrectReturnDataInfo called\n";
+                    std::cout << __func__ << " called\n";
 
                 std::vector<void*> argumentsList;
                 ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
@@ -63,7 +62,7 @@ namespace CppOverride
                     {
                         //Check return type match
                         if( curOverrideData[i].ReturnDataInfo.DataType != 
-                            typeid(INTERNAL_CO_NON_CONST_T).hash_code())
+                            typeid(INTERNAL_CO_UNCONST(ReturnType)).hash_code())
                         {
                             if(CO_LOG_GetCorrectReturnDataInfo)
                                 std::cout << "Failed at return type\n";
@@ -75,7 +74,7 @@ namespace CppOverride
                     {
                         //Check return type match
                         if( curOverrideData[i].ReturnDataActionInfo.DataType != 
-                            typeid(INTERNAL_CO_NON_CONST_T).hash_code())
+                            typeid(INTERNAL_CO_UNCONST(ReturnType)).hash_code())
                         {
                             if(CO_LOG_GetCorrectReturnDataInfo)
                                 std::cout << "Failed at return type\n";

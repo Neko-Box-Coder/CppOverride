@@ -61,9 +61,9 @@ namespace CppOverride
     }
     
     template<typename ReturnType>
-    OverrideInfoSetter& OverrideInfoSetter::ReturnsReference(ReturnType& returnData)
+    OverrideInfoSetter& OverrideInfoSetter::Returns(ReturnType& returnData)
     {
-        return CppOverrideObj.ReturnsReference(*this, returnData);
+        return CppOverrideObj.Returns(*this, &returnData);
     }
 
     template<typename... Args>

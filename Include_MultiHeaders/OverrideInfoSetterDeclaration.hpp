@@ -53,7 +53,7 @@ namespace CppOverride
             OverrideInfoSetter& Returns(ReturnType returnData);
             
             template<typename ReturnType>
-            OverrideInfoSetter& ReturnsReference(ReturnType& returnData);
+            OverrideInfoSetter& Returns(ReturnType& returnData);
             
             template<typename... Args>
             OverrideInfoSetter& SetArgs(Args... args);

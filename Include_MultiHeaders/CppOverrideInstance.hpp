@@ -150,43 +150,82 @@ namespace CppOverride
             }
 
             //------------------------------------------------------------------------------
-            //Overriding Returns
+            //Check overrides available
             //------------------------------------------------------------------------------
-            #define CO_LOG_OverrideReturns 0
-
-            //TODO(NOW): rename this
-            inline OverrideInfoSetter Internal_OverrideReturns(std::string functionName)
+            #define CO_LOG_Internal_CheckOverride 0
+            
+            template<typename ReturnType, typename... Args>
+            inline bool Internal_CheckOverride( std::string functionName, 
+                                                int& outReturnIndex,
+                                                int& outArgsIndex,
+                                                Args&... args)
             {
-                if(CO_LOG_OverrideReturns)
+                outReturnIndex = -1;
+                outArgsIndex = -1;
+                
+                if(CO_LOG_Internal_CheckOverride)
                 {
-                    std::cout << "OverrideReturns\n";
-                    std::cout << "functionName: "<<functionName << "\n";
+                    std::cout << __func__ << "\n";
+                    std::cout << "functionName: "<< functionName << "\n";
                     std::cout << "functionName.size(): " << functionName.size() << "\n";
                 }
+                
+                if(OverrideDatas.find(functionName) == OverrideDatas.end())
+                    return false;
+            
+                OverrideStatus retrieveStatus = OverrideStatus::NO_OVERRIDE;
+                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                
+                //TODO: Merge GetCorrectReturnDataInfo and GetCorrectArgumentsDataInfo common part
+                outReturnIndex = GetCorrectReturnDataInfo<ReturnType>(  functionName, 
+                                                                        retrieveStatus, 
+                                                                        args...);
+                
+                if(retrieveStatus != OverrideStatus::NO_OVERRIDE)
+                {
+                    for(int i = 0; i < currentDataList.size(); i++)
+                    {
+                        if(currentDataList.at(i).Status != nullptr)
+                            *currentDataList.at(i).Status = retrieveStatus;
+                    }
+                }
+                
+                //Called correctly action
+                if(outReturnIndex != -1)
+                    return true;
+                
+                retrieveStatus = OverrideStatus::NO_OVERRIDE;
+            
+                outArgsIndex = GetCorrectArgumentsDataInfo( functionName, 
+                                                            retrieveStatus, 
+                                                            args...);
+            
+                if(retrieveStatus != OverrideStatus::NO_OVERRIDE)
+                {
+                    for(int i = 0; i < currentDataList.size(); i++)
+                    {
+                        if(currentDataList.at(i).Status != nullptr)
+                            *currentDataList.at(i).Status = retrieveStatus;
+                    }
+                }
+                
+                //Called correctly action
+                if(outArgsIndex != -1)
+                    return true;
+            
+                return false;
+            }
 
-                OverrideDatas[functionName].push_back(Internal_OverrideData());
-                return OverrideInfoSetter(functionName, *this);
-            }
-            
-            //TODO(NOW): Common function between return and args
-            //TODO(NOW): Rename this
-            inline void Internal_ClearOverrideReturns(std::string functionName)
-            {
-                if(OverrideDatas.find(functionName) != OverrideDatas.end())
-                    OverrideDatas.erase(functionName);
-            }
-            
-            //TODO(NOW): Common function between return and args
-            //TODO(NOW): Rename this
-            inline void ClearAllOverrideReturns()
-            {
-                OverrideDatas.clear();
-            }
+
+            //------------------------------------------------------------------------------
+            //Overriding Returns
+            //------------------------------------------------------------------------------
 
             #define CO_LOG_CheckOverrideAndReturn 0
 
-            template<typename T, typename... Args>
-            inline bool Internal_CheckOverrideAndReturn(T& returnRef, 
+            //TODO(NOW): Auto convert ref to pointer
+            template<typename ReturnType, typename... Args>
+            inline ReturnType Internal_OverrideReturn(  int dataIndex,
                                                         std::string functionName, 
                                                         Args&... args)
             {
@@ -197,36 +236,11 @@ namespace CppOverride
                     std::cout << "functionName.size(): " << functionName.size() << "\n";
                 }
                 
-                if(OverrideDatas.find(functionName) == OverrideDatas.end())
-                    return false;
-            
-                OverrideStatus retrieveStatus = OverrideStatus::NO_OVERRIDE;
-                int correctDataIndex = GetCorrectReturnDataInfo(returnRef, 
-                                                                functionName, 
-                                                                retrieveStatus, 
-                                                                args...);
-                
                 Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
-                
-                if(retrieveStatus != OverrideStatus::NO_OVERRIDE)
-                {
-                    for(int i = 0; i < currentDataList.size(); i++)
-                    {
-                        if(currentDataList.at(i).Status != nullptr)
-                            *currentDataList.at(i).Status = retrieveStatus;
-                    }
-                    
-                    return false;
-                }
-                
-                //Called correctly action
-                if(correctDataIndex == -1)
-                    return false;
-                
                 std::vector<void*> argumentsList;
                 AppendArgsValues(argumentsList, args...);
                 
-                Internal_OverrideData& correctData = currentDataList.at(correctDataIndex);
+                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
                 
                 correctData.ConditionInfo.CalledTimes++;
                 
@@ -237,11 +251,13 @@ namespace CppOverride
                     *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
                 
                 if(correctData.ReturnDataInfo.DataSet)
-                    returnRef = *reinterpret_cast<T*>(correctData.ReturnDataInfo.Data);
+                    return *reinterpret_cast<ReturnType*>(correctData.ReturnDataInfo.Data);
                 else if(correctData.ReturnDataActionInfo.DataActionSet)
+                {
+                    ReturnType* returnRef;
                     correctData.ReturnDataActionInfo.DataAction(argumentsList, &returnRef);
-
-                return true;
+                    return *returnRef;
+                }
             }
 
             //------------------------------------------------------------------------------
@@ -250,7 +266,9 @@ namespace CppOverride
             #define CO_LOG_CheckOverrideAndSetArgs 0
 
             template<typename... Args>
-            inline bool Internal_CheckOverrideAndSetArgs(std::string functionName, Args&... args)
+            inline void Internal_OverrideArgs(  int dataIndex,
+                                                std::string functionName, 
+                                                Args&... args)
             {
                 if(CO_LOG_CheckOverrideAndSetArgs)
                 {
@@ -258,35 +276,11 @@ namespace CppOverride
                     std::cout << "functionName: "<<functionName << "\n";
                 }
                 
-                if(OverrideDatas.find(functionName) == OverrideDatas.end())
-                    return false;
-            
-                OverrideStatus retrieveStatus = OverrideStatus::NO_OVERRIDE;
-                int correctDataIndex = GetCorrectArgumentsDataInfo( functionName, 
-                                                                    retrieveStatus, 
-                                                                    args...);
-                
                 Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
-                
-                if(retrieveStatus != OverrideStatus::NO_OVERRIDE)
-                {
-                    for(int i = 0; i < currentDataList.size(); i++)
-                    {
-                        if(currentDataList.at(i).Status != nullptr)
-                            *currentDataList.at(i).Status = retrieveStatus;
-                    }
-                    
-                    return false;
-                }
-                
-                //Called correctly action
-                if(correctDataIndex == -1)
-                    return false;
-                
                 std::vector<void*> argumentsList;
                 AppendArgsValues(argumentsList, args...);
                 
-                Internal_OverrideData& correctData = currentDataList.at(correctDataIndex);
+                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
                 
                 correctData.ConditionInfo.CalledTimes++;
                 
@@ -306,8 +300,36 @@ namespace CppOverride
                                 correctData.Status, 
                                 args...);
                 }
-                    
-                return true;
+            }
+            
+            //------------------------------------------------------------------------------
+            //Creating override info
+            //------------------------------------------------------------------------------
+            
+            #define CO_LOG_OverrideCreation 0
+
+            inline OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName)
+            {
+                if(CO_LOG_OverrideCreation)
+                {
+                    std::cout << "OverrideReturns\n";
+                    std::cout << "functionName: "<<functionName << "\n";
+                    std::cout << "functionName.size(): " << functionName.size() << "\n";
+                }
+
+                OverrideDatas[functionName].push_back(Internal_OverrideData());
+                return OverrideInfoSetter(functionName, *this);
+            }
+            
+            inline void Internal_RemoveOverrideInfo(std::string functionName)
+            {
+                if(OverrideDatas.find(functionName) != OverrideDatas.end())
+                    OverrideDatas.erase(functionName);
+            }
+            
+            inline void ClearAllOverrideInfo()
+            {
+                OverrideDatas.clear();
             }
     };
 }
