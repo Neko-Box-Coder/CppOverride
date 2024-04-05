@@ -159,7 +159,7 @@ namespace CppOverride
                     
                     //Check condition lambda
                     if( curData[i].ConditionInfo.DataConditionSet && 
-                        !curData[i].ConditionInfo.DataCondition(argumentsList))
+                        !curData[i].ConditionInfo.LambdaCondition(argumentsList))
                     {
                         #if CO_LOG_GetCorrectArgumentsDataInfo
                             std::cout << "Failed at Check condition\n";

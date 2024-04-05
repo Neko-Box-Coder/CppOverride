@@ -1,7 +1,6 @@
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_RETRIEVER_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_RETRIEVER_HPP
 
-//#include "./Internal_OverrideReturnDataList.hpp"
 #include "./PureType.hpp"
 #include "./Internal_ArgsValuesAppender.hpp"
 #include "./Internal_ArgsTypesChecker.hpp"
@@ -19,9 +18,11 @@ namespace CppOverride
 {
     class Internal_ReturnDataRetriever
     {
+        public:
+            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
+        
         protected:
-            using OverrideDataLists = std::unordered_map<std::string, Internal_OverrideDataList>;
-            OverrideDataLists& CurrentOverrideDataLists;
+            OverrideDatas& CurrentOverrideDatas;
             Internal_ArgsValuesAppender& ArgsValuesAppender;
             Internal_ArgsTypesChecker& ArgsTypesChecker;
             Internal_ArgsValuesChecker& ArgsValuesChecker;
@@ -35,7 +36,7 @@ namespace CppOverride
                                                 OverrideStatus& status,
                                                 Args&... args)
             {
-                if(CurrentOverrideDataLists.find(functionName) == CurrentOverrideDataLists.end())
+                if(CurrentOverrideDatas.find(functionName) == CurrentOverrideDatas.end())
                 {
                     //NOTE: This should be checked before calling this
                     status = OverrideStatus::INTERNAL_MISSING_CHECK_ERROR;
@@ -49,7 +50,7 @@ namespace CppOverride
                 ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
                 std::vector<Internal_OverrideData>& curOverrideData = 
-                    CurrentOverrideDataLists[functionName];
+                    CurrentOverrideDatas[functionName];
                 
                 int returnIndex = -1;
                 for(int i = 0; i < curOverrideData.size(); i++)
@@ -94,6 +95,7 @@ namespace CppOverride
                     {
                         if(CO_LOG_GetCorrectReturnDataInfo)
                             std::cout << "Failed at Check parameter\n";
+                        
                         continue;
                     }
                     
@@ -123,7 +125,7 @@ namespace CppOverride
                     
                     //Check condition lambda
                     if( curOverrideData[i].ConditionInfo.DataConditionSet && 
-                        !curOverrideData[i].ConditionInfo.DataCondition(argumentsList))
+                        !curOverrideData[i].ConditionInfo.LambdaCondition(argumentsList))
                     {
                         if(CO_LOG_GetCorrectReturnDataInfo)
                             std::cout << "Failed at Check condition\n";
@@ -172,11 +174,11 @@ namespace CppOverride
                 return returnIndex;
             }
         public:
-            inline Internal_ReturnDataRetriever(OverrideDataLists& overrideDataLists,
+            inline Internal_ReturnDataRetriever(OverrideDatas& overrideDataLists,
                                                 Internal_ArgsValuesAppender& argsValuesAppender,
                                                 Internal_ArgsTypesChecker& argsTypesChecker,
                                                 Internal_ArgsValuesChecker& argsValuesChecker) : 
-                CurrentOverrideDataLists(overrideDataLists),
+                CurrentOverrideDatas(overrideDataLists),
                 ArgsValuesAppender(argsValuesAppender),
                 ArgsTypesChecker(argsTypesChecker),
                 ArgsValuesChecker(argsValuesChecker)

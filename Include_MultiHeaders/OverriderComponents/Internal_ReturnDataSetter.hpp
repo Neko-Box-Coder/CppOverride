@@ -1,11 +1,11 @@
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_SETTER_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_SETTER_HPP
 
-#include "./ProxiesDeclarations.hpp"
+//#include "./ProxiesDeclarations.hpp"
 //#include "./Internal_OverrideReturnData.hpp"
 //#include "./Internal_OverrideReturnDataList.hpp"
+#include "../OverrideInfoSetterDeclaration.hpp"
 #include "../Internal_OverrideData.hpp"
-#include "./ProxiesDeclarations.hpp"
 #include "./StaticAssertFalse.hpp"
 #include "./Any.hpp"
 
@@ -16,8 +16,6 @@ namespace CppOverride
 {
     class Internal_ReturnDataSetter
     {
-        friend class ReturnProxy;
-    
         public:
             using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
         
@@ -28,28 +26,29 @@ namespace CppOverride
             //Methods for setting return data
             //------------------------------------------------------------------------------
             template<typename T>
-            inline ReturnProxy& ReturnsByAction(ReturnProxy& proxy, 
-                                                std::function<void( const std::vector<void*>& args, 
-                                                                    void* out)> returnAction)
+            inline OverrideInfoSetter& 
+            ReturnsByAction(OverrideInfoSetter& infoSetter, 
+                            std::function<void( const std::vector<void*>& args, 
+                                                void* out)> returnAction)
             {
                 static_assert(!std::is_same<T, Any>(), "You can't return nothing in return action");
 
-                Internal_OverrideReturnData& lastData = 
-                    OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas.back();
+                Internal_OverrideData& lastData = 
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
 
-                lastData.ReturnDataInfo.DataAction = returnAction;
-                lastData.ReturnDataInfo.DataActionSet = true;
-                lastData.ReturnDataInfo.DataType = typeid(T).hash_code();
-                return proxy;
+                lastData.ReturnDataActionInfo.DataAction = returnAction;
+                lastData.ReturnDataActionInfo.DataActionSet = true;
+                lastData.ReturnDataActionInfo.DataType = typeid(T).hash_code();
+                return infoSetter;
             }
             
             template<typename T>
-            inline ReturnProxy& Returns(ReturnProxy& proxy, T returnData)
+            inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter, T returnData)
             {
                 if(!std::is_same<T, Any>())
                 {
-                    Internal_OverrideReturnData& lastData = 
-                        OverrideReturnInfos[proxy.FunctionSignatureName].ReturnDatas.back();
+                    Internal_OverrideData& lastData = 
+                        CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                     
                     lastData.ReturnDataInfo.Data = new T(returnData);
                     lastData.ReturnDataInfo.CopyConstructor = 
@@ -62,18 +61,18 @@ namespace CppOverride
                     lastData.ReturnDataInfo.DataType = typeid(T).hash_code();
                 }
                 
-                return proxy;
+                return infoSetter;
             }
             
             template<typename T>
-            inline ReturnProxy& ReturnsReference(ReturnProxy& proxy, T& returnData)
+            inline OverrideInfoSetter& ReturnsReference(OverrideInfoSetter& infoSetter, T& returnData)
             {
-                return Returns(proxy, &returnData);
+                return Returns(infoSetter, &returnData);
             }
             
         public:
-            inline Internal_ReturnDataSetter(ReturnInfosType& overrideReturnInfos) : 
-                OverrideReturnInfos(overrideReturnInfos)
+            inline Internal_ReturnDataSetter(OverrideDatas& overrideDatas) : 
+                CurrentOverrideDatas(overrideDatas)
             {}
     };
 }

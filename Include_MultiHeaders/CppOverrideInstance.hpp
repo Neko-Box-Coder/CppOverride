@@ -1,7 +1,7 @@
 #ifndef CO_CPP_OVERRIDE_INSTANCE_HPP
 #define CO_CPP_OVERRIDE_INSTANCE_HPP
 
-#include "./ProxiesDeclarations.hpp"
+#include "./OverrideInfoSetterDeclaration.hpp"
 #include "./Any.hpp"
 #include "./OverriderComponents/Internal_ReturnDataSetter.hpp"
 #include "./OverriderComponents/Internal_ArgsDataSetter.hpp"
@@ -33,9 +33,7 @@ namespace CppOverride
                         public Internal_ArgsDataRetriever
     {
         private:
-            //std::unordered_map<std::string, Internal_OverrideReturnDataList> OverrideReturnInfos;
-            //std::unordered_map<std::string, Internal_OverrideDataList> OverrideArgumentsInfos;
-            std::unordered_map<std::string, Internal_OverrideDataList> OverrideDataInfos;
+            std::unordered_map<std::string, Internal_OverrideDataList> OverrideDatas;
 
 
         //==============================================================================
@@ -43,12 +41,11 @@ namespace CppOverride
         //==============================================================================
         public:
             inline Overrider(const Overrider& other) :
-                Internal_ReturnDataSetter(OverrideReturnInfos),
-                Internal_ArgsDataSetter(OverrideArgumentsInfos),
-                Internal_RequirementSetter( OverrideArgumentsInfos,
-                                            OverrideReturnInfos),
-                Internal_ReturnDataRetriever(OverrideReturnInfos, *this, *this, *this),
-                Internal_ArgsDataRetriever(OverrideArgumentsInfos, *this, *this, *this, *this)
+                Internal_ReturnDataSetter(OverrideDatas),
+                Internal_ArgsDataSetter(OverrideDatas),
+                Internal_RequirementSetter( OverrideDatas),
+                Internal_ReturnDataRetriever(OverrideDatas, *this, *this, *this),
+                Internal_ArgsDataRetriever(OverrideDatas, *this, *this, *this, *this)
             {
                 *this = other;
             }
@@ -58,74 +55,43 @@ namespace CppOverride
                 if(this == &other)
                     return *this;
             
-                OverrideReturnInfos = other.OverrideReturnInfos;
-                OverrideArgumentsInfos = other.OverrideArgumentsInfos;
+                OverrideDatas = other.OverrideDatas;
             
-                for(auto it = OverrideReturnInfos.begin(); it != OverrideReturnInfos.end(); it++)
+                //For each function
+                for(auto it = OverrideDatas.begin(); it != OverrideDatas.end(); it++)
                 {
-                    for(int i = 0; i < it->second.ReturnDatas.size(); i++)
+                    //For each override
+                    for(int i = 0; i < it->second.size(); i++)
                     {
-                        Internal_DataInfo& curReturnDataInfo = 
-                            it->second.ReturnDatas[i].ReturnDataInfo;
-                        
-                        if(curReturnDataInfo.DataSet)
+                        for(int j = 0; j < it->second[i].ConditionInfo.ArgsCondition.size(); j++)
                         {
-                            curReturnDataInfo.Data = 
-                                curReturnDataInfo.CopyConstructor(curReturnDataInfo.Data);
-                        }
-                        
-                        for(int j = 0; j < it   ->second
-                                                .ReturnDatas[i]
-                                                .ReturnConditionInfo
-                                                .ArgsCondition.size(); j++)
-                        {
-                            ArgInfo& curArgDataInfo = it->second
-                                                        .ReturnDatas[i]
-                                                        .ReturnConditionInfo
-                                                        .ArgsCondition[j];
+                            ArgInfo& currentInfo = it->second[i].ConditionInfo.ArgsCondition[j];
                             
-                            if(curArgDataInfo.ArgSet)
+                            if(currentInfo.ArgSet)
                             {
-                                curArgDataInfo.ArgDataPointer = 
-                                    curArgDataInfo.CopyConstructor(curArgDataInfo.ArgDataPointer);
-                            }
-                        }
-                    }
-                }
-                
-                for(auto it = OverrideArgumentsInfos.begin(); it != OverrideArgumentsInfos.end(); it++)
-                {
-                    for(int i = 0; i < it->second.ArgumentsDatas.size(); i++)
-                    {
-                        for(int j = 0; j < it   ->second
-                                                .ArgumentsDatas[i]
-                                                .ArgumentsDataInfo.size(); j++)
-                        {
-                            Internal_DataInfo& curArgDataInfo = it  ->second
-                                                                    .ArgumentsDatas[i]
-                                                                    .ArgumentsDataInfo[j];
-                            
-                            if(curArgDataInfo.DataSet)
-                            {
-                                curArgDataInfo.Data = 
-                                    curArgDataInfo.CopyConstructor(curArgDataInfo.Data);
+                                currentInfo.ArgDataPointer = 
+                                    currentInfo.CopyConstructor(currentInfo.ArgDataPointer);
                             }
                         }
                         
-                        for(int j = 0; j < it   ->second
-                                                .ArgumentsDatas[i]
-                                                .ArgumentsConditionInfo
-                                                .ArgsCondition.size(); j++)
+                        for(int j = 0; j < it->second[i].ArgumentsDataInfo.size(); j++)
                         {
-                            ArgInfo& curArgDataInfo = it->second
-                                                        .ArgumentsDatas[i]
-                                                        .ArgumentsConditionInfo
-                                                        .ArgsCondition[j];
+                            Internal_DataInfo& currentInfo = it->second[i].ArgumentsDataInfo[j];
                             
-                            if(curArgDataInfo.ArgSet)
+                            if(currentInfo.DataSet)
                             {
-                                curArgDataInfo.ArgDataPointer = 
-                                    curArgDataInfo.CopyConstructor(curArgDataInfo.ArgDataPointer);
+                                currentInfo.Data = 
+                                    currentInfo.CopyConstructor(currentInfo.Data);
+                            }
+                        }
+                        
+                        {
+                            Internal_DataInfo& currentInfo = it->second[i].ReturnDataInfo;
+                            
+                            if(currentInfo.DataSet)
+                            {
+                                currentInfo.Data = 
+                                    currentInfo.CopyConstructor(currentInfo.Data);
                             }
                         }
                     }
@@ -134,15 +100,14 @@ namespace CppOverride
                 return *this;
             }
                 
-            inline Overrider() :    Internal_ReturnDataSetter(OverrideReturnInfos),
-                                    Internal_ArgsDataSetter(OverrideArgumentsInfos),
-                                    Internal_RequirementSetter( OverrideArgumentsInfos,
-                                                                OverrideReturnInfos),
-                                    Internal_ReturnDataRetriever(   OverrideReturnInfos, 
+            inline Overrider() :    Internal_ReturnDataSetter(OverrideDatas),
+                                    Internal_ArgsDataSetter(OverrideDatas),
+                                    Internal_RequirementSetter(OverrideDatas),
+                                    Internal_ReturnDataRetriever(   OverrideDatas, 
                                                                     *this, 
                                                                     *this,
                                                                     *this),
-                                    Internal_ArgsDataRetriever( OverrideArgumentsInfos, 
+                                    Internal_ArgsDataRetriever( OverrideDatas, 
                                                                 *this, 
                                                                 *this, 
                                                                 *this,
@@ -151,60 +116,34 @@ namespace CppOverride
             
             inline ~Overrider()
             {
-                for(auto it = OverrideReturnInfos.begin(); it != OverrideReturnInfos.end(); it++)
+                for(auto it = OverrideDatas.begin(); it != OverrideDatas.end(); it++)
                 {
-                    for(int i = 0; i < it->second.ReturnDatas.size(); i++)
+                    for(int i = 0; i < it->second.size(); i++)
                     {
-                        //Free return data
-                        Internal_DataInfo& curDataInfo = it->second.ReturnDatas[i].ReturnDataInfo;
-                        if(curDataInfo.DataSet)
-                            curDataInfo.Destructor(curDataInfo.Data);
-                        
                         //Free argument condition data
-                        for(int j = 0; j < it->second
-                                            .ReturnDatas[i]
-                                            .ReturnConditionInfo
-                                            .ArgsCondition.size(); j++)
+                        for(int j = 0; j < it->second[i].ConditionInfo.ArgsCondition.size(); j++)
                         {
-                            ArgInfo& curArgInfos = it   ->second
-                                                        .ReturnDatas[i]
-                                                        .ReturnConditionInfo
-                                                        .ArgsCondition[j];
-                            
-                            if(curArgInfos.ArgSet)
-                                curArgInfos.Destructor(curArgInfos.ArgDataPointer);
-                        }
-                    }
-                }
-                
-                for(auto it = OverrideArgumentsInfos.begin(); it != OverrideArgumentsInfos.end(); it++)
-                {
-                    for(int i = 0; i < it->second.ArgumentsDatas.size(); i++)
-                    {
-                        //Free set arguments data
-                        for(int j = 0; j < it->second.ArgumentsDatas[i].ArgumentsDataInfo.size(); j++)
-                        {
-                            Internal_DataInfo& curDataInfo = it ->second
-                                                                .ArgumentsDatas[i]
-                                                                .ArgumentsDataInfo[j];
-                            
-                            if(curDataInfo.DataSet)
-                                curDataInfo.Destructor(curDataInfo.Data);
-                        }
-                        
-                        //Free argument condition data
-                        for(int j = 0; j < it   ->second
-                                                .ArgumentsDatas[i]
-                                                .ArgumentsConditionInfo
-                                                .ArgsCondition.size(); j++)
-                        {
-                            ArgInfo& curArgInfo = it->second
-                                                    .ArgumentsDatas[i]
-                                                    .ArgumentsConditionInfo
-                                                    .ArgsCondition[j];
+                            ArgInfo& curArgInfo = it->second[i].ConditionInfo.ArgsCondition[j];
                             
                             if(curArgInfo.ArgSet)
                                 curArgInfo.Destructor(curArgInfo.ArgDataPointer);
+                        }
+                        
+                        //Free arguments data
+                        for(int j = 0; j < it->second[i].ArgumentsDataInfo.size(); j++)
+                        {
+                            Internal_DataInfo& curData = it->second[i].ArgumentsDataInfo[j];
+                            
+                            if(curData.DataSet)
+                                curData.Destructor(curData.Data);
+                        }
+                        
+                        //Free return data
+                        {
+                            Internal_DataInfo& curData = it->second[i].ReturnDataInfo;
+                            
+                            if(curData.DataSet)
+                                curData.Destructor(curData.Data);
                         }
                     }
                 }
@@ -215,27 +154,33 @@ namespace CppOverride
             //------------------------------------------------------------------------------
             #define CO_LOG_OverrideReturns 0
 
-            inline ReturnProxy Internal_OverrideReturns(std::string functionName)
+            //TODO(NOW): rename this
+            inline OverrideInfoSetter Internal_OverrideReturns(std::string functionName)
             {
-                #if CO_LOG_OverrideReturns
+                if(CO_LOG_OverrideReturns)
+                {
                     std::cout << "OverrideReturns\n";
                     std::cout << "functionName: "<<functionName << "\n";
                     std::cout << "functionName.size(): " << functionName.size() << "\n";
-                #endif
+                }
 
-                OverrideReturnInfos[functionName].ReturnDatas.push_back(Internal_OverrideReturnData());
-                return ReturnProxy(functionName, *this);
+                OverrideDatas[functionName].push_back(Internal_OverrideData());
+                return OverrideInfoSetter(functionName, *this);
             }
             
+            //TODO(NOW): Common function between return and args
+            //TODO(NOW): Rename this
             inline void Internal_ClearOverrideReturns(std::string functionName)
             {
-                if(OverrideReturnInfos.find(functionName) != OverrideReturnInfos.end())
-                    OverrideReturnInfos.erase(functionName);
+                if(OverrideDatas.find(functionName) != OverrideDatas.end())
+                    OverrideDatas.erase(functionName);
             }
             
+            //TODO(NOW): Common function between return and args
+            //TODO(NOW): Rename this
             inline void ClearAllOverrideReturns()
             {
-                OverrideReturnInfos.clear();
+                OverrideDatas.clear();
             }
 
             #define CO_LOG_CheckOverrideAndReturn 0
@@ -245,12 +190,14 @@ namespace CppOverride
                                                         std::string functionName, 
                                                         Args&... args)
             {
-                #if CO_LOG_CheckOverrideAndReturn
+                if(CO_LOG_CheckOverrideAndReturn)
+                {
                     std::cout << "CheckOverrideAndReturn\n";
                     std::cout << "functionName: "<<functionName << "\n";
                     std::cout << "functionName.size(): " << functionName.size() << "\n";
-                #endif
-                if(OverrideReturnInfos.find(functionName) == OverrideReturnInfos.end())
+                }
+                
+                if(OverrideDatas.find(functionName) == OverrideDatas.end())
                     return false;
             
                 OverrideStatus retrieveStatus = OverrideStatus::NO_OVERRIDE;
@@ -259,91 +206,59 @@ namespace CppOverride
                                                                 retrieveStatus, 
                                                                 args...);
                 
-                auto& currentReturnDatas = OverrideReturnInfos.at(functionName).ReturnDatas;
+                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
                 
                 if(retrieveStatus != OverrideStatus::NO_OVERRIDE)
                 {
-                    for(int i = 0; i < currentReturnDatas.size(); i++)
+                    for(int i = 0; i < currentDataList.size(); i++)
                     {
-                        if(currentReturnDatas.at(i).Status != nullptr)
-                            *currentReturnDatas.at(i).Status = retrieveStatus;
+                        if(currentDataList.at(i).Status != nullptr)
+                            *currentDataList.at(i).Status = retrieveStatus;
                     }
                     
                     return false;
                 }
                 
+                //Called correctly action
+                if(correctDataIndex == -1)
+                    return false;
+                
                 std::vector<void*> argumentsList;
                 AppendArgsValues(argumentsList, args...);
                 
-                //Called correctly action
-                bool returnResult = false;
-                if(correctDataIndex != -1)
-                {
-                    Internal_OverrideReturnData& correctData = 
-                        currentReturnDatas.at(correctDataIndex);
-                    
-                    correctData.ReturnConditionInfo.CalledTimes++;
-                    
-                    if(correctData.ReturnActionInfo.CorrectActionSet)
-                        correctData.ReturnActionInfo.CorrectAction(argumentsList);
-                    
-                    if(correctData.Status != nullptr)
-                        *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
-                    
-                    if(correctData.ReturnDataInfo.DataSet)
-                        returnRef = *reinterpret_cast<T*>(correctData.ReturnDataInfo.Data);
-                    else if(correctData.ReturnDataInfo.DataActionSet)
-                        correctData.ReturnDataInfo.DataAction(argumentsList, &returnRef);
-
-                    returnResult = true;
-                }
+                Internal_OverrideData& correctData = currentDataList.at(correctDataIndex);
                 
-                //Deallocating argumentsList
-                //for(int i = 0; i < argumentsList.size(); i++)
-                //    argumentsList[i].Destructor(argumentsList[i].ArgData);
+                correctData.ConditionInfo.CalledTimes++;
+                
+                if(correctData.ResultActionInfo.CorrectActionSet)
+                    correctData.ResultActionInfo.CorrectAction(argumentsList);
+                
+                if(correctData.Status != nullptr)
+                    *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
+                
+                if(correctData.ReturnDataInfo.DataSet)
+                    returnRef = *reinterpret_cast<T*>(correctData.ReturnDataInfo.Data);
+                else if(correctData.ReturnDataActionInfo.DataActionSet)
+                    correctData.ReturnDataActionInfo.DataAction(argumentsList, &returnRef);
 
-                return returnResult;
+                return true;
             }
 
             //------------------------------------------------------------------------------
-            //Overrding Arguments
+            //Overriding Arguments
             //------------------------------------------------------------------------------
-            #define CO_LOG_OverrideArgs 0
-
-            inline ArgumentsProxy Internal_OverrideArgs(std::string functionName)
-            {
-                #if CO_LOG_OverrideArgs
-                    std::cout << "OverrideArgs\n";
-                    std::cout << "functionName: "<<functionName << "\n";
-                #endif
-
-                OverrideArgumentsInfos[functionName].ArgumentsDatas
-                                                    .push_back(Internal_OverrideArgsData());
-                
-                return ArgumentsProxy(functionName, *this);
-            }
-            
-            inline void Internal_ClearOverrideArgs(std::string functionName)
-            {
-                if(OverrideArgumentsInfos.find(functionName) != OverrideArgumentsInfos.end())
-                    OverrideArgumentsInfos.erase(functionName);
-            }
-            
-            inline void ClearAllOverrideArgs()
-            {
-                OverrideArgumentsInfos.clear();
-            }
-
             #define CO_LOG_CheckOverrideAndSetArgs 0
 
             template<typename... Args>
             inline bool Internal_CheckOverrideAndSetArgs(std::string functionName, Args&... args)
             {
-                #if CO_LOG_CheckOverrideAndSetArgs
+                if(CO_LOG_CheckOverrideAndSetArgs)
+                {
                     std::cout << "CheckOverrideAndSetArgs\n";
                     std::cout << "functionName: "<<functionName << "\n";
-                #endif
-                if(OverrideArgumentsInfos.find(functionName) == OverrideArgumentsInfos.end())
+                }
+                
+                if(OverrideDatas.find(functionName) == OverrideDatas.end())
                     return false;
             
                 OverrideStatus retrieveStatus = OverrideStatus::NO_OVERRIDE;
@@ -351,56 +266,48 @@ namespace CppOverride
                                                                     retrieveStatus, 
                                                                     args...);
                 
-                auto& currentArgsDatas = OverrideArgumentsInfos.at(functionName).ArgumentsDatas;
+                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
                 
                 if(retrieveStatus != OverrideStatus::NO_OVERRIDE)
                 {
-                    for(int i = 0; i < currentArgsDatas.size(); i++)
+                    for(int i = 0; i < currentDataList.size(); i++)
                     {
-                        if(currentArgsDatas.at(i).Status != nullptr)
-                            *currentArgsDatas.at(i).Status = retrieveStatus;
+                        if(currentDataList.at(i).Status != nullptr)
+                            *currentDataList.at(i).Status = retrieveStatus;
                     }
                     
                     return false;
                 }
                 
+                //Called correctly action
+                if(correctDataIndex == -1)
+                    return false;
+                
                 std::vector<void*> argumentsList;
                 AppendArgsValues(argumentsList, args...);
                 
-                //Called correctly action
-                bool returnResult = false;
-                if(correctDataIndex != -1)
-                {
-                    Internal_OverrideArgsData& correctData = 
-                        OverrideArgumentsInfos[functionName].ArgumentsDatas[correctDataIndex];
-                    
-                    correctData.ArgumentsConditionInfo.CalledTimes++;
-                    
-                    if(correctData.ArgumentsActionInfo.CorrectActionSet)
-                        correctData.ArgumentsActionInfo.CorrectAction(argumentsList);
-
-                    if(correctData.Status != nullptr)
-                        *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
-
-                    if(correctData.ArgumentsDataActionInfo.DataActionSet)
-                        ModifyArgs(argumentsList, correctData.ArgumentsDataActionInfo);
-                    else
-                    {
-                        ModifyArgs( argumentsList, 
-                                    correctData.ArgumentsDataInfo, 
-                                    0, 
-                                    correctData.Status, 
-                                    args...);
-                    }
-                        
-                    returnResult = true;
-                }
+                Internal_OverrideData& correctData = currentDataList.at(correctDataIndex);
                 
-                //Deallocating argumentsList
-                //for(int i = 0; i < argumentsList.size(); i++)
-                //    argumentsList[i].Destructor(argumentsList[i].ArgData);
+                correctData.ConditionInfo.CalledTimes++;
+                
+                if(correctData.ResultActionInfo.CorrectActionSet)
+                    correctData.ResultActionInfo.CorrectAction(argumentsList);
+                
+                if(correctData.Status != nullptr)
+                    *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
 
-                return returnResult;
+                if(correctData.ArgumentsDataActionInfo.DataActionSet)
+                    ModifyArgs(argumentsList, correctData.ArgumentsDataActionInfo);
+                else
+                {
+                    ModifyArgs( argumentsList, 
+                                correctData.ArgumentsDataInfo, 
+                                0, 
+                                correctData.Status, 
+                                args...);
+                }
+                    
+                return true;
             }
     };
 }

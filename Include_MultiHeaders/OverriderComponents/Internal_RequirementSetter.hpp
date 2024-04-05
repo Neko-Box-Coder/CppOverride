@@ -17,16 +17,19 @@ namespace CppOverride
 {
     class Internal_RequirementSetter
     {
+        public:
+            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
+            friend class OverrideInfoSetter;
+        
         protected:
-            using OverrideDataLists = std::unordered_map<std::string, Internal_OverrideDataList>;
-            OverrideDataLists& CurrentOverrideDataLists;
+            OverrideDatas& CurrentOverrideDatas;
         
             //------------------------------------------------------------------------------
             //Methods for setting requirements
             //------------------------------------------------------------------------------
             inline OverrideInfoSetter& Times(OverrideInfoSetter& infoSetter, int times)
             {
-                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                                 .ConditionInfo
                                                                                 .Times = times;
                 
@@ -60,7 +63,7 @@ namespace CppOverride
                     #endif
                 }
 
-                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                                 .ConditionInfo
                                                                                 .ArgsCondition
                                                                                 .push_back(curArg);
@@ -72,11 +75,11 @@ namespace CppOverride
             If( OverrideInfoSetter& infoSetter, 
                 std::function<bool(const std::vector<void*>& args)> condition)
             {
-                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                                 .ConditionInfo
-                                                                                .DataCondition = condition;
+                                                                                .LambdaCondition = condition;
                         
-                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                                 .ConditionInfo
                                                                                 .DataConditionSet = true;
 
@@ -87,11 +90,11 @@ namespace CppOverride
             Otherwise_Do(   OverrideInfoSetter& infoSetter, 
                             std::function<void(const std::vector<void*>& args)> action)
             {
-                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                                 .ResultActionInfo
                                                                                 .OtherwiseAction = action;
                     
-                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                                 .ResultActionInfo
                                                                                 .OtherwiseActionSet = true;
                 
@@ -102,11 +105,11 @@ namespace CppOverride
             WhenCalledExpectedly_Do(OverrideInfoSetter& infoSetter, 
                                     std::function<void(const std::vector<void*>& args)> action)
             {
-                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                                 .ResultActionInfo
                                                                                 .CorrectAction = action;
                 
-                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                                 .ResultActionInfo
                                                                                 .CorrectActionSet = true;
 
@@ -116,7 +119,7 @@ namespace CppOverride
             inline OverrideInfoSetter& AssignStatus(OverrideInfoSetter& infoSetter, 
                                                     OverrideStatus& status)
             {
-                CurrentOverrideDataLists[infoSetter.GetFunctionSignatureName()] .back()
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                                 .Status = &status;
                 
                 return infoSetter;
@@ -124,8 +127,8 @@ namespace CppOverride
             
         
         public:
-            Internal_RequirementSetter(OverrideDataLists& overrideDataLists) :
-                CurrentOverrideDataLists(overrideDataLists)
+            Internal_RequirementSetter(OverrideDatas& overrideDataLists) :
+                CurrentOverrideDatas(overrideDataLists)
             {}
     };
 }

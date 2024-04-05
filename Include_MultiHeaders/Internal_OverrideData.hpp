@@ -13,13 +13,17 @@ namespace CppOverride
 {
     struct Internal_OverrideData
     {
+        //Condition for override
         Internal_ConditionInfo ConditionInfo;
+        
+        //Arguments and return data
         std::vector<Internal_DataInfo> ArgumentsDataInfo;
         Internal_DataInfo ReturnDataInfo;
         
         Internal_ReturnDataActionInfo ReturnDataActionInfo;
         Internal_ArgsDataActionInfo  ArgumentsDataActionInfo;
         
+        //Result of the override
         Internal_ResultActionInfo ResultActionInfo;
         OverrideStatus* Status = nullptr;
     };

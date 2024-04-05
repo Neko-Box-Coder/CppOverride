@@ -3,6 +3,7 @@
 
 #include "./CppOverrideInstance.hpp"
 #include "./OverrideInfoSetterDeclaration.hpp"
+#include "../External/MacroPowerToys/MacroPowerToy.h"
 
 namespace CppOverride 
 {
@@ -22,169 +23,91 @@ namespace CppOverride
     }
 
     inline OverrideInfoSetter& 
-        OverrideInfoSetter::If(std::function<bool(const std::vector<void*>& args)> condition)
+    OverrideInfoSetter::If(std::function<bool(const std::vector<void*>& args)> condition)
     {
         return CppOverrideObj.If(*this, condition);
     }
 
     inline OverrideInfoSetter& 
-        OverrideInfoSetter::Otherwise_Do(std::function<void(const std::vector<void*>& args)> action)
+    OverrideInfoSetter::Otherwise_Do(std::function<void(const std::vector<void*>& args)> action)
     {
         return CppOverrideObj.Otherwise_Do(*this, action);
     }
 
     inline OverrideInfoSetter& 
-        OverrideInfoSetter::WhenCalledExpectedly_Do(std::function<void(const std::vector<void*>& args)> action)
+    OverrideInfoSetter::WhenCalledExpectedly_Do(std::function<void(const std::vector<void*>& args)> action)
     {
         return CppOverrideObj.WhenCalledExpectedly_Do(*this, action);
     }
 
     inline OverrideInfoSetter& 
-        OverrideInfoSetter::AssignStatus(OverrideStatus& status)
+    OverrideInfoSetter::AssignStatus(OverrideStatus& status)
     {
         return CppOverrideObj.AssignStatus(*this, status);
     }
 
     template<typename ReturnType>
-    inline ReturnProxy& OverrideInfoSetterReturnsByAction(std::function<void(const std::vector<void*>& args, 
-                                                                        void* out)> returnAction)
+    inline OverrideInfoSetter& 
+    OverrideInfoSetter::ReturnsByAction(std::function<void( const std::vector<void*>& args, 
+                                                            void* out)> returnAction)
     {
         return CppOverrideObj.ReturnsByAction<ReturnType>(*this, returnAction);
     }
 
     template<typename ReturnType>
-    inline ReturnProxy& OverrideInfoSetterReturns(ReturnType returnData)
+    inline OverrideInfoSetter& OverrideInfoSetter::Returns(ReturnType returnData)
     {
         return CppOverrideObj.Returns(*this, returnData);
     }
     
     template<typename ReturnType>
-    ReturnProxy& OverrideInfoSetterReturnsReference(ReturnType& returnData)
+    OverrideInfoSetter& OverrideInfoSetter::ReturnsReference(ReturnType& returnData)
     {
         return CppOverrideObj.ReturnsReference(*this, returnData);
     }
 
     template<typename... Args>
-    inline ArgumentsProxy& ArgumentsProxy::SetArgs(Args... args)
+    inline OverrideInfoSetter& OverrideInfoSetter::SetArgs(Args... args)
     {
         return CppOverrideObj.SetArgs(*this, args...);
     }
     
     #ifndef CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL
     #define CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(...) \
-        template<__VA_ARGS__>\
-        inline ArgumentsProxy&\
-        ArgumentsProxy::SetArgsByAction(std::function<void(std::vector<void*>& args)> setArgsAction)\
+        template<MPT_PREPEND_APPEND_ARGS(typename, /* no append */, __VA_ARGS__)>\
+        inline OverrideInfoSetter&\
+        OverrideInfoSetter::SetArgsByAction(std::function<void(std::vector<void*>& args)> setArgsAction)\
         {\
-            return CppOverrideObj.SetArgsByAction<
-    #endif
-    
-    #ifndef CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2
-    #define CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(...) \
-            __VA_ARGS__>(*this, setArgsAction);\
+            return CppOverrideObj.SetArgsByAction<__VA_ARGS__>(*this, setArgsAction);\
         }
     #endif
 
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(typename Arg1Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(typename Arg1Type, typename Arg2Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type)
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_1(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_2(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_3(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_4(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_5(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_6(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_7(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_8(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_9(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_10(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_11(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_12(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_13(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_14(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_15(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_16(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_17(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_18(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_19(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_20(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_21(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_22(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_23(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_24(Arg, Type));
+    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_25(Arg, Type));
     
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(typename Arg1Type, typename Arg2Type, typename Arg3Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type)
-    
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type, 
-                                                typename Arg4Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type)
-    
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type, 
-                                                typename Arg4Type, typename Arg5Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type)
-    
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type, 
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type, 
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type,
-                                                typename Arg7Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type, Arg7Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type,
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type, 
-                                                typename Arg7Type, typename Arg8Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type, Arg7Type, Arg8Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type,
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type, 
-                                                typename Arg7Type, typename Arg8Type, typename Arg9Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type, Arg7Type, Arg8Type, Arg9Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type,
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type, 
-                                                typename Arg7Type, typename Arg8Type, typename Arg9Type,
-                                                typename Arg10Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type, Arg7Type, Arg8Type, Arg9Type, Arg10Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type,
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type, 
-                                                typename Arg7Type, typename Arg8Type, typename Arg9Type,
-                                                typename Arg10Type, typename Arg11Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type, Arg7Type, Arg8Type, Arg9Type, Arg10Type,
-                                                Arg11Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type,
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type, 
-                                                typename Arg7Type, typename Arg8Type, typename Arg9Type,
-                                                typename Arg10Type, typename Arg11Type, typename Arg12Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type, Arg7Type, Arg8Type, Arg9Type, Arg10Type,
-                                                Arg11Type, Arg12Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type,
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type, 
-                                                typename Arg7Type, typename Arg8Type, typename Arg9Type,
-                                                typename Arg10Type, typename Arg11Type, typename Arg12Type,
-                                                typename Arg13Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type, Arg7Type, Arg8Type, Arg9Type, Arg10Type,
-                                                Arg11Type, Arg12Type, Arg13Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type,
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type, 
-                                                typename Arg7Type, typename Arg8Type, typename Arg9Type,
-                                                typename Arg10Type, typename Arg11Type, typename Arg12Type,
-                                                typename Arg13Type, typename Arg14Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type, Arg7Type, Arg8Type, Arg9Type, Arg10Type,
-                                                Arg11Type, Arg12Type, Arg13Type, Arg14Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type,
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type, 
-                                                typename Arg7Type, typename Arg8Type, typename Arg9Type,
-                                                typename Arg10Type, typename Arg11Type, typename Arg12Type,
-                                                typename Arg13Type, typename Arg14Type, typename Arg15Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type, Arg7Type, Arg8Type, Arg9Type, Arg10Type,
-                                                Arg11Type, Arg12Type, Arg13Type, Arg14Type, Arg15Type)
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(  typename Arg1Type, typename Arg2Type, typename Arg3Type,
-                                                typename Arg4Type, typename Arg5Type, typename Arg6Type, 
-                                                typename Arg7Type, typename Arg8Type, typename Arg9Type,
-                                                typename Arg10Type, typename Arg11Type, typename Arg12Type,
-                                                typename Arg13Type, typename Arg14Type, typename Arg15Type,
-                                                typename Arg16Type)
-    CO_INTERNA_PROXYL_SET_ARGS_BY_ACTION_IMPL_2(Arg1Type, Arg2Type, Arg3Type, Arg4Type, Arg5Type, 
-                                                Arg6Type, Arg7Type, Arg8Type, Arg9Type, Arg10Type,
-                                                Arg11Type, Arg12Type, Arg13Type, Arg14Type, Arg15Type,
-                                                Arg16Type)
 }
 
 #endif

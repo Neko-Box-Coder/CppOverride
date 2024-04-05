@@ -84,7 +84,7 @@ namespace CppOverride
                     //Check Reference (Which is converted to pointer when checking)
                     if( sizeof(INTERNAL_CO_NON_CONST_T*) == validArgumentsList[argIndex].ArgSize &&
                         typeid(INTERNAL_CO_NON_CONST_T*).hash_code() == 
-                            validArgumentsList[argIndex].ArgTypeHash)
+                        validArgumentsList[argIndex].ArgTypeHash)
                     {
                         if(&arg != *(INTERNAL_CO_NON_CONST_T**)(validArgumentsList[argIndex].ArgDataPointer))
                             return false;
