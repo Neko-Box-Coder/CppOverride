@@ -31,7 +31,7 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            #define CO_LOG_SetArgs 0
+            #define INTERNAL_CO_LOG_SetArgs 0
             
             #ifndef PRINT_BYTES
                 #define PRINT_BYTES(val) \
@@ -91,7 +91,7 @@ namespace CppOverride
                     lastData.ArgumentsDataInfo.back().DataType = 
                         typeid(INTERNAL_CO_UNCONST_UNREF_T).hash_code();
 
-                    if(CO_LOG_SetArgs)
+                    if(INTERNAL_CO_LOG_SetArgs)
                     {
                         std::cout << "Set args index: "<< 
                             lastData.ArgumentsDataInfo.size() - 1 << std::endl;
