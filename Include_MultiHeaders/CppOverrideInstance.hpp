@@ -196,10 +196,6 @@ namespace CppOverride
                     }
                 }
                 
-                //Called correctly action
-                if(outReturnIndex != -1)
-                    return true;
-                
                 retrieveStatus = OverrideStatus::NO_OVERRIDE;
             
                 outArgsIndex = GetCorrectArgumentsDataInfo( functionName, 
@@ -215,11 +211,13 @@ namespace CppOverride
                     }
                 }
                 
-                //Called correctly action
-                if(outArgsIndex != -1)
-                    return true;
-            
-                return false;
+                if(INTERNAL_CO_LOG_CheckOverride)
+                {
+                    std::cout << "outReturnIndex: " << outReturnIndex << std::endl;
+                    std::cout << "outArgsIndex: " << outArgsIndex << std::endl;
+                }
+                
+                return outReturnIndex != -1 || outArgsIndex != -1;
             }
 
 
