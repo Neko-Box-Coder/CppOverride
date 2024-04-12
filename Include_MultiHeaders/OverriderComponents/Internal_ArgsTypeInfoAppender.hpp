@@ -31,6 +31,8 @@ namespace CppOverride
                 AppendArgsPureTypeInfo(argumentsList, args...);
             }
             
+            //NOTE: We need to transform pointers and references into the base type so that
+            //      the we can assign the values that we have stored to the arguments
             template<   typename T, 
                         typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
                         typename = typename std::enable_if<!std::is_same<T, const void>::value>::type, 

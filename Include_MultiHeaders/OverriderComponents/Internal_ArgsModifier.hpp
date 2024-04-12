@@ -18,7 +18,7 @@ namespace CppOverride
     class Internal_ArgsModifier
     {
         protected:
-            #define CO_LOG_ModifyArgs 0
+            #define INTERNAL_CO_LOG_ModifyArgs 0
         
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index,
@@ -60,7 +60,7 @@ namespace CppOverride
                 {
                     INTERNAL_CO_UNCONST(T)& pureArg = const_cast<INTERNAL_CO_UNCONST(T)&>(arg); 
                     pureArg = *static_cast<INTERNAL_CO_UNCONST(T)*>(argsData[index].Data);
-                    if(CO_LOG_ModifyArgs)
+                    if(INTERNAL_CO_LOG_ModifyArgs)
                     {
                         #ifndef PRINT_BYTES
                             #define PRINT_BYTES(val) \
@@ -120,7 +120,7 @@ namespace CppOverride
                                     const T& arg, 
                                     Args&... args)
             {
-                if(CO_LOG_ModifyArgs)
+                if(INTERNAL_CO_LOG_ModifyArgs)
                 {
                     std::cout << "modified index: "<<index << std::endl;
                     std::cout << "typeid(arg).name(): " << typeid(arg).name() <<std::endl;
@@ -148,9 +148,9 @@ namespace CppOverride
                                     const Any& arg, 
                                     Args&... args)
             {
-                #if CO_LOG_ModifyArgs
+                if(INTERNAL_CO_LOG_ModifyArgs)
                     std ::cout <<"Skipping ModifyArgs for index "<<index << " for Any\n";
-                #endif
+                
                 ModifyArgs(argsData, ++index, status, args...);
             }
             

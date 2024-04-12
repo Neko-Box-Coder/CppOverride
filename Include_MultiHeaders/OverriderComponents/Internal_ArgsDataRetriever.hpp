@@ -27,7 +27,7 @@ namespace CppOverride
             Internal_ArgsTypesChecker& ArgsTypesChecker;
             Internal_ArgsValuesChecker& ArgsValuesChecker;
             
-            #define CO_LOG_GetCorrectArgumentsDataInfo 0
+            #define INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo 0
 
             template<typename... Args>
             inline int GetCorrectArgumentsDataInfo( std::string functionName, 
@@ -41,13 +41,13 @@ namespace CppOverride
                     return -1;
                 }
                 
-                #if CO_LOG_GetCorrectArgumentsDataInfo
-                    std::cout <<"GetCorrectArgumentsDataInfo called\n";
-                #endif
+                if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                    std::cout << __func__ << " called\n";
                 
                 std::vector<void*> argumentsList;
                 ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
+                //Get the base types without references and pointers
                 std::vector<ArgInfo> deRefArgumentsList;
                 ArgsTypeInfoAppender.AppendArgsPureTypeInfo(deRefArgumentsList, args...);
                 
@@ -56,9 +56,8 @@ namespace CppOverride
                 int returnIndex = -1;
                 for(int i = 0; i < curData.size(); i++)
                 {
-                    #if CO_LOG_GetCorrectArgumentsDataInfo
-                        std::cout << "Checking arg data["<<i<<"]\n";
-                    #endif
+                    if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                        std::cout << "Checking arg data[" << i << "]\n";
                     
                     //Check override argument data types match
                     int argumentTypeFailedIndex = -1;
@@ -76,12 +75,13 @@ namespace CppOverride
                             {
                                 argumentTypeFailedIndex = j;
                                 
-                                #if CO_LOG_GetCorrectArgumentsDataInfo
+                                if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                                {
                                     std::cout <<    "argTypeHashes.at(" << j << "): " << 
                                                     argTypeHashes.at(j) << std::endl;
                                     std::cout <<    "deRefArgumentsList[" << j << "].ArgTypeHash: " <<
                                                     deRefArgumentsList[j].ArgTypeHash << std::endl;
-                                #endif
+                                }
                                 
                                 break;
                             }
@@ -105,18 +105,20 @@ namespace CppOverride
                     }
                     else
                     {
-                        #if CO_LOG_GetCorrectArgumentsDataInfo
-                            std::cout << "Failed at Check set argument data exist\n";
-                        #endif
+                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                            std::cout << "Failed at Check set argument data exist" << std::endl;
+                        
                         continue;
                     }
                     
                     if(argumentTypeFailedIndex >= 0)
                     {
-                        #if CO_LOG_GetCorrectArgumentsDataInfo
+                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                        {
                             std::cout <<    "Failed at Check set argument data types at index " <<
                                             argumentTypeFailedIndex << std::endl;
-                        #endif
+                        }
+                        
                         continue;
                     }
                     
@@ -127,9 +129,9 @@ namespace CppOverride
                                                                 0, 
                                                                 args...))
                     {
-                        #if CO_LOG_GetCorrectArgumentsDataInfo
-                            std::cout << "Failed at Check parameter type\n";
-                        #endif
+                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                            std::cout << "Failed at Check parameter type" << std::endl;
+                        
                         continue;
                     }
                     
@@ -141,9 +143,8 @@ namespace CppOverride
                                                                 status,
                                                                 args...))
                     {
-                        #if CO_LOG_GetCorrectArgumentsDataInfo
-                            std::cout << "Failed at Check parameter value\n";
-                        #endif
+                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                            std::cout << "Failed at Check parameter value" << std::endl;
                         
                         if(curData.at(i).Status != nullptr)
                         {
@@ -161,9 +162,8 @@ namespace CppOverride
                     if( curData[i].ConditionInfo.DataConditionSet && 
                         !curData[i].ConditionInfo.LambdaCondition(argumentsList))
                     {
-                        #if CO_LOG_GetCorrectArgumentsDataInfo
-                            std::cout << "Failed at Check condition\n";
-                        #endif
+                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                            std::cout << "Failed at Check condition" << std::endl;
                         
                         if(curData.at(i).Status != nullptr)
                         {
@@ -182,9 +182,8 @@ namespace CppOverride
                         curData[i].ConditionInfo.CalledTimes >= 
                             curData[i].ConditionInfo.Times)
                     {
-                        #if CO_LOG_GetCorrectArgumentsDataInfo
-                            std::cout << "Failed at Check times\n";
-                        #endif
+                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                            std::cout << "Failed at Check times" << std::endl;
                         
                         if(curData.at(i).Status != nullptr)
                         {
@@ -197,9 +196,8 @@ namespace CppOverride
                         continue;
                     }
                     
-                    #if CO_LOG_GetCorrectArgumentsDataInfo
-                        std::cout << "Argument data found: "<<i<<"\n";
-                    #endif
+                    if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                        std::cout << "Argument data found: " << i << std::endl;
                     
                     returnIndex = i;
                     break;

@@ -153,7 +153,7 @@ namespace CppOverride
             //------------------------------------------------------------------------------
             //Check overrides available
             //------------------------------------------------------------------------------
-            #define CO_LOG_Internal_CheckOverride 0
+            #define INTERNAL_CO_LOG_CheckOverride 0
             
             template<typename ReturnType, typename... Args>
             inline bool Internal_CheckOverride( std::string functionName, 
@@ -164,15 +164,20 @@ namespace CppOverride
                 outReturnIndex = -1;
                 outArgsIndex = -1;
                 
-                if(CO_LOG_Internal_CheckOverride)
+                if(INTERNAL_CO_LOG_CheckOverride)
                 {
-                    std::cout << __func__ << "\n";
-                    std::cout << "functionName: "<< functionName << "\n";
-                    std::cout << "functionName.size(): " << functionName.size() << "\n";
+                    std::cout << __func__ << " called" << std::endl;
+                    std::cout << "functionName: "<< functionName << std::endl;
+                    std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
                 
                 if(OverrideDatas.find(functionName) == OverrideDatas.end())
+                {
+                    if(INTERNAL_CO_LOG_CheckOverride)
+                        std::cout << functionName << " not found\n";
+                    
                     return false;
+                }
             
                 OverrideStatus retrieveStatus = OverrideStatus::NO_OVERRIDE;
                 Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
@@ -222,7 +227,7 @@ namespace CppOverride
             //Overriding Returns
             //------------------------------------------------------------------------------
 
-            #define CO_LOG_CheckOverrideAndReturn 0
+            #define INTERNAL_CO_LOG_CheckOverrideAndReturn 0
 
             template<   typename ReturnType, 
                         typename = typename std::enable_if<std::is_same<ReturnType, void>::value>::type,
@@ -242,7 +247,7 @@ namespace CppOverride
                                                         std::string functionName, 
                                                         Args&... args)
             {
-                if(CO_LOG_CheckOverrideAndReturn)
+                if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
                 {
                     std::cout << "CheckOverrideAndReturn\n";
                     std::cout << "functionName: "<<functionName << "\n";
@@ -284,7 +289,7 @@ namespace CppOverride
                                                         std::string functionName, 
                                                         Args&... args)
             {
-                if(CO_LOG_CheckOverrideAndReturn)
+                if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
                 {
                     std::cout << "CheckOverrideAndReturn\n";
                     std::cout << "functionName: "<<functionName << "\n";
@@ -325,14 +330,14 @@ namespace CppOverride
             //------------------------------------------------------------------------------
             //Overriding Arguments
             //------------------------------------------------------------------------------
-            #define CO_LOG_CheckOverrideAndSetArgs 0
+            #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 0
 
             template<typename... Args>
             inline void Internal_OverrideArgs(  int dataIndex,
                                                 std::string functionName, 
                                                 Args&... args)
             {
-                if(CO_LOG_CheckOverrideAndSetArgs)
+                if(INTERNAL_CO_LOG_CheckOverrideAndSetArgs)
                 {
                     std::cout << "CheckOverrideAndSetArgs\n";
                     std::cout << "functionName: "<<functionName << "\n";
@@ -367,11 +372,11 @@ namespace CppOverride
             //Creating override info
             //------------------------------------------------------------------------------
             
-            #define CO_LOG_OverrideCreation 0
+            #define INTERNAL_CO_LOG_OverrideCreation 0
 
             inline OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName)
             {
-                if(CO_LOG_OverrideCreation)
+                if(INTERNAL_CO_LOG_OverrideCreation)
                 {
                     std::cout << "OverrideReturns\n";
                     std::cout << "functionName: "<<functionName << "\n";
