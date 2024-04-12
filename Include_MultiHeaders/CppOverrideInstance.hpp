@@ -15,6 +15,7 @@
 #include "./OverriderComponents/Internal_ArgsDataRetriever.hpp"
 #include "./Internal_OverrideData.hpp"
 #include "./OverrideStatus.hpp"
+#include "./EarlyReturn.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -223,8 +224,20 @@ namespace CppOverride
 
             #define CO_LOG_CheckOverrideAndReturn 0
 
-            //TODO(NOW): Auto convert ref to pointer
-            template<typename ReturnType, typename... Args>
+            template<   typename ReturnType, 
+                        typename = typename std::enable_if<std::is_same<ReturnType, void>::value>::type,
+                        typename... Args>
+            inline ReturnType Internal_OverrideReturn(  int dataIndex,
+                                                        std::string functionName, 
+                                                        Args&... args)
+            {
+                return ReturnType();
+            }
+
+            template<   typename ReturnType, 
+                        typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
+                        typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type,
+                        typename... Args>
             inline ReturnType Internal_OverrideReturn(  int dataIndex,
                                                         std::string functionName, 
                                                         Args&... args)
@@ -254,10 +267,59 @@ namespace CppOverride
                     return *reinterpret_cast<ReturnType*>(correctData.ReturnDataInfo.Data);
                 else if(correctData.ReturnDataActionInfo.DataActionSet)
                 {
-                    ReturnType* returnRef;
+                    ReturnType returnRef;
+                    correctData.ReturnDataActionInfo.DataAction(argumentsList, &returnRef);
+                    return returnRef;
+                }
+                
+                return ReturnType();
+            }
+            
+            template<   typename ReturnType, 
+                        typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
+                        typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
+                        typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
+                        typename... Args>
+            inline ReturnType Internal_OverrideReturn( int dataIndex,
+                                                        std::string functionName, 
+                                                        Args&... args)
+            {
+                if(CO_LOG_CheckOverrideAndReturn)
+                {
+                    std::cout << "CheckOverrideAndReturn\n";
+                    std::cout << "functionName: "<<functionName << "\n";
+                    std::cout << "functionName.size(): " << functionName.size() << "\n";
+                }
+                
+                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                std::vector<void*> argumentsList;
+                AppendArgsValues(argumentsList, args...);
+                
+                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
+                
+                correctData.ConditionInfo.CalledTimes++;
+                
+                if(correctData.ResultActionInfo.CorrectActionSet)
+                    correctData.ResultActionInfo.CorrectAction(argumentsList);
+                
+                if(correctData.Status != nullptr)
+                    *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
+                
+                if(correctData.ReturnDataInfo.DataSet)
+                {
+                    return *reinterpret_cast<INTERNAL_CO_UNREF(ReturnType)*>
+                    (
+                        correctData.ReturnDataInfo.Data
+                    );
+                }
+                else if(correctData.ReturnDataActionInfo.DataActionSet)
+                {
+                    INTERNAL_CO_UNREF(ReturnType)* returnRef;
                     correctData.ReturnDataActionInfo.DataAction(argumentsList, &returnRef);
                     return *returnRef;
                 }
+                
+                return EarlyReturn<ReturnType>();
             }
 
             //------------------------------------------------------------------------------
@@ -294,8 +356,7 @@ namespace CppOverride
                     ModifyArgs(argumentsList, correctData.ArgumentsDataActionInfo);
                 else
                 {
-                    ModifyArgs( argumentsList, 
-                                correctData.ArgumentsDataInfo, 
+                    ModifyArgs( correctData.ArgumentsDataInfo, 
                                 0, 
                                 correctData.Status, 
                                 args...);

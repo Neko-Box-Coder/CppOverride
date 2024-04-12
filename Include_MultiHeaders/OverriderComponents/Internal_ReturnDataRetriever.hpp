@@ -58,14 +58,25 @@ namespace CppOverride
                         std::cout << "Checking return data["<<i<<"]\n";
 
                     //Check override return data exist
-                    if( curOverrideData[i].ReturnDataInfo.DataSet)
+                    if(curOverrideData[i].ReturnDataInfo.DataSet)
                     {
                         //Check return type match
                         if( curOverrideData[i].ReturnDataInfo.DataType != 
-                            typeid(INTERNAL_CO_UNCONST(ReturnType)).hash_code())
+                            typeid(ReturnType).hash_code())
                         {
                             if(CO_LOG_GetCorrectReturnDataInfo)
                                 std::cout << "Failed at return type\n";
+                            
+                            continue;
+                        }
+                        
+                        //If we need to return a reference, 
+                        //  we check for pointer type as we can't store references
+                        if( std::is_reference<ReturnType>() && 
+                            !curOverrideData[i].ReturnDataInfo.ReturnReference)
+                        {
+                            if(CO_LOG_GetCorrectReturnDataInfo)
+                                std::cout << "Failed at return reference\n";
                             
                             continue;
                         }
@@ -74,10 +85,21 @@ namespace CppOverride
                     {
                         //Check return type match
                         if( curOverrideData[i].ReturnDataActionInfo.DataType != 
-                            typeid(INTERNAL_CO_UNCONST(ReturnType)).hash_code())
+                            typeid(ReturnType).hash_code())
                         {
                             if(CO_LOG_GetCorrectReturnDataInfo)
                                 std::cout << "Failed at return type\n";
+                            
+                            continue;
+                        }
+                        
+                        //If we need to return a reference, 
+                        //  we check for pointer type as we can't store references
+                        if( std::is_reference<ReturnType>() && 
+                            !curOverrideData[i].ReturnDataActionInfo.ReturnReference)
+                        {
+                            if(CO_LOG_GetCorrectReturnDataInfo)
+                                std::cout << "Failed at return action reference\n";
                             
                             continue;
                         }

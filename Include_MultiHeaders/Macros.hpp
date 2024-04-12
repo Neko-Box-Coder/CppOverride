@@ -120,25 +120,49 @@ namespace CppOverride
     //==============================================================================
     //Macro for overriding method implementation
     //==============================================================================
+    
+    //This macro is to prepend "," if there are any arguments present, otherwise empty
+    #define INTERNAL_CO_ARGS(...) \
+        MPT_COMPOSE \
+        ( \
+            MPT_COMPOSE \
+            (\
+                MPT_CONCAT, \
+                (INTERNAL_CO_ARGS_, MPT_IS_ARGS_EMPTY __VA_ARGS__ ) \
+            ), \
+            __VA_ARGS__ \
+        )
+    
+    #define INTERNAL_CO_ARGS_EMPTY()
+    #define INTERNAL_CO_ARGS_NOT_EMPTY(...) , __VA_ARGS__
+    
+    
     #define CO_OVERRIDE_IMPL(overrideObjName, returnType, args) \
     do \
     { \
         int foundReturnIndex = -1; \
         int foundArgsIndex = -1; \
-        bool found = Internal_CheckOverride<returnType>(__func__, \
-                                                        foundReturnIndex, \
-                                                        foundArgsIndex, \
-                                                        MPT_REMOVE_PARENTHESIS(args)); \
+        bool found = overrideObjName.Internal_CheckOverride<returnType>(__func__, \
+                                                                        foundReturnIndex, \
+                                                                        foundArgsIndex \
+                                                                        INTERNAL_CO_ARGS(args)); \
         \
         if(foundArgsIndex != -1) \
         { \
-            Internal_OverrideArgs(foundArgsIndex, __func__, MPT_REMOVE_PARENTHESIS(args)); \
+            overrideObjName.Internal_OverrideArgs(  foundArgsIndex, \
+                                                    __func__ \
+                                                    INTERNAL_CO_ARGS(args)); \
+            \
             if(std::is_same<returnType, void>::value) \
-                return; \
+                return CppOverride::EarlyReturn<returnType>(); \
         } \
         \
         if(foundReturnIndex != -1) \
-            return Internal_OverrideReturns(foundReturnIndex, __func__, MPT_REMOVE_PARENTHESIS(args)); \
+        { \
+            return overrideObjName.Internal_OverrideReturn<returnType>( foundReturnIndex, \
+                                                                        __func__ \
+                                                                        INTERNAL_CO_ARGS(args)); \
+        } \
         \
     } while(0)
 
@@ -147,7 +171,7 @@ namespace CppOverride
     //-------------------------------------------------------
 
     #define CO_SETUP_OVERRIDE(overrideObjName, functionName) \
-        overrideObjName.Internal_CreateOverrideInfo(functionName)
+        overrideObjName.Internal_CreateOverrideInfo(#functionName)
 
     #define CO_REMOVE_OVERRIDE_SETUP(overrideObjName, functionName)\
         overrideObjName.Internal_RemoveOverrideInfo(functionName)
@@ -162,7 +186,7 @@ namespace CppOverride
     #define CO_DECLARE_INSTANCE(OverrideObjName) CppOverride::Overrider OverrideObjName
             
     #define CO_DECLARE_OVERRIDE_METHODS(OverrideObjName) \
-    inline OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName) \
+    inline CppOverride::OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName) \
     { \
         return OverrideObjName.Internal_CreateOverrideInfo(functionName); \
     } \

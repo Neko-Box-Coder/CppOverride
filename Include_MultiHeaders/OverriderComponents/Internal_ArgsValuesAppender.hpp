@@ -18,7 +18,7 @@ namespace CppOverride
             template<typename T, typename... Args>
             inline void AppendArgsValues(std::vector<void*>& argumentsList, T& arg, Args&... args)
             {
-                argumentsList.push_back((INTERNAL_CO_NON_CONST_T*)&arg);
+                argumentsList.push_back((INTERNAL_CO_UNCONST(T)*)&arg);
                 AppendArgsValues(argumentsList, args...);
             }
     };

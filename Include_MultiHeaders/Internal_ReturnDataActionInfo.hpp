@@ -10,6 +10,7 @@ namespace CppOverride
         std::function<void(const std::vector<void*>& args, void* out)> DataAction;
         std::size_t DataType = 0;
         bool DataActionSet = false;
+        bool ReturnReference = false;
     };
 }
 

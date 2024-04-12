@@ -54,60 +54,89 @@ namespace CppOverride
         return CppOverrideObj.ReturnsByAction<ReturnType>(*this, returnAction);
     }
 
-    template<typename ReturnType>
-    inline OverrideInfoSetter& OverrideInfoSetter::Returns(ReturnType returnData)
+    template<typename ReturnType, typename ReturnTypeOption>
+    inline OverrideInfoSetter& OverrideInfoSetter::Returns(ReturnTypeOption returnData)
     {
-        return CppOverrideObj.Returns(*this, returnData);
+        return CppOverrideObj.Returns<ReturnType>(*this, returnData);
     }
     
-    template<typename ReturnType>
-    OverrideInfoSetter& OverrideInfoSetter::Returns(ReturnType& returnData)
+    inline OverrideInfoSetter& OverrideInfoSetter::ReturnsVoid()
     {
-        return CppOverrideObj.Returns(*this, &returnData);
+        return CppOverrideObj.ReturnsVoid(*this);
     }
 
-    template<typename... Args>
-    inline OverrideInfoSetter& OverrideInfoSetter::SetArgs(Args... args)
-    {
-        return CppOverrideObj.SetArgs(*this, args...);
-    }
-    
-    #ifndef CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL
-    #define CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(...) \
-        template<MPT_PREPEND_APPEND_ARGS(typename, /* no append */, __VA_ARGS__)>\
-        inline OverrideInfoSetter&\
-        OverrideInfoSetter::SetArgsByAction(std::function<void(std::vector<void*>& args)> setArgsAction)\
-        {\
-            return CppOverrideObj.SetArgsByAction<__VA_ARGS__>(*this, setArgsAction);\
-        }
+    #ifndef INTERNAL_CO_SET_ARGS_IMPL
+        #define INTERNAL_CO_SET_ARGS_IMPL(...) \
+            template<MPT_PREFIX_SUFFIX_ARGS(typename Arg,Type,__VA_ARGS__)> \
+            OverrideInfoSetter& OverrideInfoSetter::SetArgs \
+            ( \
+                MPT_APPEND_LISTS_ITEMS \
+                ( \
+                    MPT_PREFIX_SUFFIX_ARGS \
+                    ( \
+                        typename TypeSpecifier<Arg,Type>::Type, __VA_ARGS__ \
+                    ), \
+                    MPT_COMPOSE \
+                    ( \
+                        MPT_CONCAT, \
+                        ( \
+                            MPT_COUNT_TO_, \
+                            MPT_ARGS_COUNT(__VA_ARGS__) \
+                        ) \
+                    )(_, /* no suffix */) \
+                ) \
+            ) \
+            { \
+                return CppOverrideObj.SetArgs(*this, MPT_PREFIX_SUFFIX_ARGS(_, \
+                                                                            /* no suffix */, \
+                                                                            __VA_ARGS__)); \
+            }
+
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_1(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_2(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_3(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_4(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_5(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_6(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_7(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_8(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_9(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_10(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_11(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_12(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_13(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_14(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_15(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_16(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_17(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_18(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_19(/* no prefix */, /* no suffix */))
+        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_20(/* no prefix */, /* no suffix */))
     #endif
-
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_1(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_2(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_3(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_4(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_5(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_6(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_7(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_8(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_9(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_10(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_11(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_12(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_13(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_14(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_15(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_16(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_17(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_18(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_19(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_20(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_21(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_22(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_23(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_24(Arg, Type));
-    CO_INTERNAL_PROXY_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_25(Arg, Type));
     
+    #undef INTERNAL_CO_SET_ARGS_IMPL
+    
+    
+    //template<typename T, typename... Args>
+    //OverrideInfoSetter& OverrideInfoSetter::SetArgs(typename TypeSpecifier<T>::Type arg, Args... args)
+    //{
+    //    return CppOverrideObj.SetArgs(*this, arg, args...);
+    //    //static_assert(CO_ASSERT_FALSE<int>::value, "Please specify argument types");
+    //    return *this;
+    //}
+
+    //template<typename... Args>
+    //inline OverrideInfoSetter& OverrideInfoSetter::SetArgs(Args... args)
+    //{
+    //    return CppOverrideObj.SetArgs(*this, args...);
+    //}
+    
+    template<typename... Args>
+    inline OverrideInfoSetter&
+    OverrideInfoSetter::SetArgsByAction(std::function<void(std::vector<void*>& args)> setArgsAction)
+    {
+        return CppOverrideObj.SetArgsByAction<Args...>(*this, setArgsAction);
+    }
 }
 
 #endif

@@ -22,8 +22,8 @@ namespace CppOverride
                 ArgInfo curArgInfo;
                 if(!std::is_same<T, Any>())
                 {
-                    curArgInfo.ArgSize = sizeof(INTERNAL_CO_NON_CONST_T);
-                    curArgInfo.ArgTypeHash = typeid(INTERNAL_CO_NON_CONST_T).hash_code();
+                    curArgInfo.ArgSize = sizeof(INTERNAL_CO_UNCONST(T));
+                    curArgInfo.ArgTypeHash = typeid(INTERNAL_CO_UNCONST(T)).hash_code();
                     curArgInfo.ArgSet = true;
                 }
 

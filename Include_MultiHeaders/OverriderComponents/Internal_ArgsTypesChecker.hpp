@@ -18,6 +18,8 @@ namespace CppOverride
             inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
                                             int argIndex) { return true; };
 
+            #define INTERNAL_CO_NON_CONST_T INTERNAL_CO_UNCONST(T)
+
             #define CO_LOG_CheckArguments 0
 
             //Check Value or reference
@@ -143,6 +145,8 @@ namespace CppOverride
                                             const_cast<INTERNAL_CO_NON_CONST_T&>(arg), 
                                             args...);
             }
+
+        #undef INTERNAL_CO_NON_CONST_T
     };
 }
 

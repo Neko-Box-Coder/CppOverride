@@ -58,6 +58,9 @@ namespace CppOverride
                 return SetArgs(infoSetter, args...);
             }
             
+            #define INTERNAL_CO_UNCONST_UNREF_T INTERNAL_CO_UNREF(INTERNAL_CO_UNCONST(T))
+            #define INTERNAL_CO_UNCONST_UNREF(arg) INTERNAL_CO_UNREF(INTERNAL_CO_UNCONST(arg))
+            
             template<   typename T, 
                         typename =  typename std::enable_if<std::is_copy_assignable<T>::value>::type,
                         typename... Args>
@@ -71,15 +74,22 @@ namespace CppOverride
                 
                 if(!std::is_same<T, Any>())
                 {
-                    lastData.ArgumentsDataInfo.back().Data = new T(arg);
+                    lastData.ArgumentsDataInfo.back().Data = new INTERNAL_CO_UNCONST_UNREF_T(arg);
                     lastData.ArgumentsDataInfo.back().CopyConstructor = 
-                        [](void* data) { return new T(*static_cast<T*>(data)); };
+                        [](void* data) 
+                        { 
+                            return new INTERNAL_CO_UNCONST_UNREF_T
+                            (
+                                *static_cast<INTERNAL_CO_UNCONST_UNREF_T*>(data)
+                            ); 
+                        };
                     
                     lastData.ArgumentsDataInfo.back().Destructor = 
-                        [](void* data) { delete static_cast<T*>(data); };
+                        [](void* data) { delete static_cast<INTERNAL_CO_UNCONST_UNREF_T*>(data); };
 
                     lastData.ArgumentsDataInfo.back().DataSet = true;
-                    lastData.ArgumentsDataInfo.back().DataType = typeid(T).hash_code();
+                    lastData.ArgumentsDataInfo.back().DataType = 
+                        typeid(INTERNAL_CO_UNCONST_UNREF_T).hash_code();
 
                     if(CO_LOG_SetArgs)
                     {
@@ -92,16 +102,23 @@ namespace CppOverride
                                         typeid(arg).hash_code() << 
                                         std::endl;
                         
-                        std::cout <<    "Set args value: "<< 
-                                        (*static_cast<T*>(lastData.ArgumentsDataInfo.back().Data)) << 
-                                        std::endl << 
-                                        std::endl;
+                        //std::cout <<    "Set args value: "<< 
+                        //                (*static_cast<INTERNAL_CO_UNCONST_UNREF_T*>
+                        //                (
+                        //                    lastData.ArgumentsDataInfo.back().Data
+                        //                )) << 
+                        //                std::endl << 
+                        //                std::endl;
                         
                         std::cout << "Original Data: "<<std::endl;
                         PRINT_BYTES(arg);
                         
                         std::cout << "Copied Data: "<<std::endl;
-                        PRINT_BYTES((*static_cast<T*>(lastData.ArgumentsDataInfo.back().Data)));
+                        PRINT_BYTES((*static_cast<INTERNAL_CO_UNCONST_UNREF_T*>
+                        (
+                            lastData.ArgumentsDataInfo.back().Data
+                        )));
+                        
                         std::cout << std::endl;
                     }
                 }
@@ -120,7 +137,7 @@ namespace CppOverride
                 lastData.ArgumentsDataActionInfo.DataAction = setArgsAction;
                 lastData.ArgumentsDataActionInfo.DataActionSet = true;
                 lastData.ArgumentsDataActionInfo.DataTypes
-                        .push_back(typeid(INTERNAL_CO_PURE_TYPE(Arg1Type)).hash_code());
+                        .push_back(typeid(INTERNAL_CO_UNCONST_UNREF(Arg1Type)).hash_code());
                 
                 return infoSetter;
             }
@@ -153,7 +170,7 @@ namespace CppOverride
                             .DataTypes \
                             .push_back( typeid \
                                         ( \
-                                            INTERNAL_CO_PURE_TYPE \
+                                            INTERNAL_CO_UNCONST_UNREF \
                                             ( \
                                                 MPT_PREFIX_SUFFIX_ARGS \
                                                 ( \
@@ -167,31 +184,34 @@ namespace CppOverride
                     return infoSetter; \
                 }
             
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_2(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_3(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_4(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_5(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_6(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_7(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_8(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_9(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_10(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_11(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_12(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_13(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_14(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_15(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_16(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_17(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_18(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_19(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_20(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_21(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_22(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_23(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_24(_, _));
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_25(_, _));
-            
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_2(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_3(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_4(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_5(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_6(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_7(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_8(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_9(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_10(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_11(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_12(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_13(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_14(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_15(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_16(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_17(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_18(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_19(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_20(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_21(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_22(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_23(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_24(_, _))
+            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_25(_, _))
+        
+        #undef INTERNAL_CO_UNCONST_UNREF_T
+        #undef INTERNAL_CO_UNCONST_UNREF
+        
         public:
             inline Internal_ArgsDataSetter(OverrideDatas& overrideArgumentsInfos) : 
                 CurrentOverrideDatas(overrideArgumentsInfos)

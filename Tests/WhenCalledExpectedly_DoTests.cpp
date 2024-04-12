@@ -19,9 +19,9 @@ int main()
         
         bool calledExpectedly = false;
         
-        CO_OVERRIDE_RETURNS (rect, GetWidth(float))
+        CO_SETUP_OVERRIDE   (rect, GetWidth)
                             .WhenCalledWith(2.f)
-                            .Returns(6.f)
+                            .Returns<float>(6.f)
                             .WhenCalledExpectedly_Do
                             (
                                 [&calledExpectedly] (const std::vector<void *>& args)
@@ -41,18 +41,20 @@ int main()
     {
         bool calledExpectedly = false;
         
-        CO_OVERRIDE_ARGS(OverrideObj, FuncWithConstArgsAndArgsToSet(    const int, 
-                                                                        const float, 
-                                                                        std::string&))
-                        .WhenCalledWith(1, 2.f, CO_ANY)
-                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("test"))
-                        .WhenCalledExpectedly_Do
-                        (
-                            [&calledExpectedly] (const std::vector<void *>& args)
-                            {
-                                calledExpectedly = true;
-                            }
-                        );
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithConstArgsAndArgsToSet)
+                            .WhenCalledWith(1, 2.f, CO_ANY)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string>(   CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "test")
+                            .WhenCalledExpectedly_Do
+                            (
+                                [&calledExpectedly] (const std::vector<void *>& args)
+                                {
+                                    calledExpectedly = true;
+                                }
+                            );
 
         std::string testString;
         

@@ -81,16 +81,17 @@ namespace CppOverride
 
                 if(validArgumentsList[argIndex].ArgSet)
                 {
+                    const ArgInfo& curArgInfo = validArgumentsList[argIndex];
+                    
                     //Check Reference (Which is converted to pointer when checking)
-                    if( sizeof(INTERNAL_CO_NON_CONST_T*) == validArgumentsList[argIndex].ArgSize &&
-                        typeid(INTERNAL_CO_NON_CONST_T*).hash_code() == 
-                        validArgumentsList[argIndex].ArgTypeHash)
+                    if( sizeof(INTERNAL_CO_UNCONST(T)*) == curArgInfo.ArgSize &&
+                        typeid(INTERNAL_CO_UNCONST(T)*).hash_code() == curArgInfo.ArgTypeHash)
                     {
-                        if(&arg != *(INTERNAL_CO_NON_CONST_T**)(validArgumentsList[argIndex].ArgDataPointer))
+                        if( &arg != *(INTERNAL_CO_UNCONST(T)**)(curArgInfo.ArgDataPointer))
                             return false;
                     }
                     //Check Value
-                    else if(arg != *static_cast<INTERNAL_CO_NON_CONST_T*>(validArgumentsList[argIndex].ArgDataPointer))
+                    else if(arg != *static_cast<INTERNAL_CO_UNCONST(T)*>(curArgInfo.ArgDataPointer))
                         return false;
                 }
                 
@@ -125,16 +126,14 @@ namespace CppOverride
 
                 if(validArgumentsList[argIndex].ArgSet)
                 {
+                    const ArgInfo& curArgInfo = validArgumentsList[argIndex];
+                    
                     //Check Pointer
-                    if( sizeof(INTERNAL_CO_NON_CONST_T*) == validArgumentsList[argIndex].ArgSize &&
-                        typeid(INTERNAL_CO_NON_CONST_T*).hash_code() == 
-                            validArgumentsList[argIndex].ArgTypeHash)
+                    if( sizeof(INTERNAL_CO_UNCONST(T)*) == curArgInfo.ArgSize &&
+                        typeid(INTERNAL_CO_UNCONST(T)*).hash_code() == curArgInfo.ArgTypeHash)
                     {
-                        if(arg != *(INTERNAL_CO_NON_CONST_T**)
-                                    (validArgumentsList[argIndex].ArgDataPointer))
-                        {
+                        if(arg != *(INTERNAL_CO_UNCONST(T)**)(curArgInfo.ArgDataPointer))
                             return false;
-                        }
                     }
                     //Check Value
                     else
@@ -203,7 +202,7 @@ namespace CppOverride
                 return CheckArgumentsValues(validArgumentsList, 
                                             argIndex, 
                                             status,
-                                            const_cast<INTERNAL_CO_NON_CONST_T&>(arg), 
+                                            const_cast<INTERNAL_CO_UNCONST(T)&>(arg), 
                                             args...);
             }
     };

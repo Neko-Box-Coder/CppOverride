@@ -3,6 +3,8 @@
 
 #include "../External/MacroPowerToys/MacroPowerToy.h"
 #include "./OverrideStatus.hpp"
+#include "./TemplateTypeSpecifier.hpp"
+
 #include <functional>
 #include <string>
 #include <vector>
@@ -48,52 +50,61 @@ namespace CppOverride
             template<typename ReturnType>
             OverrideInfoSetter& ReturnsByAction(std::function<void( const std::vector<void*>& args, 
                                                                     void* out)> returnAction);
+    
+            template<typename ReturnType, typename ReturnTypeOption = ReturnType>
+            OverrideInfoSetter& Returns(ReturnTypeOption returnData);
             
-            template<typename ReturnType>
-            OverrideInfoSetter& Returns(ReturnType returnData);
+            OverrideInfoSetter& ReturnsVoid();
             
-            template<typename ReturnType>
-            OverrideInfoSetter& Returns(ReturnType& returnData);
-            
-            template<typename... Args>
-            OverrideInfoSetter& SetArgs(Args... args);
-            
-            #ifndef CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL
-            #define CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(...) \
-                template<MPT_PREPEND_APPEND_ARGS(typename, /* no append */, __VA_ARGS__)>\
-                OverrideInfoSetter& \
-                SetArgsByAction(std::function<void(std::vector<void*>& args)> setArgsAction)
+            #ifndef INTERNAL_CO_SET_ARGS_DECL
+                #define INTERNAL_CO_SET_ARGS_DECL(...) \
+                    template<MPT_PREFIX_SUFFIX_ARGS(typename Arg,Type,__VA_ARGS__)> \
+                    OverrideInfoSetter& SetArgs \
+                    ( \
+                        MPT_APPEND_LISTS_ITEMS \
+                        ( \
+                            MPT_PREFIX_SUFFIX_ARGS \
+                            ( \
+                                typename TypeSpecifier<Arg,Type>::Type, __VA_ARGS__ \
+                            ), \
+                            MPT_COMPOSE \
+                            ( \
+                                MPT_CONCAT, \
+                                ( \
+                                    MPT_COUNT_TO_, \
+                                    MPT_ARGS_COUNT(__VA_ARGS__) \
+                                ) \
+                            )(_, /* no suffix */) \
+                        ) \
+                    )
+                
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_1(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_2(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_3(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_4(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_5(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_6(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_7(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_8(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_9(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_10(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_11(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_12(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_13(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_14(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_15(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_16(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_17(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_18(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_19(/* no prefix */, /* no suffix */));
+                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_20(/* no prefix */, /* no suffix */));
             #endif
             
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_1(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_2(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_3(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_4(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_5(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_6(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_7(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_8(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_9(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_10(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_11(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_12(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_13(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_14(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_15(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_16(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_17(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_18(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_19(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_20(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_21(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_22(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_23(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_24(Arg, Type));
-            CO_INTERNAL_INFO_SET_ARGS_BY_ACTION_DECL(MPT_COUNT_TO_25(Arg, Type));
+            #undef INTERNAL_CO_SET_ARGS_DECL
             
-            
-            
-            
+            template<typename... Args>
+            OverrideInfoSetter& 
+            SetArgsByAction(std::function<void(std::vector<void*>& args)> setArgsAction);
     };
 
 

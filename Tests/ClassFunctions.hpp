@@ -35,77 +35,49 @@ class Rectangle : public Shape
         
         inline virtual void SetWidth(float width)
         {
-            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
-                                    SetWidth(float), 
-                                    width);
-
+            CO_OVERRIDE_IMPL(Overrider, void, (width));
             Width = width;
         }
         
         inline virtual void SetWidth(int width)
         {
-            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
-                                    SetWidth(int), 
-                                    width);
-
+            CO_OVERRIDE_IMPL(Overrider, void, (width));
             Width = width;
         }
         
         inline virtual float GetWidth(float multiplier = 1.f) const
         {
-            CO_RETURN_IF_FOUND( Overrider, 
-                                GetWidth(float), 
-                                float,
-                                multiplier);
-
+            CO_OVERRIDE_IMPL(Overrider, float, (multiplier));
             return Width * multiplier;
         }
         
         inline virtual void SetHeight(float height)
         {
-            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
-                                    SetHeight(float), 
-                                    height);
-            
+            CO_OVERRIDE_IMPL(Overrider, void, (height));
             Height = height;
         }
         
         inline virtual void SetHeight(int height)
         {
-            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
-                                    SetHeight(int), 
-                                    height);
-            
+            CO_OVERRIDE_IMPL(Overrider, void, (height));
             Height = height;
         }
         
         inline virtual float GetHeight(float multiplier = 1.f) const
         {
-            CO_RETURN_IF_FOUND( Overrider, 
-                                GetHeight(float), 
-                                float,
-                                multiplier);
-            
+            CO_OVERRIDE_IMPL(Overrider, float, (multiplier));
             return Height * multiplier;
         }
         
         inline virtual float GetArea(float multiplier = 1.f) const override
         {
-            CO_RETURN_IF_FOUND( Overrider, 
-                                GetArea(float), 
-                                float,
-                                multiplier);
-            
+            CO_OVERRIDE_IMPL(Overrider, float, (multiplier));
             return Width * Height;
         }
         
         inline virtual float GetPerimeter(float multiplier = 1.f) const override
         {
-            CO_RETURN_IF_FOUND( Overrider, 
-                                GetPerimeter(float), 
-                                float,
-                                multiplier);
-            
+            CO_OVERRIDE_IMPL(Overrider, float, (multiplier));
             return 2.f * (Width + Height);
         }
 };
@@ -136,49 +108,33 @@ class Square : public Rectangle
         
         inline virtual void SetSize(float size)
         {
-            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
-                                    SetSize(float), 
-                                    size);
-            
+            CO_OVERRIDE_IMPL(Overrider, void, (size));
             Rectangle::SetWidth(size);
             Rectangle::SetHeight(size);
         }
         
         inline virtual void SetSize(int size)
         {
-            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
-                                    SetSize(int), 
-                                    size);
-            
+            CO_OVERRIDE_IMPL(Overrider, void, (size));
             Rectangle::SetWidth(size);
             Rectangle::SetHeight(size);
         }
         
         inline virtual float GetSize(float multiplier = 1.f) const
         {
-            CO_RETURN_IF_FOUND( Overrider, 
-                                GetSize(float), 
-                                float,
-                                multiplier);
-            
+            CO_OVERRIDE_IMPL(Overrider, float, (multiplier));
             return Rectangle::GetWidth(multiplier);
         }
         
         void SetMetaData(T metaData)
         {
-            CO_MODIFY_ARGS_IF_FOUND(Overrider, 
-                                    SetMetaData(T), 
-                                    metaData);
-            
+            CO_OVERRIDE_IMPL(Overrider, void, (metaData));
             MetaData = metaData;
         }
         
         inline virtual T GetMetaData() const
         {
-            CO_RETURN_IF_FOUND( Overrider, 
-                                GetMetaData(), 
-                                T);
-            
+            CO_OVERRIDE_IMPL(Overrider, T, ());
             return MetaData;
         }
 };
