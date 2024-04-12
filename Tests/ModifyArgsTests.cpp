@@ -38,7 +38,8 @@ int main()
                                         DummyClass>(CO_DONT_SET, 
                                                     CO_DONT_SET, 
                                                     CO_DONT_SET, 
-                                                    DummyClass(1, 2.0, "test"));
+                                                    DummyClass(1, 2.0, "test"))
+                            .Returns<bool>(true);
 
         DummyClass testClass(2, 3.0, "test 2");
         
@@ -87,7 +88,7 @@ int main()
     ssTEST("Modify By Action Test")
     {
         CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
-                            .SetArgsByAction<int, float*, std::string&>
+                            .SetArgsByAction<int, float, std::string>
                             (
                                 [](std::vector<void*>& args)
                                 {
