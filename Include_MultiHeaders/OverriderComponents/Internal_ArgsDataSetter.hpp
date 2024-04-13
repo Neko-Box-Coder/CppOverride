@@ -54,40 +54,6 @@ namespace CppOverride
                 InternalPushArgTypes<INTERNAL_CO_UNPOINTER(T)>(lastData);
             }
             
-            //template<typename T = void>
-            //void InternalPushArgTypes(Internal_OverrideData& lastData)
-            //{
-            //}
-        
-            //template<   typename T,
-            //            typename... Args>
-            //void InternalPushArgTypes(Internal_OverrideData& lastData)
-            //{
-            //    InternalPushArgTypes<T>(lastData);
-            //}
-        
-            //template<>
-            //inline void PushArgTypes(Internal_OverrideData& lastData)
-            //{
-            //}
-            
-            //template<typename T>
-            //inline void PushArgTypes(Internal_OverrideData& lastData)
-            //{
-            //   if(!std::is_empty<T>::value)
-            //        InternalPushArgTypes<T>(lastData);
-               
-            //    //PushArgTypes<Args...>(lastData);
-            //}
-            
-            //template<typename T, typename T2, typename... Args>
-            //inline void PushArgTypes(Internal_OverrideData& lastData)
-            //{
-            //    InternalPushArgTypes<T>(lastData);
-            //    InternalPushArgTypes<T2>(lastData);
-            //    PushArgTypes<Args...>(lastData);
-            //}
-        
             template<typename T, typename... Args>
             inline void PushArgTypes(Internal_OverrideData& lastData)
             {
@@ -100,8 +66,6 @@ namespace CppOverride
             PushArgTypes(Internal_OverrideData& lastData)
             {
             }
-        
-        
         
         public:
             using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
@@ -140,14 +104,6 @@ namespace CppOverride
 
                 return SetArgs(infoSetter, args...);
             }
-            
-            //TODO(NOW): Unwrap pointers, refs and consts like in ArgsTypeInfoAppender
-            //TODO(NOW): We don't need the macros for SetArgsByAction, just use parameter pack
-            
-            //#define INTERNAL_CO_UNCONST_UNREF_T INTERNAL_CO_UNREF(INTERNAL_CO_UNCONST(T))
-            //#define INTERNAL_CO_UNCONST_UNREF(arg) INTERNAL_CO_UNREF(INTERNAL_CO_UNCONST(arg))
-            
-            //#define INTERNAL_CO_PURE_TYPE_T INTERNAL_CO_PURE_TYPE(T)
             
             template<   typename T, 
                         typename = typename std::enable_if<std::is_copy_assignable<INTERNAL_CO_UNCONST_UNREF_T>::value>::type,
@@ -255,94 +211,8 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            #if 0
-            template<typename Arg1Type>
-            inline OverrideInfoSetter& 
-            SetArgsByAction(OverrideInfoSetter& infoSetter,
-                            std::function<void(std::vector<void*>& args)> setArgsAction)
-            {
-                Internal_OverrideData& lastData = 
-                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
-                
-                lastData.ArgumentsDataActionInfo.DataAction = setArgsAction;
-                lastData.ArgumentsDataActionInfo.DataActionSet = true;
-                lastData.ArgumentsDataActionInfo.DataTypes
-                        .push_back(typeid(INTERNAL_CO_PURE_TYPE(Arg1Type)).hash_code());
-                
-                return infoSetter;
-            }
-            
-            
-            #define INTERNAL_CO_COUNT_TO(...) \
-                MPT_COMPOSE( MPT_CONCAT, (MPT_COUNT_TO_, MPT_ARGS_COUNT(__VA_ARGS__)) )
-            
-            #define INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(...) \
-                template<MPT_PREPEND_APPEND_ARGS(   typename, \
-                                                    /* no append */, \
-                                                    INTERNAL_CO_COUNT_TO(__VA_ARGS__) (Arg, Type))> \
-                inline OverrideInfoSetter& \
-                SetArgsByAction(OverrideInfoSetter& infoSetter, \
-                                std::function<void(std::vector<void*>& args)> setArgsAction) \
-                { \
-                    SetArgsByAction<MPT_COMPOSE \
-                                    ( \
-                                        MPT_CONCAT, \
-                                        ( \
-                                            INTERNAL_CO_COUNT_TO(__VA_ARGS__), \
-                                            _MINUS_1 \
-                                        ) \
-                                    ) (Arg, Type)>(infoSetter, setArgsAction); \
-                    \
-                    Internal_OverrideData& lastData = \
-                        CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back(); \
-                    \
-                    lastData.ArgumentsDataActionInfo \
-                            .DataTypes \
-                            .push_back( typeid \
-                                        ( \
-                                            INTERNAL_CO_PURE_TYPE \
-                                            ( \
-                                                MPT_PREFIX_SUFFIX_ARGS \
-                                                ( \
-                                                    Arg, \
-                                                    Type,\
-                                                    MPT_ARGS_COUNT(__VA_ARGS__) \
-                                                ) \
-                                            ) \
-                                        ).hash_code()); \
-                    \
-                    return infoSetter; \
-                }
-            
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_2(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_3(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_4(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_5(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_6(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_7(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_8(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_9(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_10(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_11(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_12(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_13(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_14(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_15(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_16(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_17(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_18(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_19(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_20(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_21(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_22(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_23(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_24(_, _))
-            INTERNAL_CO_SET_ARGS_BY_ACTION_IMPL(MPT_COUNT_TO_25(_, _))
-            #endif
-        
         #undef INTERNAL_CO_UNCONST_UNREF_T
         #undef INTERNAL_CO_UNCONST_UNREF
-        //#undef INTERNAL_CO_PURE_TYPE_T
         
         public:
             inline Internal_ArgsDataSetter(OverrideDatas& overrideArgumentsInfos) : 
