@@ -48,6 +48,28 @@ int main()
         ssTEST_OUTPUT_ASSERT(testClass == DummyClass(1, 2.0, "test"));
     };
     
+    ssTEST("Modify Object Test with action")
+    {
+        CO_SETUP_OVERRIDE   (OverrideObj, SetObjectFunc)
+                            .SetArgsByAction<   CO_ANY_TYPE, 
+                                                CO_ANY_TYPE, 
+                                                CO_ANY_TYPE, 
+                                                DummyClass*>
+                            (
+                                [](std::vector<void*>& args)
+                                {
+                                    *((DummyClass*)args.at(3)) = DummyClass(1, 2.0, "test");
+                                }
+                            )
+                            .Returns<bool>(true);
+
+        DummyClass testClass(2, 3.0, "test 2");
+        
+        SetObjectFunc(0, 0, "a", testClass);
+        
+        ssTEST_OUTPUT_ASSERT(testClass == DummyClass(1, 2.0, "test"));
+    };
+    
     ssTEST("Modify Template Object Test")
     {
         TemplateDummy<int> assignDummy(1, 2, 3.f, "test");

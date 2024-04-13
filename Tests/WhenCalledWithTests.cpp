@@ -35,7 +35,8 @@ int main()
                                         DummyClass>(CO_DONT_SET, 
                                                     CO_DONT_SET, 
                                                     CO_DONT_SET, 
-                                                    assignObject);
+                                                    assignObject)
+                            .Returns<bool>(true);
 
         SetObjectFunc(10, 20.0, "test10", testObject);
         

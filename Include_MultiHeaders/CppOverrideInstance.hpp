@@ -217,6 +217,17 @@ namespace CppOverride
                     std::cout << "outArgsIndex: " << outArgsIndex << std::endl;
                 }
                 
+                if(outReturnIndex == outArgsIndex && outReturnIndex != -1)
+                    currentDataList.at(outReturnIndex).ConditionInfo.CalledTimes++;
+                else
+                {
+                    if(outReturnIndex != -1)
+                        currentDataList.at(outReturnIndex).ConditionInfo.CalledTimes++;
+                
+                    if(outArgsIndex != -1)
+                        currentDataList.at(outArgsIndex).ConditionInfo.CalledTimes++;
+                }
+                
                 return outReturnIndex != -1 || outArgsIndex != -1;
             }
 
@@ -258,8 +269,6 @@ namespace CppOverride
                 
                 Internal_OverrideData& correctData = currentDataList.at(dataIndex);
                 
-                correctData.ConditionInfo.CalledTimes++;
-                
                 if(correctData.ResultActionInfo.CorrectActionSet)
                     correctData.ResultActionInfo.CorrectAction(argumentsList);
                 
@@ -289,9 +298,9 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
                 {
-                    std::cout << "CheckOverrideAndReturn\n";
-                    std::cout << "functionName: "<<functionName << "\n";
-                    std::cout << "functionName.size(): " << functionName.size() << "\n";
+                    std::cout << __func__ << " called" << std::endl;
+                    std::cout << "functionName: " << functionName << std::endl;
+                    std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
                 
                 Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
@@ -299,8 +308,6 @@ namespace CppOverride
                 AppendArgsValues(argumentsList, args...);
                 
                 Internal_OverrideData& correctData = currentDataList.at(dataIndex);
-                
-                correctData.ConditionInfo.CalledTimes++;
                 
                 if(correctData.ResultActionInfo.CorrectActionSet)
                     correctData.ResultActionInfo.CorrectAction(argumentsList);
@@ -337,8 +344,8 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckOverrideAndSetArgs)
                 {
-                    std::cout << "CheckOverrideAndSetArgs\n";
-                    std::cout << "functionName: "<<functionName << "\n";
+                    std::cout << __func__ << " called" << std::endl;
+                    std::cout << "functionName: "<<functionName << std::endl;
                 }
                 
                 Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
@@ -346,8 +353,6 @@ namespace CppOverride
                 AppendArgsValues(argumentsList, args...);
                 
                 Internal_OverrideData& correctData = currentDataList.at(dataIndex);
-                
-                correctData.ConditionInfo.CalledTimes++;
                 
                 if(correctData.ResultActionInfo.CorrectActionSet)
                     correctData.ResultActionInfo.CorrectAction(argumentsList);

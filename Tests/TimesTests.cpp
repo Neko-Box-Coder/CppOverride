@@ -66,10 +66,11 @@ int main()
                             .SetArgs<   CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
-                                        DummyClass>(    CO_DONT_SET, 
+                                        DummyClass&>(   CO_DONT_SET, 
                                                         CO_DONT_SET, 
                                                         CO_DONT_SET, 
-                                                        assignObject);
+                                                        assignObject)
+                            .Returns<bool>(true);
 
         
         DummyClass testObject;

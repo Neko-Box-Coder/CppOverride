@@ -7,6 +7,7 @@
 #include "./Internal_ArgsValuesChecker.hpp"
 #include "./OverrideStatus.hpp"
 #include "./Internal_OverrideData.hpp"
+#include "../AliasTypes.hpp"
 
 #include <cassert>
 #include <string>
@@ -42,7 +43,7 @@ namespace CppOverride
                 }
                 
                 if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                    std::cout << __func__ << " called\n";
+                    std::cout << __func__ << " called" << std::endl;
                 
                 std::vector<void*> argumentsList;
                 ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
@@ -69,16 +70,20 @@ namespace CppOverride
                         std::vector<std::size_t>& argTypeHashes = 
                             curData[i].ArgumentsDataActionInfo.DataTypes;
                         
+                        std::vector<bool>& argsTypesSet = 
+                            curData[i].ArgumentsDataActionInfo.DataTypesSet;
+                        
                         for(int j = 0; j < argTypeHashes.size(); j++)
                         {
-                            if(argTypeHashes.at(j) != deRefArgumentsList[j].ArgTypeHash)
+                            if( argsTypesSet[j] &&
+                                argTypeHashes[j] != deRefArgumentsList[j].ArgTypeHash)
                             {
                                 argumentTypeFailedIndex = j;
                                 
                                 if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
                                 {
-                                    std::cout <<    "argTypeHashes.at(" << j << "): " << 
-                                                    argTypeHashes.at(j) << std::endl;
+                                    std::cout <<    "argTypeHashes[" << j << "]: " << 
+                                                    argTypeHashes[j] << std::endl;
                                     std::cout <<    "deRefArgumentsList[" << j << "].ArgTypeHash: " <<
                                                     deRefArgumentsList[j].ArgTypeHash << std::endl;
                                 }
@@ -146,9 +151,9 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
                             std::cout << "Failed at Check parameter value" << std::endl;
                         
-                        if(curData.at(i).Status != nullptr)
+                        if(curData[i].Status != nullptr)
                         {
-                            *curData.at(i).Status = 
+                            *curData[i].Status = 
                                 OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
                         }
                         
@@ -165,9 +170,9 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
                             std::cout << "Failed at Check condition" << std::endl;
                         
-                        if(curData.at(i).Status != nullptr)
+                        if(curData[i].Status != nullptr)
                         {
-                            *curData.at(i).Status = 
+                            *curData[i].Status = 
                                 OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
                         }
                         
@@ -185,9 +190,9 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
                             std::cout << "Failed at Check times" << std::endl;
                         
-                        if(curData.at(i).Status != nullptr)
+                        if(curData[i].Status != nullptr)
                         {
-                            *curData.at(i).Status = 
+                            *curData[i].Status = 
                                 OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
                         }
                         

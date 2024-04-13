@@ -30,8 +30,8 @@ namespace CppOverride
             inline OverrideInfoSetter& Times(OverrideInfoSetter& infoSetter, int times)
             {
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                                .ConditionInfo
-                                                                                .Times = times;
+                                                                            .ConditionInfo
+                                                                            .Times = times;
                 
                 return infoSetter;
             }
