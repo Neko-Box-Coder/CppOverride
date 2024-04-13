@@ -54,9 +54,11 @@ namespace CppOverride
         return CppOverrideObj.ReturnsByAction<ReturnType>(*this, returnAction);
     }
 
-    template<typename ReturnType, typename ReturnTypeOption>
-    inline OverrideInfoSetter& OverrideInfoSetter::Returns(ReturnTypeOption returnData)
+    template<typename ReturnType>
+    inline OverrideInfoSetter& 
+    OverrideInfoSetter::Returns(typename TypeSpecifier<ReturnType>::Type returnData)
     {
+        static_assert(std::is_same<ReturnType, decltype(returnData)>::value, "");
         return CppOverrideObj.Returns<ReturnType>(*this, returnData);
     }
     
@@ -115,21 +117,6 @@ namespace CppOverride
     #endif
     
     #undef INTERNAL_CO_SET_ARGS_IMPL
-    
-    
-    //template<typename T, typename... Args>
-    //OverrideInfoSetter& OverrideInfoSetter::SetArgs(typename TypeSpecifier<T>::Type arg, Args... args)
-    //{
-    //    return CppOverrideObj.SetArgs(*this, arg, args...);
-    //    //static_assert(CO_ASSERT_FALSE<int>::value, "Please specify argument types");
-    //    return *this;
-    //}
-
-    //template<typename... Args>
-    //inline OverrideInfoSetter& OverrideInfoSetter::SetArgs(Args... args)
-    //{
-    //    return CppOverrideObj.SetArgs(*this, args...);
-    //}
     
     template<typename... Args>
     inline OverrideInfoSetter&

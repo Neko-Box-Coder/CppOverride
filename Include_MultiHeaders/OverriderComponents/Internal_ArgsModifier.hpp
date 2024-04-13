@@ -26,8 +26,7 @@ namespace CppOverride
 
             template<   typename T, 
                         typename = typename std::enable_if<!std::is_copy_assignable<T>::value>::type,
-                        typename... Args
-                        >
+                        typename... Args>
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
@@ -62,6 +61,8 @@ namespace CppOverride
                     pureArg = *static_cast<INTERNAL_CO_UNCONST(T)*>(argsData[index].Data);
                     if(INTERNAL_CO_LOG_ModifyArgs)
                     {
+                        std::cout << "&arg: " << &arg << std::endl;
+                        
                         #ifndef PRINT_BYTES
                             #define PRINT_BYTES(val) \
                                 do \

@@ -51,8 +51,8 @@ namespace CppOverride
             OverrideInfoSetter& ReturnsByAction(std::function<void( const std::vector<void*>& args, 
                                                                     void* out)> returnAction);
     
-            template<typename ReturnType, typename ReturnTypeOption = ReturnType>
-            OverrideInfoSetter& Returns(ReturnTypeOption returnData);
+            template<typename ReturnType>
+            OverrideInfoSetter& Returns(typename TypeSpecifier<ReturnType>::Type returnData);
             
             OverrideInfoSetter& ReturnsVoid();
             
