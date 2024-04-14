@@ -55,7 +55,7 @@ namespace CppOverride
                 for(int i = 0; i < curOverrideData.size(); i++)
                 {
                     if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                        std::cout << "Checking return data["<<i<<"]\n";
+                        std::cout << "Checking return data[" << i << "]" << std::endl;
 
                     //Check override return data exist
                     if(curOverrideData[i].ReturnDataInfo.DataSet)
@@ -65,7 +65,7 @@ namespace CppOverride
                             typeid(ReturnType).hash_code())
                         {
                             if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                                std::cout << "Failed at return type\n";
+                                std::cout << "Failed at return type" << std::endl;
                             
                             continue;
                         }
@@ -76,7 +76,7 @@ namespace CppOverride
                             !curOverrideData[i].ReturnDataInfo.ReturnReference)
                         {
                             if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                                std::cout << "Failed at return reference\n";
+                                std::cout << "Failed at return reference" << std::endl;
                             
                             continue;
                         }
@@ -88,7 +88,7 @@ namespace CppOverride
                             typeid(ReturnType).hash_code())
                         {
                             if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                                std::cout << "Failed at return type\n";
+                                std::cout << "Failed at return type" << std::endl;
                             
                             continue;
                         }
@@ -99,13 +99,16 @@ namespace CppOverride
                             !curOverrideData[i].ReturnDataActionInfo.ReturnReference)
                         {
                             if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                                std::cout << "Failed at return action reference\n";
+                                std::cout << "Failed at return action reference" << std::endl;
                             
                             continue;
                         }
                     }
                     else
-                        continue;
+                    {
+                        if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
+                            std::cout << "Any return type entry encountered" << std::endl;
+                    }
                     
                     //Check parameter condition types/count match
                     if( !curOverrideData[i].ConditionInfo.ArgsCondition.empty() && 
@@ -115,7 +118,7 @@ namespace CppOverride
                                                                 args...))
                     {
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                            std::cout << "Failed at Check parameter\n";
+                            std::cout << "Failed at Check parameter" << std::endl;
                         
                         continue;
                     }
@@ -129,7 +132,7 @@ namespace CppOverride
                                                                 args...))
                     {
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                            std::cout << "Failed at Check parameter\n";
+                            std::cout << "Failed at Check parameter" << std::endl;
                         
                         if(curOverrideData.at(i).Status != nullptr)
                         {
@@ -149,7 +152,7 @@ namespace CppOverride
                         !curOverrideData[i].ConditionInfo.LambdaCondition(argumentsList))
                     {
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                            std::cout << "Failed at Check condition\n";
+                            std::cout << "Failed at Check condition" << std::endl;
                         
                         if(curOverrideData[i].Status != nullptr)
                         {
@@ -169,7 +172,7 @@ namespace CppOverride
                         curOverrideData[i].ConditionInfo.Times)
                     {
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                            std::cout << "Failed at Check times\n";
+                            std::cout << "Failed at Check times" << std::endl;
                         
                         if(curOverrideData[i].Status != nullptr)
                         {
@@ -184,7 +187,7 @@ namespace CppOverride
                     }
                     
                     if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                        std::cout << "Return data found: "<<i<<"\n";
+                        std::cout << "Return data found: " << i << std::endl;
                     
                     returnIndex = i;
                     break;

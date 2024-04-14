@@ -54,6 +54,9 @@ namespace CppOverride
             template<typename ReturnType>
             OverrideInfoSetter& Returns(typename TypeSpecifier<ReturnType>::Type returnData);
             
+            template<typename ReturnType>
+            OverrideInfoSetter& Returns();
+            
             OverrideInfoSetter& ReturnsVoid();
             
             #ifndef INTERNAL_CO_SET_ARGS_DECL

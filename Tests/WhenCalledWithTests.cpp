@@ -19,7 +19,7 @@ int main()
                             .Returns<int>(1)
                             .WhenCalledWith(1, true, 2.f);
         
-        ssTEST_OUTPUT_ASSERT(FuncWithArgs(1, true, 2.f) == 1);
+        ssTEST_OUTPUT_ASSERT(ArgsFunc(1, true, 2.f) == 1);
     };
     
     ssTEST("Object Value Test")
@@ -54,14 +54,14 @@ int main()
     
     ssTEST("Template Object Value Test")
     {
-        TemplateDummy<int> testDummy(1, 2, 3.f, "test");
-        TemplateDummy<int> testDummy2(2, 3, 4.f, "test2");
+        TemplateTestClass<int> testDummy(1, 2, 3.f, "test");
+        TemplateTestClass<int> testDummy2(2, 3, 4.f, "test2");
         
         CO_SETUP_OVERRIDE   (OverrideObj, ReturnTemplateObjectFunc)
                             .WhenCalledWith(testDummy)
-                            .Returns<TemplateDummy<int>>(testDummy2);
+                            .Returns<TemplateTestClass<int>>(testDummy2);
 
-        ssTEST_OUTPUT_ASSERT(ReturnTemplateObjectFunc(testDummy) == testDummy2);
+        ssTEST_OUTPUT_ASSERT(TemplateReturnFunc(testDummy) == testDummy2);
     };
     
     ssTEST("No Comparison Test")
@@ -70,7 +70,7 @@ int main()
                             .WhenCalledWith(CO_ANY, CO_ANY, CO_ANY)
                             .Returns<int>(1);
 
-        ssTEST_OUTPUT_ASSERT(FuncWithArgs(1, false, 2.f) == 1);
+        ssTEST_OUTPUT_ASSERT(ArgsFunc(1, false, 2.f) == 1);
     };
     
     ssTEST("Pointer Value Test")
@@ -88,7 +88,7 @@ int main()
         float assignFloat = 2.f;
         std::string assignString = "";
         
-        FuncWithArgsToSet(1, &assignFloat, assignString);
+        ArgsToSetFunc(1, &assignFloat, assignString);
         
         ssTEST_OUTPUT_ASSERT("Pointer", assignString == "test");
         
@@ -124,7 +124,7 @@ int main()
 
         std::string assignString = "test";
         
-        FuncWithArgsToSet(1, &testFloat, assignString);
+        ArgsToSetFunc(1, &testFloat, assignString);
         
         ssTEST_OUTPUT_ASSERT(assignString == "pass");
     };
@@ -143,7 +143,7 @@ int main()
 
         float assignFloat = 2.f;
         
-        FuncWithArgsToSet(1, &assignFloat, testString);
+        ArgsToSetFunc(1, &assignFloat, testString);
         
         ssTEST_OUTPUT_ASSERT(assignFloat == 3.f);
     };
@@ -162,17 +162,17 @@ int main()
     
     ssTEST("Object Missing inequality operator Test")
     {
-        NonComparableDummy testDummy(2);
-        NonComparableDummy returnDummy(3);
+        NonComparableTestClass testDummy(2);
+        NonComparableTestClass returnDummy(3);
         
         CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
         
         CO_SETUP_OVERRIDE   (OverrideObj, ReturnTemplateObjectFunc)
                             .WhenCalledWith(testDummy)
-                            .Returns<NonComparableDummy>(returnDummy)
+                            .Returns<NonComparableTestClass>(returnDummy)
                             .AssignStatus(status);
         
-        NonComparableDummy resultDummy = ReturnTemplateObjectFunc(testDummy);
+        NonComparableTestClass resultDummy = TemplateReturnFunc(testDummy);
         
         ssTEST_OUTPUT_ASSERT(status == 
             CppOverride::OverrideStatus::CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR);

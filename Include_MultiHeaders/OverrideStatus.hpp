@@ -48,6 +48,8 @@ namespace CppOverride
 
     inline std::string OverrideStatusToString(OverrideStatus status)
     {
+        static_assert((int)OverrideStatus::COUNT == 9, "");
+        
         switch (status)
         {
             case OverrideStatus::NO_OVERRIDE:
