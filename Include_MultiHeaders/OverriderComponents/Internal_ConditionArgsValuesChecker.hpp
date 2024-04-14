@@ -1,11 +1,11 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_VALUES_CHECKER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_VALUES_CHECKER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
+#define CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
 
-#include "./Any.hpp"
-#include "./ArgsInfo.hpp"
-#include "./PureType.hpp"
-#include "./TypeCheck.hpp"
-#include "./OverrideStatus.hpp"
+#include "../Any.hpp"
+#include "../ArgsInfo.hpp"
+#include "../PureType.hpp"
+#include "../TypeCheck.hpp"
+#include "../OverrideStatus.hpp"
 
 #include <cassert>
 #include <type_traits>
@@ -15,7 +15,7 @@
 
 namespace CppOverride
 {
-    class Internal_ArgsValuesChecker
+    class Internal_ConditionArgsValuesChecker
     {
         friend class Internal_ReturnDataRetriever;
         friend class Internal_ArgsDataRetriever;
@@ -38,6 +38,7 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
                 {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
                 }
@@ -73,6 +74,7 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
                 {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout << "CheckArgumentsValues index: " << argIndex << std::endl;
                 }
@@ -118,6 +120,7 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
                 {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
                 }
@@ -165,6 +168,7 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
                 {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
                 }

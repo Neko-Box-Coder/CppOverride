@@ -8,8 +8,8 @@
 #include "./OverriderComponents/Internal_RequirementSetter.hpp"
 #include "./OverriderComponents/Internal_ArgsValuesAppender.hpp"
 #include "./OverriderComponents/Internal_ArgsTypeInfoAppender.hpp"
-#include "./OverriderComponents/Internal_ArgsTypesChecker.hpp"
-#include "./OverriderComponents/Internal_ArgsValuesChecker.hpp"
+#include "./OverriderComponents/Internal_ConditionArgsTypesChecker.hpp"
+#include "./OverriderComponents/Internal_ConditionArgsValuesChecker.hpp"
 #include "./OverriderComponents/Internal_ArgsModifier.hpp"
 #include "./OverriderComponents/Internal_ReturnDataRetriever.hpp"
 #include "./OverriderComponents/Internal_ArgsDataRetriever.hpp"
@@ -27,8 +27,8 @@ namespace CppOverride
                         public Internal_RequirementSetter,
                         public Internal_ArgsValuesAppender,
                         public Internal_ArgsTypeInfoAppender,
-                        public Internal_ArgsTypesChecker,
-                        public Internal_ArgsValuesChecker,
+                        public Internal_ConditionArgsTypesChecker,
+                        public Internal_ConditionArgsValuesChecker,
                         public Internal_ArgsModifier,
                         public Internal_ReturnDataRetriever,
                         public Internal_ArgsDataRetriever
@@ -166,7 +166,7 @@ namespace CppOverride
                 
                 if(INTERNAL_CO_LOG_CheckOverride)
                 {
-                    std::cout << __func__ << " called" << std::endl;
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "functionName: "<< functionName << std::endl;
                     std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
@@ -258,9 +258,9 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
                 {
-                    std::cout << "CheckOverrideAndReturn\n";
-                    std::cout << "functionName: "<<functionName << "\n";
-                    std::cout << "functionName.size(): " << functionName.size() << "\n";
+                    std::cout << std::endl << __func__ << " called" << std::endl;
+                    std::cout << "functionName: " << functionName << std::endl;
+                    std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
                 
                 Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
@@ -298,7 +298,7 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
                 {
-                    std::cout << __func__ << " called" << std::endl;
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "functionName: " << functionName << std::endl;
                     std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
@@ -344,7 +344,7 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckOverrideAndSetArgs)
                 {
-                    std::cout << __func__ << " called" << std::endl;
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "functionName: "<<functionName << std::endl;
                 }
                 
@@ -381,9 +381,9 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_OverrideCreation)
                 {
-                    std::cout << "OverrideReturns\n";
-                    std::cout << "functionName: "<<functionName << "\n";
-                    std::cout << "functionName.size(): " << functionName.size() << "\n";
+                    std::cout << std::endl << __func__ << " called" << std::endl;
+                    std::cout << "functionName: " << functionName << std::endl;
+                    std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
 
                 OverrideDatas[functionName].push_back(Internal_OverrideData());

@@ -56,7 +56,7 @@ int main()
                             )
                             .SetArgs<   CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
-                                        std::string>(   CO_DONT_SET, 
+                                        std::string&>(   CO_DONT_SET, 
                                                         CO_DONT_SET, 
                                                         "Test String 2");
 

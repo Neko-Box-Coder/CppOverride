@@ -61,6 +61,7 @@ namespace CppOverride
                     pureArg = *static_cast<INTERNAL_CO_UNCONST(T)*>(argsData[index].Data);
                     if(INTERNAL_CO_LOG_ModifyArgs)
                     {
+                        std::cout << std::endl << __func__ << " called" << std::endl;
                         std::cout << "&arg: " << &arg << std::endl;
                         
                         #ifndef PRINT_BYTES
@@ -123,6 +124,7 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_ModifyArgs)
                 {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "modified index: "<<index << std::endl;
                     std::cout << "typeid(arg).name(): " << typeid(arg).name() <<std::endl;
                     std::cout << "typeid(arg).hash_code(): " << typeid(arg).hash_code() <<std::endl;
@@ -150,7 +152,10 @@ namespace CppOverride
                                     Args&... args)
             {
                 if(INTERNAL_CO_LOG_ModifyArgs)
+                {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std ::cout <<"Skipping ModifyArgs for index "<<index << " for Any\n";
+                }
                 
                 ModifyArgs(argsData, ++index, status, args...);
             }
