@@ -32,10 +32,10 @@ int main()
                             .SetArgs<   CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
-                                        DummyClass>(CO_DONT_SET, 
-                                                    CO_DONT_SET, 
-                                                    CO_DONT_SET, 
-                                                    assignObject)
+                                        DummyClass&>(   CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        assignObject)
                             .Returns<bool>(true);
 
         SetObjectFunc(10, 20.0, "test10", testObject);
@@ -81,7 +81,7 @@ int main()
                             .WhenCalledWith(1, testFloat, CO_ANY)
                             .SetArgs<   CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
-                                        std::string>(   CO_DONT_SET, 
+                                        std::string&>(  CO_DONT_SET, 
                                                         CO_DONT_SET, 
                                                         "test");
 
@@ -118,7 +118,7 @@ int main()
                             .WhenCalledWith(1, &testFloat, std::string("test"))
                             .SetArgs<   CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
-                                        std::string>(   CO_DONT_SET, 
+                                        std::string&>(  CO_DONT_SET, 
                                                         CO_DONT_SET, 
                                                         "pass");
 
@@ -136,7 +136,7 @@ int main()
         CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
                             .WhenCalledWith(1, 2.f, &testString)
                             .SetArgs<   CO_ANY_TYPE, 
-                                        float, 
+                                        float*, 
                                         CO_ANY_TYPE>(   CO_DONT_SET, 
                                                         3.f, 
                                                         CO_DONT_SET);

@@ -1,9 +1,10 @@
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
 
-#include "./Any.hpp"
-#include "./ArgsInfo.hpp"
-#include "./PureType.hpp"
+#include "../Any.hpp"
+#include "../ArgsInfo.hpp"
+#include "../PureType.hpp"
+#include <iostream>
 #include <vector>
 namespace CppOverride
 {
@@ -12,38 +13,33 @@ namespace CppOverride
         friend class Internal_ArgsDataRetriever;
         
         protected:
-            inline void AppendArgsPureTypeInfo(std::vector<ArgInfo>& argumentsList) {}
-
-            //NOTE: We need to transform pointers and references into the base type so that
-            //      the we can assign the values that we have stored to the arguments
+            #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
+            
+            inline void AppendArgsTypeInfo(std::vector<ArgInfo>& argumentsList) {}
+            
             template<   typename T, 
                         typename... Args>
-            inline void AppendArgsPureTypeInfo( std::vector<ArgInfo>& argumentsList, 
-                                                T& arg, 
-                                                Args&... args)
+            inline void AppendArgsTypeInfo( std::vector<ArgInfo>& argumentsList, 
+                                            T& arg, 
+                                            Args&... args)
             {
                 ArgInfo curArgInfo;
                 if(!std::is_same<T, Any>())
                 {
-                    curArgInfo.ArgSize = sizeof(INTERNAL_CO_UNCONST(INTERNAL_CO_UNREF(T)));
-                    curArgInfo.ArgTypeHash = typeid(INTERNAL_CO_UNCONST(INTERNAL_CO_UNREF(T))).hash_code();
+                    curArgInfo.ArgSize = sizeof(T);
+                    curArgInfo.ArgTypeHash = typeid(T).hash_code();
                     curArgInfo.ArgSet = true;
+                }
+                
+                if(INTERNAL_CO_LOG_AppendArgsTypeInfo)
+                {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
+                    std::cout << "Type: " << typeid(T).name() << std::endl;
+                    std::cout << "Hash: " << typeid(T).hash_code() << std::endl;
                 }
 
                 argumentsList.push_back(curArgInfo);
-                AppendArgsPureTypeInfo(argumentsList, args...);
-            }
-            
-            //Unwrap pointers if it is not void*
-            template<   typename T, 
-                        typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
-                        typename = typename std::enable_if<!std::is_same<T, const void>::value>::type, 
-                        typename... Args>
-            inline void AppendArgsPureTypeInfo( std::vector<ArgInfo>& argumentsList, 
-                                                T* arg, 
-                                                Args&... args)
-            {
-                AppendArgsPureTypeInfo(argumentsList, *arg, args...);
+                AppendArgsTypeInfo(argumentsList, args...);
             }
     };
 }

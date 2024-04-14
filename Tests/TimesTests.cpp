@@ -93,7 +93,7 @@ int main()
                             .Times(1)
                             .SetArgs<   CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
-                                        std::string>(   CO_DONT_SET, 
+                                        std::string&>(  CO_DONT_SET, 
                                                         CO_DONT_SET, 
                                                         "test");
 
@@ -102,7 +102,7 @@ int main()
                             .Times(1)
                             .SetArgs<   CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
-                                        std::string>(   CO_DONT_SET, 
+                                        std::string&>(  CO_DONT_SET, 
                                                         CO_DONT_SET, 
                                                         "test2");
 
@@ -111,7 +111,7 @@ int main()
                             .Times(2)
                             .SetArgs<   CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
-                                        std::string>(   CO_DONT_SET, 
+                                        std::string&>(  CO_DONT_SET, 
                                                         CO_DONT_SET, 
                                                         "test3");
 

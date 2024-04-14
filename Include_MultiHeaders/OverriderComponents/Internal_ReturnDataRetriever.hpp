@@ -1,13 +1,13 @@
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_RETRIEVER_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_RETRIEVER_HPP
 
-#include "./PureType.hpp"
+#include "../PureType.hpp"
 #include "./Internal_ArgsValuesAppender.hpp"
-#include "./Internal_ArgsTypesChecker.hpp"
-#include "./Internal_ArgsValuesChecker.hpp"
-#include "./TypeCheck.hpp"
-#include "./OverrideStatus.hpp"
-#include "./Internal_OverrideData.hpp"
+#include "./Internal_ConditionArgsTypesChecker.hpp"
+#include "./Internal_ConditionArgsValuesChecker.hpp"
+#include "../TypeCheck.hpp"
+#include "../OverrideStatus.hpp"
+#include "../Internal_OverrideData.hpp"
 
 #include <cassert>
 #include <string>
@@ -24,8 +24,8 @@ namespace CppOverride
         protected:
             OverrideDatas& CurrentOverrideDatas;
             Internal_ArgsValuesAppender& ArgsValuesAppender;
-            Internal_ArgsTypesChecker& ArgsTypesChecker;
-            Internal_ArgsValuesChecker& ArgsValuesChecker;
+            Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
+            Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
         
             #define INTERNAL_CO_LOG_GetCorrectReturnDataInfo 0
 
@@ -43,7 +43,7 @@ namespace CppOverride
                 }
                 
                 if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                    std::cout << __func__ << " called\n";
+                    std::cout << std::endl << __func__ << " called" << std::endl;
 
                 std::vector<void*> argumentsList;
                 ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
@@ -197,8 +197,8 @@ namespace CppOverride
         public:
             inline Internal_ReturnDataRetriever(OverrideDatas& overrideDataLists,
                                                 Internal_ArgsValuesAppender& argsValuesAppender,
-                                                Internal_ArgsTypesChecker& argsTypesChecker,
-                                                Internal_ArgsValuesChecker& argsValuesChecker) : 
+                                                Internal_ConditionArgsTypesChecker& argsTypesChecker,
+                                                Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
                 CurrentOverrideDatas(overrideDataLists),
                 ArgsValuesAppender(argsValuesAppender),
                 ArgsTypesChecker(argsTypesChecker),

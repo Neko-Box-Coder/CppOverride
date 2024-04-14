@@ -1,12 +1,11 @@
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGUMENT_DATA_SETTER_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGUMENT_DATA_SETTER_HPP
 
-//#include "./ProxiesDeclarations.hpp"
-#include "./OverrideInfoSetterDeclaration.hpp"
-#include "./Any.hpp"
-#include "./StaticAssertFalse.hpp"
-#include "./PureType.hpp"
-#include "./Internal_OverrideData.hpp"
+#include "../OverrideInfoSetterDeclaration.hpp"
+#include "../Any.hpp"
+#include "../StaticAssertFalse.hpp"
+#include "../PureType.hpp"
+#include "../Internal_OverrideData.hpp"
 #include "../../External/MacroPowerToys/MacroPowerToy.h"
 #include "../AliasTypes.hpp"
 
@@ -21,62 +20,13 @@ namespace CppOverride
     {
         friend class OverrideInfoSetter;
         
-        #define INTERNAL_CO_UNCONST_UNREF_T INTERNAL_CO_UNREF(INTERNAL_CO_UNCONST(T))
-        #define INTERNAL_CO_UNCONST_UNREF(arg) INTERNAL_CO_UNREF(INTERNAL_CO_UNCONST(arg))
-        
-        private:
-            template<   typename T,
-                        typename std::enable_if
-                        <
-                            std::is_same<INTERNAL_CO_UNCONST(T), void*>::value ||
-                            !std::is_pointer<T>::value, bool
-                        >::type = true>
-            inline void InternalPushArgTypes(Internal_OverrideData& lastData)
-            {
-                lastData.ArgumentsDataActionInfo.DataTypes
-                        .push_back(typeid(INTERNAL_CO_UNCONST_UNREF_T).hash_code());
-                
-                if(!std::is_same<T, CO_ANY_TYPE>::value)
-                    lastData.ArgumentsDataActionInfo.DataTypesSet.push_back(true);
-                else
-                    lastData.ArgumentsDataActionInfo.DataTypesSet.push_back(false);
-            }
-            
-            //Unwrap pointer
-            template<   typename T,
-                        typename std::enable_if
-                        <
-                            std::is_pointer<T>::value &&
-                            !std::is_same<INTERNAL_CO_UNCONST(T), void*>::value, bool
-                        >::type = true>
-            inline void InternalPushArgTypes(Internal_OverrideData& lastData)
-            {
-                InternalPushArgTypes<INTERNAL_CO_UNPOINTER(T)>(lastData);
-            }
-            
-            template<typename T, typename... Args>
-            inline void PushArgTypes(Internal_OverrideData& lastData)
-            {
-                InternalPushArgTypes<T>(lastData);
-                PushArgTypes<Args...>(lastData);
-            }
-            
-            template<typename... Args>
-            inline typename std::enable_if<sizeof...(Args) == 0>::type 
-            PushArgTypes(Internal_OverrideData& lastData)
-            {
-            }
+        #define INTERNAL_CO_UNWRAPPED(arg) typename TypeUnwrapper<arg>::Type
         
         public:
             using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
         
         protected:
             OverrideDatas& CurrentOverrideDatas;
-            
-            inline OverrideInfoSetter& SetArgs(OverrideInfoSetter& infoSetter)
-            {
-                return infoSetter;
-            }
             
             #define INTERNAL_CO_LOG_SetArgs 0
             
@@ -92,25 +42,31 @@ namespace CppOverride
                     } while(0)
             #endif
             
-            template<   typename T, 
-                        typename = typename std::enable_if<!std::is_copy_assignable<INTERNAL_CO_UNCONST_UNREF_T>::value>::type,
-                        typename... Args>
-            inline OverrideInfoSetter& SetArgs( OverrideInfoSetter& infoSetter,
-                                                INTERNAL_CO_UNCONST_UNREF_T arg, Args&... args)
+            template<typename T, typename... Args>
+            inline typename std::enable_if
+            <
+                !std::is_copy_assignable<INTERNAL_CO_UNWRAPPED(T)>::value && 
+                sizeof...(Args) != 0, 
+                OverrideInfoSetter&
+            >::type
+            SetArgs(OverrideInfoSetter& infoSetter,
+                    INTERNAL_CO_UNWRAPPED(T) arg, 
+                    INTERNAL_CO_UNWRAPPED(Args)... args)
             {
                 static_assert(  CO_ASSERT_FALSE<T>::value, 
                                 "Cannot modify a non copy assignable object. "
                                 "Please use SetArgsByAction instead.");
 
-                return SetArgs(infoSetter, args...);
+                return SetArgs<INTERNAL_CO_UNWRAPPED(Args)...>(infoSetter, args...);
             }
             
-            template<   typename T, 
-                        typename = typename std::enable_if<std::is_copy_assignable<INTERNAL_CO_UNCONST_UNREF_T>::value>::type,
-                        typename... Args>
-            inline OverrideInfoSetter& SetArgs( OverrideInfoSetter& infoSetter,
-                                                T arg, 
-                                                Args... args)
+            template<typename T>
+            inline typename std::enable_if
+            <
+                std::is_copy_assignable<INTERNAL_CO_UNWRAPPED(T)>::value,
+                OverrideInfoSetter&
+            >::type
+            SetArgs(OverrideInfoSetter& infoSetter, INTERNAL_CO_UNWRAPPED(T) arg)
             {
                 Internal_OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
@@ -119,32 +75,34 @@ namespace CppOverride
                 
                 if(!std::is_same<T, Any>())
                 {
-                    lastData.ArgumentsDataInfo.back().Data = new INTERNAL_CO_UNCONST_UNREF_T(arg);
+                    lastData.ArgumentsDataInfo.back().Data = new INTERNAL_CO_UNWRAPPED(T)(arg);
                     lastData.ArgumentsDataInfo.back().CopyConstructor = 
                         [](void* data) 
                         { 
-                            return new INTERNAL_CO_UNCONST_UNREF_T
+                            return new INTERNAL_CO_UNWRAPPED(T)
                             (
-                                *static_cast<INTERNAL_CO_UNCONST_UNREF_T*>(data)
+                                *static_cast<INTERNAL_CO_UNWRAPPED(T)*>(data)
                             ); 
                         };
                     
                     lastData.ArgumentsDataInfo.back().Destructor = 
-                        [](void* data) { delete static_cast<INTERNAL_CO_UNCONST_UNREF_T*>(data); };
+                        [](void* data) { delete static_cast<INTERNAL_CO_UNWRAPPED(T)*>(data); };
 
                     lastData.ArgumentsDataInfo.back().DataSet = true;
                     lastData.ArgumentsDataInfo.back().DataType = 
-                        typeid(INTERNAL_CO_UNCONST_UNREF_T).hash_code();
+                        typeid(T).hash_code();
 
                     if(INTERNAL_CO_LOG_SetArgs)
                     {
-                        std::cout << "Set args index: "<< 
-                            lastData.ArgumentsDataInfo.size() - 1 << std::endl;
+                        std::cout << std::endl << __func__ << " called" << std::endl;
                         
-                        std::cout << "arg pointer: "<<&arg<<std::endl;
-                        std::cout << "typeid(arg).name(): " << typeid(arg).name() <<std::endl;
-                        std::cout <<    "typeid(arg).hash_code(): " << 
-                                        typeid(arg).hash_code() << 
+                        std::cout <<    "Set args index: " << 
+                                        lastData.ArgumentsDataInfo.size() - 1 << std::endl;
+                        
+                        std::cout << "arg pointer: " << &arg << std::endl;
+                        std::cout << "typeid(T).name(): " << typeid(T).name() << std::endl;
+                        std::cout <<    "typeid(T).hash_code(): " << 
+                                        typeid(T).hash_code() << 
                                         std::endl;
                         
                         //std::cout <<    "Set args value: "<< 
@@ -155,33 +113,71 @@ namespace CppOverride
                         //                std::endl << 
                         //                std::endl;
                         
-                        std::cout << "Original Data: "<<std::endl;
-                        PRINT_BYTES(arg);
+                        //std::cout << "Original Data: "<<std::endl;
+                        //PRINT_BYTES(arg);
                         
-                        std::cout << "Copied Data: "<<std::endl;
-                        PRINT_BYTES((*static_cast<INTERNAL_CO_UNCONST_UNREF_T*>
-                        (
-                            lastData.ArgumentsDataInfo.back().Data
-                        )));
+                        //std::cout << "Copied Data: "<<std::endl;
+                        //PRINT_BYTES((*static_cast<INTERNAL_CO_UNWRAPPED(T)*>
+                        //(
+                        //    lastData.ArgumentsDataInfo.back().Data
+                        //)));
                         
                         std::cout << std::endl;
                     }
                 }
                 
-                return SetArgs(infoSetter, args...);
+                return infoSetter;
             }
             
-            //Unwrap pointers
-            template<   typename T, 
-                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_UNCONST_UNREF_T, void*>::value>::type,
-                        typename... Args>
-            inline OverrideInfoSetter& SetArgs( OverrideInfoSetter& infoSetter,
-                                                T* arg, 
-                                                Args... args)
+            template<typename T, typename... Args>
+            inline typename std::enable_if
+            <
+                std::is_copy_assignable<INTERNAL_CO_UNWRAPPED(T)>::value &&
+                sizeof...(Args) != 0, 
+                OverrideInfoSetter&
+            >::type
+            SetArgs(OverrideInfoSetter& infoSetter,
+                    INTERNAL_CO_UNWRAPPED(T) arg, 
+                    INTERNAL_CO_UNWRAPPED(Args)... args)
             {
-                return SetArgs(infoSetter, *arg, args...);
+                SetArgs<T>(infoSetter, arg);
+                return SetArgs<Args...>(infoSetter, args...);
             }
             
+        private:
+            template<typename T>
+            inline void InternalPushActionArgTypes(Internal_OverrideData& lastData)
+            {
+                lastData.ArgumentsDataActionInfo.DataTypes
+                        .push_back(typeid(T).hash_code());
+                
+                if(INTERNAL_CO_LOG_SetArgs)
+                {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
+                    std::cout <<    "Data Hash: " << typeid(T).hash_code() << std::endl;
+                    std::cout <<    "Data Type: " << typeid(T).name() << std::endl;
+                }
+                
+                if(!std::is_same<T, CO_ANY_TYPE>::value)
+                    lastData.ArgumentsDataActionInfo.DataTypesSet.push_back(true);
+                else
+                    lastData.ArgumentsDataActionInfo.DataTypesSet.push_back(false);
+            }
+            
+            template<typename T, typename... Args>
+            inline void PushActionArgTypes(Internal_OverrideData& lastData)
+            {
+                InternalPushActionArgTypes<T>(lastData);
+                PushActionArgTypes<Args...>(lastData);
+            }
+            
+            template<typename... Args>
+            inline typename std::enable_if<sizeof...(Args) == 0>::type 
+            PushActionArgTypes(Internal_OverrideData& lastData)
+            {
+            }
+        
+        protected:
             template<typename... Args>
             inline OverrideInfoSetter& 
             SetArgsByAction(OverrideInfoSetter& infoSetter,
@@ -193,18 +189,18 @@ namespace CppOverride
                 lastData.ArgumentsDataActionInfo.DataAction = setArgsAction;
                 lastData.ArgumentsDataActionInfo.DataActionSet = true;
                 
-                PushArgTypes<Args...>(lastData);
+                PushActionArgTypes<Args...>(lastData);
                 
                 if(INTERNAL_CO_LOG_SetArgs)
                 {
-                    std::cout << __func__ << " called" << std::endl;
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout <<    "Target function: " <<
                                     infoSetter.GetFunctionSignatureName() << std::endl;
                     
                     for(int i = 0; i < lastData.ArgumentsDataActionInfo.DataTypes.size(); i++)
                     {
-                        std::cout << "Data Type[" << i << "]: " << 
-                            lastData.ArgumentsDataActionInfo.DataTypes[i] << std::endl;
+                        std::cout <<    "Data Type[" << i << "]: " << 
+                                        lastData.ArgumentsDataActionInfo.DataTypes[i] << std::endl;
                     }
                 }
                 

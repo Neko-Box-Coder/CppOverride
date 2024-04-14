@@ -27,7 +27,10 @@ namespace CppOverride
                                         Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArguments)
-                    std::cout <<"CheckArguments index: "<<argIndex<<"\n";
+                {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
+                    std::cout << "CheckArguments index: " << argIndex << std::endl;
+                }
             
                 if(argIndex >= validArgumentsList.size())
                     return false;
@@ -99,7 +102,10 @@ namespace CppOverride
                                         Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArguments)
+                {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "CheckArguments index: " << argIndex << std::endl;
+                }
             
                 if(argIndex >= validArgumentsList.size())
                     return false;

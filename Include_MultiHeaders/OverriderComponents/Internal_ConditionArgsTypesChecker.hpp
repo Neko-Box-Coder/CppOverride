@@ -1,15 +1,15 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_TYPES_CHECKER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_TYPES_CHECKER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_TYPES_CHECKER_HPP
+#define CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_TYPES_CHECKER_HPP
 
-#include "./Any.hpp"
-#include "./ArgsInfo.hpp"
-#include "./PureType.hpp"
+#include "../Any.hpp"
+#include "../ArgsInfo.hpp"
+#include "../PureType.hpp"
 #include <vector>
 #include <iostream>
 
 namespace CppOverride
 {
-    class Internal_ArgsTypesChecker
+    class Internal_ConditionArgsTypesChecker
     {
         friend class Internal_ReturnDataRetriever;
         friend class Internal_ArgsDataRetriever;
@@ -31,6 +31,7 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckArguments)
                 {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsTypes index: "<<argIndex<<"\n";
                 }
@@ -76,6 +77,7 @@ namespace CppOverride
             {
                 if(INTERNAL_CO_LOG_CheckArguments)
                 {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsTypes index: "<<argIndex<<"\n";
                 }

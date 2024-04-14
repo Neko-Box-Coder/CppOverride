@@ -76,7 +76,9 @@ namespace CppOverride
                 ( \
                     MPT_PREFIX_SUFFIX_ARGS \
                     ( \
-                        typename TypeSpecifier<Arg,Type>::Type, __VA_ARGS__ \
+                        typename TypeUnwrapper<Arg, \
+                        Type>::Type, \
+                        __VA_ARGS__ \
                     ), \
                     MPT_COMPOSE \
                     ( \
@@ -89,7 +91,7 @@ namespace CppOverride
                 ) \
             ) \
             { \
-                return CppOverrideObj.SetArgs(*this, MPT_PREFIX_SUFFIX_ARGS(_, \
+                return CppOverrideObj.SetArgs<MPT_PREFIX_SUFFIX_ARGS(Arg,Type,__VA_ARGS__)>(*this, MPT_PREFIX_SUFFIX_ARGS(_, \
                                                                             /* no suffix */, \
                                                                             __VA_ARGS__)); \
             }

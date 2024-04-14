@@ -58,14 +58,16 @@ namespace CppOverride
             
             #ifndef INTERNAL_CO_SET_ARGS_DECL
                 #define INTERNAL_CO_SET_ARGS_DECL(...) \
-                    template<MPT_PREFIX_SUFFIX_ARGS(typename Arg,Type,__VA_ARGS__)> \
+                    template<MPT_PREFIX_SUFFIX_ARGS(typename Arg, Type, __VA_ARGS__)> \
                     OverrideInfoSetter& SetArgs \
                     ( \
                         MPT_APPEND_LISTS_ITEMS \
                         ( \
                             MPT_PREFIX_SUFFIX_ARGS \
                             ( \
-                                typename TypeSpecifier<Arg,Type>::Type, __VA_ARGS__ \
+                                typename TypeUnwrapper<Arg, \
+                                Type>::Type, \
+                                __VA_ARGS__ \
                             ), \
                             MPT_COMPOSE \
                             ( \

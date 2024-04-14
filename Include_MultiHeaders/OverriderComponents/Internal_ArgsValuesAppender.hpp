@@ -1,7 +1,7 @@
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_VALUES_APPENDER_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_VALUES_APPENDER_HPP
 
-#include "./PureType.hpp"
+#include "../PureType.hpp"
 #include <vector>
 
 namespace CppOverride

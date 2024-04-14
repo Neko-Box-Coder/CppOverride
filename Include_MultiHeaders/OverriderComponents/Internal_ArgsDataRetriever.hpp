@@ -3,8 +3,8 @@
 
 #include "./Internal_ArgsTypeInfoAppender.hpp"
 #include "./Internal_ArgsValuesAppender.hpp"
-#include "./Internal_ArgsTypesChecker.hpp"
-#include "./Internal_ArgsValuesChecker.hpp"
+#include "./Internal_ConditionArgsTypesChecker.hpp"
+#include "./Internal_ConditionArgsValuesChecker.hpp"
 #include "./OverrideStatus.hpp"
 #include "./Internal_OverrideData.hpp"
 #include "../AliasTypes.hpp"
@@ -25,8 +25,8 @@ namespace CppOverride
             OverrideDatas& CurrentOverrideDatas;
             Internal_ArgsValuesAppender& ArgsValuesAppender;
             Internal_ArgsTypeInfoAppender& ArgsTypeInfoAppender;
-            Internal_ArgsTypesChecker& ArgsTypesChecker;
-            Internal_ArgsValuesChecker& ArgsValuesChecker;
+            Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
+            Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
             
             #define INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo 0
 
@@ -43,14 +43,13 @@ namespace CppOverride
                 }
                 
                 if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                    std::cout << __func__ << " called" << std::endl;
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                 
                 std::vector<void*> argumentsList;
                 ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                //Get the base types without references and pointers
-                std::vector<ArgInfo> deRefArgumentsList;
-                ArgsTypeInfoAppender.AppendArgsPureTypeInfo(deRefArgumentsList, args...);
+                std::vector<ArgInfo> argumentsTypesList;
+                ArgsTypeInfoAppender.AppendArgsTypeInfo(argumentsTypesList, args...);
                 
                 std::vector<Internal_OverrideData>& curData = CurrentOverrideDatas[functionName];
                 
@@ -65,7 +64,7 @@ namespace CppOverride
                     
                     if( curData[i].ArgumentsDataActionInfo.DataActionSet && 
                         curData[i].ArgumentsDataActionInfo.DataTypes.size() == 
-                            deRefArgumentsList.size())
+                            argumentsTypesList.size())
                     {
                         std::vector<std::size_t>& argTypeHashes = 
                             curData[i].ArgumentsDataActionInfo.DataTypes;
@@ -76,7 +75,7 @@ namespace CppOverride
                         for(int j = 0; j < argTypeHashes.size(); j++)
                         {
                             if( argsTypesSet[j] &&
-                                argTypeHashes[j] != deRefArgumentsList[j].ArgTypeHash)
+                                argTypeHashes[j] != argumentsTypesList[j].ArgTypeHash)
                             {
                                 argumentTypeFailedIndex = j;
                                 
@@ -85,7 +84,7 @@ namespace CppOverride
                                     std::cout <<    "argTypeHashes[" << j << "]: " << 
                                                     argTypeHashes[j] << std::endl;
                                     std::cout <<    "deRefArgumentsList[" << j << "].ArgTypeHash: " <<
-                                                    deRefArgumentsList[j].ArgTypeHash << std::endl;
+                                                    argumentsTypesList[j].ArgTypeHash << std::endl;
                                 }
                                 
                                 break;
@@ -93,7 +92,7 @@ namespace CppOverride
                         }
                     }
                     //Check set argument data counts match
-                    else if(curData[i].ArgumentsDataInfo.size() == deRefArgumentsList.size())
+                    else if(curData[i].ArgumentsDataInfo.size() == argumentsTypesList.size())
                     {
                         for(int j = 0; j < curData[i].ArgumentsDataInfo.size(); j++)
                         {
@@ -101,9 +100,19 @@ namespace CppOverride
 
                             if( overrideArg && 
                                 curData[i].ArgumentsDataInfo[j].DataType != 
-                                    deRefArgumentsList[j].ArgTypeHash)
+                                    argumentsTypesList[j].ArgTypeHash)
                             {
                                 argumentTypeFailedIndex = j;
+                                
+                                if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
+                                {
+                                    std::cout << "Failed at checking argument data type" << std::endl;
+                                    std::cout <<    "curData[i].ArgumentsDataInfo[" << j << "]: " << 
+                                                    curData[i].ArgumentsDataInfo[j].DataType << std::endl;
+                                    std::cout <<    "deRefArgumentsList[" << j << "].ArgTypeHash: " <<
+                                                    argumentsTypesList[j].ArgTypeHash << std::endl;
+                                }
+                                
                                 break;
                             }
                         }
@@ -217,8 +226,8 @@ namespace CppOverride
             Internal_ArgsDataRetriever( OverrideDatas& overrideArgumentsInfos,
                                         Internal_ArgsValuesAppender& argsValuesAppender,
                                         Internal_ArgsTypeInfoAppender& argsTypeInfoAppender,
-                                        Internal_ArgsTypesChecker& argsTypesChecker,
-                                        Internal_ArgsValuesChecker& argsValuesChecker) : 
+                                        Internal_ConditionArgsTypesChecker& argsTypesChecker,
+                                        Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
                                                 CurrentOverrideDatas(overrideArgumentsInfos),
                                                 ArgsValuesAppender(argsValuesAppender),
                                                 ArgsTypeInfoAppender(argsTypeInfoAppender),
