@@ -58,10 +58,10 @@ int main()
 
         std::string testString;
         
-        FuncWithConstArgsAndArgsToSet(2, 3.f, testString);
+        ConstArgsAndArgsToSetFunc(2, 3.f, testString);
         ssTEST_OUTPUT_ASSERT(calledExpectedly == false);
         
-        FuncWithConstArgsAndArgsToSet(1, 2.f, testString);
+        ConstArgsAndArgsToSetFunc(1, 2.f, testString);
         ssTEST_OUTPUT_ASSERT(calledExpectedly == true);
     };
     

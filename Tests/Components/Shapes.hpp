@@ -1,5 +1,5 @@
-#ifndef CO_CLASS_FUNCTIONS_HPP
-#define CO_CLASS_FUNCTIONS_HPP
+#ifndef CO_SHAPES_HPP
+#define CO_SHAPES_HPP
 
 #include "CppOverride.hpp"
 

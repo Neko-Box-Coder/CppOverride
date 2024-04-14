@@ -23,7 +23,7 @@ int main()
         CO_SETUP_OVERRIDE   (rect, GetWidth)
                             .Returns<float>(5.f);
         
-        ssTEST_OUTPUT_ASSERT("int", FuncWithoutArgs() == 32);
+        ssTEST_OUTPUT_ASSERT("int", NoArgsFunc() == 32);
     
         ssTEST_OUTPUT_ASSERT("float", rect.GetWidth() == 5.f);
     };
@@ -54,7 +54,7 @@ int main()
         CO_SETUP_OVERRIDE   (OverrideObj, ReturnTemplateObjectFunc)
                             .Returns<DummyClass>(assertObject);
         
-        ssTEST_OUTPUT_ASSERT(ReturnTemplateObjectFunc<DummyClass>(testObject) == assertObject);
+        ssTEST_OUTPUT_ASSERT(TemplateReturnFunc<DummyClass>(testObject) == assertObject);
     };
     
     ssTEST("Return Nothing Test")
@@ -62,7 +62,7 @@ int main()
         CO_SETUP_OVERRIDE   (OverrideObj, FuncWithoutArgs)
                             .Returns<CO_ANY_TYPE>(CO_DONT_OVERRIDE_RETURN);
 
-        ssTEST_OUTPUT_ASSERT(FuncWithoutArgs() == -1);
+        ssTEST_OUTPUT_ASSERT(NoArgsFunc() == -1);
     };
     
     ssTEST("Return By Action Test")
@@ -76,7 +76,7 @@ int main()
                                 }
                             );
 
-        ssTEST_OUTPUT_ASSERT(FuncWithoutArgs() == 10);
+        ssTEST_OUTPUT_ASSERT(NoArgsFunc() == 10);
     };
     
     ssTEST("Return Reference Test")

@@ -1,7 +1,7 @@
 #include "CppOverride.hpp"
 #include "ssTest.hpp"
-#include "./FileFunctions.hpp"
-#include "./ClassFunctions.hpp"
+#include "./Components/FileFunctions.hpp"
+#include "./Components/Shapes.hpp"
 
 CppOverride::Overrider OverrideObj;
 
@@ -13,9 +13,9 @@ int main()
         OverrideObj = CppOverride::Overrider();
     };
     
-    ssTEST("Return Test")
+    ssTEST("If Condition Should Affect Return")
     {
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithConstArgs)
+        CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsFunc)
                             .If
                             (
                                 [] (const std::vector<void *>& args) -> bool
@@ -32,14 +32,16 @@ int main()
                             )
                             .Returns<int>(1);
     
-        ssTEST_OUTPUT_ASSERT(FuncWithConstArgs(1, true, 2.f) == 1);
+        ssTEST_OUTPUT_ASSERT(   "Meet If Condition", 
+                                ::CppOverrideTest::Const::ConstArgsFunc(1, true, 2.f) == 1);
         
-        ssTEST_OUTPUT_ASSERT(FuncWithConstArgs(2, false, 3.f) != 1);
+        ssTEST_OUTPUT_ASSERT(   "Fail If Condition", 
+                                ::CppOverrideTest::Const::ConstArgsFunc(2, false, 3.f) != 1);
     };
     
-    ssTEST("SetArgs Test")
+    ssTEST("If Condition Should Affect Set Args")
     {
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithConstArgsAndArgsToSet)
+        CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsAndArgsToSetFunc)
                             .If
                             (
                                 [] (const std::vector<void *>& args) -> bool
@@ -60,17 +62,25 @@ int main()
                                                         CO_DONT_SET, 
                                                         "Test String 2");
 
-        std::string testString = "";
+        ssTEST_OUTPUT_SETUP
+        (
+            std::string testString = "";
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::Const::ConstArgsAndArgsToSetFunc(1, 2.f, testString);
+        );
+        ssTEST_OUTPUT_ASSERT("Fail If Condition", testString.empty());
         
-        FuncWithConstArgsAndArgsToSet(1, 2.f, testString);
-
-        ssTEST_OUTPUT_ASSERT(testString.empty());
-        
-        testString = "Test String";
-        
-        FuncWithConstArgsAndArgsToSet(1, 2.f, testString);
-        
-        ssTEST_OUTPUT_ASSERT(testString == "Test String 2");
+        ssTEST_OUTPUT_SETUP
+        (
+            testString = "Test String";
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::Const::ConstArgsAndArgsToSetFunc(1, 2.f, testString);
+        );
+        ssTEST_OUTPUT_ASSERT("Meet If Condition", testString == "Test String 2");
     };
     
     ssTEST_END();

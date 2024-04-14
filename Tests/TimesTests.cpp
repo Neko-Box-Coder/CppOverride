@@ -19,13 +19,13 @@ int main()
                             .Times(3)
                             .Returns<int>(1);
 
-        ssTEST_OUTPUT_ASSERT(FuncWithArgs(1, true, 2.f) == 1);
+        ssTEST_OUTPUT_ASSERT(ArgsFunc(1, true, 2.f) == 1);
         
-        ssTEST_OUTPUT_ASSERT(FuncWithArgs(2, false, 3.f) == 1);
+        ssTEST_OUTPUT_ASSERT(ArgsFunc(2, false, 3.f) == 1);
         
-        ssTEST_OUTPUT_ASSERT(FuncWithArgs(3, true, 4.f) == 1);
+        ssTEST_OUTPUT_ASSERT(ArgsFunc(3, true, 4.f) == 1);
         
-        ssTEST_OUTPUT_ASSERT(FuncWithArgs(4, true, 5.f) != 1);
+        ssTEST_OUTPUT_ASSERT(ArgsFunc(4, true, 5.f) != 1);
     };
     
     ssTEST("Return With Multiple Overrides Test")
@@ -45,15 +45,15 @@ int main()
                             .WhenCalledWith(3, true, 4.f)
                             .Returns<int>(3);
         
-        ssTEST_OUTPUT_ASSERT("3rd Override", FuncWithArgs(3, true, 4.f) == 3);
-        ssTEST_OUTPUT_ASSERT("3rd Override", FuncWithArgs(3, true, 4.f) == 3);
-        ssTEST_OUTPUT_ASSERT("3rd Override", FuncWithArgs(3, true, 4.f) != 3);
+        ssTEST_OUTPUT_ASSERT("3rd Override", ArgsFunc(3, true, 4.f) == 3);
+        ssTEST_OUTPUT_ASSERT("3rd Override", ArgsFunc(3, true, 4.f) == 3);
+        ssTEST_OUTPUT_ASSERT("3rd Override", ArgsFunc(3, true, 4.f) != 3);
         
-        ssTEST_OUTPUT_ASSERT("2nd Override", FuncWithArgs(2, false, 3.f) == 2);
-        ssTEST_OUTPUT_ASSERT("2nd Override", FuncWithArgs(2, false, 3.f) != 2);
+        ssTEST_OUTPUT_ASSERT("2nd Override", ArgsFunc(2, false, 3.f) == 2);
+        ssTEST_OUTPUT_ASSERT("2nd Override", ArgsFunc(2, false, 3.f) != 2);
         
-        ssTEST_OUTPUT_ASSERT("1st Override", FuncWithArgs(1, true, 2.f) == 1);
-        ssTEST_OUTPUT_ASSERT("1st Override", FuncWithArgs(1, true, 2.f) != 1);
+        ssTEST_OUTPUT_ASSERT("1st Override", ArgsFunc(1, true, 2.f) == 1);
+        ssTEST_OUTPUT_ASSERT("1st Override", ArgsFunc(1, true, 2.f) != 1);
     };
     
     ssTEST("SetArg With One Override Test")
@@ -118,33 +118,33 @@ int main()
         float testFloat = 4.f;
         std::string testString = "";
         
-        FuncWithArgsToSet(3, &testFloat, testString);
+        ArgsToSetFunc(3, &testFloat, testString);
         ssTEST_OUTPUT_ASSERT("3rd Override", testString == "test3");
         testString.clear();
         
-        FuncWithArgsToSet(3, &testFloat, testString);
+        ArgsToSetFunc(3, &testFloat, testString);
         ssTEST_OUTPUT_ASSERT("3rd Override", testString == "test3");
         testString.clear();
         
-        FuncWithArgsToSet(3, &testFloat, testString);
+        ArgsToSetFunc(3, &testFloat, testString);
         ssTEST_OUTPUT_ASSERT("3rd Override", testString.empty());
         testString.clear();
         
         testFloat = 3.f;
-        FuncWithArgsToSet(2, &testFloat, testString);
+        ArgsToSetFunc(2, &testFloat, testString);
         ssTEST_OUTPUT_ASSERT("2nd Override", testString == "test2");
         testString.clear();
         
-        FuncWithArgsToSet(2, &testFloat, testString);
+        ArgsToSetFunc(2, &testFloat, testString);
         ssTEST_OUTPUT_ASSERT("2nd Override", testString.empty());
         testString.clear();
         
         testFloat = 2.f;
-        FuncWithArgsToSet(1, &testFloat, testString);
+        ArgsToSetFunc(1, &testFloat, testString);
         ssTEST_OUTPUT_ASSERT("1st Override", testString == "test");
         testString.clear();
         
-        FuncWithArgsToSet(1, &testFloat, testString);
+        ArgsToSetFunc(1, &testFloat, testString);
         ssTEST_OUTPUT_ASSERT("1st Override", testString.empty());
     };
     
