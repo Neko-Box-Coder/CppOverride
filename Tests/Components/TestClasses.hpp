@@ -78,8 +78,7 @@ class TemplateTestClass : public TestClass
         T GenericTestData;
     
     public:
-        inline TemplateTestClass() :    TestClass(), 
-                                        GenericTestData()
+        inline TemplateTestClass() : TestClass(), GenericTestData()
         {}
         
         //Copy constructor using assignment operator
@@ -133,6 +132,9 @@ class NonCopyableTestClass : public TestClass
         inline NonCopyableTestClass() : TestClass()
         {}
         
+        inline NonCopyableTestClass(int d, double v, std::string n) : TestClass(d, v, n)
+        {}
+        
         inline NonCopyableTestClass(const NonCopyableTestClass& other) = delete;
         inline NonCopyableTestClass& operator=(const NonCopyableTestClass& other) = delete;
         
@@ -151,6 +153,9 @@ class NonComparableTestClass : public TestClass
 {
     public:
         inline NonComparableTestClass() : TestClass()
+        {}
+        
+        inline NonComparableTestClass(int d, double v, std::string n) : TestClass(d, v, n)
         {}
         
         inline NonComparableTestClass(const NonComparableTestClass& other) : TestClass(other)
@@ -172,6 +177,9 @@ class ImmutableTestClass : public TestClass
 {
     public:
         inline ImmutableTestClass() : TestClass()
+        {}
+        
+        inline ImmutableTestClass(int d, double v, std::string n) : TestClass(d, v, n)
         {}
         
         inline ImmutableTestClass(const ImmutableTestClass& other) = delete;

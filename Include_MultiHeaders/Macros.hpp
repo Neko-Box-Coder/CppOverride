@@ -157,8 +157,6 @@ namespace CppOverride
                                                     __func__ \
                                                     INTERNAL_CO_ARGS(args)); \
             \
-            if(std::is_same<returnType, void>::value) \
-                return CppOverride::EarlyReturn<returnType>(); \
         } \
         \
         if(foundReturnIndex != -1) \

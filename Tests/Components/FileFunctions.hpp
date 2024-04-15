@@ -16,17 +16,31 @@ namespace CppOverrideTest
             return -1;
         }
 
+        //Used In:
+        //  IfTests
         inline int ArgsFunc(int testArg, bool testArg2, float testArg3)
         {
             CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2, testArg3));
             return -1;
         }
-        
+
+        //Used In:
+        //  IfTests
+        //  ModifyArgsTests
         inline void ArgsToSetFunc(int testArg, float* testArg2, std::string& testArg3)
         {
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
         }
         
+        //Used In:
+        //  ModifyArgsTests
+        inline void ArgsToSetFunc(int testArg, float& testArg2, float* testArg3)
+        {
+            CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
+        }
+        
+        //Used In:
+        //  ModifyArgsTests
         inline void MoreArgsToSetFunc(int testArg, float* testArg2, bool* testArg3, std::string& testArg4)
         {
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3, testArg4));
@@ -72,12 +86,16 @@ namespace CppOverrideTest
                 return TestClass();
             }
             
+            //Used In:
+            //  ModifyArgsTests
             inline bool SetObjectFunc(int data, double value, std::string name, TestClass& testClass)
             {
                 CO_OVERRIDE_IMPL(OverrideObj, bool, (data, value, name, testClass));
                 return false;
             }
             
+            //Used In:
+            //  ModifyArgsTests
             inline void SetNonCopyableArgFunc(NonCopyableTestClass* testClass)
             {
                 CO_OVERRIDE_IMPL(OverrideObj, void, (testClass));
@@ -93,6 +111,8 @@ namespace CppOverrideTest
                 return testArg;
             }
 
+            //Used In:
+            //  ModifyArgsTests
             template<typename T>
             inline void TemplateSetArgFunc(T& testArg, T* testArg2)
             {
@@ -121,12 +141,16 @@ namespace CppOverrideTest
             CO_OVERRIDE_IMPL(OverrideObj, int, (test));
             return -1;
         }
-
+        
+        //Used In:
+        //  ModifyArgsTests
         inline void SetEndConstArgFunc(int* testArg, bool* testArg2, const float* testArg3)
         {
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
         }
         
+        //Used In:
+        //  ModifyArgsTests
         inline void SetBeginConstArgFunc(const int* testArg, bool* testArg2, float* testArg3)
         {
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));

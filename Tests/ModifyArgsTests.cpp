@@ -14,7 +14,7 @@ int main()
         OverrideObj = CppOverride::Overrider();
     };
     
-    ssTEST("Modify Single Primitive Type Should Succeed")
+    ssTEST("Set Single Primitive Type Should Succeed")
     {
         CppOverride::OverrideStatus status;
         CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
@@ -36,7 +36,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
         
-    ssTEST("Modify Multiple Primitive Types Should Succeed")
+    ssTEST("Set Multiple Primitive Types Should Succeed")
     {
         CppOverride::OverrideStatus status;
         CO_SETUP_OVERRIDE   (OverrideObj, MoreArgsToSetFunc)
@@ -66,7 +66,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
-    ssTEST("Modify Object Should Succeed")
+    ssTEST("Set Object Should Succeed")
     {
         CppOverride::OverrideStatus status;
         CO_SETUP_OVERRIDE   (OverrideObj, SetObjectFunc)
@@ -93,7 +93,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
-    ssTEST("Modify Template Object Should Succeed")
+    ssTEST("Set Template Object Should Succeed")
     {
         TemplateTestClass<int> overrideDummy(1, 2, 3.f, "test");
         TemplateTestClass<int> overrideDummy2(2, 3, 4.f, "test2");
@@ -168,10 +168,149 @@ int main()
         ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::MODIFY_CONST_ARG_ERROR);
     };
     
+    ssTEST("Set Args For Overloaded Function Should Succeed")
+    {
+        CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
+        CppOverride::OverrideStatus status2 = CppOverride::DEFAULT_STATUS;
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 4.f, "Test")
+                            .AssignStatus(status);
+        
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+                            .SetArgs<CO_ANY_TYPE, float&, float*>(CO_DONT_SET, true, 3.f)
+                            .AssignStatus(status2);
     
-    #if 0
+        ssTEST_OUTPUT_SETUP
+        (
+            int testArg = 0;
+            float testArg2 = 0;
+            std::string testArg3;
+            float testArg4 = 0;
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(testArg, &testArg2, testArg3);
+        );
+        ssTEST_OUTPUT_ASSERT(testArg2 == 4.f);
+        ssTEST_OUTPUT_ASSERT(testArg3 == "Test");
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(status2 == CppOverride::DEFAULT_STATUS);
+        
+        
+        ssTEST_OUTPUT_SETUP
+        (
+            status = CppOverride::OverrideStatus::NO_OVERRIDE;
+        );
+        
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(testArg, testArg2, &testArg4);
+        );
+        ssTEST_OUTPUT_ASSERT(testArg2 == true);
+        ssTEST_OUTPUT_ASSERT(testArg4 == 3.f);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::NO_OVERRIDE);
+        ssTEST_OUTPUT_ASSERT(status2 == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+    };
     
-    ssTEST("Modify Object Test with action")
+    ssTEST("Set Args For Member Function Should Succeed")
+    {
+        CppOverride::OverrideStatus status;
+        
+        ssTEST_OUTPUT_SETUP
+        (
+            Rectangle rect(5, 5);
+            float outWidth = 0;
+        );
+        
+        CO_SETUP_OVERRIDE(rect, GetWidth)   .SetArgs<float&, CO_ANY_TYPE>(2, CO_DONT_SET)
+                                            .ReturnsVoid()
+                                            .AssignStatus(status);
+        
+        ssTEST_OUTPUT_EXECUTION( rect.GetWidth(outWidth); );
+        
+        ssTEST_OUTPUT_ASSERT(outWidth == 2);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+    };
+    
+    ssTEST("Don't Set Anything Should Modify Nothing")
+    {
+        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        CO_ANY_TYPE>(   CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        CO_DONT_SET);
+
+        ssTEST_OUTPUT_SETUP
+        (
+            float testArg = 2.f;
+            std::string testArg2 = "test";
+        );
+        
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(1, &testArg, testArg2);
+        );
+        
+        ssTEST_OUTPUT_ASSERT(testArg == 2.f);
+        ssTEST_OUTPUT_ASSERT(testArg2 == "test");
+    };
+    
+    ssTEST_SKIP("Non Copy Assignable Object Should Fail To Compile")
+    {
+        //NOTE: This is catched by static assert. If somehow it can get to runtime,
+        //      it should give MODIFY_NON_ASSIGNABLE_ARG_ERROR status. But this cannot be tested
+        
+        #if 0
+            NonCopyableTestClass testObject(1, 2.f, "test");
+            NonCopyableTestClass assignObject(2, 3.f, "test 2");
+            
+            CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
+            
+            CO_SETUP_OVERRIDE   (OverrideObj, SetNonAssignableArgFunc)
+                                .SetArgs<NonCopyableTestClass*>(assignObject)
+                                .AssignStatus(status);
+            
+            CppOverrideTest::NonConst::Object::SetNonCopyableArgFunc(&testObject);
+            
+            ssTEST_OUTPUT_ASSERT(testObject.GetTestData() == 0);
+            ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::MODIFY_NON_ASSIGNABLE_ARG_ERROR);
+        #endif
+    };
+    
+    ssTEST("Set Primitive Types By Action Should Succeed")
+    {
+        CppOverride::OverrideStatus status;
+        
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+                            .SetArgsByAction<int, float*, std::string&>
+                            (
+                                [](std::vector<void*>& args)
+                                {
+                                    **((float**)args.at(1)) = 2.f;
+                                    *((std::string*)args.at(2)) = "test";
+                                }
+                            )
+                            .AssignStatus(status);
+        
+        ssTEST_OUTPUT_SETUP
+        (
+            int testArg = 1;
+            float testArg2 = 1.f;
+            std::string testArg3 = "";
+        );
+        
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(testArg, &testArg2, testArg3);
+        );
+        
+        ssTEST_OUTPUT_ASSERT(testArg2 == 2.f);
+        ssTEST_OUTPUT_ASSERT(testArg3 == "test");
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+    };
+    
+    ssTEST("Set Object By Action Should Succeed")
     {
         CO_SETUP_OVERRIDE   (OverrideObj, SetObjectFunc)
                             .SetArgsByAction<   CO_ANY_TYPE, 
@@ -186,75 +325,76 @@ int main()
                             )
                             .Returns<bool>(true);
 
-        TestClass testClass(2, 3.0, "test 2");
+        ssTEST_OUTPUT_SETUP
+        (
+            TestClass testClass;
+        );
         
-        SetObjectFunc(0, 0, "a", testClass);
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::Object::SetObjectFunc(0, 0, "a", testClass);
+        );
         
         ssTEST_OUTPUT_ASSERT(testClass == TestClass(1, 2.0, "test"));
     };
     
-    ssTEST("Modify Nothing Test")
+    ssTEST("Set Args By Action For Overloaded Function Should Succeed")
     {
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
-                            .SetArgs<   CO_ANY_TYPE, 
-                                        CO_ANY_TYPE, 
-                                        CO_ANY_TYPE>(   CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        CO_DONT_SET);
-
-        float testArg = 2.f;
-        std::string testArg2 = "test";
-        
-        ArgsToSetFunc(1, &testArg, testArg2);
-        
-        ssTEST_OUTPUT_ASSERT(testArg == 2.f);
-        ssTEST_OUTPUT_ASSERT(testArg2 == "test");
-    };
-    
-    ssTEST("Modify By Action Test")
-    {
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
-                            .SetArgsByAction<int, float*, std::string&>
+        CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
+        CppOverride::OverrideStatus status2 = CppOverride::DEFAULT_STATUS;
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+                            .SetArgsByAction<CO_ANY_TYPE, float*, std::string&>
                             (
                                 [](std::vector<void*>& args)
                                 {
-                                    *((std::string*)args.at(2)) = "test";
+                                    **((float**)args.at(1)) = 4.f;
+                                    *((std::string*)args.at(2)) = "Test";
                                 }
-                            );
+                            )
+                            .AssignStatus(status);
         
-        int testArg = 1;
-        float testArg2 = 1.f;
-        std::string testArg3 = "";
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+                            .SetArgsByAction<CO_ANY_TYPE, float&, float*>
+                            (
+                                [](std::vector<void*>& args)
+                                {
+                                    *((float*)args.at(1)) = true;
+                                    **((float**)args.at(2)) = 3.f;
+                                }
+                            )
+                            .AssignStatus(status2);
+    
+        ssTEST_OUTPUT_SETUP
+        (
+            int testArg = 0;
+            float testArg2 = 0;
+            std::string testArg3;
+            float testArg4 = 0;
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(testArg, &testArg2, testArg3);
+        );
+        ssTEST_OUTPUT_ASSERT(testArg2 == 4.f);
+        ssTEST_OUTPUT_ASSERT(testArg3 == "Test");
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(status2 == CppOverride::DEFAULT_STATUS);
         
-        ArgsToSetFunc(testArg, &testArg2, testArg3);
         
-        ssTEST_OUTPUT_ASSERT(testArg3 == "test");
+        ssTEST_OUTPUT_SETUP
+        (
+            status = CppOverride::OverrideStatus::NO_OVERRIDE;
+        );
+        
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(testArg, testArg2, &testArg4);
+        );
+        ssTEST_OUTPUT_ASSERT(testArg2 == true);
+        ssTEST_OUTPUT_ASSERT(testArg4 == 3.f);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::NO_OVERRIDE);
+        ssTEST_OUTPUT_ASSERT(status2 == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
-    
-    
-    ssTEST_SKIP("Non copy assignable object Test")
-    {
-        //NOTE: This is catched by static assert. If somehow it can get to runtime,
-        //      it should give MODIFY_NON_ASSIGNABLE_ARG_ERROR status. But this cannot be tested
-        
-        #if 0
-            NonCopyAssignableDummy testObject(1);
-            NonCopyAssignableDummy assignObject(2);
-            
-            CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
-            
-            CO_SETUP_OVERRIDE   (OverrideObj, SetNonAssignableArgFunc)
-                                .SetArgs<NonCopyAssignableDummy>(assignObject)
-                                .AssignStatus(status);
-            
-            SetNonAssignableArgFunc(&testObject);
-            
-            ssTEST_OUTPUT_ASSERT(testObject.GetTestData() == 1);
-            ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::MODIFY_NON_ASSIGNABLE_ARG_ERROR);
-        #endif
-    };
-    
-    #endif
     
     ssTEST_END();
     return 0;
