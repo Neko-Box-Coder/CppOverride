@@ -10,6 +10,8 @@ namespace CppOverrideTest
 {
     namespace NonConst
     {
+        //Used In:
+        //  ModifyReturnsTests
         inline int NoArgsFunc()
         {
             CO_OVERRIDE_IMPL(OverrideObj, int, ());
@@ -46,18 +48,25 @@ namespace CppOverrideTest
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3, testArg4));
         }
         
+        //Used In:
+        //  ModifyReturnsTests
         inline std::string ReturnStringFunc(int value)
         {
             CO_OVERRIDE_IMPL(OverrideObj, std::string, (value));
             return "";
         }
         
-        inline int VoidPointerFunc(void* testArg, int testArg2)
+        //Used In:
+        //  ModifyArgsTests
+        inline int AddNumFromVoidPointerFunc(void* testArg, int testArg2)
         {
             CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2));
-            return -1;
+            return (*(int*)testArg) + testArg2;
         }
         
+        //Used In:
+        //  ModifyArgsTests
+        //  ModifyReturnsTests
         inline void AssignArgInternallyFunc(std::string testArg, std::string& testArg2)
         {
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2));
@@ -66,12 +75,16 @@ namespace CppOverrideTest
 
         static int ReferenceInt = 0;
 
+        //Used In:
+        //  ModifyReturnsTests
         inline int& ReturnReferenceFunc(int a)
         {
             CO_OVERRIDE_IMPL(OverrideObj, int&, (a));
             return ReferenceInt;
         }
 
+        //Used In:
+        //  ModifyReturnsTests
         inline int* ReturnPointerFunc(int a)
         {
             CO_OVERRIDE_IMPL(OverrideObj, int*, (a));
@@ -80,6 +93,8 @@ namespace CppOverrideTest
         
         namespace Object
         {
+            //Used In:
+            //  ModifyReturnsTests
             inline TestClass ReturnObjectFunc(int data, double value, std::string name)
             {
                 CO_OVERRIDE_IMPL(OverrideObj, TestClass, (data, value, name));
@@ -104,6 +119,8 @@ namespace CppOverrideTest
         
         namespace Template
         {
+            //Used In:
+            //  ModifyReturnsTests
             template<typename T>
             inline T TemplateReturnFunc(T testArg)
             {

@@ -65,6 +65,50 @@ int main()
         ssTEST_OUTPUT_ASSERT(testBool == false);
         ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
+
+    ssTEST("Set Non Pointer/Reference Arg Should Succeed")
+    {
+        CppOverride::OverrideStatus status;
+        CO_SETUP_OVERRIDE   (OverrideObj, AssignArgInternallyFunc)
+                            .SetArgs<std::string, CO_ANY_TYPE>("Test", CO_DONT_SET)
+                            .AssignStatus(status);
+        
+        ssTEST_OUTPUT_SETUP
+        (
+            std::string outString;
+        );
+        
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::AssignArgInternallyFunc("Test 2", outString);
+        );
+        
+        ssTEST_OUTPUT_ASSERT(outString == "Test");
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+    };
+
+    ssTEST("Set Void Pointer Should Succeed")
+    {
+        CppOverride::OverrideStatus status;
+        
+        ssTEST_OUTPUT_SETUP
+        (
+            int TestArg = 2;
+            int TestArg2 = 4;
+        );
+        
+        CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromVoidPointerFunc)
+                            .SetArgs<void*, CO_ANY_TYPE>(&TestArg, CO_DONT_SET)
+                            .AssignStatus(status);
+        
+        ssTEST_OUTPUT_EXECUTION
+        (
+            int result = CppOverrideTest::NonConst::AddNumFromVoidPointerFunc(&TestArg2, 5);
+        );
+        
+        ssTEST_OUTPUT_ASSERT(result == 7);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+    };
     
     ssTEST("Set Object Should Succeed")
     {
@@ -234,12 +278,14 @@ int main()
     
     ssTEST("Don't Set Anything Should Modify Nothing")
     {
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
+        CppOverride::OverrideStatus status;
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                             .SetArgs<   CO_ANY_TYPE, 
                                         CO_ANY_TYPE, 
                                         CO_ANY_TYPE>(   CO_DONT_SET, 
                                                         CO_DONT_SET, 
-                                                        CO_DONT_SET);
+                                                        CO_DONT_SET)
+                            .AssignStatus(status);
 
         ssTEST_OUTPUT_SETUP
         (
@@ -254,6 +300,7 @@ int main()
         
         ssTEST_OUTPUT_ASSERT(testArg == 2.f);
         ssTEST_OUTPUT_ASSERT(testArg2 == "test");
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST_SKIP("Non Copy Assignable Object Should Fail To Compile")

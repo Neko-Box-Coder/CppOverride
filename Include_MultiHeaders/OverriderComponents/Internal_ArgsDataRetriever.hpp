@@ -63,6 +63,7 @@ namespace CppOverride
                     int argumentTypeFailedIndex = -1;
                     
                     if( curData[i].ArgumentsDataActionInfo.DataActionSet && 
+                        !argumentsTypesList.empty() &&
                         curData[i].ArgumentsDataActionInfo.DataTypes.size() == 
                             argumentsTypesList.size())
                     {
@@ -92,7 +93,8 @@ namespace CppOverride
                         }
                     }
                     //Check set argument data counts match
-                    else if(curData[i].ArgumentsDataInfo.size() == argumentsTypesList.size())
+                    else if(curData[i].ArgumentsDataInfo.size() == argumentsTypesList.size() &&
+                            !argumentsTypesList.empty())
                     {
                         for(int j = 0; j < curData[i].ArgumentsDataInfo.size(); j++)
                         {

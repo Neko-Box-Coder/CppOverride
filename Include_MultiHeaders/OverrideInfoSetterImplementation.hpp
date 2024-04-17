@@ -55,11 +55,18 @@ namespace CppOverride
     }
 
     template<typename ReturnType>
-    inline OverrideInfoSetter& 
+    inline OverrideInfoSetter&
     OverrideInfoSetter::Returns(typename TypeSpecifier<ReturnType>::Type returnData)
     {
         static_assert(std::is_same<ReturnType, decltype(returnData)>::value, "");
         return CppOverrideObj.Returns<ReturnType>(*this, returnData);
+    }
+    
+    template<>
+    inline OverrideInfoSetter&
+    OverrideInfoSetter::Returns<void>()
+    {
+        return CppOverrideObj.ReturnsVoid(*this);
     }
     
     inline OverrideInfoSetter& OverrideInfoSetter::ReturnsVoid()

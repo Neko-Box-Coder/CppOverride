@@ -51,9 +51,9 @@ if(CPP_OVERRIDE_BUILD_TEST)
         add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/ssTest" "${CMAKE_CURRENT_BINARY_DIR}/ssTest")
     endif()
     
-    #add_executable(ModifyReturnsTests "${CMAKE_CURRENT_LIST_DIR}/Tests/ModifyReturnsTests.cpp")
-    #target_link_libraries(ModifyReturnsTests PUBLIC CppOverride ssTest)
-    #target_compile_options(ModifyReturnsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    add_executable(ModifyReturnsTests "${CMAKE_CURRENT_LIST_DIR}/Tests/ModifyReturnsTests.cpp")
+    target_link_libraries(ModifyReturnsTests PUBLIC CppOverride ssTest)
+    target_compile_options(ModifyReturnsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(ModifyArgsTests "${CMAKE_CURRENT_LIST_DIR}/Tests/ModifyArgsTests.cpp")
     target_link_libraries(ModifyArgsTests PUBLIC CppOverride ssTest)

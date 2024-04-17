@@ -153,7 +153,7 @@ namespace CppOverride
             //------------------------------------------------------------------------------
             //Check overrides available
             //------------------------------------------------------------------------------
-            #define INTERNAL_CO_LOG_CheckOverride 0
+            #define INTERNAL_CO_LOG_CheckOverride 1
             
             template<typename ReturnType, typename... Args>
             inline bool Internal_CheckOverride( std::string functionName, 
@@ -245,6 +245,16 @@ namespace CppOverride
                                                         std::string functionName, 
                                                         Args&... args)
             {
+                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                std::vector<void*> argumentsList;
+                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
+                
+                if(correctData.ResultActionInfo.CorrectActionSet)
+                    correctData.ResultActionInfo.CorrectAction(argumentsList);
+                
+                if(correctData.Status != nullptr)
+                    *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
+                
                 return ReturnType();
             }
 
