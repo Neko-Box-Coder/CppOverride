@@ -71,9 +71,9 @@ if(CPP_OVERRIDE_BUILD_TEST)
     target_link_libraries(IfTests PUBLIC CppOverride ssTest)
     target_compile_options(IfTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
-    #add_executable(Otherwise_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/Otherwise_DoTests.cpp")
-    #target_link_libraries(Otherwise_DoTests PUBLIC CppOverride ssTest)
-    #target_compile_options(Otherwise_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    add_executable(Otherwise_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/Otherwise_DoTests.cpp")
+    target_link_libraries(Otherwise_DoTests PUBLIC CppOverride ssTest)
+    target_compile_options(Otherwise_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     #add_executable(WhenCalledExpectedly_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledExpectedly_DoTests.cpp")
     #target_link_libraries(WhenCalledExpectedly_DoTests PUBLIC CppOverride ssTest)
