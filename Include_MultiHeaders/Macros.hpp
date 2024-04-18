@@ -136,7 +136,7 @@ namespace CppOverride
     #define INTERNAL_CO_ARGS_EMPTY()
     #define INTERNAL_CO_ARGS_NOT_EMPTY(...) , __VA_ARGS__
     
-    #define INTERNAL_CO_LOG_FOUND_INDEX 1
+    #define INTERNAL_CO_LOG_FOUND_INDEX 0
     
     #define CO_OVERRIDE_IMPL(overrideObjName, returnType, args) \
     do \
