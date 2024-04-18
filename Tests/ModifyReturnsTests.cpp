@@ -117,11 +117,6 @@ int main()
     
     ssTEST("Return Nothing Should Not Override Return Value")
     {
-        //TODO(NOW): Right now it is not possible to override to return nothing because
-        //              - If it doesn't override, you can't perform any actions such as 
-        //                  WhenCalledExpectedly_Do or Otherwise_Do.
-        //              - But if it does override for the actions, it will need to return SOMETHING
-        
         CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
         CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
                             .Returns<CO_ANY_TYPE>(CO_DONT_OVERRIDE_RETURN)
