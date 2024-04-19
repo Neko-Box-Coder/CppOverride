@@ -12,6 +12,7 @@ namespace CppOverrideTest
     {
         //Used In:
         //  ModifyReturnsTests
+        //  TimesTests
         inline int NoArgsFunc()
         {
             CO_OVERRIDE_IMPL(OverrideObj, int, ());
@@ -29,6 +30,7 @@ namespace CppOverrideTest
         //Used In:
         //  IfTests
         //  ModifyArgsTests
+        //  TimesTests
         inline void ArgsToSetFunc(int testArg, float* testArg2, std::string& testArg3)
         {
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));

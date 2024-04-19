@@ -63,9 +63,9 @@ if(CPP_OVERRIDE_BUILD_TEST)
     #target_link_libraries(WhenCalledWithTests PUBLIC CppOverride ssTest)
     #target_compile_options(WhenCalledWithTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
-    #add_executable(TimesTests "${CMAKE_CURRENT_LIST_DIR}/Tests/TimesTests.cpp")
-    #target_link_libraries(TimesTests PUBLIC CppOverride ssTest)
-    #target_compile_options(TimesTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    add_executable(TimesTests "${CMAKE_CURRENT_LIST_DIR}/Tests/TimesTests.cpp")
+    target_link_libraries(TimesTests PUBLIC CppOverride ssTest)
+    target_compile_options(TimesTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(IfTests "${CMAKE_CURRENT_LIST_DIR}/Tests/IfTests.cpp")
     target_link_libraries(IfTests PUBLIC CppOverride ssTest)

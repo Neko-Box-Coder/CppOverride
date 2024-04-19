@@ -1,7 +1,7 @@
 #include "CppOverride.hpp"
 #include "ssTest.hpp"
-#include "./FileFunctions.hpp"
-#include "./ClassFunctions.hpp"
+#include "./Components/FileFunctions.hpp"
+#include "./Components/TestClasses.hpp"
 
 CppOverride::Overrider OverrideObj;
 
@@ -13,139 +13,254 @@ int main()
         OverrideObj = CppOverride::Overrider();
     };
     
-    ssTEST("Return With One Override Test")
+    ssTEST("Return With Zero Time Set Should Succeed")
     {
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgs)
-                            .Times(3)
+        CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
+                            .Times(0)
                             .Returns<int>(1);
 
-        ssTEST_OUTPUT_ASSERT(ArgsFunc(1, true, 2.f) == 1);
-        
-        ssTEST_OUTPUT_ASSERT(ArgsFunc(2, false, 3.f) == 1);
-        
-        ssTEST_OUTPUT_ASSERT(ArgsFunc(3, true, 4.f) == 1);
-        
-        ssTEST_OUTPUT_ASSERT(ArgsFunc(4, true, 5.f) != 1);
+        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
     };
     
-    ssTEST("Return With Multiple Overrides Test")
+    ssTEST("Return With One Time Set Should Succeed")
     {
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgs)
-                            .WhenCalledWith(1, true, 2.f)
+        CppOverride::OverrideStatus status;
+        CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
                             .Times(1)
-                            .Returns<int>(1);
+                            .Returns<int>(1)
+                            .AssignStatus(status);
+
+        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgs)
-                            .Times(1)
-                            .WhenCalledWith(2, false, 3.f)
-                            .Returns<int>(2);
-        
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgs)
-                            .Times(2)
-                            .WhenCalledWith(3, true, 4.f)
-                            .Returns<int>(3);
-        
-        ssTEST_OUTPUT_ASSERT("3rd Override", ArgsFunc(3, true, 4.f) == 3);
-        ssTEST_OUTPUT_ASSERT("3rd Override", ArgsFunc(3, true, 4.f) == 3);
-        ssTEST_OUTPUT_ASSERT("3rd Override", ArgsFunc(3, true, 4.f) != 3);
-        
-        ssTEST_OUTPUT_ASSERT("2nd Override", ArgsFunc(2, false, 3.f) == 2);
-        ssTEST_OUTPUT_ASSERT("2nd Override", ArgsFunc(2, false, 3.f) != 2);
-        
-        ssTEST_OUTPUT_ASSERT("1st Override", ArgsFunc(1, true, 2.f) == 1);
-        ssTEST_OUTPUT_ASSERT("1st Override", ArgsFunc(1, true, 2.f) != 1);
+        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
     };
     
-    ssTEST("SetArg With One Override Test")
+    ssTEST("Return With Two Times Set Should Succeed")
     {
-        DummyClass assignObject = DummyClass(2, 3.0, "test2");
-        
-        CO_SETUP_OVERRIDE   (OverrideObj, SetObjectFunc)
-                            .WhenCalledWith(10, 20.0, std::string("test10"), CO_ANY)
+        CppOverride::OverrideStatus status;
+        CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
                             .Times(2)
-                            .SetArgs<   CO_ANY_TYPE, 
-                                        CO_ANY_TYPE, 
-                                        CO_ANY_TYPE, 
-                                        DummyClass&>(   CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        assignObject)
-                            .Returns<bool>(true);
+                            .Returns<int>(1)
+                            .AssignStatus(status);
 
+        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
-        DummyClass testObject;
-        SetObjectFunc(10, 20.0, "test10", testObject);
-        ssTEST_OUTPUT_ASSERT(testObject == assignObject);
+        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
-        testObject = DummyClass();
-        SetObjectFunc(10, 20.0, "test10", testObject);
-        ssTEST_OUTPUT_ASSERT(testObject == assignObject);
-        
-        testObject = DummyClass();
-        SetObjectFunc(10, 20.0, "test10", testObject);
-        ssTEST_OUTPUT_ASSERT(testObject == DummyClass(10, 20.0, "test10"));
+        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
     };
     
-    ssTEST("SetArg With Multiple Overrides Test")
+    ssTEST("Return With No Time Set Should Succeed")
     {
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
-                            .WhenCalledWith(1, 2.f, CO_ANY)
-                            .Times(1)
-                            .SetArgs<   CO_ANY_TYPE, 
-                                        CO_ANY_TYPE, 
-                                        std::string&>(  CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        "test");
-
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
-                            .WhenCalledWith(2, 3.f, CO_ANY)
-                            .Times(1)
-                            .SetArgs<   CO_ANY_TYPE, 
-                                        CO_ANY_TYPE, 
-                                        std::string&>(  CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        "test2");
-
-        CO_SETUP_OVERRIDE   (OverrideObj, FuncWithArgsToSet)
-                            .WhenCalledWith(3, 4.f, CO_ANY)
+        CppOverride::OverrideStatus status;
+        CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
+                            .Returns<int>(1)
+                            .AssignStatus(status);
+        
+        for(int i = 0; i < 10; i++)
+        {
+            ssTEST_OUTPUT_ASSERT(   "Try " + std::to_string(i), 
+                                    CppOverrideTest::NonConst::NoArgsFunc() == 1);
+            
+            ssTEST_OUTPUT_ASSERT(   "Try " + std::to_string(i),
+                                    status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        }
+    };
+    
+    ssTEST("Return Exceeding Times Set Should Set OverrideStatus To MATCHING_OVERRIDE_TIMES_FAILED")
+    {
+        CppOverride::OverrideStatus status;
+        CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
                             .Times(2)
-                            .SetArgs<   CO_ANY_TYPE, 
-                                        CO_ANY_TYPE, 
-                                        std::string&>(  CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        "test3");
+                            .Returns<int>(1)
+                            .AssignStatus(status);
 
-        float testFloat = 4.f;
-        std::string testString = "";
+        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
-        ArgsToSetFunc(3, &testFloat, testString);
-        ssTEST_OUTPUT_ASSERT("3rd Override", testString == "test3");
-        testString.clear();
+        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+
+        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
+    };
+    
+    ssTEST("SetArgs With Zero Time Set Should Succeed")
+    {
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+                            .Times(0)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test");
+
+        ssTEST_OUTPUT_SETUP
+        (
+            float testFloat = 0.f;
+            std::string testString = "";
+        );
+
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
         
-        ArgsToSetFunc(3, &testFloat, testString);
-        ssTEST_OUTPUT_ASSERT("3rd Override", testString == "test3");
-        testString.clear();
+        ssTEST_OUTPUT_ASSERT(testFloat == 0.f);
+        ssTEST_OUTPUT_ASSERT(testString.empty() == true);
+    };
+    
+    ssTEST("SetArgs With One Time Set Should Succeed")
+    {
+        CppOverride::OverrideStatus status;
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+                            .Times(1)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                            .AssignStatus(status);
+
+        ssTEST_OUTPUT_SETUP
+        (
+            float testFloat = 0.f;
+            std::string testString = "";
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
+        ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+
+        ssTEST_OUTPUT_SETUP
+        (
+            testFloat = 0.f;
+            testString = "";
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
+        ssTEST_OUTPUT_ASSERT(testFloat == 0.f && testString.empty() == true);
+    };
+    
+    ssTEST("SetArgs With Two Times Set Should Succeed")
+    {
+        CppOverride::OverrideStatus status;
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+                            .Times(2)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                            .AssignStatus(status);
+
+        ssTEST_OUTPUT_SETUP
+        (
+            float testFloat = 0.f;
+            std::string testString = "";
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
+        ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+
+
+        ssTEST_OUTPUT_SETUP
+        (
+            testFloat = 0.f;
+            testString = "";
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
+        ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
-        ArgsToSetFunc(3, &testFloat, testString);
-        ssTEST_OUTPUT_ASSERT("3rd Override", testString.empty());
-        testString.clear();
         
-        testFloat = 3.f;
-        ArgsToSetFunc(2, &testFloat, testString);
-        ssTEST_OUTPUT_ASSERT("2nd Override", testString == "test2");
-        testString.clear();
+        ssTEST_OUTPUT_SETUP
+        (
+            testFloat = 0.f;
+            testString = "";
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
+        ssTEST_OUTPUT_ASSERT(testFloat == 0.f && testString.empty() == true);
+    };
+    
+    ssTEST("SetArgs With No Time Set Should Succeed")
+    {
+        CppOverride::OverrideStatus status;
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                            .AssignStatus(status);
+
+        ssTEST_OUTPUT_SETUP
+        (
+            float testFloat = 0.f;
+            std::string testString = "";
+        );
+
+        for(int i = 0; i < 10; i++)
+        {
+            ssTEST_OUTPUT_SETUP
+            (
+                testFloat = 0.f;
+                testString = "";
+            );
+            ssTEST_OUTPUT_EXECUTION
+            (
+                CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+            );
+            ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
+            ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        }
+    };
+    
+    ssTEST("SetArgs Exceeding Times Set Should Set OverrideStatus To MATCHING_OVERRIDE_TIMES_FAILED")
+    {
+        CppOverride::OverrideStatus status;
+        CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+                            .Times(2)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                            .AssignStatus(status);
+
+        ssTEST_OUTPUT_SETUP
+        (
+            float testFloat = 0.f;
+            std::string testString = "";
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
+        ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+
+
+        ssTEST_OUTPUT_SETUP
+        (
+            testFloat = 0.f;
+            testString = "";
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
+        ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
-        ArgsToSetFunc(2, &testFloat, testString);
-        ssTEST_OUTPUT_ASSERT("2nd Override", testString.empty());
-        testString.clear();
         
-        testFloat = 2.f;
-        ArgsToSetFunc(1, &testFloat, testString);
-        ssTEST_OUTPUT_ASSERT("1st Override", testString == "test");
-        testString.clear();
-        
-        ArgsToSetFunc(1, &testFloat, testString);
-        ssTEST_OUTPUT_ASSERT("1st Override", testString.empty());
+        ssTEST_OUTPUT_SETUP
+        (
+            testFloat = 0.f;
+            testString = "";
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
+        ssTEST_OUTPUT_ASSERT(testFloat == 0.f && testString.empty() == true);
+        ssTEST_OUTPUT_ASSERT(status == CppOverride::OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
     };
     
     ssTEST_END();
