@@ -14,7 +14,12 @@ namespace CppOverride
         std::function<void*(void*)> CopyConstructor;
         std::function<void(void*)> Destructor;
         bool DataSet = false;
+    };
+    
+    struct Internal_ReturnDataInfo : public Internal_DataInfo
+    {
         bool ReturnReference = false;
+        bool ReturnAny = false;
     };
 }
 

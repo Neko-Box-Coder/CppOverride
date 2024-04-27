@@ -41,9 +41,9 @@ namespace CppOverride
     }
 
     inline OverrideInfoSetter& 
-    OverrideInfoSetter::AssignStatus(OverrideStatus& status)
+    OverrideInfoSetter::AssignOverrideResult(OverrideResult& result)
     {
-        return CppOverrideObj.AssignStatus(*this, status);
+        return CppOverrideObj.AssignOverrideResult(*this, result);
     }
 
     template<typename ReturnType>

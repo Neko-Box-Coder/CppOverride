@@ -32,13 +32,13 @@ namespace CppOverride
             template<   typename ReturnType, 
                         typename... Args>
             inline int GetCorrectReturnDataInfo(std::string functionName, 
-                                                OverrideStatus& status,
+                                                OverrideStatus& outInternalStatus,
                                                 Args&... args)
             {
                 if(CurrentOverrideDatas.find(functionName) == CurrentOverrideDatas.end())
                 {
                     //NOTE: This should be checked before calling this
-                    status = OverrideStatus::INTERNAL_MISSING_CHECK_ERROR;
+                    outInternalStatus = OverrideStatus::INTERNAL_MISSING_CHECK_ERROR;
                     return -1;
                 }
                 
@@ -104,11 +104,13 @@ namespace CppOverride
                             continue;
                         }
                     }
-                    else
+                    else if(curOverrideData[i].ReturnDataInfo.ReturnAny)
                     {
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
                             std::cout << "Any return type entry encountered" << std::endl;
                     }
+                    else
+                        continue;
                     
                     //Check parameter condition types/count match
                     if( !curOverrideData[i].ConditionInfo.ArgsCondition.empty() && 
@@ -128,15 +130,15 @@ namespace CppOverride
                         !ArgsValuesChecker.CheckArgumentsValues(curOverrideData[i]  .ConditionInfo
                                                                                     .ArgsCondition, 
                                                                 0, 
-                                                                status,
+                                                                outInternalStatus,
                                                                 args...))
                     {
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
                             std::cout << "Failed at Check parameter" << std::endl;
                         
-                        if(curOverrideData.at(i).Status != nullptr)
+                        if(curOverrideData.at(i).ReturnStatus != nullptr)
                         {
-                            *curOverrideData.at(i).Status = 
+                            *curOverrideData.at(i).ReturnStatus = 
                                 OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
                         }
                         
@@ -154,9 +156,9 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
                             std::cout << "Failed at Check condition" << std::endl;
                         
-                        if(curOverrideData[i].Status != nullptr)
+                        if(curOverrideData[i].ReturnStatus != nullptr)
                         {
-                            *curOverrideData[i].Status = 
+                            *curOverrideData[i].ReturnStatus = 
                                 OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
                         }
                         
@@ -174,9 +176,9 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
                             std::cout << "Failed at Check times" << std::endl;
                         
-                        if(curOverrideData[i].Status != nullptr)
+                        if(curOverrideData[i].ReturnStatus != nullptr)
                         {
-                            *curOverrideData[i].Status = 
+                            *curOverrideData[i].ReturnStatus = 
                                 OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
                         }
                         

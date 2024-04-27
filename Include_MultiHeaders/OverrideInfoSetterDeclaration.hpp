@@ -4,6 +4,7 @@
 #include "../External/MacroPowerToys/MacroPowerToy.h"
 #include "./OverrideStatus.hpp"
 #include "./TemplateTypeSpecifier.hpp"
+#include "./OverrideResult.hpp"
 
 #include <functional>
 #include <string>
@@ -44,7 +45,7 @@ namespace CppOverride
             OverrideInfoSetter& 
             WhenCalledExpectedly_Do(std::function<void(const std::vector<void*>& args)> action);
             
-            OverrideInfoSetter& AssignStatus(OverrideStatus& status);
+            OverrideInfoSetter& AssignOverrideResult(OverrideResult& result);
             
             
             template<typename ReturnType>
