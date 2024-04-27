@@ -21,6 +21,7 @@ namespace CppOverrideTest
 
         //Used In:
         //  IfTests
+        //  WhenCalledWithTests
         inline int ArgsFunc(int testArg, bool testArg2, float testArg3)
         {
             CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2, testArg3));
@@ -31,6 +32,7 @@ namespace CppOverrideTest
         //  IfTests
         //  ModifyArgsTests
         //  TimesTests
+        //  WhenCalledWithTests
         inline void ArgsToSetFunc(int testArg, float* testArg2, std::string& testArg3)
         {
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
@@ -45,6 +47,7 @@ namespace CppOverrideTest
         
         //Used In:
         //  ModifyArgsTests
+        //  WhenCalledWithTests
         inline void MoreArgsToSetFunc(int testArg, float* testArg2, bool* testArg3, std::string& testArg4)
         {
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3, testArg4));
@@ -105,6 +108,7 @@ namespace CppOverrideTest
             
             //Used In:
             //  ModifyArgsTests
+            //  WhenCalledWithTests
             inline bool SetObjectFunc(int data, double value, std::string name, TestClass& testClass)
             {
                 CO_OVERRIDE_IMPL(OverrideObj, bool, (data, value, name, testClass));
@@ -123,6 +127,7 @@ namespace CppOverrideTest
         {
             //Used In:
             //  ModifyReturnsTests
+            //  WhenCalledWithTests
             template<typename T>
             inline T TemplateReturnFunc(T testArg)
             {
@@ -150,6 +155,7 @@ namespace CppOverrideTest
 
         //Used In:
         //  Otherwise_DoTests
+        //  WhenCalledExpectedly_DoTests
         inline void ConstArgsAndArgsToSetFunc(  const int testArg, 
                                                 const float testArg2, 
                                                 std::string& testArg3)
@@ -157,6 +163,8 @@ namespace CppOverrideTest
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
         }
 
+        //Used In:
+        //  WhenCalledWithTests
         inline int ConstStringRefArgFunc(const std::string& test)
         {
             CO_OVERRIDE_IMPL(OverrideObj, int, (test));
@@ -177,6 +185,8 @@ namespace CppOverrideTest
             CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
         }
 
+        //Used In:
+        //  WhenCalledWithTests
         inline int ConstVoidPointerFunc(const void* testArg, int testArg2)
         {
             CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2));

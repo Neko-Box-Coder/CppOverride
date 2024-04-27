@@ -59,9 +59,9 @@ if(CPP_OVERRIDE_BUILD_TEST)
     target_link_libraries(ModifyArgsTests PUBLIC CppOverride ssTest)
     target_compile_options(ModifyArgsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
-    #add_executable(WhenCalledWithTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledWithTests.cpp")
-    #target_link_libraries(WhenCalledWithTests PUBLIC CppOverride ssTest)
-    #target_compile_options(WhenCalledWithTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    add_executable(WhenCalledWithTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledWithTests.cpp")
+    target_link_libraries(WhenCalledWithTests PUBLIC CppOverride ssTest)
+    target_compile_options(WhenCalledWithTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(TimesTests "${CMAKE_CURRENT_LIST_DIR}/Tests/TimesTests.cpp")
     target_link_libraries(TimesTests PUBLIC CppOverride ssTest)
@@ -75,9 +75,9 @@ if(CPP_OVERRIDE_BUILD_TEST)
     target_link_libraries(Otherwise_DoTests PUBLIC CppOverride ssTest)
     target_compile_options(Otherwise_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
-    #add_executable(WhenCalledExpectedly_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledExpectedly_DoTests.cpp")
-    #target_link_libraries(WhenCalledExpectedly_DoTests PUBLIC CppOverride ssTest)
-    #target_compile_options(WhenCalledExpectedly_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    add_executable(WhenCalledExpectedly_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledExpectedly_DoTests.cpp")
+    target_link_libraries(WhenCalledExpectedly_DoTests PUBLIC CppOverride ssTest)
+    target_compile_options(WhenCalledExpectedly_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
 
 
