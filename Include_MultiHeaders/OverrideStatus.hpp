@@ -44,7 +44,7 @@ namespace CppOverride
     };
     
     
-    const OverrideStatus DEFAULT_STATUS = OverrideStatus::NO_OVERRIDE;
+    //const OverrideStatus DEFAULT_STATUS = OverrideStatus::NO_OVERRIDE;
 
     inline std::string OverrideStatusToString(OverrideStatus status)
     {

@@ -116,12 +116,14 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            inline OverrideInfoSetter& AssignStatus(OverrideInfoSetter& infoSetter, 
-                                                    OverrideStatus& status)
+            inline OverrideInfoSetter& AssignOverrideResult(OverrideInfoSetter& infoSetter, 
+                                                            OverrideResult& result)
             {
-                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .Status = &status;
+                Internal_OverrideData& currentData = 
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
+                currentData.ReturnStatus = &result.ReturnStatus;
+                currentData.SetArgsStatus = &result.SetArgsStatus;
                 return infoSetter;
             }
             

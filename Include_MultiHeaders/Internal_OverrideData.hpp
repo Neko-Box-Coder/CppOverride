@@ -18,14 +18,15 @@ namespace CppOverride
         
         //Arguments and return data
         std::vector<Internal_DataInfo> ArgumentsDataInfo;
-        Internal_DataInfo ReturnDataInfo;
+        Internal_ReturnDataInfo ReturnDataInfo;
         
         Internal_ReturnDataActionInfo ReturnDataActionInfo;
         Internal_ArgsDataActionInfo  ArgumentsDataActionInfo;
         
         //Result of the override
         Internal_ResultActionInfo ResultActionInfo;
-        OverrideStatus* Status = nullptr;
+        OverrideStatus* ReturnStatus = nullptr;
+        OverrideStatus* SetArgsStatus = nullptr;
     };
     
     using Internal_OverrideDataList = std::vector<Internal_OverrideData>;

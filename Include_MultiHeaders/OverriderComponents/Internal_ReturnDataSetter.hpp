@@ -65,6 +65,12 @@ namespace CppOverride
                     lastData.ReturnDataInfo.DataSet = true;
                     lastData.ReturnDataInfo.DataType = typeid(ReturnType).hash_code();
                 }
+                else
+                {
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .ReturnDataInfo
+                                                                                .ReturnAny = true;
+                }
                 
                 return infoSetter;
             }
@@ -86,6 +92,12 @@ namespace CppOverride
                     lastData.ReturnDataInfo.DataSet = true;
                     lastData.ReturnDataInfo.DataType = typeid(ReturnType).hash_code();
                     lastData.ReturnDataInfo.ReturnReference = true;
+                }
+                else
+                {
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
+                                                                                .ReturnDataInfo
+                                                                                .ReturnAny = true;
                 }
                 
                 return infoSetter;
