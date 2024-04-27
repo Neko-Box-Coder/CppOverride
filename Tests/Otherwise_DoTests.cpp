@@ -20,20 +20,17 @@ int main()
         (
             Rectangle rect(1.5, 1.5);
             bool otherwiseDoCalled = false;
+            CO_SETUP_OVERRIDE   (rect, GetWidth)
+                                .WhenCalledWith(2.f)
+                                .Returns<float>(6.f)
+                                .Otherwise_Do
+                                (
+                                    [&otherwiseDoCalled] (const std::vector<void *>& args)
+                                    {
+                                        otherwiseDoCalled = true;
+                                    }
+                                );
         );
-        
-        
-        CO_SETUP_OVERRIDE   (rect, GetWidth)
-                            .WhenCalledWith(2.f)
-                            .Returns<float>(6.f)
-                            .Otherwise_Do
-                            (
-                                [&otherwiseDoCalled] (const std::vector<void *>& args)
-                                {
-                                    otherwiseDoCalled = true;
-                                }
-                            );
-        
         ssTEST_OUTPUT_EXECUTION
         (
             rect.GetWidth(2.f);
@@ -53,26 +50,23 @@ int main()
         (
             Rectangle rect(1.5, 1.5);
             bool otherwiseDoCalled = false;
+            CO_SETUP_OVERRIDE   (rect, GetWidth)
+                                .If
+                                (
+                                    [] (const std::vector<void *>& args)
+                                    {
+                                        return (*(float*)args[0] == 2.f);
+                                    }
+                                )
+                                .Returns<float>(6.f)
+                                .Otherwise_Do
+                                (
+                                    [&otherwiseDoCalled] (const std::vector<void *>& args)
+                                    {
+                                        otherwiseDoCalled = true;
+                                    }
+                                );
         );
-        
-        
-        CO_SETUP_OVERRIDE   (rect, GetWidth)
-                            .If
-                            (
-                                [] (const std::vector<void *>& args)
-                                {
-                                    return (*(float*)args[0] == 2.f);
-                                }
-                            )
-                            .Returns<float>(6.f)
-                            .Otherwise_Do
-                            (
-                                [&otherwiseDoCalled] (const std::vector<void *>& args)
-                                {
-                                    otherwiseDoCalled = true;
-                                }
-                            );
-        
         ssTEST_OUTPUT_EXECUTION
         (
             rect.GetWidth(2.f);
@@ -92,23 +86,21 @@ int main()
         (
             bool otherwiseDoCalled = false;
             std::string testString;
+            (CO_SETUP_OVERRIDE  (OverrideObj, ConstArgsAndArgsToSetFunc)
+                                .WhenCalledWith(1, 2.f, CO_ANY)
+                                .SetArgs<   CO_ANY_TYPE, 
+                                            CO_ANY_TYPE, 
+                                            std::string&>(  CO_DONT_SET, 
+                                                            CO_DONT_SET, 
+                                                            "test")
+                                .Otherwise_Do
+                                (
+                                    [&otherwiseDoCalled] (const std::vector<void *>& args)
+                                    {
+                                        otherwiseDoCalled = true;
+                                    }
+                                ));
         );
-        
-        CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsAndArgsToSetFunc)
-                            .WhenCalledWith(1, 2.f, CO_ANY)
-                            .SetArgs<   CO_ANY_TYPE, 
-                                        CO_ANY_TYPE, 
-                                        std::string&>(  CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        "test")
-                            .Otherwise_Do
-                            (
-                                [&otherwiseDoCalled] (const std::vector<void *>& args)
-                                {
-                                    otherwiseDoCalled = true;
-                                }
-                            );
-
         ssTEST_OUTPUT_EXECUTION
         (
             CppOverrideTest::Const::ConstArgsAndArgsToSetFunc(1, 2.f, testString);
@@ -128,29 +120,27 @@ int main()
         (
             bool otherwiseDoCalled = false;
             std::string testString;
+            (CO_SETUP_OVERRIDE  (OverrideObj, ConstArgsAndArgsToSetFunc)
+                                .If
+                                (
+                                    [] (const std::vector<void *>& args)
+                                    {
+                                        return (*(int*)args[0] == 1) && (*(float*)args[1] == 2.f);
+                                    }
+                                )
+                                .SetArgs<   CO_ANY_TYPE, 
+                                            CO_ANY_TYPE, 
+                                            std::string&>(  CO_DONT_SET, 
+                                                            CO_DONT_SET, 
+                                                            "test")
+                                .Otherwise_Do
+                                (
+                                    [&otherwiseDoCalled] (const std::vector<void *>& args)
+                                    {
+                                        otherwiseDoCalled = true;
+                                    }
+                                ));
         );
-        
-        CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsAndArgsToSetFunc)
-                            .If
-                            (
-                                [] (const std::vector<void *>& args)
-                                {
-                                    return (*(int*)args[0] == 1) && (*(float*)args[1] == 2.f);
-                                }
-                            )
-                            .SetArgs<   CO_ANY_TYPE, 
-                                        CO_ANY_TYPE, 
-                                        std::string&>(  CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        "test")
-                            .Otherwise_Do
-                            (
-                                [&otherwiseDoCalled] (const std::vector<void *>& args)
-                                {
-                                    otherwiseDoCalled = true;
-                                }
-                            );
-
         ssTEST_OUTPUT_EXECUTION
         (
             CppOverrideTest::Const::ConstArgsAndArgsToSetFunc(1, 2.f, testString);
