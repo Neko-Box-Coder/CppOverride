@@ -189,18 +189,14 @@ int OverrideMyReturnValue(int value1, float value2)
 
 void OverrideMyArgs(float& value1, int* value2)
 {
-    CO_OVERRIDE_IMPL(OverrideInstanceName, int, (value1, value2))
+    CO_OVERRIDE_IMPL(OverrideInstanceName, void, (value1, value2))
     
     //The rest of the implementations...
-    
-    return 0;
 }
 
 ```
 
 ### Disable Overrides
-The override implementations macros are there so that you can enable/disable the override 
-functionalities easily in your codebase.
 
 ```cpp
 //Just define CO_NO_OVERRIDE before including "CppOverride.hpp" or in compile definitions
@@ -237,7 +233,7 @@ You must specify the return type with template to avoid any ambiguity as we matc
 with the function signature
 
 ```cpp
-//...
+//CO_SETUP_OVERRIDE...
 .Returns<[Return Type]>(<Return Value>);
 ```
 
@@ -249,8 +245,8 @@ CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
 
 ### Override Arguments Values
 ```cpp
-CO_SETUP_OVERRIDE(<Override Instance Name>, <Function Name>)
-                 .SetArgs<[Override Function Arg Types...]>(<Args Values...>);
+//CO_SETUP_OVERRIDE...
+.SetArgs<[Override Function Arg Types...]>(<Args Values...>);
 ```
 
 Example:
@@ -264,10 +260,25 @@ The types of the argument specified with template must match the function argume
 > It is **common to pair** `.SetArgs` with `.Returns` so that the execution doesn't continue when
 we finish overriding the arguments.
 
+> Given we have this
+> ```cpp
+> void OverrideMyArgs(float& value1, int* value2)
+> {
+>     CO_OVERRIDE_IMPL(OverrideInstanceName, void, (value1, value2))
+>     std::cout << "Rest of the OverrideMyArgs execution..." << std::endl;
+> }
+> ```
 > So something like this:
 > ```cpp
 >  CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyArgs)
->                   .SetArgs<float&, int*>(1.f, 3)
+>                   .SetArgs<float&, int*>(1.f, 3);
+> ```
+> Will output: "Rest of the OverrideMyArgs execution..."
+> 
+> But something like this won't:
+> ```cpp
+>  CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyArgs)
+>                   .SetArgs<float&, int*>(1.f, 3);
 >                   .Returns<void>();
 >                   //Or .ReturnsVoid();
 >                   //Or a normal .Returns<...>(...);
@@ -281,16 +292,14 @@ you can use `ReturnsByAction` and `SetArgsByAction`.
 #### Override Returns
 
 ```cpp
-CO_SETUP_OVERRIDE(<Override Instance Name>, <Function Name>)
-                 .ReturnsByAction<[Return Type]>(<void( const std::vector<void*>& args, 
-                                                        void* out) Function>);
-
+//CO_SETUP_OVERRIDE...
+.ReturnsByAction<[Return Type]>(<void(const std::vector<void*>& args, void* out) Function>);
 ```
 
-When the function is called, the args vector will contain the pointer to the arguments. You must
+When the function is called, the `args` vector will contain the pointer to the arguments. You must
 cast them to their original type pointers to get the values inside.
 
-The return value should be set by modifying the out pointer (Pointer to the return value).
+The return value should be set by modifying the `out` pointer (Pointer to the return value).
 
 Example:
 ```cpp
@@ -310,11 +319,11 @@ CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
 #### Override Arguments
 
 ```cpp
-CO_SETUP_OVERRIDE(<Override Instance Name>, <Function Name>)
-    .SetArgsByAction<[Override Function Arg Types...]>(<void(std::vector<void*>& args) Function>);
+//CO_SETUP_OVERRIDE...
+.SetArgsByAction<[Override Function Arg Types...]>(<void(std::vector<void*>& args) Function>);
 ```
 
-This the same as the ReturnsByAction, but without the need of modifying any return value.
+This the same as the `ReturnsByAction`, but without the need of modifying any return value.
 Again, you must cast the arguments pointers to their original type pointers to get the values inside.
 
 Example:
@@ -341,6 +350,8 @@ Just like any mocking library, you can also control when and how the override fu
 as well as registering callbacks when the override is successful or not.
 
 ### When Called With
+
+Example:
 ```cpp
 CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
                  .WhenCalledWith(2, 3.f)
@@ -351,6 +362,8 @@ int ret2 = OverrideMyReturnValue(1, 2.f);   //Won't return 1
 ```
 
 ### Times
+
+Example:
 ```cpp
 CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyArgs)
                  .SetArgs<float&, int*>(1.f, 2)
@@ -367,6 +380,8 @@ OverrideMyArgs(testFloat, &testInt);    //The argument values are still 2.f and 
 ```
 
 ### If Condition Function / Lambda
+
+Example:
 ```cpp
 CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
                  .If
@@ -386,6 +401,8 @@ int ret2 = OverrideMyReturnValue(2, 3.f);   //Won't return 1
 ```
 
 ### When Called Expectedly Do Function / Lambda
+
+Example:
 ```cpp
 bool called = false;
 CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
@@ -405,6 +422,8 @@ int ret2 = OverrideMyReturnValue(2, 3.f);   //called is true now
 ```
 
 ### Otherwise Do Function / Lambda
+
+Example:
 ```cpp
 bool called = false;
 CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue(int, float))
@@ -424,6 +443,8 @@ int ret1 = OverrideMyReturnValue(1, 2.f);   //called is true now
 
 
 ### Get Override Result
+
+Example:
 ```cpp
 CppOverride::OverrideResult result;
 CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
