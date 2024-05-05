@@ -118,6 +118,9 @@ pipelines:
                                 command: dir
                                 working_directory: CppOverride
                         -   exec:
+                                command: dir
+                                working_directory: CppOverride/Tests
+                        -   exec:
                                 arguments:
                                 -   /s
                                 -   /v

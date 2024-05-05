@@ -85,8 +85,11 @@ if(CPP_OVERRIDE_BUILD_TEST)
 
 
     if(WIN32)
-        file(   COPY "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat"
-                DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+        #file(   COPY "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat"
+        #        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+        
+        execute_process(COMMAND ${CMAKE_COMMAND} -E copy    "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat" 
+                                                            "${CMAKE_CURRENT_BINARY_DIR}")
     else()
         file(   CHMOD "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.sh"
                 PERMISSIONS  OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
