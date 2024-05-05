@@ -6,7 +6,7 @@
 #include "../StaticAssertFalse.hpp"
 #include "../PureType.hpp"
 #include "../Internal_OverrideData.hpp"
-#include "../../External/MacroPowerToys/MacroPowerToy.h"
+#include "../../External/MacroPowerToys/MacroPowerToys.h"
 #include "../AliasTypes.hpp"
 
 #include <cstdint>

@@ -47,9 +47,8 @@ else()
 endif()
 
 if(CPP_OVERRIDE_BUILD_TEST)
-    if(NOT TARGET ssTest)
-        add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/ssTest" "${CMAKE_CURRENT_BINARY_DIR}/ssTest")
-    endif()
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/ssTest" "${CMAKE_CURRENT_BINARY_DIR}/ssTest")
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/MacroPowerToys" "${CMAKE_CURRENT_BINARY_DIR}/MacroPowerToys")
     
     add_executable(ModifyReturnsTests "${CMAKE_CURRENT_LIST_DIR}/Tests/ModifyReturnsTests.cpp")
     target_link_libraries(ModifyReturnsTests PUBLIC CppOverride ssTest)

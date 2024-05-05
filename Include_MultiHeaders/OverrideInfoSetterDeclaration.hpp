@@ -1,7 +1,7 @@
 #ifndef CO_OVERRIDE_INFO_SETTER_DECLARATION_HPP
 #define CO_OVERRIDE_INFO_SETTER_DECLARATION_HPP
 
-#include "../External/MacroPowerToys/MacroPowerToy.h"
+#include "../External/MacroPowerToys/MacroPowerToys.h"
 #include "./OverrideStatus.hpp"
 #include "./TemplateTypeSpecifier.hpp"
 #include "./OverrideResult.hpp"

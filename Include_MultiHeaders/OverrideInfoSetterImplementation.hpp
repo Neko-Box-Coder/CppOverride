@@ -3,7 +3,7 @@
 
 #include "./CppOverrideInstance.hpp"
 #include "./OverrideInfoSetterDeclaration.hpp"
-#include "../External/MacroPowerToys/MacroPowerToy.h"
+#include "../External/MacroPowerToys/MacroPowerToys.h"
 
 namespace CppOverride 
 {

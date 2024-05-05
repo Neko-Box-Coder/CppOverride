@@ -1,7 +1,7 @@
 #ifndef CO_MACROS_HPP
 #define CO_MACROS_HPP
 
-#include "../External/MacroPowerToys/MacroPowerToy.h"
+#include "../External/MacroPowerToys/MacroPowerToys.h"
 
 #include <set>
 #include <string>
