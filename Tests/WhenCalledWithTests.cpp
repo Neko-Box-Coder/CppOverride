@@ -24,7 +24,7 @@ int main()
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::ArgsFunc(1, true, 2.f) == 1);
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions",
-                                result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+                                result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         ssTEST_OUTPUT_SETUP
         (
@@ -33,7 +33,7 @@ int main()
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::ArgsFunc(2, false, 2.f) != 1);
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions",
-                                result.ReturnStatus == 
+                                result.Status == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
     
@@ -64,7 +64,7 @@ int main()
         ssTEST_OUTPUT_ASSERT("Meet WhenCalledWith Conditions", assignBool == true);
         ssTEST_OUTPUT_ASSERT("Meet WhenCalledWith Conditions", assignString == "test");
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions", 
-                                result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+                                result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         ssTEST_OUTPUT_SETUP
         (
@@ -83,7 +83,7 @@ int main()
         ssTEST_OUTPUT_ASSERT("Fail WhenCalledWith Conditions", assignBool == false);
         ssTEST_OUTPUT_ASSERT("Fail WhenCalledWith Conditions", assignString == "");
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions",
-                                result.SetArgsStatus == 
+                                result.Status == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
     
@@ -96,7 +96,7 @@ int main()
                             .AssignOverrideResult(result);
 
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::ArgsFunc(1, false, 2.f) == 1);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Comparing Const Void Pointer Should Override If Match")
@@ -136,7 +136,7 @@ int main()
             CppOverrideTest::NonConst::ArgsToSetFunc(1, &assignFloat, assignString);
         );
         ssTEST_OUTPUT_ASSERT(assignString == "test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         //TODO: Add test for not meeting conditions
     };
@@ -166,7 +166,7 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT("Meet WhenCalledWith Conditions", assignString == "test");
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions", 
-                                result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+                                result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         ssTEST_OUTPUT_SETUP
         (
@@ -181,7 +181,7 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT("Fail WhenCalledWith Conditions", assignString == "");
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions", 
-                                result.SetArgsStatus == 
+                                result.Status == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
     
@@ -209,7 +209,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions",
                                 assignFloat == 3.f);
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions", 
-                                result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+                                result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     
         ssTEST_OUTPUT_SETUP
         (
@@ -224,7 +224,7 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions", assignFloat == 2.f);
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions", 
-                                result.SetArgsStatus == 
+                                result.Status == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
     
@@ -243,7 +243,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions", 
                                 CppOverrideTest::Const::ConstStringRefArgFunc(testString) == 5);
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions", 
-                                result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+                                result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         ssTEST_OUTPUT_SETUP
         (
@@ -253,7 +253,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions", 
                                 CppOverrideTest::Const::ConstStringRefArgFunc(testString) == -1);
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions", 
-                                result.ReturnStatus == 
+                                result.Status == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
     
@@ -286,7 +286,7 @@ int main()
         
         ssTEST_OUTPUT_ASSERT("Meet WhenCalledWith Conditions", setObject == overrideObject);
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions", 
-                                result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+                                result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         
         ssTEST_OUTPUT_SETUP
@@ -305,7 +305,7 @@ int main()
                                 setObject == TestClass(3, 4.0, "test3"));
         
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions",
-                                result.ReturnStatus == 
+                                result.Status == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
     
@@ -330,7 +330,7 @@ int main()
                                 returnTemplate);
         
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions", 
-                                result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+                                result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         ssTEST_OUTPUT_SETUP
         (
@@ -343,7 +343,7 @@ int main()
                                 testTemplate);
         
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions",
-                                result.ReturnStatus == 
+                                result.Status == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
     
@@ -361,7 +361,7 @@ int main()
         
         ssTEST_OUTPUT_ASSERT("Meet WhenCalledWith Conditions", rect.GetWidth(2.f) == 5.f);
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions", 
-                                result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+                                result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
 
         ssTEST_OUTPUT_SETUP
         (
@@ -369,7 +369,7 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT("Fail WhenCalledWith Conditions", rect.GetWidth(1.f) == 1.5);
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions", 
-                                result.ReturnStatus == 
+                                result.Status == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
     
@@ -394,7 +394,7 @@ int main()
                 CppOverrideTemplateTest::TemplateReturnFunc(testDummy);
         );
         
-        ssTEST_OUTPUT_ASSERT(   result.ReturnStatus == 
+        ssTEST_OUTPUT_ASSERT(   result.Status == 
                                 CppOverride::OverrideStatus::CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR);
         
         ssTEST_OUTPUT_ASSERT(resultDummy.GetTestData() == testDummy.GetTestData());

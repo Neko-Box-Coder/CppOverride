@@ -23,7 +23,7 @@ int main()
                                 .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 32);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Return String Type Should Override")
@@ -36,7 +36,7 @@ int main()
                                 .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::ReturnStringFunc(1) == "test");
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Return Void Early Should Override")
@@ -56,7 +56,7 @@ int main()
             CppOverrideTest::NonConst::AssignArgInternallyFunc(testString, testString2);
         );
         ssTEST_OUTPUT_ASSERT("ReturnsVoid Function", testString2 == "test2");
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         
         ssTEST_OUTPUT_SETUP
@@ -72,7 +72,7 @@ int main()
             CppOverrideTest::NonConst::AssignArgInternallyFunc(testString, testString2);
         );
         ssTEST_OUTPUT_ASSERT("Returns<void> Function", testString2 == "test2");
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Return Reference Should Override")
@@ -90,7 +90,7 @@ int main()
             int& testNum2 = CppOverrideTest::NonConst::ReturnReferenceFunc(1);
         );
         ssTEST_OUTPUT_ASSERT(testNum == testNum2);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Return Pointer Should Override")
@@ -108,7 +108,7 @@ int main()
             int* testNum2 = CppOverrideTest::NonConst::ReturnPointerFunc(1);
         );
         ssTEST_OUTPUT_ASSERT(&testNum == testNum2);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Return Nothing Should Not Override Return Value")
@@ -121,7 +121,7 @@ int main()
                                 .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Return Type Not Matching Should Not Override Return Value")
@@ -134,7 +134,7 @@ int main()
                                 .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::NO_OVERRIDE);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::NO_OVERRIDE);
     };
     
     ssTEST("Return Object Should Override")
@@ -149,7 +149,7 @@ int main()
         );
         using namespace CppOverrideTest::NonConst::Object;
         ssTEST_OUTPUT_ASSERT(ReturnObjectFunc(1, 3.0, "test 2") == assertObject);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Return Template Object Should Override")
@@ -165,7 +165,7 @@ int main()
         );
         using namespace CppOverrideTest::NonConst::Template;
         ssTEST_OUTPUT_ASSERT(TemplateReturnFunc<TestClass>(testObject) == assertObject);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Return By Action Should Override")
@@ -184,7 +184,7 @@ int main()
                                 .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 10);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     

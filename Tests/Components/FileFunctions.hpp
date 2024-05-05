@@ -70,6 +70,14 @@ namespace CppOverrideTest
         }
         
         //Used In:
+        //  AddNumFromNumPointerFunc
+        inline int AddNumFromNumPointerFunc(int* testArg, int testArg2)
+        {
+            CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2));
+            return *testArg + testArg2;
+        }
+        
+        //Used In:
         //  ModifyArgsTests
         //  ModifyReturnsTests
         inline void AssignArgInternallyFunc(std::string testArg, std::string& testArg2)

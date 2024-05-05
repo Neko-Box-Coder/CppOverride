@@ -136,9 +136,9 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
                             std::cout << "Failed at Check parameter" << std::endl;
                         
-                        if(curOverrideData.at(i).ReturnStatus != nullptr)
+                        if(curOverrideData.at(i).Status != nullptr)
                         {
-                            *curOverrideData.at(i).ReturnStatus = 
+                            *curOverrideData.at(i).Status = 
                                 OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
                         }
                         
@@ -156,9 +156,9 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
                             std::cout << "Failed at Check condition" << std::endl;
                         
-                        if(curOverrideData[i].ReturnStatus != nullptr)
+                        if(curOverrideData[i].Status != nullptr)
                         {
-                            *curOverrideData[i].ReturnStatus = 
+                            *curOverrideData[i].Status = 
                                 OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
                         }
                         
@@ -176,9 +176,9 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
                             std::cout << "Failed at Check times" << std::endl;
                         
-                        if(curOverrideData[i].ReturnStatus != nullptr)
+                        if(curOverrideData[i].Status != nullptr)
                         {
-                            *curOverrideData[i].ReturnStatus = 
+                            *curOverrideData[i].Status = 
                                 OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
                         }
                         

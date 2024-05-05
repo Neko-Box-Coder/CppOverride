@@ -10,7 +10,7 @@ namespace CppOverride
 {
     class Internal_ArgsTypeInfoAppender
     {
-        friend class Internal_ArgsDataRetriever;
+        friend class Internal_ArgsDataValidator;
         
         protected:
             #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0

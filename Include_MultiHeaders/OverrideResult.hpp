@@ -7,8 +7,7 @@ namespace CppOverride
 {
     struct OverrideResult
     {
-        OverrideStatus ReturnStatus = OverrideStatus::NO_OVERRIDE;
-        OverrideStatus SetArgsStatus = OverrideStatus::NO_OVERRIDE;
+        OverrideStatus Status = OverrideStatus::NO_OVERRIDE;
     };
 }
 

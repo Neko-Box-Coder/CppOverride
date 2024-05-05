@@ -17,8 +17,9 @@ namespace CppOverride
 {
     class Internal_ConditionArgsValuesChecker
     {
-        friend class Internal_ReturnDataRetriever;
-        friend class Internal_ArgsDataRetriever;
+        friend class Internal_ReturnDataValidator;
+        friend class Internal_ArgsDataValidator;
+        friend class Internal_RequirementValidator;
         
         protected:
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 

@@ -35,7 +35,7 @@ int main()
                                 .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
     };
@@ -51,10 +51,10 @@ int main()
                                 .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
     };
@@ -75,7 +75,7 @@ int main()
                                     CppOverrideTest::NonConst::NoArgsFunc() == 1);
             
             ssTEST_OUTPUT_ASSERT(   "Try " + std::to_string(i),
-                                    result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+                                    result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         }
     };
     
@@ -91,13 +91,13 @@ int main()
         );
 
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(result.ReturnStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
 
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
-        ssTEST_OUTPUT_ASSERT(   result.ReturnStatus == 
+        ssTEST_OUTPUT_ASSERT(   result.Status == 
                                 CppOverride::OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
     };
     
@@ -139,7 +139,7 @@ int main()
             CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
 
         ssTEST_OUTPUT_SETUP
         (
@@ -171,7 +171,7 @@ int main()
             CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
 
 
         ssTEST_OUTPUT_SETUP
@@ -184,7 +184,7 @@ int main()
             CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         
         ssTEST_OUTPUT_SETUP
@@ -224,7 +224,7 @@ int main()
                 CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
             );
             ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-            ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+            ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         }
     };
     
@@ -246,7 +246,7 @@ int main()
             CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
 
 
         ssTEST_OUTPUT_SETUP
@@ -259,7 +259,7 @@ int main()
             CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
         
         
         ssTEST_OUTPUT_SETUP
@@ -272,7 +272,7 @@ int main()
             CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 0.f && testString.empty() == true);
-        ssTEST_OUTPUT_ASSERT(   result.SetArgsStatus == 
+        ssTEST_OUTPUT_ASSERT(   result.Status == 
                                 CppOverride::OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
     };
     

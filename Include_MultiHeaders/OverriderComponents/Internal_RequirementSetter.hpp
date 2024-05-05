@@ -122,8 +122,7 @@ namespace CppOverride
                 Internal_OverrideData& currentData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
-                currentData.ReturnStatus = &result.ReturnStatus;
-                currentData.SetArgsStatus = &result.SetArgsStatus;
+                currentData.Status = &result.Status;
                 return infoSetter;
             }
             

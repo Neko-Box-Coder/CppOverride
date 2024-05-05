@@ -8,8 +8,9 @@ namespace CppOverride
 {
     class Internal_ArgsValuesAppender
     {
-        friend class Internal_ReturnDataRetriever;
-        friend class Internal_ArgsDataRetriever;
+        friend class Internal_ReturnDataValidator;
+        friend class Internal_ArgsDataValidator;
+        friend class Internal_RequirementValidator;
         
         protected:
             //Appending arguments from function calls

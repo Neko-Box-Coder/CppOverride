@@ -136,58 +136,68 @@ namespace CppOverride
     #define INTERNAL_CO_ARGS_EMPTY()
     #define INTERNAL_CO_ARGS_NOT_EMPTY(...) , __VA_ARGS__
     
-    #define INTERNAL_CO_LOG_FOUND_INDEX 0
+    #define INTERNAL_CO_LOG_CO_OVERRIDE_IMPL 0
     
     #define CO_OVERRIDE_IMPL(overrideObjName, returnType, args) \
     do \
     { \
-        int foundReturnIndex = -1; \
-        int foundArgsIndex = -1; \
+        int foundIndex = -1; \
+        bool overrideArgs = false; \
+        bool overrideReturn = false; \
         bool dontReturn = false; \
         bool found = overrideObjName.Internal_CheckOverride<returnType>(__func__, \
-                                                                        foundReturnIndex, \
-                                                                        foundArgsIndex, \
+                                                                        foundIndex, \
+                                                                        overrideReturn, \
+                                                                        overrideArgs, \
                                                                         dontReturn \
                                                                         INTERNAL_CO_ARGS(args)); \
         \
-        if(foundArgsIndex != -1) \
+        if(found) \
         { \
-            if(INTERNAL_CO_LOG_FOUND_INDEX) \
-                std::cout << "foundArgsIndex: " << foundArgsIndex << std::endl; \
-            \
-            overrideObjName.Internal_OverrideArgs(  foundArgsIndex, \
-                                                    foundArgsIndex != foundReturnIndex, \
-                                                    __func__ \
-                                                    INTERNAL_CO_ARGS(args)); \
-            \
-        } \
-        \
-        if(foundReturnIndex != -1) \
-        { \
-            if(INTERNAL_CO_LOG_FOUND_INDEX) \
+            if(INTERNAL_CO_LOG_CO_OVERRIDE_IMPL) \
             { \
-                std::cout << "foundReturnIndex: " << foundReturnIndex << std::endl; \
+                std::cout << "foundIndex: " << foundIndex << std::endl; \
+                std::cout << "overrideArgs: " << overrideArgs << std::endl; \
+                std::cout << "overrideReturn: " << overrideReturn << std::endl; \
                 std::cout << "dontReturn: " << dontReturn << std::endl; \
             } \
             \
-            if(dontReturn) \
+            if(foundIndex != -1) \
             { \
-                overrideObjName.Internal_CallReturnOverrideResultExpectedAction(__func__, \
-                                                                                foundReturnIndex \
-                                                                                INTERNAL_CO_ARGS(args)); \
+                if(overrideArgs) \
+                { \
+                    overrideObjName.Internal_OverrideArgs(  foundIndex, \
+                                                            __func__, \
+                                                            !overrideReturn \
+                                                            INTERNAL_CO_ARGS(args)); \
+                    \
+                } \
+                \
+                if(overrideReturn) \
+                { \
+                    if(INTERNAL_CO_LOG_CO_OVERRIDE_IMPL) \
+                        std::cout << "dontReturn: " << dontReturn << std::endl; \
+                    \
+                    if(dontReturn) \
+                    { \
+                        overrideObjName.Internal_CallReturnOverrideResultExpectedAction(__func__, \
+                                                                                        foundIndex \
+                                                                                        INTERNAL_CO_ARGS(args)); \
+                    } \
+                    else \
+                    { \
+                        return overrideObjName.Internal_OverrideReturn<returnType>( foundIndex, \
+                                                                                    __func__ \
+                                                                                    INTERNAL_CO_ARGS(args)); \
+                    } \
+                } \
+                if(!overrideArgs && !overrideReturn) \
+                { \
+                    overrideObjName.Internal_CallReturnOverrideResultExpectedAction(__func__, \
+                                                                                    foundIndex \
+                                                                                    INTERNAL_CO_ARGS(args)); \
+                } \
             } \
-            else \
-            { \
-                return overrideObjName.Internal_OverrideReturn<returnType>( foundReturnIndex, \
-                                                                            __func__ \
-                                                                            INTERNAL_CO_ARGS(args)); \
-            } \
-        } \
-        \
-        if(INTERNAL_CO_LOG_FOUND_INDEX) \
-        { \
-            std::cout << "foundArgsIndex: " << foundArgsIndex << std::endl; \
-            std::cout << "foundReturnIndex: " << foundReturnIndex << std::endl; \
         } \
     } while(0)
 

@@ -1,11 +1,11 @@
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_MODIFIER_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_MODIFIER_HPP
 
-#include "./Internal_DataInfo.hpp"
-#include "./PureType.hpp"
-#include "./Any.hpp"
-#include "./Internal_ArgsDataActionInfo.hpp"
-#include "./OverrideStatus.hpp"
+#include "../Internal_DataInfo.hpp"
+#include "../PureType.hpp"
+#include "../Any.hpp"
+#include "../Internal_ArgsDataActionInfo.hpp"
+#include "../OverrideStatus.hpp"
 
 #include <cassert>
 #include <cstdint>

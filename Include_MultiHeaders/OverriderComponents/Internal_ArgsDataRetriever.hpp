@@ -5,8 +5,8 @@
 #include "./Internal_ArgsValuesAppender.hpp"
 #include "./Internal_ConditionArgsTypesChecker.hpp"
 #include "./Internal_ConditionArgsValuesChecker.hpp"
-#include "./OverrideStatus.hpp"
-#include "./Internal_OverrideData.hpp"
+#include "../OverrideStatus.hpp"
+#include "../Internal_OverrideData.hpp"
 #include "../AliasTypes.hpp"
 
 #include <cassert>
@@ -162,11 +162,8 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
                             std::cout << "Failed at Check parameter value" << std::endl;
                         
-                        if(curData[i].SetArgsStatus != nullptr)
-                        {
-                            *curData[i].SetArgsStatus = 
-                                OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
-                        }
+                        if(curData[i].Status != nullptr)
+                            *curData[i].Status = OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
                         
                         if(curData[i].ResultActionInfo.OtherwiseActionSet)
                             curData[i].ResultActionInfo.OtherwiseAction(argumentsList);
@@ -181,11 +178,8 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
                             std::cout << "Failed at Check condition" << std::endl;
                         
-                        if(curData[i].SetArgsStatus != nullptr)
-                        {
-                            *curData[i].SetArgsStatus = 
-                                OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
-                        }
+                        if(curData[i].Status != nullptr)
+                            *curData[i].Status = OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
                         
                         if(curData[i].ResultActionInfo.OtherwiseActionSet)
                             curData[i].ResultActionInfo.OtherwiseAction(argumentsList);
@@ -201,9 +195,9 @@ namespace CppOverride
                         if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
                             std::cout << "Failed at Check times" << std::endl;
                         
-                        if(curData[i].SetArgsStatus != nullptr)
+                        if(curData[i].Status != nullptr)
                         {
-                            *curData[i].SetArgsStatus = 
+                            *curData[i].Status = 
                                 OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
                         }
                         

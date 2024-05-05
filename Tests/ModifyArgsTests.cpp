@@ -34,7 +34,7 @@ int main()
             CppOverrideTest::NonConst::ArgsToSetFunc(1, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 5);
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
         
     ssTEST("Set Multiple Primitive Types Should Override")
@@ -62,7 +62,7 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 15);
         ssTEST_OUTPUT_ASSERT(testBool == false);
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
 
     ssTEST("Set Non Pointer/Reference Arg Should Override")
@@ -80,7 +80,7 @@ int main()
             CppOverrideTest::NonConst::AssignArgInternallyFunc("Test 2", outString);
         );
         ssTEST_OUTPUT_ASSERT(outString == "Test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
 
     ssTEST("Set Void Pointer Should Override")
@@ -99,7 +99,7 @@ int main()
             int returnResult = CppOverrideTest::NonConst::AddNumFromVoidPointerFunc(&TestArg2, 5);
         );
         ssTEST_OUTPUT_ASSERT(returnResult == 7);
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Set Object Should Override")
@@ -123,7 +123,7 @@ int main()
             CppOverrideTest::NonConst::Object::SetObjectFunc(0, 0, "a", testClass);
         );
         ssTEST_OUTPUT_ASSERT(testClass == TestClass(1, 2.0, "test"));
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Set Template Object Should Override")
@@ -149,7 +149,7 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT(testDummy == overrideDummy);
         ssTEST_OUTPUT_ASSERT(testDummy2 == overrideDummy2);
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Set Begin Const Arg Should Fail With Status")
@@ -172,7 +172,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(testArg == 1);
         ssTEST_OUTPUT_ASSERT(testArg2 == false);
         ssTEST_OUTPUT_ASSERT(testArg3 == 1.f);
-        ssTEST_OUTPUT_ASSERT(   result.SetArgsStatus == 
+        ssTEST_OUTPUT_ASSERT(   result.Status == 
                                 CppOverride::OverrideStatus::MODIFY_CONST_ARG_ERROR);
     };
     
@@ -196,7 +196,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(testArg == 2);
         ssTEST_OUTPUT_ASSERT(testArg2 == true);
         ssTEST_OUTPUT_ASSERT(testArg3 == 1.f);
-        ssTEST_OUTPUT_ASSERT(   result.SetArgsStatus == 
+        ssTEST_OUTPUT_ASSERT(   result.Status == 
                                 CppOverride::OverrideStatus::MODIFY_CONST_ARG_ERROR);
     };
     
@@ -225,8 +225,8 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT(testArg2 == 4.f);
         ssTEST_OUTPUT_ASSERT(testArg3 == "Test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
-        ssTEST_OUTPUT_ASSERT(result2.SetArgsStatus == CppOverride::OverrideStatus::NO_OVERRIDE);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result2.Status == CppOverride::OverrideStatus::NO_OVERRIDE);
         
         ssTEST_OUTPUT_SETUP
         (
@@ -239,8 +239,8 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT(testArg2 == true);
         ssTEST_OUTPUT_ASSERT(testArg4 == 3.f);
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::NO_OVERRIDE);
-        ssTEST_OUTPUT_ASSERT(result2.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::NO_OVERRIDE);
+        ssTEST_OUTPUT_ASSERT(result2.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Set Args For Member Function Should Override")
@@ -257,7 +257,7 @@ int main()
         );
         ssTEST_OUTPUT_EXECUTION( rect.GetWidth(outWidth); );
         ssTEST_OUTPUT_ASSERT(outWidth == 2);
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Don't Set Anything Should Modify Nothing")
@@ -282,7 +282,7 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT(testArg == 2.f);
         ssTEST_OUTPUT_ASSERT(testArg2 == "test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST_SKIP("Non Copy Assignable Object Should Fail To Compile")
@@ -306,7 +306,7 @@ int main()
                 CppOverrideTest::NonConst::Object::SetNonCopyableArgFunc(&testObject);
             );
             ssTEST_OUTPUT_ASSERT(testObject.GetTestData() == 0);
-            ssTEST_OUTPUT_ASSERT(   result.SetArgsStatus == 
+            ssTEST_OUTPUT_ASSERT(   result.Status == 
                                     CppOverride::OverrideStatus::MODIFY_NON_ASSIGNABLE_ARG_ERROR);
         #endif
     };
@@ -337,7 +337,7 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT(testArg2 == 2.f);
         ssTEST_OUTPUT_ASSERT(testArg3 == "test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Set Object By Action Should Override")
@@ -367,7 +367,7 @@ int main()
             CppOverrideTest::NonConst::Object::SetObjectFunc(0, 0, "a", testClass);
         );
         ssTEST_OUTPUT_ASSERT(testClass == TestClass(1, 2.0, "test"));
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Set Args By Action For Overloaded Function Should Override")
@@ -408,8 +408,8 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT(testArg2 == 4.f);
         ssTEST_OUTPUT_ASSERT(testArg3 == "Test");
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
-        ssTEST_OUTPUT_ASSERT(result2.SetArgsStatus == CppOverride::OverrideStatus::NO_OVERRIDE);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result2.Status == CppOverride::OverrideStatus::NO_OVERRIDE);
 
 
         ssTEST_OUTPUT_SETUP
@@ -422,8 +422,8 @@ int main()
         );
         ssTEST_OUTPUT_ASSERT(testArg2 == true);
         ssTEST_OUTPUT_ASSERT(testArg4 == 3.f);
-        ssTEST_OUTPUT_ASSERT(result.SetArgsStatus == CppOverride::OverrideStatus::NO_OVERRIDE);
-        ssTEST_OUTPUT_ASSERT(result2.SetArgsStatus == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::NO_OVERRIDE);
+        ssTEST_OUTPUT_ASSERT(result2.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST_END();

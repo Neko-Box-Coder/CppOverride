@@ -16,6 +16,7 @@ Of course, you can still create mock classes if you want.
 ---
 
 <!-- Links to all the headings -->
+TODO(NOW): Update this
 ## Table of Contents
 - [Installation](#installation)
 - [Quick Start](#quick-start)
@@ -257,6 +258,16 @@ CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyArgs)
 
 The types of the argument specified with template must match the function argument types exactly.
 
+You can also use `CO_ANY_TYPE` and `CO_DONT_SET` to not set some of the arguments.
+
+Example:
+```cpp
+CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyArgs)
+                 .SetArgs<CO_ANY_TYPE, int*>(CO_DONT_SET, 3);
+```
+
+In this case, the first argument is not touched, while the second argument is set to 3.
+
 > It is **common to pair** `.SetArgs` with `.Returns` so that the execution doesn't continue when
 we finish overriding the arguments.
 
@@ -342,6 +353,9 @@ CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyArgs)
                  );
 ```
 
+Similar to `.SetArgs<...>(...)`, you can use `CO_ANY_TYPE` to match any type or to indicate 
+that it won't be set.
+
 ---
 
 ### Override Rules And Actions
@@ -420,6 +434,18 @@ CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
 int ret1 = OverrideMyReturnValue(1, 2.f);   //called is still false
 int ret2 = OverrideMyReturnValue(2, 3.f);   //called is true now
 ```
+
+> If you just want to see if the function is called without overriding anything, you can use
+> `CO_ANY` and `CO_DONT_OVERRIDE_RETURN` to not return anything. So something like:
+> ```cpp
+> //CO_SETUP_OVERRIDE...
+> .Returns<CO_ANY>(CO_DONT_OVERRIDE_RETURN)
+> .WhenCalledExpectedly_Do
+> (
+>     //...
+> )
+> ```
+
 
 ### Otherwise Do Function / Lambda
 
