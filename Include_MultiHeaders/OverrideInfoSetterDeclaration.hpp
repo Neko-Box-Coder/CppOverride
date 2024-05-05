@@ -65,22 +65,31 @@ namespace CppOverride
                     template<MPT_PREFIX_SUFFIX_ARGS(typename Arg, Type, __VA_ARGS__)> \
                     OverrideInfoSetter& SetArgs \
                     ( \
-                        MPT_APPEND_LISTS_ITEMS \
+                        MPT_COMPOSE \
                         ( \
-                            MPT_PREFIX_SUFFIX_ARGS \
+                            MPT_APPEND_LISTS_ITEMS, \
                             ( \
-                                typename TypeUnwrapper<Arg, \
-                                Type>::Type, \
-                                __VA_ARGS__ \
-                            ), \
-                            MPT_COMPOSE \
-                            ( \
-                                MPT_CONCAT, \
+                                MPT_COMPOSE2 \
                                 ( \
-                                    MPT_COUNT_TO_, \
-                                    MPT_ARGS_COUNT(__VA_ARGS__) \
+                                    MPT_PREFIX_SUFFIX_ARGS, \
+                                    ( \
+                                        typename TypeUnwrapper<Arg, \
+                                        Type>::Type, \
+                                        __VA_ARGS__ \
+                                    ) \
+                                ), \
+                                MPT_COMPOSE2 \
+                                ( \
+                                    MPT_COMPOSE3, \
+                                    ( \
+                                        MPT_CONCAT, \
+                                        ( \
+                                            MPT_COUNT_TO_, \
+                                            MPT_ARGS_COUNT(__VA_ARGS__) \
+                                        ) \
+                                    )(_, /* no suffix */) \
                                 ) \
-                            )(_, /* no suffix */) \
+                            ) \
                         ) \
                     )
                 

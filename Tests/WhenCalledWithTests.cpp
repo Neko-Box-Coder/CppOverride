@@ -352,7 +352,7 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            Rectangle rect(1.5, 1.5);
+            class Rectangle rect(1.5, 1.5);
             CO_SETUP_OVERRIDE   (rect, GetWidth)
                                 .WhenCalledWith(2.f)
                                 .Returns<float>(5.f)

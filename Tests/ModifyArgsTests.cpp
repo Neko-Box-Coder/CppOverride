@@ -249,7 +249,7 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            Rectangle rect(5, 5);
+            class Rectangle rect(5, 5);
             float outWidth = 0;
             (CO_SETUP_OVERRIDE(rect, GetWidth)  .SetArgs<float&, CO_ANY_TYPE>(2, CO_DONT_SET)
                                                 .ReturnsVoid()

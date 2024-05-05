@@ -125,14 +125,24 @@ namespace CppOverride
     #define INTERNAL_CO_ARGS(...) \
         MPT_COMPOSE \
         ( \
-            MPT_COMPOSE \
-            (\
-                MPT_CONCAT, \
-                (INTERNAL_CO_ARGS_, MPT_IS_ARGS_EMPTY __VA_ARGS__ ) \
-            ), \
-            __VA_ARGS__ \
+            MPT_COMPOSE2, \
+            ( \
+                MPT_COMPOSE3, \
+                ( \
+                    MPT_CONCAT, \
+                    ( \
+                        INTERNAL_CO_ARGS_, \
+                        MPT_COMPOSE3 \
+                        ( \
+                            MPT_IS_ARGS_EMPTY, \
+                            __VA_ARGS__ \
+                        ) \
+                    ) \
+                    __VA_ARGS__ \
+                ) \
+            ) \
         )
-    
+
     #define INTERNAL_CO_ARGS_EMPTY()
     #define INTERNAL_CO_ARGS_NOT_EMPTY(...) , __VA_ARGS__
     

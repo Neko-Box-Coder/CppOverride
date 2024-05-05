@@ -17,7 +17,7 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            Rectangle rect(1.5, 1.5);
+            class Rectangle rect(1.5, 1.5);
             bool calledExpectedly = false;
             
             CO_SETUP_OVERRIDE   (rect, GetWidth)
