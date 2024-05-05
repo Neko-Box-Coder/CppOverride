@@ -211,7 +211,7 @@ int main()
                                 .AssignOverrideResult(result));
             
             (CO_SETUP_OVERRIDE  (OverrideObj, ArgsToSetFunc)
-                                .SetArgs<CO_ANY_TYPE, float&, float*>(CO_DONT_SET, true, 3.f)
+                                .SetArgs<CO_ANY_TYPE, float&, float*>(CO_DONT_SET, 5.f, 3.f)
                                 .AssignOverrideResult(result2));
             
             int testArg = 0;
@@ -237,7 +237,7 @@ int main()
         (
             CppOverrideTest::NonConst::ArgsToSetFunc(testArg, testArg2, &testArg4);
         );
-        ssTEST_OUTPUT_ASSERT(testArg2 == true);
+        ssTEST_OUTPUT_ASSERT(testArg2 == 5.f);
         ssTEST_OUTPUT_ASSERT(testArg4 == 3.f);
         ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::NO_OVERRIDE);
         ssTEST_OUTPUT_ASSERT(result2.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
@@ -392,7 +392,7 @@ int main()
                                 (
                                     [](std::vector<void*>& args)
                                     {
-                                        *((float*)args.at(1)) = true;
+                                        *((float*)args.at(1)) = 5.f;
                                         **((float**)args.at(2)) = 3.f;
                                     }
                                 )
@@ -420,7 +420,7 @@ int main()
         (
             CppOverrideTest::NonConst::ArgsToSetFunc(testArg, testArg2, &testArg4);
         );
-        ssTEST_OUTPUT_ASSERT(testArg2 == true);
+        ssTEST_OUTPUT_ASSERT(testArg2 == 5.f);
         ssTEST_OUTPUT_ASSERT(testArg4 == 3.f);
         ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::NO_OVERRIDE);
         ssTEST_OUTPUT_ASSERT(result2.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
