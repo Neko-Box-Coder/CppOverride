@@ -21,13 +21,13 @@ GOTO :FINAL
 
 :RUN_TEST <testFile>
     @REM Setlocal EnableDelayedExpansion
-    IF NOT EXIST %~1 (
+    IF NOT EXIST "%~1" (
         ECHO "[Auto Test Warning] %~1 doesn't exist, skipping"
         ECHO ""
         EXIT /b
     )
-    PUSHD %~dp1
-    CALL %~1
+    PUSHD "%~dp1"
+    CALL "%~1"
     IF NOT %errorlevel% == 0 (
         ECHO "Failed: %errorlevel%"
         GOTO :FAILED
@@ -37,13 +37,13 @@ GOTO :FINAL
 
 
 :FINAL
-CALL :RUN_TEST %~dp0\%MODE%IfTests.exe
-CALL :RUN_TEST %~dp0\%MODE%ModifyArgsTests.exe
-CALL :RUN_TEST %~dp0\%MODE%ModifyReturnsTests.exe
-CALL :RUN_TEST %~dp0\%MODE%Otherwise_DoTests.exe
-CALL :RUN_TEST %~dp0\%MODE%TimesTests.exe
-CALL :RUN_TEST %~dp0\%MODE%WhenCalledExpectedly_DoTests.exe
-CALL :RUN_TEST %~dp0\%MODE%WhenCalledWithTests.exe
+CALL :RUN_TEST "%~dp0\%MODE%IfTests.exe"
+CALL :RUN_TEST "%~dp0\%MODE%ModifyArgsTests.exe"
+CALL :RUN_TEST "%~dp0\%MODE%ModifyReturnsTests.exe"
+CALL :RUN_TEST "%~dp0\%MODE%Otherwise_DoTests.exe"
+CALL :RUN_TEST "%~dp0\%MODE%TimesTests.exe"
+CALL :RUN_TEST "%~dp0\%MODE%WhenCalledExpectedly_DoTests.exe"
+CALL :RUN_TEST "%~dp0\%MODE%WhenCalledWithTests.exe"
 
 EXIT 0
 
