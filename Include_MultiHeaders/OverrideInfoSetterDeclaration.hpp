@@ -65,7 +65,7 @@ namespace CppOverride
                     template<MPT_PREFIX_SUFFIX_ARGS(typename Arg, Type, __VA_ARGS__)> \
                     OverrideInfoSetter& SetArgs \
                     ( \
-                        MPT_COMPOSE \
+                        MPT_COMPOSE4 \
                         ( \
                             MPT_APPEND_LISTS_ITEMS, \
                             ( \
@@ -78,9 +78,9 @@ namespace CppOverride
                                         __VA_ARGS__ \
                                     ) \
                                 ), \
-                                MPT_COMPOSE2 \
+                                MPT_COMPOSE3 \
                                 ( \
-                                    MPT_COMPOSE3, \
+                                    MPT_COMPOSE2, \
                                     ( \
                                         MPT_CONCAT, \
                                         ( \

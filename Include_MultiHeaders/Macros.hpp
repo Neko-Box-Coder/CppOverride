@@ -123,25 +123,16 @@ namespace CppOverride
     
     //This macro is to prepend "," if there are any arguments present, otherwise empty
     #define INTERNAL_CO_ARGS(...) \
-        MPT_COMPOSE \
+        MPT_DELAYED_CONCAT \
         ( \
-            MPT_COMPOSE2, \
+            INTERNAL_CO_ARGS_, \
+            MPT_COMPOSE3 \
             ( \
-                MPT_COMPOSE3, \
-                ( \
-                    MPT_CONCAT, \
-                    ( \
-                        INTERNAL_CO_ARGS_, \
-                        MPT_COMPOSE3 \
-                        ( \
-                            MPT_IS_ARGS_EMPTY, \
-                            __VA_ARGS__ \
-                        ) \
-                    ) \
-                    __VA_ARGS__ \
-                ) \
+                MPT_ARE_ARGS_EMPTY, \
+                __VA_ARGS__ \
             ) \
-        )
+        ) \
+        __VA_ARGS__
 
     #define INTERNAL_CO_ARGS_EMPTY()
     #define INTERNAL_CO_ARGS_NOT_EMPTY(...) , __VA_ARGS__
