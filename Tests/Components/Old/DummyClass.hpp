@@ -70,84 +70,84 @@ class DummyClass {
 };
 
 template <typename T>
-class TemplateDummy : public DummyClass
+class TemplateTestClass : public DummyClass
 {
     private:
-        T GenericData;
+        T GenericTestData;
     
     public:
-        inline TemplateDummy() :   
+        inline TemplateTestClass() :   
             DummyClass(),
-            GenericData()
+            GenericTestData()
         {}
         
         //Copy constructor using assignment operator
-        inline TemplateDummy(const TemplateDummy<T>& other) : DummyClass()
+        inline TemplateTestClass(const TemplateTestClass<T>& other) : DummyClass()
         {
             *this = other;
         }
         
-        inline TemplateDummy(T genericData, int d, double v, std::string n) :   
+        inline TemplateTestClass(T genericData, int d, double v, std::string n) :   
             DummyClass(d, v, n),
-            GenericData(genericData)
+            GenericTestData(genericData)
         {}
         
-        inline TemplateDummy(T genericData) :   DummyClass(),
-                                                GenericData(genericData)
+        inline TemplateTestClass(T genericData) :   DummyClass(),
+                                                GenericTestData(genericData)
         {}
         
         //Assignment operator
-        inline TemplateDummy<T>& operator=(const TemplateDummy<T>& other)
+        inline TemplateTestClass<T>& operator=(const TemplateTestClass<T>& other)
         {
             DummyClass::operator=(other);
-            GenericData = other.GenericData;
+            GenericTestData = other.GenericTestData;
             return *this;
         }
 
-        inline bool operator ==(const TemplateDummy<T>& other) const
+        inline bool operator ==(const TemplateTestClass<T>& other) const
         {
             return  DummyClass::operator==(other) && 
-                    GenericData == other.GenericData;
+                    GenericTestData == other.GenericTestData;
         }
         
-        inline bool operator!=(const TemplateDummy<T>& other) const
+        inline bool operator!=(const TemplateTestClass<T>& other) const
         {
-            return !TemplateDummy<T>::operator==(other);
+            return !TemplateTestClass<T>::operator==(other);
         }
         
-        inline void SetGenericData(T genericData)
+        inline void SetGenericTestData(T genericData)
         {
-            GenericData = genericData;
+            GenericTestData = genericData;
         }
         
-        inline T GetGenericData() const
+        inline T GetGenericTestData() const
         {
-            return GenericData;
+            return GenericTestData;
         }
 };
 
-class NonCopyAssignableDummy
+class NonCopyableTestClass
 {
     private:
         int TestData;
     
     public:
-        inline NonCopyAssignableDummy() :    
+        inline NonCopyableTestClass() :    
                                               TestData(0)
         {}
         
-        inline NonCopyAssignableDummy(int testData) :   
+        inline NonCopyableTestClass(int testData) :   
                                                         TestData(testData)
         {}
         
-        inline NonCopyAssignableDummy(const NonCopyAssignableDummy& other)
+        inline NonCopyableTestClass(const NonCopyableTestClass& other)
         {
             TestData = other.TestData;
         }
         
-        inline NonCopyAssignableDummy& operator=(const NonCopyAssignableDummy& other) = delete;
+        inline NonCopyableTestClass& operator=(const NonCopyableTestClass& other) = delete;
         
-        inline bool operator!=(const NonCopyAssignableDummy& other) = delete;
+        inline bool operator!=(const NonCopyableTestClass& other) = delete;
         
         inline void SetTestData(int testData)
         {
@@ -160,34 +160,34 @@ class NonCopyAssignableDummy
         }
 };
 
-class NonComparableDummy
+class NonComparableTestClass
 {
     private:
         int TestData;
     
     public:
-        inline NonComparableDummy() :   
+        inline NonComparableTestClass() :   
                                         TestData(0)
         {}
         
-        inline NonComparableDummy(int testData) :   
+        inline NonComparableTestClass(int testData) :   
                                                     TestData(testData)
         {}
         
-        inline NonComparableDummy(const NonComparableDummy& other)
+        inline NonComparableTestClass(const NonComparableTestClass& other)
         {
             *this = other.TestData;
         }
         
-        inline NonComparableDummy& operator=(const NonComparableDummy& other) 
+        inline NonComparableTestClass& operator=(const NonComparableTestClass& other) 
         {
             
             TestData = other.TestData;
             return *this;
         }
         
-        inline bool operator==(const NonComparableDummy& other) = delete;
-        inline bool operator!=(const NonComparableDummy& other) = delete;
+        inline bool operator==(const NonComparableTestClass& other) = delete;
+        inline bool operator!=(const NonComparableTestClass& other) = delete;
         
         inline void SetTestData(int testData)
         {

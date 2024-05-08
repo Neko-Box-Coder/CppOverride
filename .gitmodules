@@ -1,3 +1,6 @@
 [submodule "External/ssTest"]
 	path = External/ssTest
 	url = https://github.com/Neko-Box-Coder/ssTest.git
+[submodule "External/MacroPowerToys"]
+	path = External/MacroPowerToys
+	url = https://github.com/Neko-Box-Coder/MacroPowerToys.git

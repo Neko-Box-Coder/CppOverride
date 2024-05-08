@@ -10,6 +10,7 @@ namespace CppOverride
     {
         std::function<void(std::vector<void*>& args)> DataAction;
         std::vector<std::size_t> DataTypes;
+        std::vector<bool> DataTypesSet;
         bool DataActionSet = false;
     };
 }

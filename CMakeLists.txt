@@ -18,7 +18,7 @@ project(CppOverrideProject)
 set(CPP_OVERRIDE_BUILD_EXAMPLE "ON" CACHE BOOL "Build tests for CppOverride")
 set(CPP_OVERRIDE_BUILD_TEST "OFF" CACHE BOOL "Build tests for CppOverride")
 set(CPP_OVERRIDE_USE_SINGLE_HEADER "ON" CACHE BOOL "Use single header version instead")
- 
+
 add_library(CppOverride INTERFACE)
 
 add_executable(GenerateSingleHeader "${CMAKE_CURRENT_LIST_DIR}/Scripts/GenerateSingleHeader.cpp")
@@ -47,44 +47,44 @@ else()
 endif()
 
 if(CPP_OVERRIDE_BUILD_TEST)
-    if(NOT TARGET ssTest)
-        add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/ssTest" "${CMAKE_CURRENT_BINARY_DIR}/ssTest")
-    endif()
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/ssTest" "${CMAKE_CURRENT_BINARY_DIR}/ssTest")
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/MacroPowerToys" "${CMAKE_CURRENT_BINARY_DIR}/MacroPowerToys")
     
-    #add_executable(CppOverrideTest "${CMAKE_CURRENT_LIST_DIR}/Tests/CppOverrideTests.cpp")
     add_executable(ModifyReturnsTests "${CMAKE_CURRENT_LIST_DIR}/Tests/ModifyReturnsTests.cpp")
-    target_link_libraries(ModifyReturnsTests PUBLIC CppOverride ssTest)
+    target_link_libraries(ModifyReturnsTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_compile_options(ModifyReturnsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(ModifyArgsTests "${CMAKE_CURRENT_LIST_DIR}/Tests/ModifyArgsTests.cpp")
-    target_link_libraries(ModifyArgsTests PUBLIC CppOverride ssTest)
+    target_link_libraries(ModifyArgsTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_compile_options(ModifyArgsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(WhenCalledWithTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledWithTests.cpp")
-    target_link_libraries(WhenCalledWithTests PUBLIC CppOverride ssTest)
+    target_link_libraries(WhenCalledWithTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_compile_options(WhenCalledWithTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(TimesTests "${CMAKE_CURRENT_LIST_DIR}/Tests/TimesTests.cpp")
-    target_link_libraries(TimesTests PUBLIC CppOverride ssTest)
+    target_link_libraries(TimesTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_compile_options(TimesTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(IfTests "${CMAKE_CURRENT_LIST_DIR}/Tests/IfTests.cpp")
-    target_link_libraries(IfTests PUBLIC CppOverride ssTest)
+    target_link_libraries(IfTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_compile_options(IfTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(Otherwise_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/Otherwise_DoTests.cpp")
-    target_link_libraries(Otherwise_DoTests PUBLIC CppOverride ssTest)
+    target_link_libraries(Otherwise_DoTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_compile_options(Otherwise_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(WhenCalledExpectedly_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledExpectedly_DoTests.cpp")
-    target_link_libraries(WhenCalledExpectedly_DoTests PUBLIC CppOverride ssTest)
-
-    target_compile_options(ModifyReturnsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
-    target_compile_options(ModifyArgsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
-    target_compile_options(WhenCalledWithTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
-    target_compile_options(TimesTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
-    target_compile_options(IfTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
-    target_compile_options(Otherwise_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+    target_link_libraries(WhenCalledExpectedly_DoTests PUBLIC CppOverride ssTest MacroPowerToys)
     target_compile_options(WhenCalledExpectedly_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
+    add_executable(MixedModifyArgsAndReturnsTest "${CMAKE_CURRENT_LIST_DIR}/Tests/MixedModifyArgsAndReturnsTest.cpp")
+    target_link_libraries(MixedModifyArgsAndReturnsTest PUBLIC CppOverride ssTest MacroPowerToys)
+    target_compile_options(MixedModifyArgsAndReturnsTest PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
     if(WIN32)
-        file(   COPY "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat"
-                DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E copy    "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat" 
+                                                            "${CMAKE_CURRENT_BINARY_DIR}")
     else()
         file(   CHMOD "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.sh"
                 PERMISSIONS  OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)

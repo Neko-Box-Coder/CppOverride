@@ -6,7 +6,6 @@
 namespace CppOverride
 {
     #define INTERNAL_CO_UNCONST(targetType) typename std::remove_const<targetType>::type
-    #define INTERNAL_CO_NON_CONST_T INTERNAL_CO_UNCONST(T)
     
     #define INTERNAL_CO_UNREF(targetType) typename std::remove_reference<targetType>::type
     

@@ -1,0 +1,346 @@
+format_version: 10
+pipelines:
+    CppOverrideMain:
+        group: CppOverride
+        label_template: ${COUNT}
+        lock_behavior: none
+        display_order: -1
+        environment_variables:
+            CI_GITHUB_PAT: "{{SECRET:[SECRET_CONFIG][CI_GITHUB_PAT]}}"
+        materials:
+            CppOverrideArtifacts:
+                ignore_for_scheduling: false
+                pipeline: CppOverrideArtifacts
+                stage: CommonArtifactsStage
+        stages:
+        -   BuildStage:
+                fetch_materials: false
+                keep_artifacts: false
+                clean_workspace: true
+                approval:
+                    type: success
+                    allow_only_on_success: false
+                jobs:
+                    LinuxBuildJob:
+                        timeout: 0
+                        resources:
+                        -   Ubuntu-22
+                        artifacts:
+                        -   build:
+                                source: CppOverride/*
+                                destination: CppOverrideLinuxBuild
+                        tasks:
+                        -   fetch:
+                                is_file: false
+                                source: CppOverride
+                                destination: ""
+                                pipeline: CppOverrideArtifacts
+                                stage: CommonArtifactsStage
+                                job: CommonArtifactsJob
+                                artifact_origin: gocd
+                        -   exec:
+                                arguments:
+                                -   -lah
+                                command: ls
+                        -   exec:
+                                arguments:
+                                -   -lah
+                                command: ls
+                                working_directory: CppOverride
+                        -   exec:
+                                arguments:
+                                -   +x
+                                -   ./SendGithubStatus.sh
+                                command: chmod
+                                working_directory: CppOverride
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   ./SendGithubStatus.sh "$CI_GITHUB_PAT" "pending"
+                                    "$GO_PIPELINE_NAME" "$GO_PIPELINE_COUNTER" "$GO_STAGE_NAME"
+                                    "$GO_STAGE_COUNTER" "$GO_JOB_NAME"
+                                command: sh
+                                working_directory: CppOverride
+                        -   exec:
+                                arguments:
+                                -   -p
+                                -   ./Build
+                                command: mkdir
+                                working_directory: CppOverride
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   cmake .. -DCPP_OVERRIDE_BUILD_TEST=ON 
+                                command: sh
+                                working_directory: CppOverride/Build
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   cmake --build . -j 16
+                                command: sh
+                                working_directory: CppOverride/Build
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   ./SendGithubStatus.sh "$CI_GITHUB_PAT" "success" 
+                                    "$GO_PIPELINE_NAME" "$GO_PIPELINE_COUNTER" "$GO_STAGE_NAME"
+                                    "$GO_STAGE_COUNTER" "$GO_JOB_NAME"
+                                command: sh
+                                working_directory: CppOverride
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   ./SendGithubStatus.sh "$CI_GITHUB_PAT" "failure"
+                                    "$GO_PIPELINE_NAME" "$GO_PIPELINE_COUNTER" "$GO_STAGE_NAME"
+                                    "$GO_STAGE_COUNTER" "$GO_JOB_NAME"
+                                command: sh
+                                working_directory: CppOverride
+                                run_if: failed
+                    WindowsBuildJob:
+                        timeout: 0
+                        resources:
+                        -   Windows-10
+                        artifacts:
+                        -   build:
+                                source: CppOverride/*
+                                destination: CppOverrideWindowsBuild
+                        tasks:
+                        -   fetch:
+                                is_file: false
+                                source: CppOverride
+                                destination: ""
+                                pipeline: CppOverrideArtifacts
+                                stage: CommonArtifactsStage
+                                job: CommonArtifactsJob
+                                artifact_origin: gocd
+                        -   exec:
+                                command: dir
+                                working_directory: CppOverride
+                        -   exec:
+                                command: dir
+                                working_directory: CppOverride/Tests
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   .\SendGithubStatus.bat "%CI_GITHUB_PAT%" "pending"
+                                    "%GO_PIPELINE_NAME%" "%GO_PIPELINE_COUNTER%" "%GO_STAGE_NAME%"
+                                    "%GO_STAGE_COUNTER%" "%GO_JOB_NAME%"
+                                command: cmd
+                                working_directory: CppOverride
+                        -   exec:
+                                arguments:
+                                -   Build
+                                command: mkdir
+                                working_directory: CppOverride
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   cmake .. -DCPP_OVERRIDE_BUILD_TEST=ON
+                                command: cmd
+                                working_directory: CppOverride\Build
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   cmake --build . -j 16
+                                command: cmd
+                                working_directory: CppOverride\Build
+                        -   exec:
+                                command: dir
+                                working_directory: CppOverride\Build
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   .\SendGithubStatus.bat "%CI_GITHUB_PAT%" "success"
+                                    "%GO_PIPELINE_NAME%" "%GO_PIPELINE_COUNTER%" "%GO_STAGE_NAME%"
+                                    "%GO_STAGE_COUNTER%" "%GO_JOB_NAME%"
+                                command: cmd
+                                working_directory: CppOverride
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   .\SendGithubStatus "%CI_GITHUB_PAT%" "failure" "%GO_PIPELINE_NAME%"
+                                        "%GO_PIPELINE_COUNTER%" "%GO_STAGE_NAME%" "%GO_STAGE_COUNTER%" "%GO_JOB_NAME%"
+                                command: cmd
+                                working_directory: CppOverride
+                                run_if: failed
+        -   TestStage:
+                fetch_materials: false
+                keep_artifacts: false
+                clean_workspace: true
+                approval:
+                    type: success
+                    allow_only_on_success: true
+                jobs:
+                    LinuxTestJob:
+                        timeout: 0
+                        resources:
+                        -   Ubuntu-22
+                        tasks:
+                        -   fetch:
+                                is_file: false
+                                source: CppOverrideLinuxBuild
+                                destination: ""
+                                pipeline: CppOverrideMain
+                                stage: BuildStage
+                                job: LinuxBuildJob
+                                artifact_origin: gocd
+                        -   exec:
+                                arguments:
+                                -   +x
+                                -   ./SendGithubStatus.sh
+                                command: chmod
+                                working_directory: CppOverrideLinuxBuild
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   ./SendGithubStatus.sh "$CI_GITHUB_PAT" "pending"
+                                    "$GO_PIPELINE_NAME" "$GO_PIPELINE_COUNTER" "$GO_STAGE_NAME"
+                                    "$GO_STAGE_COUNTER" "$GO_JOB_NAME"
+                                command: sh
+                                working_directory: CppOverrideLinuxBuild
+                        -   exec:
+                                arguments:
+                                -   +x
+                                -   ./RunAllTests.sh
+                                command: chmod
+                                working_directory: CppOverrideLinuxBuild/Build
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   ./RunAllTests.sh
+                                command: sh
+                                working_directory: CppOverrideLinuxBuild/Build
+                        -   exec:
+                                arguments:
+                                -   +x
+                                -   ./CppOverrideExample
+                                command: chmod
+                                working_directory: CppOverrideLinuxBuild/Build
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   ./CppOverrideExample
+                                command: sh
+                                working_directory: CppOverrideLinuxBuild/Build
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   ./SendGithubStatus.sh "$CI_GITHUB_PAT" "success"
+                                    "$GO_PIPELINE_NAME" "$GO_PIPELINE_COUNTER" "$GO_STAGE_NAME"
+                                    "$GO_STAGE_COUNTER" "$GO_JOB_NAME"
+                                command: sh
+                                working_directory: CppOverrideLinuxBuild
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   ./SendGithubStatus.sh "$CI_GITHUB_PAT" "failure"
+                                    "$GO_PIPELINE_NAME" "$GO_PIPELINE_COUNTER" "$GO_STAGE_NAME"
+                                    "$GO_STAGE_COUNTER" "$GO_JOB_NAME"
+                                command: sh
+                                working_directory: CppOverrideLinuxBuild
+                                run_if: failed
+                    WindowsTestJob:
+                        timeout: 0
+                        resources:
+                        -   Windows-10
+                        tasks:
+                        -   fetch:
+                                is_file: false
+                                source: CppOverrideWindowsBuild
+                                destination: ""
+                                pipeline: CppOverrideMain
+                                stage: BuildStage
+                                job: WindowsBuildJob
+                                artifact_origin: gocd
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   .\SendGithubStatus.bat "%CI_GITHUB_PAT%" "pending"
+                                    "%GO_PIPELINE_NAME%" "%GO_PIPELINE_COUNTER%" "%GO_STAGE_NAME%"
+                                    "%GO_STAGE_COUNTER%" "%GO_JOB_NAME%"
+                                command: cmd
+                                working_directory: CppOverrideWindowsBuild
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   .\RunAllTests.bat -d
+                                command: cmd
+                                working_directory: CppOverrideWindowsBuild\Build
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   .\CppOverrideExample.exe
+                                command: cmd
+                                working_directory: CppOverrideWindowsBuild\Build\Debug
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   .\SendGithubStatus.bat "%CI_GITHUB_PAT%" "success"
+                                    "%GO_PIPELINE_NAME%" "%GO_PIPELINE_COUNTER%" "%GO_STAGE_NAME%"
+                                    "%GO_STAGE_COUNTER%" "%GO_JOB_NAME%"
+                                command: cmd
+                                working_directory: CppOverrideWindowsBuild
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   .\SendGithubStatus "%CI_GITHUB_PAT%" "failure"
+                                    "%GO_PIPELINE_NAME%" "%GO_PIPELINE_COUNTER%" "%GO_STAGE_NAME%"
+                                    "%GO_STAGE_COUNTER%" "%GO_JOB_NAME%"
+                                command: cmd
+                                working_directory: CppOverrideWindowsBuild
+                                run_if: failed
+        -   FinishStage:
+                fetch_materials: false
+                keep_artifacts: false
+                clean_workspace: true
+                approval:
+                    type: success
+                    allow_only_on_success: true
+                jobs:
+                    FinishJob:
+                        timeout: 0
+                        resources:
+                        -   Ubuntu-22
+                        tasks:
+                        -   fetch:
+                                is_file: false
+                                source: CppOverride
+                                destination: ""
+                                pipeline: CppOverrideArtifacts
+                                stage: CommonArtifactsStage
+                                job: CommonArtifactsJob
+                                artifact_origin: gocd
+                        -   exec:
+                                arguments:
+                                -   +x
+                                -   ./SendGithubStatus.sh
+                                command: chmod
+                                working_directory: CppOverride
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   ./SendGithubStatus.sh "$CI_GITHUB_PAT" "success"
+                                    "$GO_PIPELINE_NAME" "$GO_PIPELINE_COUNTER" "$GO_STAGE_NAME"
+                                    "$GO_STAGE_COUNTER" "$GO_JOB_NAME"
+                                command: sh
+                                working_directory: CppOverride

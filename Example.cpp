@@ -1,17 +1,11 @@
 #include "CppOverride.hpp"
 
-CO_DECLARE_INSTNACE(OverrideInstanceName);
+CO_DECLARE_INSTANCE(OverrideInstanceName);
 
 int OverrideMyReturnValue(int value1, float value2)
 {
-    CO_RETURN_IF_FOUND( OverrideInstanceName, 
-                        OverrideMyReturnValue(int, float), 
-                        int,
-                        value1, 
-                        value2);
-    
+    CO_OVERRIDE_IMPL(OverrideInstanceName, int, (value1, value2));
     //The rest of the implementations...
-    
     return 0;
 }
 
@@ -19,34 +13,19 @@ int SomeRef = 0;
 
 int& OverrideMyReturnRef(int value1, float value2)
 {
-    CO_RETURN_REF_IF_FOUND( OverrideInstanceName, 
-                            OverrideMyReturnRef(int, float), 
-                            int,
-                            value1, 
-                            value2);
-    
+    CO_OVERRIDE_IMPL(OverrideInstanceName, int&, (value1, value2));
     //The rest of the implementations...
-    
     return SomeRef;
 }
 
 void OverrideMyArgs(float& value1, int* value2)
 {
-    CO_MODIFY_ARGS_IF_FOUND(OverrideInstanceName, 
-                            OverrideMyArgs(float&, int*), 
-                            value1, 
-                            value2);
+    CO_OVERRIDE_IMPL(OverrideInstanceName, void, (value1, value2));
 }
 
 bool OverrideMyArgsWithStstus(float& value1, int* value2)
 {
-    //Returns true if there's an override for setting arguments
-    CO_MODIFY_ARGS_AND_RETURN_IF_FOUND(OverrideInstanceName, 
-                                       true,
-                                       OverrideMyArgs(float&, int*), 
-                                       value1, 
-                                       value2);
-
+    CO_OVERRIDE_IMPL(OverrideInstanceName, bool, (value1, value2));
     return false;
 }
 
@@ -67,20 +46,19 @@ do\
 
 void ResetAll()
 {
-    CO_CLEAR_ALL_OVERRIDE_RETURNS(OverrideInstanceName);
-    CO_CLEAR_ALL_OVERRIDE_ARGS(OverrideInstanceName);
+    CO_CLEAR_ALL_OVERRIDE_SETUP(OverrideInstanceName);
 }
 
 void OverrideReturnsExample()
 {
-    CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
-                        .Returns(1);
+    CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyReturnValue)
+                        .Returns<int>(1);
 
     CO_QUICK_ASSERT(OverrideMyReturnValue(0, 0.f) == 1);
 
     int returnRef = 1;
-    CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnRef(int, float))
-                        .ReturnsReference(returnRef);
+    CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyReturnRef)
+                        .Returns<int&>(returnRef);
 
     CO_QUICK_ASSERT(&returnRef == &OverrideMyReturnRef(0, 0.f));
     
@@ -89,8 +67,8 @@ void OverrideReturnsExample()
 
 void OverrideArgumentsExample()
 {
-    CO_OVERRIDE_ARGS(OverrideInstanceName, OverrideMyArgs(float&, int*))
-                    .SetArgs(1.f, 3);
+    CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyArgs)
+                        .SetArgs<float&, int*>(1.f, 3);
 
     float arg1 = 0.f;
     int arg2 = 0;
@@ -103,7 +81,7 @@ void OverrideArgumentsExample()
 
 void OverrideReturnsWithActionLambda()
 {
-    CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+    CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyReturnValue)
                         .ReturnsByAction<int>
                         ( 
                             [](const std::vector<void*>& args, void* out)
@@ -119,7 +97,7 @@ void OverrideReturnsWithActionLambda()
 
 void OverrideArgumentsWithActionLambda()
 {
-    CO_OVERRIDE_ARGS(OverrideInstanceName, OverrideMyArgs(float&, int*))
+    CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyArgs)
                     .SetArgsByAction<float&, int*>
                     (
                         [](std::vector<void*>& args)
@@ -140,9 +118,9 @@ void OverrideArgumentsWithActionLambda()
 
 void WhenCalledWithExample()
 {
-    CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+    CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyReturnValue)
                         .WhenCalledWith(2, 3.f)
-                        .Returns(1);
+                        .Returns<int>(1);
 
     int ret1 = OverrideMyReturnValue(2, 3.f);   //Returns 1
     int ret2 = OverrideMyReturnValue(1, 2.f);   //Won't return 1
@@ -155,9 +133,9 @@ void WhenCalledWithExample()
 
 void TimesExample()
 {
-    CO_OVERRIDE_ARGS(OverrideInstanceName, OverrideMyArgs(float&, int*))
-                    .SetArgs(1.f, 2)
-                    .Times(1);
+    CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyArgs)
+                        .SetArgs<float&, int*>(1.f, 2)
+                        .Times(1);
     
     float testFloat = 2.f;
     int testInt = 3;
@@ -178,7 +156,7 @@ void TimesExample()
 
 void IfConditionLambdaExample()
 {
-    CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+    CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyReturnValue)
                         .If
                         (
                             [](const std::vector<void*>& args)
@@ -189,7 +167,7 @@ void IfConditionLambdaExample()
                                     return false;
                             }
                         )
-                        .Returns(1);
+                        .Returns<int>(1);
 
     int ret1 = OverrideMyReturnValue(1, 2.f);   //Returns 1
     int ret2 = OverrideMyReturnValue(2, 3.f);   //Won't return 1
@@ -203,9 +181,9 @@ void IfConditionLambdaExample()
 void WhenCalledExpectedlyDoLambdaExample()
 {
     bool called = false;
-    CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+    CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyReturnValue)
                         .WhenCalledWith(2, 3.f)
-                        .Returns(1)
+                        .Returns<int>(1)
                         .WhenCalledExpectedly_Do
                         (
                             [&called](const std::vector<void*>& args)
@@ -223,9 +201,9 @@ void WhenCalledExpectedlyDoLambdaExample()
 void OtherwiseDoLambdaExample()
 {
     bool called = false;
-    CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+    CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyReturnValue)
                         .WhenCalledWith(2, 3.f)
-                        .Returns(1)
+                        .Returns<int>(1)
                         .Otherwise_Do
                         (
                             [&called](const std::vector<void*>& args)
@@ -242,17 +220,16 @@ void OtherwiseDoLambdaExample()
 
 void AssignStatusExample()
 {
-    CppOverride::OverrideStatus status = CppOverride::DEFAULT_STATUS;
-    CO_OVERRIDE_RETURNS (OverrideInstanceName, OverrideMyReturnValue(int, float))
+    CppOverride::OverrideResult result;
+    CO_SETUP_OVERRIDE (OverrideInstanceName, OverrideMyReturnValue)
                         .WhenCalledWith(2, 3.f)
-                        .Returns(1)
-                        .AssignStatus(status);
+                        .Returns<int>(1)
+                        .AssignOverrideResult(result);
     
     int ret1 = OverrideMyReturnValue(1, 2.f);
     
     //status will be OverrideStatus::MATCHING_CONDITION_VALUE_FAILED
-    
-    CO_QUICK_ASSERT(status == CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
+    CO_QUICK_ASSERT(result.Status == CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
 
     ResetAll();
 }

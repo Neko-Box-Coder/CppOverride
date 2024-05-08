@@ -3,7 +3,7 @@
 
 
 #include "./CppOverrideInstance.hpp"
-#include "./ProxiesImplementations.hpp"
+#include "./OverrideInfoSetterImplementation.hpp"
 #include "./Macros.hpp"
 #include "./AliasTypes.hpp"
 

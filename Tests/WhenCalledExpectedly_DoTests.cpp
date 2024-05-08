@@ -1,7 +1,7 @@
 #include "CppOverride.hpp"
 #include "ssTest.hpp"
-#include "./FileFunctions.hpp"
-#include "./ClassFunctions.hpp"
+#include "./Components/FileFunctions.hpp"
+#include "./Components/Shapes.hpp"
 
 CppOverride::Overrider OverrideObj;
 
@@ -13,54 +13,72 @@ int main()
         OverrideObj = CppOverride::Overrider();
     };
     
-    ssTEST("Returns Test")
+    ssTEST("Calling WhenCalledWith Correctly Should Call WhenCalledExpectedly_Do For Returns")
     {
-        Rectangle rect(1.5, 1.5);
+        ssTEST_OUTPUT_SETUP
+        (
+            class Rectangle rect(1.5, 1.5);
+            bool calledExpectedly = false;
+            
+            CO_SETUP_OVERRIDE   (rect, GetWidth)
+                                .WhenCalledWith(2.f)
+                                .Returns<float>(6.f)
+                                .WhenCalledExpectedly_Do
+                                (
+                                    [&calledExpectedly] (const std::vector<void *>& args)
+                                    {
+                                        calledExpectedly = true;
+                                    }
+                                );
+        );
+        ssTEST_OUTPUT_EXECUTION
+        (
+            rect.GetWidth(3.f);
+        );
+        ssTEST_OUTPUT_ASSERT("Not Meeting WhenCalledWith", calledExpectedly == false);
         
-        bool calledExpectedly = false;
-        
-        CO_OVERRIDE_RETURNS (rect, GetWidth(float))
-                            .WhenCalledWith(2.f)
-                            .Returns(6.f)
-                            .WhenCalledExpectedly_Do
-                            (
-                                [&calledExpectedly] (const std::vector<void *>& args)
-                                {
-                                    calledExpectedly = true;
-                                }
-                            );
-        
-        rect.GetWidth(3.f);
-        ssTEST_OUTPUT_ASSERT(calledExpectedly == false);
-        
-        rect.GetWidth(2.f);
-        ssTEST_OUTPUT_ASSERT(calledExpectedly == true);
+        ssTEST_OUTPUT_EXECUTION
+        (
+            rect.GetWidth(2.f);
+        );
+        ssTEST_OUTPUT_ASSERT("Meeting WhenCalledWith", calledExpectedly == true);
     };
     
-    ssTEST("SetArgs Test")
+    ssTEST("Calling WhenCalledWith Correctly Should Call WhenCalledExpectedly_Do For SetArgs")
     {
-        bool calledExpectedly = false;
-        
-        CO_OVERRIDE_ARGS(OverrideObj, FuncWithConstArgsAndArgsToSet(    const int, 
-                                                                        const float, 
-                                                                        std::string&))
-                        .WhenCalledWith(1, 2.f, CO_ANY)
-                        .SetArgs(CO_DONT_SET, CO_DONT_SET, std::string("test"))
-                        .WhenCalledExpectedly_Do
-                        (
-                            [&calledExpectedly] (const std::vector<void *>& args)
-                            {
-                                calledExpectedly = true;
-                            }
-                        );
+        ssTEST_OUTPUT_SETUP
+        (
+            bool calledExpectedly = false;
+            
+            (CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsAndArgsToSetFunc)
+                                .WhenCalledWith(1, 2.f, CO_ANY)
+                                .SetArgs<   CO_ANY_TYPE, 
+                                            CO_ANY_TYPE, 
+                                            std::string&>(  CO_DONT_SET, 
+                                                            CO_DONT_SET, 
+                                                            "test")
+                                .WhenCalledExpectedly_Do
+                                (
+                                    [&calledExpectedly] (const std::vector<void *>& args)
+                                    {
+                                        calledExpectedly = true;
+                                    }
+                                ));
 
-        std::string testString;
+            std::string testString;
+        );
         
-        FuncWithConstArgsAndArgsToSet(2, 3.f, testString);
-        ssTEST_OUTPUT_ASSERT(calledExpectedly == false);
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::Const::ConstArgsAndArgsToSetFunc(2, 3.f, testString);
+        );
+        ssTEST_OUTPUT_ASSERT("Not Meeting WhenCalledWith", calledExpectedly == false);
         
-        FuncWithConstArgsAndArgsToSet(1, 2.f, testString);
-        ssTEST_OUTPUT_ASSERT(calledExpectedly == true);
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::Const::ConstArgsAndArgsToSetFunc(1, 2.f, testString);
+        );
+        ssTEST_OUTPUT_ASSERT("Meeting WhenCalledWith", calledExpectedly == true);
     };
     
     ssTEST_END();

@@ -1,11 +1,11 @@
-#ifndef CO_INTERNAL_ARGS_VALUES_CHECKER_HPP
-#define CO_INTERNAL_ARGS_VALUES_CHECKER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
+#define CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
 
-#include "./Any.hpp"
-#include "./ArgsInfo.hpp"
-#include "./PureType.hpp"
-#include "./TypeCheck.hpp"
-#include "./OverrideStatus.hpp"
+#include "../Any.hpp"
+#include "../ArgsInfo.hpp"
+#include "../PureType.hpp"
+#include "../TypeCheck.hpp"
+#include "../OverrideStatus.hpp"
 
 #include <cassert>
 #include <type_traits>
@@ -15,17 +15,18 @@
 
 namespace CppOverride
 {
-    class Internal_ArgsValuesChecker
+    class Internal_ConditionArgsValuesChecker
     {
-        friend class Internal_ReturnDataRetriever;
-        friend class Internal_ArgsDataRetriever;
+        friend class Internal_ReturnDataValidator;
+        friend class Internal_ArgsDataValidator;
+        friend class Internal_RequirementValidator;
         
         protected:
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex,
                                                 OverrideStatus& status) { return true; };
 
-            #define CO_LOG_CheckArgumentsValues 0
+            #define INTERNAL_CO_LOG_CheckArgumentsValues 0
 
             template<   typename T, 
                         typename = typename std::enable_if<!InequalExists<T>::value>::type,
@@ -36,10 +37,12 @@ namespace CppOverride
                                                 T& arg, 
                                                 Args&... args)
             {
-                #if CO_LOG_CheckArgumentsValues
+                if(INTERNAL_CO_LOG_CheckArgumentsValues)
+                {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
-                #endif
+                }
             
                 if(argIndex >= validArgumentsList.size())
                     return false;
@@ -51,10 +54,11 @@ namespace CppOverride
                     return false;
                 }
                 
-                #if CO_LOG_CheckArgumentsValues
+                if(INTERNAL_CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
-                #endif
+                }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
@@ -69,33 +73,37 @@ namespace CppOverride
                                                 T& arg, 
                                                 Args&... args)
             {
-                #if CO_LOG_CheckArgumentsValues
+                if(INTERNAL_CO_LOG_CheckArgumentsValues)
+                {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
-                    std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
-                #endif
-            
+                    std::cout << "CheckArgumentsValues index: " << argIndex << std::endl;
+                }
+
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
                 if(validArgumentsList[argIndex].ArgSet)
                 {
+                    const ArgInfo& curArgInfo = validArgumentsList[argIndex];
+                    
                     //Check Reference (Which is converted to pointer when checking)
-                    if( sizeof(INTERNAL_CO_NON_CONST_T*) == validArgumentsList[argIndex].ArgSize &&
-                        typeid(INTERNAL_CO_NON_CONST_T*).hash_code() == 
-                            validArgumentsList[argIndex].ArgTypeHash)
+                    if( sizeof(INTERNAL_CO_UNCONST(T)*) == curArgInfo.ArgSize &&
+                        typeid(INTERNAL_CO_UNCONST(T)*).hash_code() == curArgInfo.ArgTypeHash)
                     {
-                        if(&arg != *(INTERNAL_CO_NON_CONST_T**)(validArgumentsList[argIndex].ArgDataPointer))
+                        if( &arg != *(INTERNAL_CO_UNCONST(T)**)(curArgInfo.ArgDataPointer))
                             return false;
                     }
                     //Check Value
-                    else if(arg != *static_cast<INTERNAL_CO_NON_CONST_T*>(validArgumentsList[argIndex].ArgDataPointer))
+                    else if(arg != *static_cast<INTERNAL_CO_UNCONST(T)*>(curArgInfo.ArgDataPointer))
                         return false;
                 }
                 
-                #if CO_LOG_CheckArgumentsValues
+                if(INTERNAL_CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
-                #endif
+                }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
@@ -111,26 +119,26 @@ namespace CppOverride
                                                 T*& arg, 
                                                 Args&... args)
             {
-                #if CO_LOG_CheckArgumentsValues
+                if(INTERNAL_CO_LOG_CheckArgumentsValues)
+                {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
-                #endif
+                }
             
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
                 if(validArgumentsList[argIndex].ArgSet)
                 {
+                    const ArgInfo& curArgInfo = validArgumentsList[argIndex];
+                    
                     //Check Pointer
-                    if( sizeof(INTERNAL_CO_NON_CONST_T*) == validArgumentsList[argIndex].ArgSize &&
-                        typeid(INTERNAL_CO_NON_CONST_T*).hash_code() == 
-                            validArgumentsList[argIndex].ArgTypeHash)
+                    if( sizeof(INTERNAL_CO_UNCONST(T)*) == curArgInfo.ArgSize &&
+                        typeid(INTERNAL_CO_UNCONST(T)*).hash_code() == curArgInfo.ArgTypeHash)
                     {
-                        if(arg != *(INTERNAL_CO_NON_CONST_T**)
-                                    (validArgumentsList[argIndex].ArgDataPointer))
-                        {
+                        if(arg != *(INTERNAL_CO_UNCONST(T)**)(curArgInfo.ArgDataPointer))
                             return false;
-                        }
                     }
                     //Check Value
                     else
@@ -143,10 +151,11 @@ namespace CppOverride
                     }
                 }
                 
-                #if CO_LOG_CheckArgumentsValues
+                if(INTERNAL_CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
-                #endif
+                }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
@@ -158,10 +167,12 @@ namespace CppOverride
                                                 void*& arg, 
                                                 Args&... args)
             {
-                #if CO_LOG_CheckArgumentsValues
+                if(INTERNAL_CO_LOG_CheckArgumentsValues)
+                {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<"\n";
-                #endif
+                }
                 
                 if(argIndex >= validArgumentsList.size())
                     return false;
@@ -178,10 +189,11 @@ namespace CppOverride
                     }
                 }
                 
-                #if CO_LOG_CheckArgumentsValues
+                if(INTERNAL_CO_LOG_CheckArgumentsValues)
+                {
                     std::cout << "Line: " << __LINE__ << std::endl;
                     std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
-                #endif
+                }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
@@ -196,7 +208,7 @@ namespace CppOverride
                 return CheckArgumentsValues(validArgumentsList, 
                                             argIndex, 
                                             status,
-                                            const_cast<INTERNAL_CO_NON_CONST_T&>(arg), 
+                                            const_cast<INTERNAL_CO_UNCONST(T)&>(arg), 
                                             args...);
             }
     };

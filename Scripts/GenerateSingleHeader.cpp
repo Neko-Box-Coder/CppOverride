@@ -13,6 +13,14 @@ bool processFile(const std::string& filePath)
         std::cerr << "Error opening file: " << filePath << std::endl;
         return false;
     }
+    
+    //Check if we have already included this file
+    {
+        if(includedFiles.find(filePath) != includedFiles.end())
+            return true;
+        
+        includedFiles.insert(filePath);
+    }
 
     std::cout << "//=================================================================" << std::endl;
     std::cout << "//" << filePath << std::endl;
@@ -29,16 +37,50 @@ bool processFile(const std::string& filePath)
 
             if(includedFiles.find(includePath) == includedFiles.end()) 
             {
-                includedFiles.insert(includePath);
-
-                if(includePath[0] == '.') 
+                //If it is a relative path
+                if(includePath.size() >= 2 && includePath[0] == '.' && includePath[1] == '/')
+                    includePath = includePath.substr(2);
+                
+                //Handle recursive parent paths
+                int backCounter = 0;
+                while(  includePath.size() >= 3 && 
+                        includePath[0] == '.' && 
+                        includePath[1] == '.' &&
+                        includePath[2] == '/')
                 {
-                    // It's a relative path
-                    size_t lastSlash = filePath.find_last_of('/');
-                    std::string basePath = filePath.substr(0, lastSlash + 1);
-                    includePath = basePath + includePath;
+                    includePath = includePath.substr(3);
+                    ++backCounter;
                 }
-
+                
+                {
+                    size_t lastSlash = filePath.find_last_of('/');
+                    
+                    if(lastSlash == std::string::npos)
+                    {
+                        std::cerr << "Failed to find base path" << std::endl;
+                        return false;
+                    }
+                    
+                    std::string basePath = filePath.substr(0, lastSlash);
+                    
+                    for(int i = 0; i < backCounter; ++i)
+                    {
+                        lastSlash = basePath.find_last_of('/');
+                        
+                        if(lastSlash == std::string::npos)
+                        {
+                            std::cerr << "Failed to find base path" << std::endl;
+                            return false;
+                        }
+                        
+                        basePath = basePath.substr(0, lastSlash);
+                        std::cerr << "Trimming to base: " << basePath << std::endl;
+                    }
+                    
+                    includePath = basePath + "/" + includePath;
+                }
+                
+                std::cerr << "Including: " << includePath << std::endl;
                 if(!processFile(includePath))
                     return false;
 
