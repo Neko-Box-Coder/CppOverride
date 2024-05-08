@@ -16,30 +16,30 @@ Of course, you can still create mock classes if you want.
 ---
 
 <!-- Links to all the headings -->
-TODO(NOW): Update this
 ## Table of Contents
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Usage](#usage)
+    - [Override Free Function](#override-free-function)
+    - [Override Class Function](#override-class-function)
+- [Documentation](#documentation)
     - [Declare Override Instance](#declare-override-instance)
-        - [Global / File Scope](#global-file-scope)
+        - [Global / File Scope](#global--file-scope)
         - [Class Member Variable](#class-member-variable)
-    - [Add Override Implementations](#add-override-implementations)
-        - [Add Override Return Value](#add-override-return-value)
-        - [Add Override Argument Values](#add-override-argument-values)
+    - [Implement Override Action](#implement-override-action)
     - [Disable Overrides](#disable-overrides)
-    - [Control Override Functions](#control-override-functions)
+    - [Setup Override Actions](#setup-override-actions)
         - [Override Returns](#override-returns)
         - [Override Arguments Values](#override-arguments-values)
-        - [Override Returns With Action Lambda](#override-returns-with-action-lambda)
-        - [Override Arguments With Action Lambda](#override-arguments-with-action-lambda)
-    - [Override Rules](#override-rules)
+        - [Override Returns And Arguments With Function / Lambda](#override-returns-and-arguments-with-function--lambda)
+            - [Override Returns](#override-returns)
+            - [Override Arguments](#override-arguments)
+    - [Override Rules And Actions](#override-rules-and-actions)
         - [When Called With](#when-called-with)
         - [Times](#times)
-        - [If Condition Lambda](#if-condition-lambda)
-        - [When Called Expectedly Do Lambda](#when-called-expectedly-do-lambda)
-        - [Otherwise Do Lambda](#otherwise-do-lambda)
-        - [Assign Status](#assign-status)
+        - [If Condition Function / Lambda](#if-condition-function--lambda)
+        - [When Called Expectedly Do Function / Lambda](#when-called-expectedly-do-function--lambda)
+        - [Otherwise Do Function / Lambda](#otherwise-do-function--lambda)
+        - [Get Override Result](#get-override-result)
 
 ---
 
@@ -197,6 +197,8 @@ void OverrideMyArgs(float& value1, int* value2)
 
 ```
 
+---
+
 ### Disable Overrides
 
 ```cpp
@@ -228,6 +230,8 @@ CO_SETUP_OVERRIDE(<Override Instance Name>, <Function Name>)
 
 Anything beyond this point are assuming that you have called `CO_SETUP_OVERRIDE` macro.
 
+---
+
 ### Override Returns
 
 You must specify the return type with template to avoid any ambiguity as we match the return type 
@@ -243,6 +247,8 @@ Example:
 CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
                  .Returns<int>(1);
 ```
+
+---
 
 ### Override Arguments Values
 ```cpp
@@ -294,6 +300,8 @@ we finish overriding the arguments.
 >                   //Or .ReturnsVoid();
 >                   //Or a normal .Returns<...>(...);
 > ```
+
+---
 
 ### Override Returns And Arguments With Function / Lambda
 
@@ -358,10 +366,12 @@ that it won't be set.
 
 ---
 
-### Override Rules And Actions
+## Override Rules And Actions
 
 Just like any mocking library, you can also control when and how the override functions will behave,
 as well as registering callbacks when the override is successful or not.
+
+---
 
 ### When Called With
 
@@ -374,6 +384,8 @@ CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
 int ret1 = OverrideMyReturnValue(2, 3.f);   //Returns 1
 int ret2 = OverrideMyReturnValue(1, 2.f);   //Won't return 1
 ```
+
+---
 
 ### Times
 
@@ -392,6 +404,8 @@ testFloat = 2.f;
 testInt = 3;
 OverrideMyArgs(testFloat, &testInt);    //The argument values are still 2.f and 3
 ```
+
+---
 
 ### If Condition Function / Lambda
 
@@ -413,6 +427,8 @@ CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
 int ret1 = OverrideMyReturnValue(1, 2.f);   //Returns 1
 int ret2 = OverrideMyReturnValue(2, 3.f);   //Won't return 1
 ```
+
+---
 
 ### When Called Expectedly Do Function / Lambda
 
@@ -446,6 +462,7 @@ int ret2 = OverrideMyReturnValue(2, 3.f);   //called is true now
 > )
 > ```
 
+---
 
 ### Otherwise Do Function / Lambda
 
@@ -467,6 +484,7 @@ int ret2 = OverrideMyReturnValue(2, 3.f);   //called is still false
 int ret1 = OverrideMyReturnValue(1, 2.f);   //called is true now
 ```
 
+---
 
 ### Get Override Result
 
@@ -479,10 +497,10 @@ CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
                  .AssignOverrideResult(result);
 
 int ret1 = OverrideMyReturnValue(1, 2.f);
-//result.ReturnStatus will be OverrideStatus::MATCHING_CONDITION_VALUE_FAILED
+//result.Status will be OverrideStatus::MATCHING_CONDITION_VALUE_FAILED
 
 ret1 = OverrideMyReturnValue(2, 3.f);
-//result.ReturnStatus will be OverrideStatus::OVERRIDE_SUCCESS
+//result.Status will be OverrideStatus::OVERRIDE_SUCCESS
 
 //For all the override status, see `enum class OverrideStatus`
 ```

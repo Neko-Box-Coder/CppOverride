@@ -20,3 +20,4 @@ runTest ./Otherwise_DoTests
 runTest ./TimesTests
 runTest ./WhenCalledExpectedly_DoTests
 runTest ./WhenCalledWithTests
+runTest ./MixedModifyArgsAndReturnsTest

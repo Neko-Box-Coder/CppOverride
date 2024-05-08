@@ -70,8 +70,7 @@ pipelines:
                         -   exec:
                                 arguments:
                                 -   -c
-                                -   cmake .. -DCPP_OVERRIDE_BUILD_EXAMPLE=OFF
-                                    -DCPP_OVERRIDE_BUILD_TEST=ON -DCPP_OVERRIDE_USE_SINGLE_HEADER=OFF
+                                -   cmake .. -DCPP_OVERRIDE_BUILD_TEST=ON 
                                 command: sh
                                 working_directory: CppOverride/Build
                         -   exec:
@@ -140,8 +139,7 @@ pipelines:
                                 -   /s
                                 -   /v
                                 -   /c
-                                -   cmake .. -DCPP_OVERRIDE_BUILD_EXAMPLE=OFF
-                                    -DCPP_OVERRIDE_BUILD_TEST=ON -DCPP_OVERRIDE_USE_SINGLE_HEADER=OFF
+                                -   cmake .. -DCPP_OVERRIDE_BUILD_TEST=ON
                                 command: cmd
                                 working_directory: CppOverride\Build
                         -   exec:
@@ -224,6 +222,18 @@ pipelines:
                                 working_directory: CppOverrideLinuxBuild/Build
                         -   exec:
                                 arguments:
+                                -   +x
+                                -   ./CppOverrideExample
+                                command: chmod
+                                working_directory: CppOverrideLinuxBuild/Build
+                        -   exec:
+                                arguments:
+                                -   -c
+                                -   ./CppOverrideExample
+                                command: sh
+                                working_directory: CppOverrideLinuxBuild/Build
+                        -   exec:
+                                arguments:
                                 -   -c
                                 -   ./SendGithubStatus.sh "$CI_GITHUB_PAT" "success"
                                     "$GO_PIPELINE_NAME" "$GO_PIPELINE_COUNTER" "$GO_STAGE_NAME"
@@ -270,6 +280,14 @@ pipelines:
                                 -   .\RunAllTests.bat -d
                                 command: cmd
                                 working_directory: CppOverrideWindowsBuild\Build
+                        -   exec:
+                                arguments:
+                                -   /s
+                                -   /v
+                                -   /c
+                                -   .\CppOverrideExample.exe
+                                command: cmd
+                                working_directory: CppOverrideWindowsBuild\Build\Debug
                         -   exec:
                                 arguments:
                                 -   /s

@@ -78,15 +78,11 @@ if(CPP_OVERRIDE_BUILD_TEST)
     target_link_libraries(WhenCalledExpectedly_DoTests PUBLIC CppOverride ssTest MacroPowerToys)
     target_compile_options(WhenCalledExpectedly_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
-    #add_executable(MixedModifyArgsAndReturnsTest "${CMAKE_CURRENT_LIST_DIR}/Tests/MixedModifyArgsAndReturnsTest.cpp")
-    #target_link_libraries(MixedModifyArgsAndReturnsTest PUBLIC CppOverride ssTest MacroPowerToys)
-    #target_compile_options(MixedModifyArgsAndReturnsTest PUBLIC "${STANDARD_COMPILE_FLAGS}")
-
+    add_executable(MixedModifyArgsAndReturnsTest "${CMAKE_CURRENT_LIST_DIR}/Tests/MixedModifyArgsAndReturnsTest.cpp")
+    target_link_libraries(MixedModifyArgsAndReturnsTest PUBLIC CppOverride ssTest MacroPowerToys)
+    target_compile_options(MixedModifyArgsAndReturnsTest PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
     if(WIN32)
-        #file(   COPY "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat"
-        #        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-        
         execute_process(COMMAND ${CMAKE_COMMAND} -E copy    "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat" 
                                                             "${CMAKE_CURRENT_BINARY_DIR}")
     else()
