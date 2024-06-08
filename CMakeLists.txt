@@ -22,13 +22,12 @@ set(CPP_OVERRIDE_USE_SINGLE_HEADER "ON" CACHE BOOL "Use single header version in
 add_library(CppOverride INTERFACE)
 
 add_executable(GenerateSingleHeader "${CMAKE_CURRENT_LIST_DIR}/Scripts/GenerateSingleHeader.cpp")
+add_executable(GenerateMockClass "${CMAKE_CURRENT_LIST_DIR}/Scripts/GenerateMockClass.cpp")
 
 if(CPP_OVERRIDE_USE_SINGLE_HEADER)
     target_include_directories(CppOverride INTERFACE "${CMAKE_CURRENT_LIST_DIR}/Include_SingleHeader")
-    #target_sources(CppOverride INTERFACE "${CMAKE_CURRENT_LIST_DIR}/CppOverride.hpp")
 else()
     target_include_directories(CppOverride INTERFACE "${CMAKE_CURRENT_LIST_DIR}/Include_MultiHeaders")
-    #target_sources(CppOverride INTERFACE "${CMAKE_CURRENT_LIST_DIR}/Include/CppOverride.hpp")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -81,6 +80,10 @@ if(CPP_OVERRIDE_BUILD_TEST)
     add_executable(MixedModifyArgsAndReturnsTest "${CMAKE_CURRENT_LIST_DIR}/Tests/MixedModifyArgsAndReturnsTest.cpp")
     target_link_libraries(MixedModifyArgsAndReturnsTest PUBLIC CppOverride ssTest MacroPowerToys)
     target_compile_options(MixedModifyArgsAndReturnsTest PUBLIC "${STANDARD_COMPILE_FLAGS}")
+
+    add_executable(MockShapesTests "${CMAKE_CURRENT_LIST_DIR}/Tests/MockShapesTests.cpp")
+    target_link_libraries(MockShapesTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_compile_options(MockShapesTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
     if(WIN32)
         execute_process(COMMAND ${CMAKE_COMMAND} -E copy    "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat" 

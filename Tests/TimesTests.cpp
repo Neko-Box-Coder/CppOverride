@@ -7,8 +7,8 @@ CppOverride::Overrider OverrideObj;
 
 int main()
 {
-    ssTEST_INIT();
-    ssTEST_SET_UP
+    ssTEST_INIT_TEST_GROUP();
+    ssTEST_COMMON_SET_UP
     {
         OverrideObj = CppOverride::Overrider();
     };
@@ -105,9 +105,9 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            (CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .Times(0)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test"));
+                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test");
             
             float testFloat = 0.f;
             std::string testString = "";
@@ -126,10 +126,10 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            (CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .Times(1)
                                 .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
             float testFloat = 0.f;
             std::string testString = "";
@@ -158,10 +158,10 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            (CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .Times(2)
                                 .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
             float testFloat = 0.f;
             std::string testString = "";
@@ -204,9 +204,9 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            (CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
             float testFloat = 0.f;
             std::string testString = "";
@@ -233,10 +233,10 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            (CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .Times(2)
                                 .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
             float testFloat = 0.f;
             std::string testString = "";
@@ -276,7 +276,7 @@ int main()
                                 CppOverride::OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
     };
     
-    ssTEST_END();
+    ssTEST_END_TEST_GROUP();
     
     return 0;
 }

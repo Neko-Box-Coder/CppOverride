@@ -8,8 +8,8 @@ CppOverride::Overrider OverrideObj;
 
 int main()
 {
-    ssTEST_INIT();
-    ssTEST_SET_UP
+    ssTEST_INIT_TEST_GROUP();
+    ssTEST_COMMON_SET_UP
     {
         OverrideObj = CppOverride::Overrider();
     };
@@ -262,21 +262,21 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            TestClass conditionObject(1, 2.0, "test");
-            TestClass setObject(1, 2.0, "test");
-            TestClass overrideObject(2, 3.0, "test2");
+            CppOverrideTest::TestClass conditionObject(1, 2.0, "test");
+            CppOverrideTest::TestClass setObject(1, 2.0, "test");
+            CppOverrideTest::TestClass overrideObject(2, 3.0, "test2");
         
-            (CO_SETUP_OVERRIDE  (OverrideObj, SetObjectFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, SetObjectFunc)
                                 .WhenCalledWith(10, 20.0, std::string("test10"), conditionObject)
                                 .SetArgs<   CO_ANY_TYPE, 
                                             CO_ANY_TYPE, 
                                             CO_ANY_TYPE, 
-                                            TestClass&>(CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        overrideObject)
+                                            CppOverrideTest::TestClass&>(   CO_DONT_SET, 
+                                                                            CO_DONT_SET, 
+                                                                            CO_DONT_SET, 
+                                                                            overrideObject)
                                 .Returns<bool>(true)
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
         );
 
         ssTEST_OUTPUT_EXECUTION
@@ -292,8 +292,8 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             result = CppOverride::OverrideResult();
-            setObject = TestClass (3, 4.0, "test3");
-            overrideObject = TestClass (2, 3.0, "test2");
+            setObject = CppOverrideTest::TestClass (3, 4.0, "test3");
+            overrideObject = CppOverrideTest::TestClass (2, 3.0, "test2");
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -302,7 +302,7 @@ int main()
         );
         
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions", 
-                                setObject == TestClass(3, 4.0, "test3"));
+                                setObject == CppOverrideTest::TestClass(3, 4.0, "test3"));
         
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions",
                                 result.Status == 
@@ -314,12 +314,12 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            TemplateTestClass<int> conditionTemplate(1, 2, 3.f, "test");
-            TemplateTestClass<int> returnTemplate(2, 3, 4.f, "test2");
+            CppOverrideTest::TemplateTestClass<int> conditionTemplate(1, 2, 3.f, "test");
+            CppOverrideTest::TemplateTestClass<int> returnTemplate(2, 3, 4.f, "test2");
             
             CO_SETUP_OVERRIDE   (OverrideObj, TemplateReturnFunc)
                                 .WhenCalledWith(conditionTemplate)
-                                .Returns<TemplateTestClass<int>>(returnTemplate)
+                                .Returns<CppOverrideTest::TemplateTestClass<int>>(returnTemplate)
                                 .AssignOverrideResult(result);
         );
 
@@ -335,7 +335,7 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             result = CppOverride::OverrideResult();
-            TemplateTestClass<int> testTemplate(4, 5, 6.f, "test2");
+            CppOverrideTest::TemplateTestClass<int> testTemplate(4, 5, 6.f, "test2");
         );
         
         ssTEST_OUTPUT_ASSERT(   "Fail WhenCalledWith Conditions", 
@@ -352,7 +352,7 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            class Rectangle rect(1.5, 1.5);
+            CppOverrideTest::Rectangle rect(1.5, 1.5);
             CO_SETUP_OVERRIDE   (rect, GetWidth)
                                 .WhenCalledWith(2.f)
                                 .Returns<float>(5.f)
@@ -378,11 +378,11 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            NonComparableTestClass testDummy(2, 3.0, "test");
-            NonComparableTestClass returnDummy(3, 4.0, "test2");
+            CppOverrideTest::NonComparableTestClass testDummy(2, 3.0, "test");
+            CppOverrideTest::NonComparableTestClass returnDummy(3, 4.0, "test2");
             CO_SETUP_OVERRIDE   (OverrideObj, TemplateReturnFunc)
                                 .WhenCalledWith(testDummy)
-                                .Returns<NonComparableTestClass>(returnDummy)
+                                .Returns<CppOverrideTest::NonComparableTestClass>(returnDummy)
                                 .AssignOverrideResult(result);
         );
         
@@ -390,7 +390,7 @@ int main()
         
         ssTEST_OUTPUT_EXECUTION
         (
-            NonComparableTestClass resultDummy = 
+            CppOverrideTest::NonComparableTestClass resultDummy = 
                 CppOverrideTemplateTest::TemplateReturnFunc(testDummy);
         );
         
@@ -400,7 +400,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(resultDummy.GetTestData() == testDummy.GetTestData());
     };
     
-    ssTEST_END();
+    ssTEST_END_TEST_GROUP();
     
     return 0;
 }

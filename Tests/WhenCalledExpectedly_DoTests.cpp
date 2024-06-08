@@ -7,8 +7,8 @@ CppOverride::Overrider OverrideObj;
 
 int main()
 {
-    ssTEST_INIT();
-    ssTEST_SET_UP
+    ssTEST_INIT_TEST_GROUP();
+    ssTEST_COMMON_SET_UP
     {
         OverrideObj = CppOverride::Overrider();
     };
@@ -17,7 +17,7 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            class Rectangle rect(1.5, 1.5);
+            CppOverrideTest::Rectangle rect(1.5, 1.5);
             bool calledExpectedly = false;
             
             CO_SETUP_OVERRIDE   (rect, GetWidth)
@@ -50,7 +50,7 @@ int main()
         (
             bool calledExpectedly = false;
             
-            (CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsAndArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsAndArgsToSetFunc)
                                 .WhenCalledWith(1, 2.f, CO_ANY)
                                 .SetArgs<   CO_ANY_TYPE, 
                                             CO_ANY_TYPE, 
@@ -63,7 +63,7 @@ int main()
                                     {
                                         calledExpectedly = true;
                                     }
-                                ));
+                                );
 
             std::string testString;
         );
@@ -81,7 +81,7 @@ int main()
         ssTEST_OUTPUT_ASSERT("Meeting WhenCalledWith", calledExpectedly == true);
     };
     
-    ssTEST_END();
+    ssTEST_END_TEST_GROUP();
     
     return 0;
 }

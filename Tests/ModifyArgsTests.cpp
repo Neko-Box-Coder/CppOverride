@@ -8,8 +8,8 @@ CppOverride::Overrider OverrideObj;
 
 int main()
 {
-    ssTEST_INIT();
-    ssTEST_SET_UP
+    ssTEST_INIT_TEST_GROUP();
+    ssTEST_COMMON_SET_UP
     {
         OverrideObj = CppOverride::Overrider();
     };
@@ -21,13 +21,13 @@ int main()
             CppOverride::OverrideResult result;
             float testFloat = 0.f;
             std::string testString;
-            (CO_SETUP_OVERRIDE  (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgs<   CO_ANY_TYPE, 
                                             float*, 
                                             CO_ANY_TYPE>(   CO_DONT_SET, 
                                                             5, 
                                                             CO_DONT_SET)
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -46,7 +46,7 @@ int main()
             bool testBool = true;
             std::string testString;
             
-            (CO_SETUP_OVERRIDE  (OverrideObj, MoreArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, MoreArgsToSetFunc)
                                 .SetArgs<   CO_ANY_TYPE, 
                                             float*, 
                                             bool*, 
@@ -54,7 +54,7 @@ int main()
                                                             15, 
                                                             false, 
                                                             CO_DONT_SET)
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -71,9 +71,9 @@ int main()
         (
             std::string outString;
             CppOverride::OverrideResult result;
-            (CO_SETUP_OVERRIDE  (OverrideObj, AssignArgInternallyFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, AssignArgInternallyFunc)
                                 .SetArgs<std::string, CO_ANY_TYPE>("Test", CO_DONT_SET)
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -90,9 +90,9 @@ int main()
             CppOverride::OverrideResult result;
             int TestArg = 2;
             int TestArg2 = 4;
-            (CO_SETUP_OVERRIDE  (OverrideObj, AddNumFromVoidPointerFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromVoidPointerFunc)
                                 .SetArgs<void*, CO_ANY_TYPE>(&TestArg, CO_DONT_SET)
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -106,23 +106,23 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            TestClass testClass;
+            CppOverrideTest::TestClass testClass;
             CppOverride::OverrideResult result;
-            (CO_SETUP_OVERRIDE  (OverrideObj, SetObjectFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, SetObjectFunc)
                                 .SetArgs<   CO_ANY_TYPE, 
                                             CO_ANY_TYPE, 
                                             CO_ANY_TYPE, 
-                                            TestClass&>(    CO_DONT_SET, 
-                                                            CO_DONT_SET, 
-                                                            CO_DONT_SET, 
-                                                            TestClass(1, 2.0, "test"))
-                                .AssignOverrideResult(result));
+                                            CppOverrideTest::TestClass&>(   CO_DONT_SET, 
+                                                                            CO_DONT_SET, 
+                                                                            CO_DONT_SET, 
+                                                                            CppOverrideTest::TestClass(1, 2.0, "test"))
+                                .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_EXECUTION
         (
             CppOverrideTest::NonConst::Object::SetObjectFunc(0, 0, "a", testClass);
         );
-        ssTEST_OUTPUT_ASSERT(testClass == TestClass(1, 2.0, "test"));
+        ssTEST_OUTPUT_ASSERT(testClass == CppOverrideTest::TestClass(1, 2.0, "test"));
         ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
@@ -130,18 +130,18 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            TemplateTestClass<int> overrideDummy(1, 2, 3.f, "test");
-            TemplateTestClass<int> overrideDummy2(2, 3, 4.f, "test2");
+            CppOverrideTest::TemplateTestClass<int> overrideDummy(1, 2, 3.f, "test");
+            CppOverrideTest::TemplateTestClass<int> overrideDummy2(2, 3, 4.f, "test2");
             
             CppOverride::OverrideResult result;
-            (CO_SETUP_OVERRIDE  (OverrideObj, TemplateSetArgFunc)
-                                .SetArgs<   TemplateTestClass<int>&, 
-                                            TemplateTestClass<int>*>(   overrideDummy, 
-                                                                        overrideDummy2)
-                                .AssignOverrideResult(result));
+            CO_SETUP_OVERRIDE   (OverrideObj, TemplateSetArgFunc)
+                                .SetArgs<   CppOverrideTest::TemplateTestClass<int>&, 
+                                            CppOverrideTest::TemplateTestClass<int>*>(  overrideDummy, 
+                                                                                        overrideDummy2)
+                                .AssignOverrideResult(result);
 
-            TemplateTestClass<int> testDummy(3, 4, 5.f, "test3");
-            TemplateTestClass<int> testDummy2(4, 5, 6.f, "test4");
+            CppOverrideTest::TemplateTestClass<int> testDummy(3, 4, 5.f, "test3");
+            CppOverrideTest::TemplateTestClass<int> testDummy2(4, 5, 6.f, "test4");
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -157,9 +157,9 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            (CO_SETUP_OVERRIDE  (OverrideObj, SetBeginConstArgFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, SetBeginConstArgFunc)
                                 .SetArgs<const int*, bool*, float*>(2, true, 3.f)
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
             int testArg = 1;
             bool testArg2 = false;
@@ -181,9 +181,9 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            (CO_SETUP_OVERRIDE  (OverrideObj, SetEndConstArgFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, SetEndConstArgFunc)
                                 .SetArgs<int*, bool*, const float*>(2, true, 3.f)
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
             int testArg = 1;
             bool testArg2 = false;
@@ -206,13 +206,13 @@ int main()
         (
             CppOverride::OverrideResult result;
             CppOverride::OverrideResult result2;
-            (CO_SETUP_OVERRIDE  (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 4.f, "Test")
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
-            (CO_SETUP_OVERRIDE  (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgs<CO_ANY_TYPE, float&, float*>(CO_DONT_SET, 5.f, 3.f)
-                                .AssignOverrideResult(result2));
+                                .AssignOverrideResult(result2);
             
             int testArg = 0;
             float testArg2 = 0;
@@ -249,11 +249,11 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            class Rectangle rect(5, 5);
+            CppOverrideTest::Rectangle rect(5, 5);
             float outWidth = 0;
-            (CO_SETUP_OVERRIDE(rect, GetWidth)  .SetArgs<float&, CO_ANY_TYPE>(2, CO_DONT_SET)
+            CO_SETUP_OVERRIDE   (rect, GetWidth).SetArgs<float&, CO_ANY_TYPE>(2, CO_DONT_SET)
                                                 .ReturnsVoid()
-                                                .AssignOverrideResult(result));
+                                                .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_EXECUTION( rect.GetWidth(outWidth); );
         ssTEST_OUTPUT_ASSERT(outWidth == 2);
@@ -265,13 +265,13 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::OverrideResult result;
-            (CO_SETUP_OVERRIDE  (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgs<   CO_ANY_TYPE, 
                                             CO_ANY_TYPE, 
                                             CO_ANY_TYPE>(   CO_DONT_SET, 
                                                             CO_DONT_SET, 
                                                             CO_DONT_SET)
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
             float testArg = 2.f;
             std::string testArg2 = "test";
@@ -289,7 +289,7 @@ int main()
     {
         //NOTE: This is catched by static assert. If somehow it can get to runtime,
         //      it should give MODIFY_NON_ASSIGNABLE_ARG_ERROR status. But this cannot be tested
-        
+    
         #if 0
             ssTEST_OUTPUT_SETUP
             (
@@ -297,9 +297,9 @@ int main()
                 NonCopyableTestClass assignObject(2, 3.f, "test 2");
                 CppOverride::OverrideResult result;
                 
-                (CO_SETUP_OVERRIDE   (OverrideObj, SetNonAssignableArgFunc)
+                CO_SETUP_OVERRIDE   (OverrideObj, SetNonAssignableArgFunc)
                                     .SetArgs<NonCopyableTestClass*>(assignObject)
-                                    .AssignOverrideResult(result));
+                                    .AssignOverrideResult(result);
             );
             ssTEST_OUTPUT_EXECUTION
             (
@@ -317,7 +317,7 @@ int main()
         (
             CppOverride::OverrideResult result;
             
-            (CO_SETUP_OVERRIDE  (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgsByAction<int, float*, std::string&>
                                 (
                                     [](std::vector<void*>& args)
@@ -326,7 +326,7 @@ int main()
                                         *((std::string*)args.at(2)) = "test";
                                     }
                                 )
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             int testArg = 1;
             float testArg2 = 1.f;
             std::string testArg3 = "";
@@ -346,27 +346,28 @@ int main()
         (
             CppOverride::OverrideResult result;
             
-            (CO_SETUP_OVERRIDE  (OverrideObj, SetObjectFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, SetObjectFunc)
                                 .SetArgsByAction<   CO_ANY_TYPE, 
                                                     CO_ANY_TYPE, 
                                                     CO_ANY_TYPE, 
-                                                    TestClass&>
+                                                    CppOverrideTest::TestClass&>
                                 (
                                     [](std::vector<void*>& args)
                                     {
-                                        *((TestClass*)args.at(3)) = TestClass(1, 2.0, "test");
+                                        *((CppOverrideTest::TestClass*)args.at(3)) = 
+                                            CppOverrideTest::TestClass(1, 2.0, "test");
                                     }
                                 )
                                 .Returns<bool>(true)
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
-            TestClass testClass;
+            CppOverrideTest::TestClass testClass;
         );
         ssTEST_OUTPUT_EXECUTION
         (
             CppOverrideTest::NonConst::Object::SetObjectFunc(0, 0, "a", testClass);
         );
-        ssTEST_OUTPUT_ASSERT(testClass == TestClass(1, 2.0, "test"));
+        ssTEST_OUTPUT_ASSERT(testClass == CppOverrideTest::TestClass(1, 2.0, "test"));
         ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
@@ -376,7 +377,7 @@ int main()
         (
             CppOverride::OverrideResult result;
             CppOverride::OverrideResult result2;
-            (CO_SETUP_OVERRIDE  (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgsByAction<CO_ANY_TYPE, float*, std::string&>
                                 (
                                     [](std::vector<void*>& args)
@@ -385,9 +386,9 @@ int main()
                                         *((std::string*)args.at(2)) = "Test";
                                     }
                                 )
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
-            (CO_SETUP_OVERRIDE  (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgsByAction<CO_ANY_TYPE, float&, float*>
                                 (
                                     [](std::vector<void*>& args)
@@ -396,7 +397,7 @@ int main()
                                         **((float**)args.at(2)) = 3.f;
                                     }
                                 )
-                                .AssignOverrideResult(result2));
+                                .AssignOverrideResult(result2);
             int testArg = 0;
             float testArg2 = 0;
             std::string testArg3;
@@ -426,6 +427,6 @@ int main()
         ssTEST_OUTPUT_ASSERT(result2.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
-    ssTEST_END();
+    ssTEST_END_TEST_GROUP();
     return 0;
 }

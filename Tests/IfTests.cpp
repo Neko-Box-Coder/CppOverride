@@ -1,14 +1,13 @@
 #include "CppOverride.hpp"
 #include "ssTest.hpp"
 #include "./Components/FileFunctions.hpp"
-#include "./Components/Shapes.hpp"
 
 CppOverride::Overrider OverrideObj;
 
 int main()
 {
-    ssTEST_INIT();
-    ssTEST_SET_UP
+    ssTEST_INIT_TEST_GROUP();
+    ssTEST_COMMON_SET_UP
     {
         OverrideObj = CppOverride::Overrider();
     };
@@ -57,7 +56,7 @@ int main()
             std::string testString = "";
             float testFloat = 1.f;
             
-            (CO_SETUP_OVERRIDE  (OverrideObj, ArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .If
                                 (
                                     [] (const std::vector<void *>& args) -> bool
@@ -77,7 +76,7 @@ int main()
                                             std::string&>(  CO_DONT_SET, 
                                                             CO_DONT_SET, 
                                                             "Test String 2")
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -102,7 +101,7 @@ int main()
                                 CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
-    ssTEST_END();
+    ssTEST_END_TEST_GROUP();
     
     return 0;
 }

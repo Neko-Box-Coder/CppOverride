@@ -7,8 +7,8 @@ CppOverride::Overrider OverrideObj;
 
 int main()
 {
-    ssTEST_INIT();
-    ssTEST_SET_UP
+    ssTEST_INIT_TEST_GROUP();
+    ssTEST_COMMON_SET_UP
     {
         OverrideObj = CppOverride::Overrider();
     };
@@ -141,10 +141,10 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            TestClass assertObject(1, 2.0, "test");
+            CppOverrideTest::TestClass assertObject(1, 2.0, "test");
             CppOverride::OverrideResult result;
             CO_SETUP_OVERRIDE   (OverrideObj, ReturnObjectFunc)
-                                .Returns<TestClass>(assertObject)
+                                .Returns<CppOverrideTest::TestClass>(assertObject)
                                 .AssignOverrideResult(result);
         );
         using namespace CppOverrideTest::NonConst::Object;
@@ -156,15 +156,15 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            TestClass assertObject(1, 2.f, "test");
-            TestClass testObject(2, 3.f, "test 2");
+            CppOverrideTest::TestClass assertObject(1, 2.f, "test");
+            CppOverrideTest::TestClass testObject(2, 3.f, "test 2");
             CppOverride::OverrideResult result;
             CO_SETUP_OVERRIDE   (OverrideObj, TemplateReturnFunc)
-                                .Returns<TestClass>(assertObject)
+                                .Returns<CppOverrideTest::TestClass>(assertObject)
                                 .AssignOverrideResult(result);
         );
         using namespace CppOverrideTest::NonConst::Template;
-        ssTEST_OUTPUT_ASSERT(TemplateReturnFunc<TestClass>(testObject) == assertObject);
+        ssTEST_OUTPUT_ASSERT(TemplateReturnFunc<CppOverrideTest::TestClass>(testObject) == assertObject);
         ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
@@ -189,7 +189,7 @@ int main()
     
     
     
-    ssTEST_END();
+    ssTEST_END_TEST_GROUP();
     
     return 0;
 }

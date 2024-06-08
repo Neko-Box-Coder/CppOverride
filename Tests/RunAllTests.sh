@@ -21,3 +21,4 @@ runTest ./TimesTests
 runTest ./WhenCalledExpectedly_DoTests
 runTest ./WhenCalledWithTests
 runTest ./MixedModifyArgsAndReturnsTest
+runTest ./MockShapesTests

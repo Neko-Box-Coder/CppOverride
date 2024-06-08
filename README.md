@@ -6,34 +6,35 @@ A C++ 11 Compatible Framework that allows you to override function behaviors.
 
 Similar to mocking but with greater flexibility.
 
-- Override any classes you want, including **non virtual classes**
-- Override any functions you want, including **free functions**
-- Doesn't break **C++ Standard**, no need to exploit vtable
-- Easy to setup and use
-
-Of course, you can still create mock classes if you want.
+## 🚀 Features
+### ⚙️ Override any classes you want, including **non virtual classes**
+### 💡 Override any functions you want, including **free functions**
+### 📑 Doesn't break **C++ Standard**, no need to exploit vtable
+### 🔌 Easy to setup and use
+### 🔋 Batteries included, generate mock classes using the mock class generator
 
 ---
 
-<!-- Links to all the headings -->
-## Table of Contents
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-    - [Override Free Function](#override-free-function)
-    - [Override Class Function](#override-class-function)
-- [Documentation](#documentation)
-    - [Declare Override Instance](#declare-override-instance)
+## 🔗 Table of Contents
+- 📦️ [Installation](#-installation)
+- 🏃 [Quick Start](#-quick-start)
+    - 💡 [Override Free Function](#-override-free-function)
+    - ⚙️ [Override Class Function](#-override-class-function)
+- 📔 [Documentation](#-documentation)
+    - 📢 [Declare Override Instance](#-declare-override-instance)
         - [Global / File Scope](#global--file-scope)
         - [Class Member Variable](#class-member-variable)
-    - [Implement Override Action](#implement-override-action)
-    - [Disable Overrides](#disable-overrides)
-    - [Setup Override Actions](#setup-override-actions)
+        - [Inheriting Mock Class](#inheriting-mock-class)
+    - ⚙️ [Implement Override Action](#-implement-override-action)
+        - [Implement Full Override Action Using Mock Class](#implement-full-override-action-using-mock-class)
+    - 🚫 [Disable Overrides](#-disable-overrides)
+    - 🧲 [Setup Override Actions](#-setup-override-actions)
         - [Override Returns](#override-returns)
         - [Override Arguments Values](#override-arguments-values)
         - [Override Returns And Arguments With Function / Lambda](#override-returns-and-arguments-with-function--lambda)
             - [Override Returns](#override-returns)
             - [Override Arguments](#override-arguments)
-    - [Override Rules And Actions](#override-rules-and-actions)
+    - 📐 [Override Rules And Actions](#-override-rules-and-actions)
         - [When Called With](#when-called-with)
         - [Times](#times)
         - [If Condition Function / Lambda](#if-condition-function--lambda)
@@ -43,7 +44,7 @@ Of course, you can still create mock classes if you want.
 
 ---
 
-## Installation
+## 📦️ Installation
 
 - Header Only
     - Just include `CppOverride.hpp` in `Include_SingleHeader` or `Include_MultiHeader`
@@ -53,9 +54,9 @@ Of course, you can still create mock classes if you want.
 
 ---
 
-## Quick Start
+## 🏃 Quick Start
 
-### Override Free Function
+### 💡 Override Free Function
 ```cpp
 #include <iostream>
 
@@ -68,7 +69,6 @@ CO_DECLARE_INSTANCE(OverrideInstance);
 int DummyFunction(int value1)
 {
     CO_OVERRIDE_IMPL(OverrideInstance, int, value1);
-    
     return value1;
 }
 
@@ -92,7 +92,7 @@ int main()
 }
 ```
 
-### Override Class Function
+### ⚙️ Override Class Function
 ```cpp
 #include <iostream>
 
@@ -108,12 +108,18 @@ class DummyClass
     public:
         CO_DECLARE_OVERRIDE_METHODS(OverrideInstance);
         
-        int DummyMemberFunction(int value1)
+        inline int DummyMemberFunction(int value1)
         {
             CO_OVERRIDE_IMPL(OverrideInstance, int, value1);
-            
             return value1;
         }
+};
+
+//This is the same as above
+class DummyMockClass : public CppOverride::MockClass
+{
+    public:
+        CO_MOCK_METHOD(int, DummyMemberFunction, (int), /* no append */)
 };
 
 int main()
@@ -138,12 +144,11 @@ int main()
 }
 ```
 
-
 ---
 
-## Documentation
+## 📔 Documentation
 
-### Declare Override Instance
+### 📢 Declare Override Instance
 
 In order to override anything, we will first need an override instance to store all the override 
 information that the function can reference from. 
@@ -152,6 +157,7 @@ information that the function can reference from.
 ```cpp
 CO_DECLARE_INSTANCE(<Override Instance Name>);
 ```
+
 #### Class Member Variable
 ```cpp
 class YourClass
@@ -168,10 +174,19 @@ class YourClass
 };
 ```
 
+#### Inheriting Mock Class
+```cpp
+class YourMockClass : public CppOverride::MockClass
+{
+    //Other methods for your class...
+}
+```
+
 ---
 
-### Implement Override Action
-In order to override a function, we will need to hijack the function using override implementations macros
+### ⚙️ Implement Override Action
+After declaring the override instance (See [Declare Override Instance](#declare-override-instance)),
+in order to override a function, we will need to hijack the function using override implementations macros
 
 ```cpp
 CO_OVERRIDE_IMPL(<Override Instance Name>, <Return Type>, (<Arguments>))
@@ -194,12 +209,53 @@ void OverrideMyArgs(float& value1, int* value2)
     
     //The rest of the implementations...
 }
-
 ```
+
+> [!IMPORTANT]
+> If you have comma in your return type (such as `std::tuple<int, int>`), you need to add an extra
+> parenthesis to protect it against macro. So Something like 
+> `CO_OVERRIDE_IMPL(OverrideInstanceName, (std::tuple<int, int>), (value1, value2))`
+
+#### Implement Full Override Action Using Mock Class
+If you want to fully override a class (also known as mock class) you have, you can easily do so with
+the `CO_MOCK_METHOD` macro. This comes in as an overloaded macro so you can use the one you need.
+
+- `CO_MOCK_METHOD(<Return Type>, <Function Name>, (<Args Types>), <Function Append>)`
+- `CO_MOCK_METHOD(<Function Prepend>, <Return Type>, <Function Name>, (<Args Types>), <Function Append>)`
+- `CO_MOCK_METHOD(<Function Prepend>, <Return Type>, <Function Name>, (<Args Types>), (<Args Defaults>), <Function Append>)`
+
+Example:
+```cpp
+//int OverrideMyReturnValue(int value1, float value2)
+CO_MOCK_METHOD(int, OverrideMyReturnValue, (int, float), /* no append */)
+
+//void OverrideMyArgs(float& value1, int* value2) const
+CO_MOCK_METHOD(/* no prepend */, void, OverrideMyArgs, (float&, int*), const)
+
+//virtual int OverrideMyMemberFunction(int value1, float value2 = 1.f) const override
+CO_MOCK_METHOD(virtual, int, OverrideMyMemberFunction, (int, float), 
+                (/* no default */, = 1.f), const override)
+```
+
+> [!IMPORTANT]
+> Similar to `CO_OVERRIDE_IMPL`, any type that has a comma in it needs to be protected with parenthesis
+>
+> For example:
+> `CO_MOCK_METHOD((std::tuple<int, int>), OverrideMyTupleArg, ((std::tuple<int, int>), float), /* no append */)`
+
+A Mock class can be automatically generated with `GenerateMockClass` executable that is built
+in this project. Do keep it mind that this is just a rough header parser so manual adjustment might
+still be needed. For more details, do `GenerateMockClass --help`.
 
 ---
 
-### Disable Overrides
+### 🚫 Disable Overrides
+
+By default, the override implementations won't do anything if nothing is setup, which 
+will behave exactly as the original function.
+
+However, if you want zero overhead when the override is disabled, you can define `CO_NO_OVERRIDE`
+before including the header file.
 
 ```cpp
 //Just define CO_NO_OVERRIDE before including "CppOverride.hpp" or in compile definitions
@@ -210,7 +266,7 @@ void OverrideMyArgs(float& value1, int* value2)
 
 ---
 
-### Setup Override Actions
+### 🧲 Setup Override Actions
 Now we have the override implementations in place, 
 we will just need to interact with the override instance to control the override functions when called.
 
@@ -366,7 +422,7 @@ that it won't be set.
 
 ---
 
-## Override Rules And Actions
+## 📐 Override Rules And Actions
 
 Just like any mocking library, you can also control when and how the override functions will behave,
 as well as registering callbacks when the override is successful or not.
