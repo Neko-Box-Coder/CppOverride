@@ -201,6 +201,12 @@ void OverrideMyArgs(float& value1, int* value2)
 
 ### Disable Overrides
 
+By default, the override implementations won't do anything if nothing is setup, which 
+will behave exactly as the original function.
+
+However, if you want zero overhead when the override is disabled, you can define `CO_NO_OVERRIDE`
+before including the header file.
+
 ```cpp
 //Just define CO_NO_OVERRIDE before including "CppOverride.hpp" or in compile definitions
 //So like this:

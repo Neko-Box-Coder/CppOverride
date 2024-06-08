@@ -37,6 +37,17 @@
 #define MPT_CONCAT7( A, B ) A ## B
 #define MPT_CONCAT8( A, B ) A ## B
 #define MPT_CONCAT9( A, B ) A ## B
+#define MPT_CONCAT10( A, B ) A ## B
+#define MPT_CONCAT11( A, B ) A ## B
+#define MPT_CONCAT12( A, B ) A ## B
+#define MPT_CONCAT13( A, B ) A ## B
+#define MPT_CONCAT14( A, B ) A ## B
+#define MPT_CONCAT15( A, B ) A ## B
+#define MPT_CONCAT16( A, B ) A ## B
+#define MPT_CONCAT17( A, B ) A ## B
+#define MPT_CONCAT18( A, B ) A ## B
+#define MPT_CONCAT19( A, B ) A ## B
+#define MPT_CONCAT20( A, B ) A ## B
 
 #define MPT_COMPOSE( A, B ) A B
 #define MPT_COMPOSE2( A, B ) A B
@@ -47,6 +58,17 @@
 #define MPT_COMPOSE7( A, B ) A B
 #define MPT_COMPOSE8( A, B ) A B
 #define MPT_COMPOSE9( A, B ) A B
+#define MPT_COMPOSE10( A, B ) A B
+#define MPT_COMPOSE11( A, B ) A B
+#define MPT_COMPOSE12( A, B ) A B
+#define MPT_COMPOSE13( A, B ) A B
+#define MPT_COMPOSE14( A, B ) A B
+#define MPT_COMPOSE15( A, B ) A B
+#define MPT_COMPOSE16( A, B ) A B
+#define MPT_COMPOSE17( A, B ) A B
+#define MPT_COMPOSE18( A, B ) A B
+#define MPT_COMPOSE19( A, B ) A B
+#define MPT_COMPOSE20( A, B ) A B
 
 #define MPT_DELAYED_CONCAT(A, B) MPT_COMPOSE(MPT_CONCAT, (A, B))
 #define MPT_DELAYED_CONCAT2(A, B) MPT_COMPOSE2(MPT_CONCAT2, (A, B))
@@ -57,6 +79,17 @@
 #define MPT_DELAYED_CONCAT7(A, B) MPT_COMPOSE7(MPT_CONCAT7, (A, B))
 #define MPT_DELAYED_CONCAT8(A, B) MPT_COMPOSE8(MPT_CONCAT8, (A, B))
 #define MPT_DELAYED_CONCAT9(A, B) MPT_COMPOSE9(MPT_CONCAT9, (A, B))
+#define MPT_DELAYED_CONCAT10(A, B) MPT_COMPOSE10(MPT_CONCAT10, (A, B))
+#define MPT_DELAYED_CONCAT11(A, B) MPT_COMPOSE11(MPT_CONCAT11, (A, B))
+#define MPT_DELAYED_CONCAT12(A, B) MPT_COMPOSE12(MPT_CONCAT12, (A, B))
+#define MPT_DELAYED_CONCAT13(A, B) MPT_COMPOSE13(MPT_CONCAT13, (A, B))
+#define MPT_DELAYED_CONCAT14(A, B) MPT_COMPOSE14(MPT_CONCAT14, (A, B))
+#define MPT_DELAYED_CONCAT15(A, B) MPT_COMPOSE15(MPT_CONCAT15, (A, B))
+#define MPT_DELAYED_CONCAT16(A, B) MPT_COMPOSE16(MPT_CONCAT16, (A, B))
+#define MPT_DELAYED_CONCAT17(A, B) MPT_COMPOSE17(MPT_CONCAT17, (A, B))
+#define MPT_DELAYED_CONCAT18(A, B) MPT_COMPOSE18(MPT_CONCAT18, (A, B))
+#define MPT_DELAYED_CONCAT19(A, B) MPT_COMPOSE19(MPT_CONCAT19, (A, B))
+#define MPT_DELAYED_CONCAT20(A, B) MPT_COMPOSE20(MPT_CONCAT20, (A, B))
 
 #define INTERNAL_MPT_REMOVE_PARENTHESIS( ... ) __VA_ARGS__
 #define MPT_REMOVE_PARENTHESIS( ... ) INTERNAL_MPT_REMOVE_PARENTHESIS __VA_ARGS__
@@ -66,10 +99,66 @@
 #define INTERNAL_MPT_DELAY3( ... ) __VA_ARGS__
 #define INTERNAL_MPT_DELAY4( ... ) __VA_ARGS__
 #define INTERNAL_MPT_DELAY5( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY6( ... ) __VA_ARGS__
 #define INTERNAL_MPT_DELAY7( ... ) __VA_ARGS__
 #define INTERNAL_MPT_DELAY8( ... ) __VA_ARGS__
 #define INTERNAL_MPT_DELAY9( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY10( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY11( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY12( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY13( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY14( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY15( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY16( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY17( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY18( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY19( ... ) __VA_ARGS__
+#define INTERNAL_MPT_DELAY20( ... ) __VA_ARGS__
 #define INTERNAL_MPT_DELAY_ONE( x ) x
+
+#define MPT_DELAY( ... ) __VA_ARGS__
+#define MPT_DELAY2( ... ) __VA_ARGS__
+#define MPT_DELAY3( ... ) __VA_ARGS__
+#define MPT_DELAY4( ... ) __VA_ARGS__
+#define MPT_DELAY5( ... ) __VA_ARGS__
+#define MPT_DELAY6( ... ) __VA_ARGS__
+#define MPT_DELAY7( ... ) __VA_ARGS__
+#define MPT_DELAY8( ... ) __VA_ARGS__
+#define MPT_DELAY9( ... ) __VA_ARGS__
+#define MPT_DELAY10( ... ) __VA_ARGS__
+#define MPT_DELAY11( ... ) __VA_ARGS__
+#define MPT_DELAY12( ... ) __VA_ARGS__
+#define MPT_DELAY13( ... ) __VA_ARGS__
+#define MPT_DELAY14( ... ) __VA_ARGS__
+#define MPT_DELAY15( ... ) __VA_ARGS__
+#define MPT_DELAY16( ... ) __VA_ARGS__
+#define MPT_DELAY17( ... ) __VA_ARGS__
+#define MPT_DELAY18( ... ) __VA_ARGS__
+#define MPT_DELAY19( ... ) __VA_ARGS__
+#define MPT_DELAY20( ... ) __VA_ARGS__
+#define MPT_DELAY_ONE( x ) x
+
+
+#define MPT_DELAYED_COMPOSE(macro, args) MPT_DELAYED_COMPOSE( macro, MPT_DELAY(args) )
+#define MPT_DELAYED_COMPOSE2(macro, args) MPT_DELAYED_COMPOSE2( macro, MPT_DELAY2(args) )
+#define MPT_DELAYED_COMPOSE3(macro, args) MPT_DELAYED_COMPOSE3( macro, MPT_DELAY3(args) )
+#define MPT_DELAYED_COMPOSE4(macro, args) MPT_DELAYED_COMPOSE4( macro, MPT_DELAY4(args) )
+#define MPT_DELAYED_COMPOSE5(macro, args) MPT_DELAYED_COMPOSE5( macro, MPT_DELAY5(args) )
+#define MPT_DELAYED_COMPOSE6(macro, args) MPT_DELAYED_COMPOSE6( macro, MPT_DELAY6(args) )
+#define MPT_DELAYED_COMPOSE7(macro, args) MPT_DELAYED_COMPOSE7( macro, MPT_DELAY7(args) )
+#define MPT_DELAYED_COMPOSE8(macro, args) MPT_DELAYED_COMPOSE8( macro, MPT_DELAY8(args) )
+#define MPT_DELAYED_COMPOSE9(macro, args) MPT_DELAYED_COMPOSE9( macro, MPT_DELAY9(args) )
+#define MPT_DELAYED_COMPOSE10(macro, args) MPT_DELAYED_COMPOSE10( macro, MPT_DELAY10(args) )
+#define MPT_DELAYED_COMPOSE11(macro, args) MPT_DELAYED_COMPOSE11( macro, MPT_DELAY11(args) )
+#define MPT_DELAYED_COMPOSE12(macro, args) MPT_DELAYED_COMPOSE12( macro, MPT_DELAY12(args) )
+#define MPT_DELAYED_COMPOSE13(macro, args) MPT_DELAYED_COMPOSE13( macro, MPT_DELAY13(args) )
+#define MPT_DELAYED_COMPOSE14(macro, args) MPT_DELAYED_COMPOSE14( macro, MPT_DELAY14(args) )
+#define MPT_DELAYED_COMPOSE15(macro, args) MPT_DELAYED_COMPOSE15( macro, MPT_DELAY15(args) )
+#define MPT_DELAYED_COMPOSE16(macro, args) MPT_DELAYED_COMPOSE16( macro, MPT_DELAY16(args) )
+#define MPT_DELAYED_COMPOSE17(macro, args) MPT_DELAYED_COMPOSE17( macro, MPT_DELAY17(args) )
+#define MPT_DELAYED_COMPOSE18(macro, args) MPT_DELAYED_COMPOSE18( macro, MPT_DELAY18(args) )
+#define MPT_DELAYED_COMPOSE19(macro, args) MPT_DELAYED_COMPOSE19( macro, MPT_DELAY19(args) )
+#define MPT_DELAYED_COMPOSE20(macro, args) MPT_DELAYED_COMPOSE20( macro, MPT_DELAY20(args) )
 
 #define INTERNAL_MPT_CONCAT( A, B ) A ## B
 #define INTERNAL_MPT_CONCAT2( A, B ) A ## B
@@ -80,6 +169,17 @@
 #define INTERNAL_MPT_CONCAT7( A, B ) A ## B
 #define INTERNAL_MPT_CONCAT8( A, B ) A ## B
 #define INTERNAL_MPT_CONCAT9( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT10( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT11( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT12( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT13( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT14( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT15( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT16( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT17( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT18( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT19( A, B ) A ## B
+#define INTERNAL_MPT_CONCAT20( A, B ) A ## B
 
 #define INTERNAL_MPT_SELECT( NAME, NUM ) INTERNAL_MPT_CONCAT( NAME ## _, NUM )
 #define INTERNAL_MPT_SELECT2( NAME, NUM ) INTERNAL_MPT_CONCAT2( NAME ## _, NUM )
@@ -90,6 +190,17 @@
 #define INTERNAL_MPT_SELECT7( NAME, NUM ) INTERNAL_MPT_CONCAT7( NAME ## _, NUM )
 #define INTERNAL_MPT_SELECT8( NAME, NUM ) INTERNAL_MPT_CONCAT8( NAME ## _, NUM )
 #define INTERNAL_MPT_SELECT9( NAME, NUM ) INTERNAL_MPT_CONCAT9( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT10( NAME, NUM ) INTERNAL_MPT_CONCAT10( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT11( NAME, NUM ) INTERNAL_MPT_CONCAT11( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT12( NAME, NUM ) INTERNAL_MPT_CONCAT12( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT13( NAME, NUM ) INTERNAL_MPT_CONCAT13( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT14( NAME, NUM ) INTERNAL_MPT_CONCAT14( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT15( NAME, NUM ) INTERNAL_MPT_CONCAT15( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT16( NAME, NUM ) INTERNAL_MPT_CONCAT16( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT17( NAME, NUM ) INTERNAL_MPT_CONCAT17( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT18( NAME, NUM ) INTERNAL_MPT_CONCAT18( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT19( NAME, NUM ) INTERNAL_MPT_CONCAT19( NAME ## _, NUM )
+#define INTERNAL_MPT_SELECT20( NAME, NUM ) INTERNAL_MPT_CONCAT20( NAME ## _, NUM )
 
 #define INTERNAL_MPT_DELAYED_SELECT( NAME, NUM ) INTERNAL_MPT_SELECT( NAME, NUM )
 #define INTERNAL_MPT_DELAYED_SELECT2( NAME, NUM ) INTERNAL_MPT_SELECT2( NAME, NUM )
@@ -100,6 +211,17 @@
 #define INTERNAL_MPT_DELAYED_SELECT7( NAME, NUM ) INTERNAL_MPT_SELECT7( NAME, NUM )
 #define INTERNAL_MPT_DELAYED_SELECT8( NAME, NUM ) INTERNAL_MPT_SELECT8( NAME, NUM )
 #define INTERNAL_MPT_DELAYED_SELECT9( NAME, NUM ) INTERNAL_MPT_SELECT9( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT10( NAME, NUM ) INTERNAL_MPT_SELECT10( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT11( NAME, NUM ) INTERNAL_MPT_SELECT11( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT12( NAME, NUM ) INTERNAL_MPT_SELECT12( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT13( NAME, NUM ) INTERNAL_MPT_SELECT13( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT14( NAME, NUM ) INTERNAL_MPT_SELECT14( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT15( NAME, NUM ) INTERNAL_MPT_SELECT15( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT16( NAME, NUM ) INTERNAL_MPT_SELECT16( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT17( NAME, NUM ) INTERNAL_MPT_SELECT17( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT18( NAME, NUM ) INTERNAL_MPT_SELECT18( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT19( NAME, NUM ) INTERNAL_MPT_SELECT19( NAME, NUM )
+#define INTERNAL_MPT_DELAYED_SELECT20( NAME, NUM ) INTERNAL_MPT_SELECT20( NAME, NUM )
 
 #define INTERNAL_MPT_COMPOSE( macro, args ) macro args
 #define INTERNAL_MPT_COMPOSE2( macro, args ) macro args
@@ -110,6 +232,17 @@
 #define INTERNAL_MPT_COMPOSE7( macro, args ) macro args
 #define INTERNAL_MPT_COMPOSE8( macro, args ) macro args
 #define INTERNAL_MPT_COMPOSE9( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE10( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE11( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE12( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE13( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE14( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE15( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE16( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE17( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE18( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE19( macro, args ) macro args
+#define INTERNAL_MPT_COMPOSE20( macro, args ) macro args
 
 
 #define INTERNAL_MPT_DELAYED_COMPOSE( macro, args ) INTERNAL_MPT_COMPOSE( macro, INTERNAL_MPT_DELAY(args) )
@@ -121,6 +254,17 @@
 #define INTERNAL_MPT_DELAYED_COMPOSE7( macro, args ) INTERNAL_MPT_COMPOSE7( macro, INTERNAL_MPT_DELAY7(args) )
 #define INTERNAL_MPT_DELAYED_COMPOSE8( macro, args ) INTERNAL_MPT_COMPOSE8( macro, INTERNAL_MPT_DELAY8(args) )
 #define INTERNAL_MPT_DELAYED_COMPOSE9( macro, args ) INTERNAL_MPT_COMPOSE9( macro, INTERNAL_MPT_DELAY9(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE10( macro, args ) INTERNAL_MPT_COMPOSE10( macro, INTERNAL_MPT_DELAY10(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE11( macro, args ) INTERNAL_MPT_COMPOSE11( macro, INTERNAL_MPT_DELAY11(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE12( macro, args ) INTERNAL_MPT_COMPOSE12( macro, INTERNAL_MPT_DELAY12(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE13( macro, args ) INTERNAL_MPT_COMPOSE13( macro, INTERNAL_MPT_DELAY13(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE14( macro, args ) INTERNAL_MPT_COMPOSE14( macro, INTERNAL_MPT_DELAY14(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE15( macro, args ) INTERNAL_MPT_COMPOSE15( macro, INTERNAL_MPT_DELAY15(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE16( macro, args ) INTERNAL_MPT_COMPOSE16( macro, INTERNAL_MPT_DELAY16(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE17( macro, args ) INTERNAL_MPT_COMPOSE17( macro, INTERNAL_MPT_DELAY17(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE18( macro, args ) INTERNAL_MPT_COMPOSE18( macro, INTERNAL_MPT_DELAY18(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE19( macro, args ) INTERNAL_MPT_COMPOSE19( macro, INTERNAL_MPT_DELAY19(args) )
+#define INTERNAL_MPT_DELAYED_COMPOSE20( macro, args ) INTERNAL_MPT_COMPOSE20( macro, INTERNAL_MPT_DELAY20(args) )
 
 
 #endif
@@ -169,7 +313,7 @@
                                 ,,,,,,,,,
 
 #define MPT_ARGS_COUNT( ... ) \
-    INTERNAL_MPT_COMPOSE \
+    INTERNAL_MPT_COMPOSE4 \
     ( \
         INTERNAL_MPT_GET_COUNT, \
         ( \
@@ -195,11 +339,11 @@
 
 
 #define MPT_OVERLOAD_MACRO( NAME, ... ) \
-        INTERNAL_MPT_COMPOSE3 \
+        INTERNAL_MPT_COMPOSE7 \
         ( \
-            INTERNAL_MPT_COMPOSE2 \
+            INTERNAL_MPT_COMPOSE8 \
             ( \
-                INTERNAL_MPT_SELECT, \
+                INTERNAL_MPT_SELECT4, \
                 ( NAME, MPT_ARGS_COUNT( __VA_ARGS__ ) ) \
             ), \
             (__VA_ARGS__) \
@@ -213,7 +357,7 @@
 
 
 #define MPT_APPEND_LISTS_ITEMS( ... ) \
-    INTERNAL_MPT_DELAYED_COMPOSE3 \
+    INTERNAL_MPT_DELAYED_COMPOSE \
     ( \
         INTERNAL_MPT_COMPOSE2 \
         ( \
@@ -389,9 +533,9 @@ INTERNAL_MPT_APPEND_LISTS_ITEMS_96( a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11
 
 
 #define MPT_CONCAT_LISTS_ITEMS( ... ) \
-    INTERNAL_MPT_COMPOSE2 \
+    INTERNAL_MPT_COMPOSE5 \
     ( \
-        INTERNAL_MPT_SELECT, \
+        INTERNAL_MPT_SELECT2, \
         ( INTERNAL_MPT_CONCAT_LISTS_ITEMS, MPT_ARGS_COUNT( __VA_ARGS__ ) ) \
     ) (__VA_ARGS__)
 
@@ -1463,9 +1607,9 @@ INTERNAL_MPT_CONCAT_LISTS_ITEMS_96( a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11
 
 
 #define MPT_GET_LAST_ARG( ... ) \
-    INTERNAL_MPT_COMPOSE2 \
+    INTERNAL_MPT_COMPOSE6 \
     ( \
-        INTERNAL_MPT_SELECT, \
+        INTERNAL_MPT_SELECT3, \
         ( INTERNAL_MPT_GET_LAST_ARG, MPT_ARGS_COUNT( __VA_ARGS__ ) ) \
     ) (__VA_ARGS__)
 
@@ -1585,7 +1729,7 @@ INTERNAL_MPT_CONCAT_LISTS_ITEMS_96( a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11
 
 
 #define MPT_ARE_ARGS_EMPTY( ... ) \
-    INTERNAL_MPT_COMPOSE2 \
+    INTERNAL_MPT_COMPOSE3 \
     ( \
         INTERNAL_MPT_GET_COUNT, \
         ( \
@@ -1626,22 +1770,22 @@ INTERNAL_MPT_CONCAT_LISTS_ITEMS_96( a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11
 #endif
 
 #define MPT_PREFIX_SUFFIX_ARGS( prefix, suffix, ... ) \
-    INTERNAL_MPT_DELAYED_COMPOSE5 \
+    INTERNAL_MPT_DELAYED_COMPOSE9 \
     ( \
-        INTERNAL_MPT_COMPOSE3 \
+        INTERNAL_MPT_COMPOSE10 \
         ( \
-            INTERNAL_MPT_COMPOSE2, \
+            INTERNAL_MPT_COMPOSE11, \
             ( \
-                INTERNAL_MPT_DELAYED_SELECT, \
+                INTERNAL_MPT_DELAYED_SELECT5, \
                 ( INTERNAL_MPT_PREFIX_SUFFIX_ARGS, MPT_ARGS_COUNT( __VA_ARGS__ ) ) \
             ) \
         ), \
         ( \
             prefix, \
             suffix \
-            INTERNAL_MPT_COMPOSE4 \
+            INTERNAL_MPT_COMPOSE12 \
             ( \
-                MPT_DELAYED_CONCAT3 \
+                MPT_DELAYED_CONCAT6 \
                 ( \
                     INTERNAL_MPT_PREPEND_COMMA_, MPT_ARE_ARGS_EMPTY( __VA_ARGS__ ) \
                 ), \
@@ -1973,22 +2117,22 @@ INTERNAL_MPT_PREFIX_SUFFIX_ARGS_98(pre, suf, _1, _2, _3, _4, _5, _6, _7, _8, _9,
 #endif
 
 #define MPT_PREPEND_APPEND_ARGS( prepend, append, ... ) \
-    INTERNAL_MPT_DELAYED_COMPOSE5 \
+    INTERNAL_MPT_DELAYED_COMPOSE14 \
     ( \
-        INTERNAL_MPT_COMPOSE3 \
+        INTERNAL_MPT_COMPOSE15 \
         ( \
-            INTERNAL_MPT_COMPOSE2, \
+            INTERNAL_MPT_COMPOSE16, \
             ( \
-                INTERNAL_MPT_DELAYED_SELECT, \
+                INTERNAL_MPT_DELAYED_SELECT7, \
                 ( INTERNAL_MPT_PREPEND_APPEND_ARGS, MPT_ARGS_COUNT( __VA_ARGS__ ) ) \
             ) \
         ), \
         ( \
             prepend, \
             append \
-            INTERNAL_MPT_COMPOSE4 \
+            INTERNAL_MPT_COMPOSE17 \
             ( \
-                MPT_DELAYED_CONCAT3 \
+                MPT_DELAYED_CONCAT8 \
                 ( \
                     INTERNAL_MPT_PREPEND_COMMA_, MPT_ARE_ARGS_EMPTY( __VA_ARGS__ ) \
                 ), \
@@ -5735,6 +5879,68 @@ namespace CppOverride
         return &OverrideObjName; \
     }
     
+    #define INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes) \
+        MPT_COMPOSE \
+        ( \
+            MPT_DELAYED_CONCAT \
+            ( \
+                MPT_COUNT_TO_, \
+                MPT_ARGS_COUNT \
+                ( \
+                    MPT_REMOVE_PARENTHESIS(argsTypes) \
+                ) \
+            ), \
+            (arg_, /* no suffix */) \
+        )
+
+    #define INTERNAL_POPULATE_ARGS_FIELD(argsTypes) \
+        MPT_APPEND_LISTS_ITEMS \
+        ( \
+            MPT_REMOVE_PARENTHESIS(argsTypes), \
+            INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes) \
+        )
+
+    #define CO_MOCK_METHOD(...) \
+        MPT_OVERLOAD_MACRO(INTERNAL_CO_MOCK_METHOD, __VA_ARGS__)
+
+    #define INTERNAL_CO_MOCK_METHOD_0(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 0 given currently")
+    #define INTERNAL_CO_MOCK_METHOD_1(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 1 given currently")
+    #define INTERNAL_CO_MOCK_METHOD_2(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 2 given currently")
+    #define INTERNAL_CO_MOCK_METHOD_3(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 3 given currently")
+
+    #define INTERNAL_CO_MOCK_METHOD_4(returnType, functionName, argsTypes, functionAppend) \
+        inline returnType functionName (INTERNAL_POPULATE_ARGS_FIELD(argsTypes)) functionAppend \
+        { \
+            CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
+            return returnType(); \
+        }
+
+    #define INTERNAL_CO_MOCK_METHOD_5(functionPrepend, returnType, functionName, argsTypes, functionAppend) \
+        functionPrepend inline returnType functionName (INTERNAL_POPULATE_ARGS_FIELD(argsTypes)) functionAppend \
+        { \
+            CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
+            return returnType(); \
+        }
+    
+    #define INTERNAL_CO_MOCK_METHOD_6(functionPrepend, returnType, functionName, argsTypes, argsDefaults, functionAppend) \
+        functionPrepend inline returnType functionName \
+                                        ( \
+                                            MPT_APPEND_LISTS_ITEMS \
+                                            ( \
+                                                INTERNAL_POPULATE_ARGS_FIELD(argsTypes), \
+                                                MPT_REMOVE_PARENTHESIS(argsDefaults) \
+                                            ) \
+                                        ) functionAppend \
+        { \
+            CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
+            return returnType(); \
+        }
+
+    #define INTERNAL_CO_MOCK_METHOD_7(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 7 given currently")
+    #define INTERNAL_CO_MOCK_METHOD_8(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 8 given currently")
+    #define INTERNAL_CO_MOCK_METHOD_9(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 9 given currently")
+    #define INTERNAL_CO_MOCK_METHOD_10(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 10 given currently")
+    
     //#if 1
     #ifdef CO_NO_OVERRIDE
         #undef CO_OVERRIDE_IMPL
@@ -5744,6 +5950,7 @@ namespace CppOverride
         #undef CO_DECLARE_MEMBER_INSTANCE
         #undef CO_DECLARE_INSTANCE
         #undef CO_DECLARE_OVERRIDE_METHODS
+        #undef CO_MOCK_METHOD
     
         #define CO_OVERRIDE_IMPL(...)
         #define CO_SETUP_OVERRIDE(...)
@@ -5752,11 +5959,24 @@ namespace CppOverride
         #define CO_DECLARE_MEMBER_INSTANCE(...)
         #define CO_DECLARE_INSTANCE(...)
         #define CO_DECLARE_OVERRIDE_METHODS(...)
+        #define CO_MOCK_METHOD(...)
     #endif
 }
 
 #endif
 
 
+
+namespace CppOverride
+{
+    class MockClass
+    {
+        protected:
+            CO_DECLARE_MEMBER_INSTANCE(CurrentOverrideInstance);
+        
+        public:
+            CO_DECLARE_OVERRIDE_METHODS(CurrentOverrideInstance);
+    };
+}
 
 #endif

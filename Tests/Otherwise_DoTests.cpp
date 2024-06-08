@@ -8,8 +8,8 @@ CppOverride::Overrider OverrideObj;
 
 int main()
 {
-    ssTEST_INIT();
-    ssTEST_SET_UP
+    ssTEST_INIT_TEST_GROUP();
+    ssTEST_COMMON_SET_UP
     {
         OverrideObj = CppOverride::Overrider();
     };
@@ -18,7 +18,7 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            class Rectangle rect(1.5, 1.5);
+            CppOverrideTest::Rectangle rect(1.5, 1.5);
             bool otherwiseDoCalled = false;
             CO_SETUP_OVERRIDE   (rect, GetWidth)
                                 .WhenCalledWith(2.f)
@@ -48,7 +48,7 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            class Rectangle rect(1.5, 1.5);
+            CppOverrideTest::Rectangle rect(1.5, 1.5);
             bool otherwiseDoCalled = false;
             CO_SETUP_OVERRIDE   (rect, GetWidth)
                                 .If
@@ -86,7 +86,7 @@ int main()
         (
             bool otherwiseDoCalled = false;
             std::string testString;
-            (CO_SETUP_OVERRIDE  (OverrideObj, ConstArgsAndArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsAndArgsToSetFunc)
                                 .WhenCalledWith(1, 2.f, CO_ANY)
                                 .SetArgs<   CO_ANY_TYPE, 
                                             CO_ANY_TYPE, 
@@ -99,7 +99,7 @@ int main()
                                     {
                                         otherwiseDoCalled = true;
                                     }
-                                ));
+                                );
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -120,7 +120,7 @@ int main()
         (
             bool otherwiseDoCalled = false;
             std::string testString;
-            (CO_SETUP_OVERRIDE  (OverrideObj, ConstArgsAndArgsToSetFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsAndArgsToSetFunc)
                                 .If
                                 (
                                     [] (const std::vector<void *>& args)
@@ -139,7 +139,7 @@ int main()
                                     {
                                         otherwiseDoCalled = true;
                                     }
-                                ));
+                                );
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -154,7 +154,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(otherwiseDoCalled == true);
     };
     
-    ssTEST_END();
+    ssTEST_END_TEST_GROUP();
     
     return 0;
 }

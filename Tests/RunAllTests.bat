@@ -45,6 +45,7 @@ CALL :RUN_TEST "%~dp0\%MODE%TimesTests.exe"
 CALL :RUN_TEST "%~dp0\%MODE%WhenCalledExpectedly_DoTests.exe"
 CALL :RUN_TEST "%~dp0\%MODE%WhenCalledWithTests.exe"
 CALL :RUN_TEST "%~dp0\%MODE%MixedModifyArgsAndReturnsTest.exe"
+CALL :RUN_TEST "%~dp0\%MODE%MockShapesTests.exe"
 
 EXIT 0
 

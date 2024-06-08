@@ -1,14 +1,13 @@
 #include "CppOverride.hpp"
 #include "ssTest.hpp"
 #include "./Components/FileFunctions.hpp"
-#include "./Components/Shapes.hpp"
 
 CppOverride::Overrider OverrideObj;
 
 int main()
 {
-    ssTEST_INIT();
-    ssTEST_SET_UP
+    ssTEST_INIT_TEST_GROUP();
+    ssTEST_COMMON_SET_UP
     {
         OverrideObj = CppOverride::Overrider();
     };
@@ -22,7 +21,7 @@ int main()
             int testArg2 = 1;
             int calledCounter = 0;
             
-            (CO_SETUP_OVERRIDE  (OverrideObj, AddNumFromNumPointerFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
                                 .SetArgs<int*, CO_ANY_TYPE>(5, CO_DONT_SET)
                                 .Returns<int>(32)
                                 .WhenCalledExpectedly_Do
@@ -32,7 +31,7 @@ int main()
                                         ++calledCounter;
                                     }
                                 )
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -65,7 +64,7 @@ int main()
             int testArg = 1;
             int calledCounter = 0;
             
-            (CO_SETUP_OVERRIDE  (OverrideObj, AddNumFromNumPointerFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
                                 .SetArgs<int*, CO_ANY_TYPE>(5, CO_DONT_SET)
                                 .Returns<int>(32)
                                 .WhenCalledExpectedly_Do
@@ -75,9 +74,9 @@ int main()
                                         ++calledCounter;
                                     }
                                 )
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
             
-            (CO_SETUP_OVERRIDE  (OverrideObj, AddNumFromNumPointerFunc)
+            CO_SETUP_OVERRIDE  (OverrideObj, AddNumFromNumPointerFunc)
                                 .SetArgs<int*, CO_ANY_TYPE>(10, CO_DONT_SET)
                                 .WhenCalledExpectedly_Do
                                 (
@@ -86,7 +85,7 @@ int main()
                                         ++calledCounter;
                                     }
                                 )
-                                .AssignOverrideResult(result2));
+                                .AssignOverrideResult(result2);
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -109,7 +108,7 @@ int main()
             int testArg = 1;
             int calledCounter = 0;
             
-            (CO_SETUP_OVERRIDE  (OverrideObj, AddNumFromNumPointerFunc)
+            CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
                                 .WhenCalledExpectedly_Do
                                 (
                                     [&calledCounter](...)
@@ -117,7 +116,7 @@ int main()
                                         ++calledCounter;
                                     }
                                 )
-                                .AssignOverrideResult(result));
+                                .AssignOverrideResult(result);
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -129,7 +128,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
-    ssTEST_END();
+    ssTEST_END_TEST_GROUP();
     
     return 0;
 }
