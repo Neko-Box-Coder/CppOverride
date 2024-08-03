@@ -47,42 +47,41 @@ endif()
 
 if(CPP_OVERRIDE_BUILD_TEST)
     add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/ssTest" "${CMAKE_CURRENT_BINARY_DIR}/ssTest")
-    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/MacroPowerToys" "${CMAKE_CURRENT_BINARY_DIR}/MacroPowerToys")
     
     add_executable(ModifyReturnsTests "${CMAKE_CURRENT_LIST_DIR}/Tests/ModifyReturnsTests.cpp")
-    target_link_libraries(ModifyReturnsTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_link_libraries(ModifyReturnsTests PUBLIC CppOverride ssTest)
     target_compile_options(ModifyReturnsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(ModifyArgsTests "${CMAKE_CURRENT_LIST_DIR}/Tests/ModifyArgsTests.cpp")
-    target_link_libraries(ModifyArgsTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_link_libraries(ModifyArgsTests PUBLIC CppOverride ssTest)
     target_compile_options(ModifyArgsTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(WhenCalledWithTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledWithTests.cpp")
-    target_link_libraries(WhenCalledWithTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_link_libraries(WhenCalledWithTests PUBLIC CppOverride ssTest)
     target_compile_options(WhenCalledWithTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(TimesTests "${CMAKE_CURRENT_LIST_DIR}/Tests/TimesTests.cpp")
-    target_link_libraries(TimesTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_link_libraries(TimesTests PUBLIC CppOverride ssTest)
     target_compile_options(TimesTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(IfTests "${CMAKE_CURRENT_LIST_DIR}/Tests/IfTests.cpp")
-    target_link_libraries(IfTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_link_libraries(IfTests PUBLIC CppOverride ssTest)
     target_compile_options(IfTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(Otherwise_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/Otherwise_DoTests.cpp")
-    target_link_libraries(Otherwise_DoTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_link_libraries(Otherwise_DoTests PUBLIC CppOverride ssTest)
     target_compile_options(Otherwise_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
     
     add_executable(WhenCalledExpectedly_DoTests "${CMAKE_CURRENT_LIST_DIR}/Tests/WhenCalledExpectedly_DoTests.cpp")
-    target_link_libraries(WhenCalledExpectedly_DoTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_link_libraries(WhenCalledExpectedly_DoTests PUBLIC CppOverride ssTest)
     target_compile_options(WhenCalledExpectedly_DoTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
     add_executable(MixedModifyArgsAndReturnsTest "${CMAKE_CURRENT_LIST_DIR}/Tests/MixedModifyArgsAndReturnsTest.cpp")
-    target_link_libraries(MixedModifyArgsAndReturnsTest PUBLIC CppOverride ssTest MacroPowerToys)
+    target_link_libraries(MixedModifyArgsAndReturnsTest PUBLIC CppOverride ssTest)
     target_compile_options(MixedModifyArgsAndReturnsTest PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
     add_executable(MockShapesTests "${CMAKE_CURRENT_LIST_DIR}/Tests/MockShapesTests.cpp")
-    target_link_libraries(MockShapesTests PUBLIC CppOverride ssTest MacroPowerToys)
+    target_link_libraries(MockShapesTests PUBLIC CppOverride ssTest)
     target_compile_options(MockShapesTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
     add_executable(FreeFunctionTests    "${CMAKE_CURRENT_LIST_DIR}/Tests/FreeFunctionTests.cpp"
