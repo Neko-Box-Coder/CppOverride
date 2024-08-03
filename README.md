@@ -72,6 +72,12 @@ int DummyFunction(int value1)
     return value1;
 }
 
+//If the free function is not accessible, you can "redirect" it by using macro
+//For example if you want to override an external function called "FreeFunction" to your "MockFreeFunction"
+#if !defined(CO_NO_OVERRIDE) || !CO_NO_OVERRIDE
+    #define FreeFunction MockFreeFunction
+endif
+
 int main()
 {
     CO_SETUP_OVERRIDE(OverrideInstanceName, DummyFunction)
@@ -156,6 +162,9 @@ information that the function can reference from.
 #### Global / File Scope
 ```cpp
 CO_DECLARE_INSTANCE(<Override Instance Name>);
+
+//Or this if you want to reference an instance declared somewhere else
+extern CO_DECLARE_INSTANCE(<Override Instance Name>);
 ```
 
 #### Class Member Variable
@@ -282,6 +291,18 @@ CO_SETUP_OVERRIDE(<Override Instance Name>, <Function Name>)
                  .WhenCalledWith(<Values...>)
                  .Returns(<Return Value>);
                  //etc...
+```
+
+To remove the override setups for a particular function, call `CO_REMOVE_OVERRIDE_SETUP` macro
+
+```cpp
+CO_REMOVE_OVERRIDE_SETUP(<Override Instance Name>, <Function Name>)
+```
+
+Similarly, to remove all override setups, call `CO_CLEAR_ALL_OVERRIDE_SETUP` macro
+
+```cpp
+CO_CLEAR_ALL_OVERRIDE_SETUP(<Override Instance Name>)
 ```
 
 Anything beyond this point are assuming that you have called `CO_SETUP_OVERRIDE` macro.

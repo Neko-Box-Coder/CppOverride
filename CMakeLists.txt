@@ -85,6 +85,12 @@ if(CPP_OVERRIDE_BUILD_TEST)
     target_link_libraries(MockShapesTests PUBLIC CppOverride ssTest MacroPowerToys)
     target_compile_options(MockShapesTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
+    add_executable(FreeFunctionTests    "${CMAKE_CURRENT_LIST_DIR}/Tests/FreeFunctionTests.cpp"
+                                        "${CMAKE_CURRENT_LIST_DIR}/Tests/Components/FreeFunctions.cpp"
+                                        "${CMAKE_CURRENT_LIST_DIR}/Tests/Components/MockFreeFunctions.cpp")
+    target_link_libraries(FreeFunctionTests PUBLIC CppOverride ssTest)
+    target_compile_options(FreeFunctionTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+
     if(WIN32)
         execute_process(COMMAND ${CMAKE_COMMAND} -E copy    "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat" 
                                                             "${CMAKE_CURRENT_BINARY_DIR}")
