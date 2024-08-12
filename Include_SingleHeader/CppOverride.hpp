@@ -2928,17 +2928,10 @@ namespace CppOverride
 {
     struct Any
     {
-        inline bool operator== (Any& other)
-        {
-            return true;
-        }
-        
-        inline bool operator!= (Any& other)
-        {
-            return false;
-        }
+        inline bool operator== (Any&) { return true;}
+        inline bool operator!= (Any&) { return false; }
 
-        friend std::ostream& operator<<(std::ostream& os, const Any& other)
+        friend std::ostream& operator<<(std::ostream& os, const Any&)
         {
             os << "Any";
             return os;
@@ -3233,7 +3226,7 @@ namespace CppOverride
                     
                     lastData.ReturnDataInfo.Data = &returnData;
                     lastData.ReturnDataInfo.CopyConstructor = [](void* data) { return data; };
-                    lastData.ReturnDataInfo.Destructor = [](void* data) { }; 
+                    lastData.ReturnDataInfo.Destructor = [](void*) {}; 
                     lastData.ReturnDataInfo.DataSet = true;
                     lastData.ReturnDataInfo.DataType = typeid(ReturnType).hash_code();
                     lastData.ReturnDataInfo.ReturnReference = true;
@@ -3254,8 +3247,8 @@ namespace CppOverride
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 lastData.ReturnDataInfo.Data = nullptr;
-                lastData.ReturnDataInfo.CopyConstructor = [](void* data) { return nullptr; };
-                lastData.ReturnDataInfo.Destructor = [](void* data) {}; 
+                lastData.ReturnDataInfo.CopyConstructor = [](void*) { return nullptr; };
+                lastData.ReturnDataInfo.Destructor = [](void*) {}; 
                 
                 lastData.ReturnDataInfo.DataSet = true;
                 lastData.ReturnDataInfo.DataType = typeid(void).hash_code();
@@ -3472,9 +3465,7 @@ namespace CppOverride
             
             template<typename... Args>
             inline typename std::enable_if<sizeof...(Args) == 0>::type 
-            PushActionArgTypes(Internal_OverrideData& lastData)
-            {
-            }
+            PushActionArgTypes(Internal_OverrideData&) {}
         
         protected:
             template<typename... Args>
@@ -3679,7 +3670,7 @@ namespace CppOverride
         
         protected:
             //Appending arguments from function calls
-            inline void AppendArgsValues(std::vector<void*>& argumentsList){};
+            inline void AppendArgsValues(std::vector<void*>&) {};
 
             template<typename T, typename... Args>
             inline void AppendArgsValues(std::vector<void*>& argumentsList, T& arg, Args&... args)
@@ -3712,12 +3703,12 @@ namespace CppOverride
         protected:
             #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
             
-            inline void AppendArgsTypeInfo(std::vector<ArgInfo>& argumentsList) {}
+            inline void AppendArgsTypeInfo(std::vector<ArgInfo>&) {}
             
             template<   typename T, 
                         typename... Args>
             inline void AppendArgsTypeInfo( std::vector<ArgInfo>& argumentsList, 
-                                            T& arg, 
+                                            T&, 
                                             Args&... args)
             {
                 ArgInfo curArgInfo;
@@ -3764,8 +3755,7 @@ namespace CppOverride
         friend class Internal_RequirementValidator;
         
         protected:
-            inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
-                                            int argIndex) { return true; };
+            inline bool CheckArgumentsTypes(std::vector<ArgInfo>&, int) { return true; };
 
             #define INTERNAL_CO_NON_CONST_T INTERNAL_CO_UNCONST(T)
 
@@ -3775,7 +3765,7 @@ namespace CppOverride
             template<typename T, typename... Args>
             inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
                                             int argIndex, 
-                                            T& arg, 
+                                            T&, 
                                             Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArguments)
@@ -3821,7 +3811,7 @@ namespace CppOverride
                         typename... Args>
             inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
                                             int argIndex, 
-                                            T*& arg, 
+                                            T*&, 
                                             Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArguments)
@@ -3947,9 +3937,9 @@ namespace CppOverride
         friend class Internal_RequirementValidator;
         
         protected:
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
-                                                int argIndex,
-                                                OverrideStatus& status) { return true; };
+            inline bool CheckArgumentsValues(   std::vector<ArgInfo>&, 
+                                                int,
+                                                OverrideStatus&) { return true; };
 
             #define INTERNAL_CO_LOG_CheckArgumentsValues 0
 
@@ -3959,7 +3949,7 @@ namespace CppOverride
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
-                                                T& arg, 
+                                                T&, 
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
@@ -4166,9 +4156,9 @@ namespace CppOverride
         protected:
             #define INTERNAL_CO_LOG_ModifyArgs 0
         
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
-                                    int index,
-                                    OverrideStatus* status) {}
+            inline void ModifyArgs( std::vector<Internal_DataInfo>&, 
+                                    int,
+                                    OverrideStatus*) {}
 
             template<   typename T, 
                         typename = typename std::enable_if<!std::is_copy_assignable<T>::value>::type,
@@ -4176,7 +4166,7 @@ namespace CppOverride
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
-                                    T& arg, 
+                                    T&, 
                                     Args&... args)
             {
                 if(argsData[index].DataSet)
@@ -4295,7 +4285,7 @@ namespace CppOverride
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
-                                    const Any& arg, 
+                                    const Any&, 
                                     Args&... args)
             {
                 if(INTERNAL_CO_LOG_ModifyArgs)
@@ -5491,11 +5481,7 @@ namespace CppOverride
                                                         std::string functionName, 
                                                         Args&... args)
             {
-                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
-                std::vector<void*> argumentsList;
-                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
                 Internal_CallReturnOverrideResultExpectedAction(functionName, dataIndex, args...);
-                
                 return ReturnType();
             }
 

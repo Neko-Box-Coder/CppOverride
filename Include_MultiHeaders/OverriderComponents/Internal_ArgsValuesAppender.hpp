@@ -14,7 +14,7 @@ namespace CppOverride
         
         protected:
             //Appending arguments from function calls
-            inline void AppendArgsValues(std::vector<void*>& argumentsList){};
+            inline void AppendArgsValues(std::vector<void*>&) {};
 
             template<typename T, typename... Args>
             inline void AppendArgsValues(std::vector<void*>& argumentsList, T& arg, Args&... args)

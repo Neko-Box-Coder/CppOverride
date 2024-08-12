@@ -84,7 +84,7 @@ void OverrideReturnsWithActionLambda()
     CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyReturnValue)
                         .ReturnsByAction<int>
                         ( 
-                            [](const std::vector<void*>& args, void* out)
+                            [](const std::vector<void*>&, void* out)
                             { 
                                 *static_cast<int*>(out) = 5;
                             }
@@ -186,13 +186,14 @@ void WhenCalledExpectedlyDoLambdaExample()
                         .Returns<int>(1)
                         .WhenCalledExpectedly_Do
                         (
-                            [&called](const std::vector<void*>& args)
+                            [&called](const std::vector<void*>&)
                             {
                                 called = true;
                             }
                         );
 
     int ret1 = OverrideMyReturnValue(2, 3.f);   //Returns 1 and sets called to true
+    CO_QUICK_ASSERT(ret1 == 1);
     CO_QUICK_ASSERT(called == true);
 
     ResetAll();
@@ -206,13 +207,14 @@ void OtherwiseDoLambdaExample()
                         .Returns<int>(1)
                         .Otherwise_Do
                         (
-                            [&called](const std::vector<void*>& args)
+                            [&called](const std::vector<void*>&)
                             {
                                 called = true;
                             }
                         );
     
     int ret1 = OverrideMyReturnValue(1, 2.f);   //Won't return 1
+    CO_QUICK_ASSERT(ret1 != 1);
     CO_QUICK_ASSERT(called == true);
 
     ResetAll();
@@ -229,12 +231,13 @@ void AssignStatusExample()
     int ret1 = OverrideMyReturnValue(1, 2.f);
     
     //status will be OverrideStatus::MATCHING_CONDITION_VALUE_FAILED
+    CO_QUICK_ASSERT(ret1 != 1);
     CO_QUICK_ASSERT(result.Status == CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
 
     ResetAll();
 }
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
     OverrideReturnsExample();
     

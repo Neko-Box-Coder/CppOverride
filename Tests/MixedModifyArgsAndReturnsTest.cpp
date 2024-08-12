@@ -121,7 +121,7 @@ int main()
         
         ssTEST_OUTPUT_EXECUTION
         (
-            int executeResult = CppOverrideTest::NonConst::AddNumFromNumPointerFunc(&testArg, 2);
+            CppOverrideTest::NonConst::AddNumFromNumPointerFunc(&testArg, 2);
         );
         
         ssTEST_OUTPUT_ASSERT(calledCounter == 1);

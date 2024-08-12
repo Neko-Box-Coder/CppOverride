@@ -16,8 +16,7 @@ namespace CppOverride
         friend class Internal_RequirementValidator;
         
         protected:
-            inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
-                                            int argIndex) { return true; };
+            inline bool CheckArgumentsTypes(std::vector<ArgInfo>&, int) { return true; };
 
             #define INTERNAL_CO_NON_CONST_T INTERNAL_CO_UNCONST(T)
 
@@ -27,7 +26,7 @@ namespace CppOverride
             template<typename T, typename... Args>
             inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
                                             int argIndex, 
-                                            T& arg, 
+                                            T&, 
                                             Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArguments)
@@ -73,7 +72,7 @@ namespace CppOverride
                         typename... Args>
             inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
                                             int argIndex, 
-                                            T*& arg, 
+                                            T*&, 
                                             Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArguments)
