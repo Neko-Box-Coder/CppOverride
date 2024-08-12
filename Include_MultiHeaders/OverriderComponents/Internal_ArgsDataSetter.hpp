@@ -173,9 +173,7 @@ namespace CppOverride
             
             template<typename... Args>
             inline typename std::enable_if<sizeof...(Args) == 0>::type 
-            PushActionArgTypes(Internal_OverrideData& lastData)
-            {
-            }
+            PushActionArgTypes(Internal_OverrideData&) {}
         
         protected:
             template<typename... Args>

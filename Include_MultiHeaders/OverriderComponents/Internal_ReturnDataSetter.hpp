@@ -88,7 +88,7 @@ namespace CppOverride
                     
                     lastData.ReturnDataInfo.Data = &returnData;
                     lastData.ReturnDataInfo.CopyConstructor = [](void* data) { return data; };
-                    lastData.ReturnDataInfo.Destructor = [](void* data) { }; 
+                    lastData.ReturnDataInfo.Destructor = [](void*) {}; 
                     lastData.ReturnDataInfo.DataSet = true;
                     lastData.ReturnDataInfo.DataType = typeid(ReturnType).hash_code();
                     lastData.ReturnDataInfo.ReturnReference = true;
@@ -109,8 +109,8 @@ namespace CppOverride
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 lastData.ReturnDataInfo.Data = nullptr;
-                lastData.ReturnDataInfo.CopyConstructor = [](void* data) { return nullptr; };
-                lastData.ReturnDataInfo.Destructor = [](void* data) {}; 
+                lastData.ReturnDataInfo.CopyConstructor = [](void*) { return nullptr; };
+                lastData.ReturnDataInfo.Destructor = [](void*) {}; 
                 
                 lastData.ReturnDataInfo.DataSet = true;
                 lastData.ReturnDataInfo.DataType = typeid(void).hash_code();

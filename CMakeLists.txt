@@ -36,8 +36,6 @@ else()
     set(STANDARD_COMPILE_FLAGS  "-Wall"
                                 "-Wno-return-local-addr"
                                 "-Wno-sign-compare"
-                                "-Wno-unused-variable"
-                                "-Wno-unused-parameter"
                                 "-Wno-switch"
                                 "-Wno-gnu-zero-variadic-macro-arguments"
                                 "-Wextra"

@@ -22,9 +22,9 @@ namespace CppOverride
         friend class Internal_RequirementValidator;
         
         protected:
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
-                                                int argIndex,
-                                                OverrideStatus& status) { return true; };
+            inline bool CheckArgumentsValues(   std::vector<ArgInfo>&, 
+                                                int,
+                                                OverrideStatus&) { return true; };
 
             #define INTERNAL_CO_LOG_CheckArgumentsValues 0
 
@@ -34,7 +34,7 @@ namespace CppOverride
             inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
-                                                T& arg, 
+                                                T&, 
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)

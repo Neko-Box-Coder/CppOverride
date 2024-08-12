@@ -27,6 +27,7 @@ int main()
                                 (
                                     [&calledExpectedly] (const std::vector<void *>& args)
                                     {
+                                        (void)args;
                                         calledExpectedly = true;
                                     }
                                 );
@@ -59,7 +60,7 @@ int main()
                                                             "test")
                                 .WhenCalledExpectedly_Do
                                 (
-                                    [&calledExpectedly] (const std::vector<void *>& args)
+                                    [&calledExpectedly] (const std::vector<void *>&)
                                     {
                                         calledExpectedly = true;
                                     }

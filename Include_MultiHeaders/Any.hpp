@@ -7,17 +7,10 @@ namespace CppOverride
 {
     struct Any
     {
-        inline bool operator== (Any& other)
-        {
-            return true;
-        }
-        
-        inline bool operator!= (Any& other)
-        {
-            return false;
-        }
+        inline bool operator== (Any&) { return true;}
+        inline bool operator!= (Any&) { return false; }
 
-        friend std::ostream& operator<<(std::ostream& os, const Any& other)
+        friend std::ostream& operator<<(std::ostream& os, const Any&)
         {
             os << "Any";
             return os;

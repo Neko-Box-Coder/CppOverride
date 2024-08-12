@@ -20,9 +20,9 @@ namespace CppOverride
         protected:
             #define INTERNAL_CO_LOG_ModifyArgs 0
         
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
-                                    int index,
-                                    OverrideStatus* status) {}
+            inline void ModifyArgs( std::vector<Internal_DataInfo>&, 
+                                    int,
+                                    OverrideStatus*) {}
 
             template<   typename T, 
                         typename = typename std::enable_if<!std::is_copy_assignable<T>::value>::type,
@@ -30,7 +30,7 @@ namespace CppOverride
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
-                                    T& arg, 
+                                    T&, 
                                     Args&... args)
             {
                 if(argsData[index].DataSet)
@@ -149,7 +149,7 @@ namespace CppOverride
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
-                                    const Any& arg, 
+                                    const Any&, 
                                     Args&... args)
             {
                 if(INTERNAL_CO_LOG_ModifyArgs)

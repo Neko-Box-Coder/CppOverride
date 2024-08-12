@@ -176,7 +176,7 @@ int main()
             CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
                                 .ReturnsByAction<int>
                                 (
-                                    [](const std::vector<void *>& args, void* out)
+                                    [](const std::vector<void *>&, void* out)
                                     {
                                         (*(int*)(out)) = 10;
                                     }

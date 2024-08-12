@@ -25,7 +25,7 @@ int main()
                                 .Returns<float>(6.f)
                                 .Otherwise_Do
                                 (
-                                    [&otherwiseDoCalled] (const std::vector<void *>& args)
+                                    [&otherwiseDoCalled] (const std::vector<void *>&)
                                     {
                                         otherwiseDoCalled = true;
                                     }
@@ -61,7 +61,7 @@ int main()
                                 .Returns<float>(6.f)
                                 .Otherwise_Do
                                 (
-                                    [&otherwiseDoCalled] (const std::vector<void *>& args)
+                                    [&otherwiseDoCalled] (const std::vector<void *>&)
                                     {
                                         otherwiseDoCalled = true;
                                     }
@@ -95,7 +95,7 @@ int main()
                                                             "test")
                                 .Otherwise_Do
                                 (
-                                    [&otherwiseDoCalled] (const std::vector<void *>& args)
+                                    [&otherwiseDoCalled] (const std::vector<void *>&)
                                     {
                                         otherwiseDoCalled = true;
                                     }
@@ -135,7 +135,7 @@ int main()
                                                             "test")
                                 .Otherwise_Do
                                 (
-                                    [&otherwiseDoCalled] (const std::vector<void *>& args)
+                                    [&otherwiseDoCalled] (const std::vector<void *>&)
                                     {
                                         otherwiseDoCalled = true;
                                     }

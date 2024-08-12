@@ -304,11 +304,7 @@ namespace CppOverride
                                                         std::string functionName, 
                                                         Args&... args)
             {
-                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
-                std::vector<void*> argumentsList;
-                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
                 Internal_CallReturnOverrideResultExpectedAction(functionName, dataIndex, args...);
-                
                 return ReturnType();
             }
 

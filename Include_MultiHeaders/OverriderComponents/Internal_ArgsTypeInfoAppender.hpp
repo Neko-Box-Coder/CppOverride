@@ -15,12 +15,12 @@ namespace CppOverride
         protected:
             #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
             
-            inline void AppendArgsTypeInfo(std::vector<ArgInfo>& argumentsList) {}
+            inline void AppendArgsTypeInfo(std::vector<ArgInfo>&) {}
             
             template<   typename T, 
                         typename... Args>
             inline void AppendArgsTypeInfo( std::vector<ArgInfo>& argumentsList, 
-                                            T& arg, 
+                                            T&, 
                                             Args&... args)
             {
                 ArgInfo curArgInfo;
