@@ -205,7 +205,7 @@ Example:
 ```cpp
 int OverrideMyReturnValue(int value1, float value2)
 {
-    CO_OVERRIDE_IMPL(OverrideInstanceName, int, (value1, value2))
+    CO_OVERRIDE_IMPL(OverrideInstanceName, int, (value1, value2));
     
     //The rest of the implementations...
     
@@ -214,7 +214,7 @@ int OverrideMyReturnValue(int value1, float value2)
 
 void OverrideMyArgs(float& value1, int* value2)
 {
-    CO_OVERRIDE_IMPL(OverrideInstanceName, void, (value1, value2))
+    CO_OVERRIDE_IMPL(OverrideInstanceName, void, (value1, value2));
     
     //The rest of the implementations...
 }
@@ -358,7 +358,7 @@ we finish overriding the arguments.
 > ```cpp
 > void OverrideMyArgs(float& value1, int* value2)
 > {
->     CO_OVERRIDE_IMPL(OverrideInstanceName, void, (value1, value2))
+>     CO_OVERRIDE_IMPL(OverrideInstanceName, void, (value1, value2));
 >     std::cout << "Rest of the OverrideMyArgs execution..." << std::endl;
 > }
 > ```
