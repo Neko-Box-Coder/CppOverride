@@ -2726,8 +2726,11 @@ namespace CppOverride
     
     #define INTERNAL_CO_UNPOINTER(targetType) typename std::remove_pointer<targetType>::type
     
-    #define INTERNAL_CO_PURE_TYPE(targetType)\
-        INTERNAL_CO_UNCONST(INTERNAL_CO_UNREF(INTERNAL_CO_UNPOINTER(targetType)))
+    #define INTERNAL_CO_RAW_TYPE(targetType) \
+        typename std::decay<INTERNAL_CO_UNCONST(targetType)>::type
+    
+    #define INTERNAL_CO_PURE_TYPE(targetType) \
+        typename std::decay<INTERNAL_CO_UNCONST(INTERNAL_CO_UNPOINTER(targetType))>::type
 }
 
 #endif
@@ -2736,6 +2739,7 @@ namespace CppOverride
 
 namespace CppOverride
 {
+    //NOTE: This is used to avoid auto type translation
     template<typename T>
     struct TypeSpecifier { using Type = T; };
     
@@ -2849,62 +2853,9 @@ namespace CppOverride
             
             OverrideInfoSetter& ReturnsVoid();
             
-            #ifndef INTERNAL_CO_SET_ARGS_DECL
-                #define INTERNAL_CO_SET_ARGS_DECL(...) \
-                    template<MPT_PREFIX_SUFFIX_ARGS(typename Arg, Type, __VA_ARGS__)> \
-                    OverrideInfoSetter& SetArgs \
-                    ( \
-                        MPT_COMPOSE4 \
-                        ( \
-                            MPT_APPEND_LISTS_ITEMS, \
-                            ( \
-                                MPT_COMPOSE2 \
-                                ( \
-                                    MPT_PREFIX_SUFFIX_ARGS, \
-                                    ( \
-                                        typename TypeUnwrapper<Arg, \
-                                        Type>::Type, \
-                                        __VA_ARGS__ \
-                                    ) \
-                                ), \
-                                MPT_COMPOSE3 \
-                                ( \
-                                    MPT_COMPOSE2, \
-                                    ( \
-                                        MPT_CONCAT, \
-                                        ( \
-                                            MPT_COUNT_TO_, \
-                                            MPT_ARGS_COUNT(__VA_ARGS__) \
-                                        ) \
-                                    )(_, /* no suffix */) \
-                                ) \
-                            ) \
-                        ) \
-                    )
-                
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_1(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_2(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_3(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_4(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_5(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_6(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_7(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_8(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_9(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_10(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_11(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_12(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_13(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_14(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_15(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_16(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_17(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_18(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_19(/* no prefix */, /* no suffix */));
-                INTERNAL_CO_SET_ARGS_DECL(MPT_COUNT_TO_20(/* no prefix */, /* no suffix */));
-            #endif
-            
-            #undef INTERNAL_CO_SET_ARGS_DECL
+            template<typename... Args>
+            OverrideInfoSetter& 
+            SetArgs(typename TypeUnwrapper<Args>::Type... args);
             
             template<typename... Args>
             OverrideInfoSetter& 
@@ -3011,29 +2962,6 @@ namespace CppOverride
 #ifndef CO_INTERNAL_CONDITION_INFO_HPP
 #define CO_INTERNAL_CONDITION_INFO_HPP
 
-//=================================================================
-//./Include_MultiHeaders/ArgsInfo.hpp
-//=================================================================
-#ifndef CO_ARGS_INFO_HPP
-#define CO_ARGS_INFO_HPP
-
-#include <cstddef>
-#include <functional>
-
-namespace CppOverride
-{
-    struct ArgInfo
-    {
-        void* ArgDataPointer = nullptr;
-        std::function<void*(void* data)> CopyConstructor;
-        std::function<void(void* data)> Destructor;
-        size_t ArgSize = 0;
-        size_t ArgTypeHash = 0;
-        bool ArgSet = false;
-    };
-}
-
-#endif
 
 
 #include <functional>
@@ -3044,7 +2972,7 @@ namespace CppOverride
     struct Internal_ConditionInfo
     {
         std::function<bool(const std::vector<void*>& args)> LambdaCondition;
-        std::vector<ArgInfo> ArgsCondition = {};
+        std::vector<Internal_DataInfo> ArgsCondition = {};
         int Times = -1;
         int CalledTimes = 0;
         bool DataConditionSet = false;
@@ -3183,9 +3111,12 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            template<   typename ReturnType,
-                        typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                        typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type>
+            template
+            <
+                typename ReturnType,
+                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
+                typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type
+            >
             inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter, ReturnType returnData)
             {
                 if(!std::is_same<ReturnType, Any>())
@@ -3213,10 +3144,13 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            template<   typename ReturnType,
-                        typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                        typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
-                        typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type>
+            template
+            <
+                typename ReturnType,
+                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
+                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
+                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type
+            >
             inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter, ReturnType returnData)
             {
                 if(!std::is_same<ReturnType, Any&>())
@@ -3337,19 +3271,17 @@ namespace CppOverride
             template<typename T, typename... Args>
             inline typename std::enable_if
             <
-                !std::is_copy_assignable<INTERNAL_CO_UNWRAPPED(T)>::value && 
-                sizeof...(Args) != 0, 
+                !std::is_copy_assignable<INTERNAL_CO_UNWRAPPED(T)>::value,
                 OverrideInfoSetter&
             >::type
             SetArgs(OverrideInfoSetter& infoSetter,
-                    INTERNAL_CO_UNWRAPPED(T) arg, 
-                    INTERNAL_CO_UNWRAPPED(Args)... args)
+                    INTERNAL_CO_UNWRAPPED(T) arg)
             {
                 static_assert(  CO_ASSERT_FALSE<T>::value, 
                                 "Cannot modify a non copy assignable object. "
                                 "Please use SetArgsByAction instead.");
 
-                return SetArgs<INTERNAL_CO_UNWRAPPED(Args)...>(infoSetter, args...);
+                return infoSetter;
             }
             
             template<typename T>
@@ -3497,8 +3429,7 @@ namespace CppOverride
                 return infoSetter;
             }
             
-        #undef INTERNAL_CO_UNCONST_UNREF_T
-        #undef INTERNAL_CO_UNCONST_UNREF
+        #undef INTERNAL_CO_UNWRAPPED
         
         public:
             inline Internal_ArgsDataSetter(OverrideDatas& overrideArgumentsInfos) : 
@@ -3547,7 +3478,6 @@ namespace CppOverride
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                             .ConditionInfo
                                                                             .Times = times;
-                
                 return infoSetter;
             }
             
@@ -3555,25 +3485,54 @@ namespace CppOverride
             {
                 return infoSetter;
             }
-
-            template<typename T, typename... Args>
+            
+            template<   typename T, 
+                        typename... Args, 
+                        typename = typename std::enable_if<std::is_same<INTERNAL_CO_PURE_TYPE(T), 
+                                                                        void>::value>::type,
+                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T)>
             inline OverrideInfoSetter& WhenCalledWith(  OverrideInfoSetter& infoSetter,
                                                         T arg, 
                                                         Args... args)
             {
-                ArgInfo curArg;
-                if(!std::is_same<T, Any>())
+                Internal_DataInfo argData;
+                //T is void*
+                argData.Data = new void*((void*)arg);
+                argData.CopyConstructor = 
+                    [](void* data) { return new void*(*static_cast<void**>(data)); };
+                argData.Destructor = 
+                    [](void* data){ delete static_cast<void**>(data); };
+                argData.DataType = typeid(void*).hash_code();
+                argData.DataSet = true;
+
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
+                                                                            .ConditionInfo
+                                                                            .ArgsCondition
+                                                                            .push_back(argData);
+
+                return WhenCalledWith(infoSetter, args...);
+            }
+            
+            template<   typename T, 
+                        typename... Args, 
+                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(T), 
+                                                                        void>::value>::type>
+            inline OverrideInfoSetter& WhenCalledWith(  OverrideInfoSetter& infoSetter,
+                                                        T arg, 
+                                                        Args... args)
+            {
+                Internal_DataInfo argData;
+                //Other types that are not Any
+                if(!std::is_same<INTERNAL_CO_RAW_TYPE(T), Any>())
                 {
-                    curArg.ArgDataPointer = new T(arg);
-                    curArg.CopyConstructor = [](void* data) { return new T(*static_cast<T*>(data)); };
-                    curArg.Destructor = [](void* data){ delete static_cast<T*>(data); };
-                    curArg.ArgSize = sizeof(T);
-                    curArg.ArgTypeHash = typeid(T).hash_code();
-                    curArg.ArgSet = true;
+                    argData.Data = new T(arg);
+                    argData.CopyConstructor = [](void* data) { return new T(*static_cast<T*>(data)); };
+                    argData.Destructor = [](void* data){ delete static_cast<T*>(data); };
+                    argData.DataType = typeid(INTERNAL_CO_RAW_TYPE(T)).hash_code();
+                    argData.DataSet = true;
                     
                     #if 0
-                        std::cout << "typeid(T).name(): "<<typeid(T).name() <<"\n";
-                        std::cout << "sizeof(T): " << sizeof(T) << "\n";
+                        std::cout << "typeid(T).name(): " << typeid(T).name() <<"\n";
                         std::cout << "typeid(T).hash_code(): " << typeid(T).hash_code() << "\n";
                     #endif
                 }
@@ -3581,7 +3540,7 @@ namespace CppOverride
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                             .ConditionInfo
                                                                             .ArgsCondition
-                                                                            .push_back(curArg);
+                                                                            .push_back(argData);
 
                 return WhenCalledWith(infoSetter, args...);
             }
@@ -3640,7 +3599,6 @@ namespace CppOverride
                 currentData.Status = &result.Status;
                 return infoSetter;
             }
-            
         
         public:
             Internal_RequirementSetter(OverrideDatas& overrideDataLists) :
@@ -3672,10 +3630,10 @@ namespace CppOverride
             //Appending arguments from function calls
             inline void AppendArgsValues(std::vector<void*>&) {};
 
-            template<typename T, typename... Args>
+            template<typename T, typename RAW_T = INTERNAL_CO_RAW_TYPE(T), typename... Args>
             inline void AppendArgsValues(std::vector<void*>& argumentsList, T& arg, Args&... args)
             {
-                argumentsList.push_back((INTERNAL_CO_UNCONST(T)*)&arg);
+                argumentsList.push_back((RAW_T*)&arg);
                 AppendArgsValues(argumentsList, args...);
             }
     };
@@ -3694,6 +3652,8 @@ namespace CppOverride
 
 #include <iostream>
 #include <vector>
+#include <type_traits>
+
 namespace CppOverride
 {
     class Internal_ArgsTypeInfoAppender
@@ -3703,20 +3663,19 @@ namespace CppOverride
         protected:
             #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
             
-            inline void AppendArgsTypeInfo(std::vector<ArgInfo>&) {}
+            inline void AppendArgsTypeInfo(std::vector<Internal_DataInfo>&) {}
             
             template<   typename T, 
                         typename... Args>
-            inline void AppendArgsTypeInfo( std::vector<ArgInfo>& argumentsList, 
+            inline void AppendArgsTypeInfo( std::vector<Internal_DataInfo>& argumentsList, 
                                             T&, 
                                             Args&... args)
             {
-                ArgInfo curArgInfo;
+                Internal_DataInfo curArgInfo;
                 if(!std::is_same<T, Any>())
                 {
-                    curArgInfo.ArgSize = sizeof(T);
-                    curArgInfo.ArgTypeHash = typeid(T).hash_code();
-                    curArgInfo.ArgSet = true;
+                    curArgInfo.DataType = typeid(T).hash_code();
+                    curArgInfo.DataSet = true;
                 }
                 
                 if(INTERNAL_CO_LOG_AppendArgsTypeInfo)
@@ -3743,8 +3702,10 @@ namespace CppOverride
 
 
 
+
 #include <vector>
 #include <iostream>
+#include <type_traits>
 
 namespace CppOverride
 {
@@ -3755,15 +3716,17 @@ namespace CppOverride
         friend class Internal_RequirementValidator;
         
         protected:
-            inline bool CheckArgumentsTypes(std::vector<ArgInfo>&, int) { return true; };
-
-            #define INTERNAL_CO_NON_CONST_T INTERNAL_CO_UNCONST(T)
+            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>&, int) { return true; };
 
             #define INTERNAL_CO_LOG_CheckArguments 0
 
-            //Check Value or reference
-            template<typename T, typename... Args>
-            inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
+            //Check void*
+            template<   typename T, 
+                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T),
+                        typename = typename std::enable_if<std::is_same<PURE_T, void>::value>::type, 
+                        typename... Args,
+                        typename = void()>
+            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
                                             Args&... args)
@@ -3772,24 +3735,56 @@ namespace CppOverride
                 {
                     std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
-                    std::cout <<"CheckArgumentsTypes index: "<<argIndex<<"\n";
+                    std::cout << "CheckArgumentsTypes index: " << argIndex << std::endl;
                 }
             
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    if( sizeof(INTERNAL_CO_NON_CONST_T) != validArgumentsList[argIndex].ArgSize &&
-                        sizeof(INTERNAL_CO_NON_CONST_T*) != validArgumentsList[argIndex].ArgSize)
-                    {
+                    if(typeid(void*).hash_code() != validArgumentsList.at(argIndex).DataType)
                         return false;
-                    }
+                }
+                
+                if(INTERNAL_CO_LOG_CheckArguments)
+                {
+                    std::cout << "Line: " << __LINE__ << std::endl;
+                    std::cout << "CheckArgumentsTypes index: " << argIndex << " passed" << std::endl;
+                }
+                
+                return CheckArgumentsTypes(validArgumentsList, ++argIndex, args...);
+            }
+            
+            //Check Value or reference
+            template<   typename T, 
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<!std::is_pointer<RAW_T>::value>::type,
+                        typename... Args>
+            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
+                                            int argIndex, 
+                                            T&, 
+                                            Args&... args)
+            {
+                if(INTERNAL_CO_LOG_CheckArguments)
+                {
+                    std::cout << std::endl << __func__ << " called" << std::endl;
+                    std::cout << "Line: " << __LINE__ << std::endl;
+                    std::cout << "CheckArgumentsTypes index: " << argIndex << std::endl;
+                }
+            
+                if(argIndex >= validArgumentsList.size())
+                    return false;
 
-                    if( typeid(INTERNAL_CO_NON_CONST_T).hash_code() != 
-                            validArgumentsList[argIndex].ArgTypeHash &&
-                        typeid(INTERNAL_CO_NON_CONST_T*).hash_code() != 
-                            validArgumentsList[argIndex].ArgTypeHash)
+                if(validArgumentsList.at(argIndex).DataSet)
+                {
+                    if( typeid(RAW_T).hash_code() != 
+                            validArgumentsList.at(argIndex).DataType &&
+                        typeid(RAW_T&).hash_code() != 
+                            validArgumentsList.at(argIndex).DataType &&
+                        //NOTE: Reference can be compared as pointer later down the line
+                        typeid(RAW_T*).hash_code() != 
+                            validArgumentsList.at(argIndex).DataType)
                     {
                         return false;
                     }
@@ -3798,7 +3793,7 @@ namespace CppOverride
                 if(INTERNAL_CO_LOG_CheckArguments)
                 {
                     std::cout << "Line: " << __LINE__ << std::endl;
-                    std::cout <<"CheckArgumentsTypes index: "<<argIndex<<" passed\n";
+                    std::cout << "CheckArgumentsTypes index: " << argIndex << " passed" << std::endl;
                 }
                 
                 return CheckArgumentsTypes(validArgumentsList, ++argIndex, args...);
@@ -3806,61 +3801,46 @@ namespace CppOverride
             
             //Check Pointer or value
             template<   typename T, 
-                        typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
-                        typename = typename std::enable_if<!std::is_same<T, const void>::value>::type, 
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<std::is_pointer<RAW_T>::value>::type,
+                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(RAW_T), void>::value>::type, 
+                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T),
                         typename... Args>
-            inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
+            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
                                             int argIndex, 
-                                            T*&, 
+                                            T&, 
                                             Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArguments)
                 {
                     std::cout << std::endl << __func__ << " called" << std::endl;
                     std::cout << "Line: " << __LINE__ << std::endl;
-                    std::cout <<"CheckArgumentsTypes index: "<<argIndex<<"\n";
+                    std::cout << "CheckArgumentsTypes index: " << argIndex << std::endl;
                 }
             
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    if( sizeof(INTERNAL_CO_NON_CONST_T*) != validArgumentsList[argIndex].ArgSize &&
-                        sizeof(INTERNAL_CO_NON_CONST_T) != validArgumentsList[argIndex].ArgSize)
+                        //Check pointer type
+                    if( typeid(RAW_T).hash_code() != validArgumentsList.at(argIndex).DataType &&
+                        //Check value type
+                        typeid(PURE_T).hash_code() != validArgumentsList.at(argIndex).DataType)
                     {
                         if(INTERNAL_CO_LOG_CheckArguments)
                         {
-                            std::cout <<    "sizeof(INTERNAL_CO_NON_CONST_T): " <<
-                                            sizeof(INTERNAL_CO_NON_CONST_T) <<
-                                            "\n";
-                            
-                            std::cout << "sizeof(T): "<<sizeof(T)<<"\n";
+                            std::cout <<    "typeid(RAW_T).hash_code(): " <<
+                                            typeid(RAW_T).hash_code() << 
+                                            std::endl;
+                            std::cout <<    "typeid(PURE_T).hash_code(): " <<
+                                            typeid(PURE_T).hash_code() << 
+                                            std::endl;
                             std::cout <<    "validArgumentsList[" << 
                                             argIndex << 
-                                            "].ArgSize: " << 
-                                            validArgumentsList[argIndex].ArgSize <<
-                                            "\n";
-                        }
-                        return false;
-                    }
-
-                    if( typeid(INTERNAL_CO_NON_CONST_T*).hash_code() != 
-                            validArgumentsList[argIndex].ArgTypeHash &&
-                        typeid(INTERNAL_CO_NON_CONST_T).hash_code() != 
-                            validArgumentsList[argIndex].ArgTypeHash)
-                    {
-                        if(INTERNAL_CO_LOG_CheckArguments)
-                        {
-                            std::cout <<    "typeid(INTERNAL_CO_NON_CONST_T).hash_code(): " <<
-                                            typeid(INTERNAL_CO_NON_CONST_T).hash_code() << 
-                                            "\n";
-                            
-                            std::cout <<    "validArgumentsList["
-                                            <<argIndex << 
                                             "].ArgTypeHash: " <<
-                                            validArgumentsList[argIndex].ArgTypeHash <<
-                                            "\n";
+                                            validArgumentsList.at(argIndex).DataType <<
+                                            std::endl;
                         }
                         return false;
                     }
@@ -3869,25 +3849,11 @@ namespace CppOverride
                 if(INTERNAL_CO_LOG_CheckArguments)
                 {
                     std::cout << "Line: " << __LINE__ << std::endl;
-                    std::cout <<"CheckArgumentsTypes index: "<<argIndex<<" passed\n";
+                    std::cout << "CheckArgumentsTypes index: " << argIndex << " passed" << std::endl;
                 }
                 
                 return CheckArgumentsTypes(validArgumentsList, ++argIndex, args...);
             }
-            
-            template<typename T, typename... Args>
-            inline bool CheckArgumentsTypes(std::vector<ArgInfo>& validArgumentsList, 
-                                            int argIndex, 
-                                            const T& arg, 
-                                            Args&... args)
-            {
-                return CheckArgumentsTypes( validArgumentsList, 
-                                            argIndex, 
-                                            const_cast<INTERNAL_CO_NON_CONST_T&>(arg), 
-                                            args...);
-            }
-
-        #undef INTERNAL_CO_NON_CONST_T
     };
 }
 
@@ -3898,7 +3864,6 @@ namespace CppOverride
 //=================================================================
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
-
 
 
 
@@ -3922,6 +3887,7 @@ namespace CppOverride
 
 
 
+
 #include <cassert>
 #include <type_traits>
 #include <vector>
@@ -3937,19 +3903,21 @@ namespace CppOverride
         friend class Internal_RequirementValidator;
         
         protected:
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>&, 
+            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>&, 
                                                 int,
                                                 OverrideStatus&) { return true; };
 
             #define INTERNAL_CO_LOG_CheckArgumentsValues 0
 
+            //Check type support inequal operator
             template<   typename T, 
-                        typename = typename std::enable_if<!InequalExists<T>::value>::type,
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<!InequalExists<RAW_T>::value>::type,
                         typename... Args>
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
-                                                T&, 
+                                                T& arg, 
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
@@ -3962,11 +3930,22 @@ namespace CppOverride
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    //NOTE: Cannot check data that doesn't have inequal operator
-                    status = OverrideStatus::CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR;
-                    return false;
+                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    
+                    //Check Reference (Which is converted to pointer when checking)
+                    if(typeid(RAW_T*).hash_code() == curArgInfo.DataType)
+                    {
+                        if((RAW_T*)(&arg) != *(RAW_T**)(curArgInfo.Data))
+                            return false;
+                    }
+                    else
+                    {
+                        //NOTE: Cannot check data that doesn't have inequal operator
+                        status = OverrideStatus::CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR;
+                        return false;
+                    }
                 }
                 
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
@@ -3978,11 +3957,13 @@ namespace CppOverride
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
+            //Check value or reference
             template<   typename T, 
-                        typename = typename std::enable_if<InequalExists<T>::value>::type,
-                        typename... Args,
-                        typename = void()>
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<InequalExists<RAW_T>::value>::type,
+                        typename = typename std::enable_if<!std::is_pointer<RAW_T>::value>::type,
+                        typename... Args>
+            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -3998,40 +3979,41 @@ namespace CppOverride
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const ArgInfo& curArgInfo = validArgumentsList[argIndex];
+                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
-                    if( sizeof(INTERNAL_CO_UNCONST(T)*) == curArgInfo.ArgSize &&
-                        typeid(INTERNAL_CO_UNCONST(T)*).hash_code() == curArgInfo.ArgTypeHash)
+                    if(typeid(RAW_T*).hash_code() == curArgInfo.DataType)
                     {
-                        if( &arg != *(INTERNAL_CO_UNCONST(T)**)(curArgInfo.ArgDataPointer))
+                        if((RAW_T*)(&arg) != *(RAW_T**)(curArgInfo.Data))
                             return false;
                     }
                     //Check Value
-                    else if(arg != *static_cast<INTERNAL_CO_UNCONST(T)*>(curArgInfo.ArgDataPointer))
+                    else if(*(RAW_T*)(&arg) != *static_cast<RAW_T*>(curArgInfo.Data))
                         return false;
                 }
                 
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
                 {
                     std::cout << "Line: " << __LINE__ << std::endl;
-                    std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
+                    std::cout <<"CheckArgumentsValues index: "<< argIndex << " passed\n";
                 }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
+            //Check pointer or value
             template<   typename T, 
-                        typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
-                        typename = typename std::enable_if<!std::is_same<T, const void>::value>::type,
-                        typename = typename std::enable_if<InequalExists<T>::value>::type,
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<std::is_pointer<RAW_T>::value>::type,
+                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(RAW_T), void>::value>::type, 
+                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T),
                         typename... Args>
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
-                                                T*& arg, 
+                                                T& arg, 
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
@@ -4044,15 +4026,14 @@ namespace CppOverride
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const ArgInfo& curArgInfo = validArgumentsList[argIndex];
+                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Pointer
-                    if( sizeof(INTERNAL_CO_UNCONST(T)*) == curArgInfo.ArgSize &&
-                        typeid(INTERNAL_CO_UNCONST(T)*).hash_code() == curArgInfo.ArgTypeHash)
+                    if(typeid(RAW_T).hash_code() == curArgInfo.DataType)
                     {
-                        if(arg != *(INTERNAL_CO_UNCONST(T)**)(curArgInfo.ArgDataPointer))
+                        if((RAW_T)arg != *(RAW_T*)(curArgInfo.Data))
                             return false;
                     }
                     //Check Value
@@ -4061,7 +4042,7 @@ namespace CppOverride
                         return CheckArgumentsValues(validArgumentsList, 
                                                     argIndex, 
                                                     status, 
-                                                    *arg, 
+                                                    *(RAW_T)(arg), 
                                                     args...);
                     }
                 }
@@ -4075,11 +4056,18 @@ namespace CppOverride
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
-            template<typename... Args>
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
+            //Check void*
+            template<   typename T, 
+                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T),
+                        typename = typename std::enable_if<std::is_same<PURE_T, void>::value>::type, 
+                        typename... Args,
+                        typename = void(),
+                        typename = void(),
+                        typename = void()>
+            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
-                                                void*& arg, 
+                                                T& arg, 
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
@@ -4092,13 +4080,11 @@ namespace CppOverride
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
                     //Check void Pointer
-                    if( sizeof(void*) != validArgumentsList[argIndex].ArgSize ||
-                        typeid(void*).hash_code() != 
-                            validArgumentsList[argIndex].ArgTypeHash ||
-                        arg != *(void**)(validArgumentsList[argIndex].ArgDataPointer))
+                    if( typeid(void*).hash_code() != validArgumentsList.at(argIndex).DataType ||
+                        (void*)arg != *(void**)(validArgumentsList.at(argIndex).Data))
                     {
                         return false;
                     }
@@ -4111,20 +4097,6 @@ namespace CppOverride
                 }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
-            }
-            
-            template<typename T, typename... Args>
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
-                                                int argIndex, 
-                                                OverrideStatus& status,
-                                                const T& arg, 
-                                                Args&... args)
-            {
-                return CheckArgumentsValues(validArgumentsList, 
-                                            argIndex, 
-                                            status,
-                                            const_cast<INTERNAL_CO_UNCONST(T)&>(arg), 
-                                            args...);
             }
     };
 }
@@ -4147,7 +4119,6 @@ namespace CppOverride
 #include <cstdint>
 #include <vector>
 #include <iostream>
-#include <type_traits>
 
 namespace CppOverride 
 {
@@ -4161,7 +4132,8 @@ namespace CppOverride
                                     OverrideStatus*) {}
 
             template<   typename T, 
-                        typename = typename std::enable_if<!std::is_copy_assignable<T>::value>::type,
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T),
+                        typename = typename std::enable_if<!std::is_copy_assignable<RAW_T>::value>::type,
                         typename... Args>
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
@@ -4182,7 +4154,8 @@ namespace CppOverride
             }
             
             template<   typename T, 
-                        typename = typename std::enable_if<std::is_copy_assignable<T>::value>::type,
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T),
+                        typename = typename std::enable_if<std::is_copy_assignable<RAW_T>::value>::type,
                         typename... Args,
                         typename = void()>
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
@@ -4191,10 +4164,10 @@ namespace CppOverride
                                     T& arg, 
                                     Args&... args)
             {
-                if(argsData[index].DataSet)
+                if(argsData.at(index).DataSet)
                 {
-                    INTERNAL_CO_UNCONST(T)& pureArg = const_cast<INTERNAL_CO_UNCONST(T)&>(arg); 
-                    pureArg = *static_cast<INTERNAL_CO_UNCONST(T)*>(argsData[index].Data);
+                    RAW_T& pureArg = (RAW_T&)(arg); 
+                    pureArg = *(RAW_T*)(argsData.at(index).Data);
                     if(INTERNAL_CO_LOG_ModifyArgs)
                     {
                         std::cout << std::endl << __func__ << " called" << std::endl;
@@ -4212,14 +4185,14 @@ namespace CppOverride
                                 } while(0)
                         #endif
                         
-                        std::cout << "modified index: "<<index << std::endl;
-                        std::cout << "typeid(arg).name(): " << typeid(arg).name() <<std::endl;
-                        std::cout <<    "typeid(arg).hash_code(): " << 
-                                        typeid(arg).hash_code() <<
+                        std::cout << "modified index: " << index << std::endl;
+                        std::cout << "typeid(RAW_T).name(): " << typeid(RAW_T).name() << std::endl;
+                        std::cout <<    "typeid(RAW_T).hash_code(): " << 
+                                        typeid(RAW_T).hash_code() <<
                                         std::endl;
                         
-                        std::cout <<    "argsData[index].DataType: " << 
-                                        argsData[index].DataType <<
+                        std::cout <<    "argsData.at(index).DataType: " << 
+                                        argsData.at(index).DataType <<
                                         std::endl;
                         
                         //std::cout << "arg value: "<< arg << std::endl;
@@ -4230,7 +4203,7 @@ namespace CppOverride
 
                         std::cout << "modified value bytes:" << std::endl;
                         
-                        PRINT_BYTES((*static_cast<T*>(argsData[index].Data)));
+                        PRINT_BYTES(*(RAW_T*)(argsData.at(index).Data));
                         std::cout << std::endl;
                     }
                 }
@@ -4238,10 +4211,14 @@ namespace CppOverride
                 ModifyArgs(argsData, ++index, status, args...);
             }
             
+            //If the argument is a pointer type, we can just dereference that and 
+            //pass it as reference to a value
             template<   typename T, 
-                        typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
-                        typename = typename std::enable_if<!std::is_same<T, const void>::value>::type, 
-                        typename... Args>
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T),
+                        typename = typename std::enable_if<!std::is_same<RAW_T, void>::value>::type, 
+                        typename... Args,
+                        typename = void(),
+                        typename = void()>
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
@@ -4265,11 +4242,11 @@ namespace CppOverride
                     std::cout << "typeid(arg).name(): " << typeid(arg).name() <<std::endl;
                     std::cout << "typeid(arg).hash_code(): " << typeid(arg).hash_code() <<std::endl;
                     //std::cout << "arg value: "<< arg << std::endl;
-                    std::cout << "argsData[index].DataSet: " << argsData[index].DataSet << std::endl;
+                    std::cout << "argsData.att(index).DataSet: " << argsData.at(index).DataSet << std::endl;
                     std::cout << std::endl;
                 }
                 
-                if(argsData[index].DataSet)
+                if(argsData.at(index).DataSet)
                 {
                     //NOTE: Data cannot be set for const arguments
                     if(status != nullptr)
@@ -4308,466 +4285,6 @@ namespace CppOverride
 
 #endif
 
-//=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ReturnDataRetriever.hpp
-//=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_RETRIEVER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_RETRIEVER_HPP
-
-
-
-
-
-
-
-
-
-#include <cassert>
-#include <string>
-#include <unordered_map>
-#include <iostream>
-
-namespace CppOverride
-{
-    class Internal_ReturnDataRetriever
-    {
-        public:
-            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
-        
-        protected:
-            OverrideDatas& CurrentOverrideDatas;
-            Internal_ArgsValuesAppender& ArgsValuesAppender;
-            Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
-            Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
-        
-            #define INTERNAL_CO_LOG_GetCorrectReturnDataInfo 0
-
-            template<   typename ReturnType, 
-                        typename... Args>
-            inline int GetCorrectReturnDataInfo(std::string functionName, 
-                                                OverrideStatus& outInternalStatus,
-                                                Args&... args)
-            {
-                if(CurrentOverrideDatas.find(functionName) == CurrentOverrideDatas.end())
-                {
-                    //NOTE: This should be checked before calling this
-                    outInternalStatus = OverrideStatus::INTERNAL_MISSING_CHECK_ERROR;
-                    return -1;
-                }
-                
-                if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                    std::cout << std::endl << __func__ << " called" << std::endl;
-
-                std::vector<void*> argumentsList;
-                ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
-                
-                std::vector<Internal_OverrideData>& curOverrideData = 
-                    CurrentOverrideDatas[functionName];
-                
-                int returnIndex = -1;
-                for(int i = 0; i < curOverrideData.size(); i++)
-                {
-                    if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                        std::cout << "Checking return data[" << i << "]" << std::endl;
-
-                    //Check override return data exist
-                    if(curOverrideData[i].ReturnDataInfo.DataSet)
-                    {
-                        //Check return type match
-                        if( curOverrideData[i].ReturnDataInfo.DataType != 
-                            typeid(ReturnType).hash_code())
-                        {
-                            if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                                std::cout << "Failed at return type" << std::endl;
-                            
-                            continue;
-                        }
-                        
-                        //If we need to return a reference, 
-                        //  we check for pointer type as we can't store references
-                        if( std::is_reference<ReturnType>() && 
-                            !curOverrideData[i].ReturnDataInfo.ReturnReference)
-                        {
-                            if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                                std::cout << "Failed at return reference" << std::endl;
-                            
-                            continue;
-                        }
-                    }
-                    else if(curOverrideData[i].ReturnDataActionInfo.DataActionSet)
-                    {
-                        //Check return type match
-                        if( curOverrideData[i].ReturnDataActionInfo.DataType != 
-                            typeid(ReturnType).hash_code())
-                        {
-                            if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                                std::cout << "Failed at return type" << std::endl;
-                            
-                            continue;
-                        }
-                        
-                        //If we need to return a reference, 
-                        //  we check for pointer type as we can't store references
-                        if( std::is_reference<ReturnType>() && 
-                            !curOverrideData[i].ReturnDataActionInfo.ReturnReference)
-                        {
-                            if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                                std::cout << "Failed at return action reference" << std::endl;
-                            
-                            continue;
-                        }
-                    }
-                    else if(curOverrideData[i].ReturnDataInfo.ReturnAny)
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                            std::cout << "Any return type entry encountered" << std::endl;
-                    }
-                    else
-                        continue;
-                    
-                    //Check parameter condition types/count match
-                    if( !curOverrideData[i].ConditionInfo.ArgsCondition.empty() && 
-                        !ArgsTypesChecker.CheckArgumentsTypes(  curOverrideData[i]  .ConditionInfo
-                                                                                    .ArgsCondition, 
-                                                                0, 
-                                                                args...))
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                            std::cout << "Failed at Check parameter" << std::endl;
-                        
-                        continue;
-                    }
-                    
-                    //Check parameter values
-                    if( !curOverrideData[i].ConditionInfo.ArgsCondition.empty() && 
-                        !ArgsValuesChecker.CheckArgumentsValues(curOverrideData[i]  .ConditionInfo
-                                                                                    .ArgsCondition, 
-                                                                0, 
-                                                                outInternalStatus,
-                                                                args...))
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                            std::cout << "Failed at Check parameter" << std::endl;
-                        
-                        if(curOverrideData.at(i).Status != nullptr)
-                        {
-                            *curOverrideData.at(i).Status = 
-                                OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
-                        }
-                        
-                        if(curOverrideData[i].ResultActionInfo.OtherwiseActionSet)
-                            curOverrideData[i].ResultActionInfo.OtherwiseAction(argumentsList);
-                        
-                        continue;
-                    }
-                    
-                    
-                    //Check condition lambda
-                    if( curOverrideData[i].ConditionInfo.DataConditionSet && 
-                        !curOverrideData[i].ConditionInfo.LambdaCondition(argumentsList))
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                            std::cout << "Failed at Check condition" << std::endl;
-                        
-                        if(curOverrideData[i].Status != nullptr)
-                        {
-                            *curOverrideData[i].Status = 
-                                OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
-                        }
-                        
-                        if(curOverrideData[i].ResultActionInfo.OtherwiseActionSet)
-                            curOverrideData[i].ResultActionInfo.OtherwiseAction(argumentsList);
-                        
-                        continue;
-                    }
-                    
-                    //Check times
-                    if( curOverrideData[i].ConditionInfo.Times >= 0 && 
-                        curOverrideData[i].ConditionInfo.CalledTimes >= 
-                        curOverrideData[i].ConditionInfo.Times)
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                            std::cout << "Failed at Check times" << std::endl;
-                        
-                        if(curOverrideData[i].Status != nullptr)
-                        {
-                            *curOverrideData[i].Status = 
-                                OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
-                        }
-                        
-                        if(curOverrideData[i].ResultActionInfo.OtherwiseActionSet)
-                            curOverrideData[i].ResultActionInfo.OtherwiseAction(argumentsList);
-
-                        continue;
-                    }
-                    
-                    if(INTERNAL_CO_LOG_GetCorrectReturnDataInfo)
-                        std::cout << "Return data found: " << i << std::endl;
-                    
-                    returnIndex = i;
-                    break;
-                }
-                
-                //NOTE: We don't need to deallocate argumentsList and derefArgumentsList 
-                //  because they are just pointers to arg values and type info from the caller
-                return returnIndex;
-            }
-        public:
-            inline Internal_ReturnDataRetriever(OverrideDatas& overrideDataLists,
-                                                Internal_ArgsValuesAppender& argsValuesAppender,
-                                                Internal_ConditionArgsTypesChecker& argsTypesChecker,
-                                                Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
-                CurrentOverrideDatas(overrideDataLists),
-                ArgsValuesAppender(argsValuesAppender),
-                ArgsTypesChecker(argsTypesChecker),
-                ArgsValuesChecker(argsValuesChecker)
-            {}
-    };
-}
-
-#endif
-
-//=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ArgsDataRetriever.hpp
-//=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_DATA_RETRIEVER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_DATA_RETRIEVER_HPP
-
-
-
-
-
-
-
-
-
-#include <cassert>
-#include <string>
-#include <unordered_map>
-#include <iostream>
-
-namespace CppOverride
-{
-    class Internal_ArgsDataRetriever
-    {
-        public:
-            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
-        
-        protected:
-            OverrideDatas& CurrentOverrideDatas;
-            Internal_ArgsValuesAppender& ArgsValuesAppender;
-            Internal_ArgsTypeInfoAppender& ArgsTypeInfoAppender;
-            Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
-            Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
-            
-            #define INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo 0
-
-            template<typename... Args>
-            inline int GetCorrectArgumentsDataInfo( std::string functionName, 
-                                                    OverrideStatus& outInternalStatus,
-                                                    Args&... args)
-            {
-                if(CurrentOverrideDatas.find(functionName) == CurrentOverrideDatas.end())
-                {
-                    //NOTE: This should be checked before calling this
-                    outInternalStatus = OverrideStatus::INTERNAL_MISSING_CHECK_ERROR;
-                    return -1;
-                }
-                
-                if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                    std::cout << std::endl << __func__ << " called" << std::endl;
-                
-                std::vector<void*> argumentsList;
-                ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
-                
-                std::vector<ArgInfo> argumentsTypesList;
-                ArgsTypeInfoAppender.AppendArgsTypeInfo(argumentsTypesList, args...);
-                
-                std::vector<Internal_OverrideData>& curData = CurrentOverrideDatas[functionName];
-                
-                int returnIndex = -1;
-                for(int i = 0; i < curData.size(); i++)
-                {
-                    if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                        std::cout << "Checking arg data[" << i << "]\n";
-                    
-                    //Check override argument data types match
-                    int argumentTypeFailedIndex = -1;
-                    
-                    if( curData[i].ArgumentsDataActionInfo.DataActionSet && 
-                        !argumentsTypesList.empty() &&
-                        curData[i].ArgumentsDataActionInfo.DataTypes.size() == 
-                            argumentsTypesList.size())
-                    {
-                        std::vector<std::size_t>& argTypeHashes = 
-                            curData[i].ArgumentsDataActionInfo.DataTypes;
-                        
-                        std::vector<bool>& argsTypesSet = 
-                            curData[i].ArgumentsDataActionInfo.DataTypesSet;
-                        
-                        for(int j = 0; j < argTypeHashes.size(); j++)
-                        {
-                            if( argsTypesSet[j] &&
-                                argTypeHashes[j] != argumentsTypesList[j].ArgTypeHash)
-                            {
-                                argumentTypeFailedIndex = j;
-                                
-                                if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                                {
-                                    std::cout <<    "argTypeHashes[" << j << "]: " << 
-                                                    argTypeHashes[j] << std::endl;
-                                    std::cout <<    "deRefArgumentsList[" << j << "].ArgTypeHash: " <<
-                                                    argumentsTypesList[j].ArgTypeHash << std::endl;
-                                }
-                                
-                                break;
-                            }
-                        }
-                    }
-                    //Check set argument data counts match
-                    else if(curData[i].ArgumentsDataInfo.size() == argumentsTypesList.size() &&
-                            !argumentsTypesList.empty())
-                    {
-                        for(int j = 0; j < curData[i].ArgumentsDataInfo.size(); j++)
-                        {
-                            bool overrideArg =  curData[i].ArgumentsDataInfo[j].DataSet;
-
-                            if( overrideArg && 
-                                curData[i].ArgumentsDataInfo[j].DataType != 
-                                    argumentsTypesList[j].ArgTypeHash)
-                            {
-                                argumentTypeFailedIndex = j;
-                                
-                                if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                                {
-                                    std::cout << "Failed at checking argument data type" << std::endl;
-                                    std::cout <<    "curData[i].ArgumentsDataInfo[" << j << "]: " << 
-                                                    curData[i].ArgumentsDataInfo[j].DataType << std::endl;
-                                    std::cout <<    "deRefArgumentsList[" << j << "].ArgTypeHash: " <<
-                                                    argumentsTypesList[j].ArgTypeHash << std::endl;
-                                }
-                                
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                            std::cout << "Failed at Check set argument data exist" << std::endl;
-                        
-                        continue;
-                    }
-                    
-                    if(argumentTypeFailedIndex >= 0)
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                        {
-                            std::cout <<    "Failed at Check set argument data types at index " <<
-                                            argumentTypeFailedIndex << std::endl;
-                        }
-                        
-                        continue;
-                    }
-                    
-                    //Check parameter condition types/count match
-                    if( !curData[i].ConditionInfo.ArgsCondition.empty() && 
-                        !ArgsTypesChecker.CheckArgumentsTypes(  curData[i]  .ConditionInfo
-                                                                            .ArgsCondition, 
-                                                                0, 
-                                                                args...))
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                            std::cout << "Failed at Check parameter type" << std::endl;
-                        
-                        continue;
-                    }
-                    
-                    //Check parameter values
-                    if( !curData[i].ConditionInfo.ArgsCondition.empty() && 
-                        !ArgsValuesChecker.CheckArgumentsValues(curData[i]  .ConditionInfo
-                                                                            .ArgsCondition, 
-                                                                0, 
-                                                                outInternalStatus,
-                                                                args...))
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                            std::cout << "Failed at Check parameter value" << std::endl;
-                        
-                        if(curData[i].Status != nullptr)
-                            *curData[i].Status = OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
-                        
-                        if(curData[i].ResultActionInfo.OtherwiseActionSet)
-                            curData[i].ResultActionInfo.OtherwiseAction(argumentsList);
-                        
-                        continue;
-                    }
-                    
-                    //Check condition lambda
-                    if( curData[i].ConditionInfo.DataConditionSet && 
-                        !curData[i].ConditionInfo.LambdaCondition(argumentsList))
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                            std::cout << "Failed at Check condition" << std::endl;
-                        
-                        if(curData[i].Status != nullptr)
-                            *curData[i].Status = OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
-                        
-                        if(curData[i].ResultActionInfo.OtherwiseActionSet)
-                            curData[i].ResultActionInfo.OtherwiseAction(argumentsList);
-                        
-                        continue;
-                    }
-                    
-                    //Check times
-                    if( curData[i].ConditionInfo.Times >= 0 && 
-                        curData[i].ConditionInfo.CalledTimes >= 
-                            curData[i].ConditionInfo.Times)
-                    {
-                        if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                            std::cout << "Failed at Check times" << std::endl;
-                        
-                        if(curData[i].Status != nullptr)
-                        {
-                            *curData[i].Status = 
-                                OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
-                        }
-                        
-                        if(curData[i].ResultActionInfo.OtherwiseActionSet)
-                            curData[i].ResultActionInfo.OtherwiseAction(argumentsList);
-                        continue;
-                    }
-                    
-                    if(INTERNAL_CO_LOG_GetCorrectArgumentsDataInfo)
-                        std::cout << "Argument data found: " << i << std::endl;
-                    
-                    returnIndex = i;
-                    break;
-                }
-                
-                //NOTE: We don't need to deallocate argumentsList and derefArgumentsList 
-                //  because they are just pointers to arg values and type info from the caller
-                return returnIndex;
-            }
-        
-        public:
-            Internal_ArgsDataRetriever( OverrideDatas& overrideArgumentsInfos,
-                                        Internal_ArgsValuesAppender& argsValuesAppender,
-                                        Internal_ArgsTypeInfoAppender& argsTypeInfoAppender,
-                                        Internal_ConditionArgsTypesChecker& argsTypesChecker,
-                                        Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
-                                                CurrentOverrideDatas(overrideArgumentsInfos),
-                                                ArgsValuesAppender(argsValuesAppender),
-                                                ArgsTypeInfoAppender(argsTypeInfoAppender),
-                                                ArgsTypesChecker(argsTypesChecker),
-                                                ArgsValuesChecker(argsValuesChecker)
-            {}
-    };
-
-}
-
-#endif
-
 
 //=================================================================
 //./Include_MultiHeaders/OverriderComponents/Internal_ReturnDataValidator.hpp
@@ -4778,15 +4295,11 @@ namespace CppOverride
 
 
 
-
-
-
-
-
 #include <cassert>
 #include <string>
 #include <unordered_map>
 #include <iostream>
+#include <type_traits>
 
 namespace CppOverride
 {
@@ -4794,8 +4307,6 @@ namespace CppOverride
     {
         protected:
             Internal_ArgsValuesAppender& ArgsValuesAppender;
-            Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
-            Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
         
             #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 0
 
@@ -4873,12 +4384,8 @@ namespace CppOverride
                 return true;
             }
         public:
-            inline Internal_ReturnDataValidator(Internal_ArgsValuesAppender& argsValuesAppender,
-                                                Internal_ConditionArgsTypesChecker& argsTypesChecker,
-                                                Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
-                ArgsValuesAppender(argsValuesAppender),
-                ArgsTypesChecker(argsTypesChecker),
-                ArgsValuesChecker(argsValuesChecker)
+            inline Internal_ReturnDataValidator(Internal_ArgsValuesAppender* argsValuesAppender) :
+                ArgsValuesAppender(*argsValuesAppender)
             {}
     };
 }
@@ -4890,8 +4397,6 @@ namespace CppOverride
 //=================================================================
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_DATA_VALIDATOR_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_DATA_VALIDATOR_HPP
-
-
 
 
 
@@ -4911,8 +4416,6 @@ namespace CppOverride
         protected:
             Internal_ArgsValuesAppender& ArgsValuesAppender;
             Internal_ArgsTypeInfoAppender& ArgsTypeInfoAppender;
-            Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
-            Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
             
             #define INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo 0
 
@@ -4927,7 +4430,7 @@ namespace CppOverride
                 std::vector<void*> argumentsList;
                 ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                std::vector<ArgInfo> argumentsTypesList;
+                std::vector<Internal_DataInfo> argumentsTypesList;
                 ArgsTypeInfoAppender.AppendArgsTypeInfo(argumentsTypesList, args...);
                 
                 if(INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo)
@@ -4949,17 +4452,17 @@ namespace CppOverride
                     
                     for(int i = 0; i < argTypeHashes.size(); i++)
                     {
-                        if( argsTypesSet[i] &&
-                            argTypeHashes[i] != argumentsTypesList[i].ArgTypeHash)
+                        if( argsTypesSet.at(i) &&
+                            argTypeHashes.at(i) != argumentsTypesList.at(i).DataType)
                         {
                             argumentTypeFailedIndex = i;
                             
                             if(INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo)
                             {
                                 std::cout <<    "argTypeHashes[" << i << "]: " << 
-                                                argTypeHashes[i] << std::endl;
+                                                argTypeHashes.at(i) << std::endl;
                                 std::cout <<    "deRefArgumentsList[" << i << "].ArgTypeHash: " <<
-                                                argumentsTypesList[i].ArgTypeHash << std::endl;
+                                                argumentsTypesList.at(i).DataType << std::endl;
                             }
                             
                             break;
@@ -4972,11 +4475,11 @@ namespace CppOverride
                 {
                     for(int i = 0; i < overrideDataToCheck.ArgumentsDataInfo.size(); i++)
                     {
-                        bool overrideArg =  overrideDataToCheck.ArgumentsDataInfo[i].DataSet;
+                        bool overrideArg =  overrideDataToCheck.ArgumentsDataInfo.at(i).DataSet;
 
                         if( overrideArg && 
-                            overrideDataToCheck.ArgumentsDataInfo[i].DataType != 
-                                argumentsTypesList[i].ArgTypeHash)
+                            overrideDataToCheck.ArgumentsDataInfo.at(i).DataType != 
+                                argumentsTypesList.at(i).DataType)
                         {
                             argumentTypeFailedIndex = i;
                             
@@ -4984,9 +4487,9 @@ namespace CppOverride
                             {
                                 std::cout << "Failed at checking argument data type" << std::endl;
                                 std::cout <<    "overrideDataToCheck.ArgumentsDataInfo[" << i << "]: " << 
-                                                overrideDataToCheck.ArgumentsDataInfo[i].DataType << std::endl;
+                                                overrideDataToCheck.ArgumentsDataInfo.at(i).DataType << std::endl;
                                 std::cout <<    "deRefArgumentsList[" << i << "].ArgTypeHash: " <<
-                                                argumentsTypesList[i].ArgTypeHash << std::endl;
+                                                argumentsTypesList.at(i).DataType << std::endl;
                             }
                             
                             break;
@@ -5021,13 +4524,9 @@ namespace CppOverride
         
         public:
             Internal_ArgsDataValidator( Internal_ArgsValuesAppender& argsValuesAppender,
-                                        Internal_ArgsTypeInfoAppender& argsTypeInfoAppender,
-                                        Internal_ConditionArgsTypesChecker& argsTypesChecker,
-                                        Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
+                                        Internal_ArgsTypeInfoAppender& argsTypeInfoAppender) :
                                                 ArgsValuesAppender(argsValuesAppender),
-                                                ArgsTypeInfoAppender(argsTypeInfoAppender),
-                                                ArgsTypesChecker(argsTypesChecker),
-                                                ArgsValuesChecker(argsValuesChecker)
+                                                ArgsTypeInfoAppender(argsTypeInfoAppender)
             {}
     };
 
@@ -5199,6 +4698,7 @@ namespace CppOverride
 #endif
 
 
+
 #include <string>
 #include <unordered_map>
 
@@ -5215,8 +4715,6 @@ namespace CppOverride
                         public Internal_ReturnDataValidator,
                         public Internal_ArgsDataValidator,
                         public Internal_RequirementValidator
-                        //public Internal_ReturnDataRetriever,
-                        //public Internal_ArgsDataRetriever
     {
         private:
             std::unordered_map<std::string, Internal_OverrideDataList> OverrideDatas;
@@ -5230,11 +4728,9 @@ namespace CppOverride
                 Internal_ReturnDataSetter(OverrideDatas),
                 Internal_ArgsDataSetter(OverrideDatas),
                 Internal_RequirementSetter(OverrideDatas),
-                Internal_ReturnDataValidator(*this, *this, *this),
-                Internal_ArgsDataValidator(*this, *this, *this, *this),
+                Internal_ReturnDataValidator(static_cast<Internal_ArgsValuesAppender*>(this)),
+                Internal_ArgsDataValidator(*this, *this),
                 Internal_RequirementValidator(*this, *this, *this)
-                //Internal_ReturnDataRetriever(OverrideDatas, *this, *this, *this),
-                //Internal_ArgsDataRetriever(OverrideDatas, *this, *this, *this, *this)
             {
                 *this = other;
             }
@@ -5252,20 +4748,22 @@ namespace CppOverride
                     //For each override
                     for(int i = 0; i < it->second.size(); i++)
                     {
-                        for(int j = 0; j < it->second[i].ConditionInfo.ArgsCondition.size(); j++)
+                        for(int j = 0; j < it->second.at(i).ConditionInfo.ArgsCondition.size(); j++)
                         {
-                            ArgInfo& currentInfo = it->second[i].ConditionInfo.ArgsCondition[j];
+                            Internal_DataInfo& currentInfo = 
+                                it->second.at(i).ConditionInfo.ArgsCondition.at(j);
                             
-                            if(currentInfo.ArgSet)
+                            if(currentInfo.DataSet)
                             {
-                                currentInfo.ArgDataPointer = 
-                                    currentInfo.CopyConstructor(currentInfo.ArgDataPointer);
+                                currentInfo.Data = 
+                                    currentInfo.CopyConstructor(currentInfo.Data);
                             }
                         }
                         
-                        for(int j = 0; j < it->second[i].ArgumentsDataInfo.size(); j++)
+                        for(int j = 0; j < it->second.at(i).ArgumentsDataInfo.size(); j++)
                         {
-                            Internal_DataInfo& currentInfo = it->second[i].ArgumentsDataInfo[j];
+                            Internal_DataInfo& currentInfo = 
+                                it->second.at(i).ArgumentsDataInfo.at(j);
                             
                             if(currentInfo.DataSet)
                             {
@@ -5275,7 +4773,7 @@ namespace CppOverride
                         }
                         
                         {
-                            Internal_ReturnDataInfo& currentInfo = it->second[i].ReturnDataInfo;
+                            Internal_ReturnDataInfo& currentInfo = it->second.at(i).ReturnDataInfo;
                             
                             if(currentInfo.DataSet)
                             {
@@ -5292,18 +4790,9 @@ namespace CppOverride
             inline Overrider() :    Internal_ReturnDataSetter(OverrideDatas),
                                     Internal_ArgsDataSetter(OverrideDatas),
                                     Internal_RequirementSetter(OverrideDatas),
-                                    Internal_ReturnDataValidator(*this, *this, *this),
-                                    Internal_ArgsDataValidator(*this, *this, *this, *this),
+                                    Internal_ReturnDataValidator(*this),
+                                    Internal_ArgsDataValidator(*this, *this),
                                     Internal_RequirementValidator(*this, *this, *this)
-                                    //Internal_ReturnDataRetriever(   OverrideDatas, 
-                                    //                                *this, 
-                                    //                                *this,
-                                    //                                *this),
-                                    //Internal_ArgsDataRetriever( OverrideDatas, 
-                                    //                            *this, 
-                                    //                            *this, 
-                                    //                            *this,
-                                    //                            *this)
             {}
             
             inline ~Overrider()
@@ -5313,18 +4802,19 @@ namespace CppOverride
                     for(int i = 0; i < it->second.size(); i++)
                     {
                         //Free argument condition data
-                        for(int j = 0; j < it->second[i].ConditionInfo.ArgsCondition.size(); j++)
+                        for(int j = 0; j < it->second.at(i).ConditionInfo.ArgsCondition.size(); j++)
                         {
-                            ArgInfo& curArgInfo = it->second[i].ConditionInfo.ArgsCondition[j];
+                            Internal_DataInfo& curArgInfo = 
+                                it->second.at(i).ConditionInfo.ArgsCondition.at(j);
                             
-                            if(curArgInfo.ArgSet)
-                                curArgInfo.Destructor(curArgInfo.ArgDataPointer);
+                            if(curArgInfo.DataSet)
+                                curArgInfo.Destructor(curArgInfo.Data);
                         }
                         
                         //Free arguments data
-                        for(int j = 0; j < it->second[i].ArgumentsDataInfo.size(); j++)
+                        for(int j = 0; j < it->second.at(i).ArgumentsDataInfo.size(); j++)
                         {
-                            Internal_DataInfo& curData = it->second[i].ArgumentsDataInfo[j];
+                            Internal_DataInfo& curData = it->second.at(i).ArgumentsDataInfo.at(j);
                             
                             if(curData.DataSet)
                                 curData.Destructor(curData.Data);
@@ -5332,7 +4822,7 @@ namespace CppOverride
                         
                         //Free return data
                         {
-                            Internal_ReturnDataInfo& curData = it->second[i].ReturnDataInfo;
+                            Internal_ReturnDataInfo& curData = it->second.at(i).ReturnDataInfo;
                             
                             if(curData.DataSet)
                                 curData.Destructor(curData.Data);
@@ -5378,10 +4868,10 @@ namespace CppOverride
                 outDontReturn = false;
                 for(int i = 0; i < currentDataList.size(); ++i)
                 {
-                    if( !currentDataList[i].ArgumentsDataInfo.empty() ||
-                        currentDataList[i].ArgumentsDataActionInfo.DataActionSet)
+                    if( !currentDataList.at(i).ArgumentsDataInfo.empty() ||
+                        currentDataList.at(i).ArgumentsDataActionInfo.DataActionSet)
                     {
-                        if(!IsCorrectArgumentsDataInfo( currentDataList[i], 
+                        if(!IsCorrectArgumentsDataInfo( currentDataList.at(i), 
                                                         args...))
                         {
                             if(INTERNAL_CO_LOG_CheckOverride)
@@ -5393,11 +4883,11 @@ namespace CppOverride
                         outOverrideArgs = true;
                     }
 
-                    if( currentDataList[i].ReturnDataInfo.DataSet ||
-                        currentDataList[i].ReturnDataInfo.ReturnAny ||
-                        currentDataList[i].ReturnDataActionInfo.DataActionSet)
+                    if( currentDataList.at(i).ReturnDataInfo.DataSet ||
+                        currentDataList.at(i).ReturnDataInfo.ReturnAny ||
+                        currentDataList.at(i).ReturnDataActionInfo.DataActionSet)
                     {
-                        if(!IsCorrectReturnDataInfo<ReturnType>(currentDataList[i], args...))
+                        if(!IsCorrectReturnDataInfo<ReturnType>(currentDataList.at(i), args...))
                         {
                             if(INTERNAL_CO_LOG_CheckOverride)
                                 std::cout << "Return not correct at index: " << i << std::endl;
@@ -5407,14 +4897,14 @@ namespace CppOverride
                         
                         outOverrideReturn = true;
                         
-                        if(currentDataList[i].ReturnDataInfo.ReturnAny)
+                        if(currentDataList.at(i).ReturnDataInfo.ReturnAny)
                             outDontReturn = true;
                         else
                             outDontReturn = false;
                     }
 
                     OverrideStatus internalStatus = OverrideStatus::NO_OVERRIDE;
-                    if(!IsMeetingRequirementForDataInfo<ReturnType>(currentDataList[i], 
+                    if(!IsMeetingRequirementForDataInfo<ReturnType>(currentDataList.at(i), 
                                                                     internalStatus, 
                                                                     args...))
                     {
@@ -5423,8 +4913,8 @@ namespace CppOverride
                         {
                             for(int i = 0; i < currentDataList.size(); i++)
                             {
-                                if(currentDataList[i].Status != nullptr)
-                                    *currentDataList[i].Status = internalStatus;
+                                if(currentDataList.at(i).Status != nullptr)
+                                    *currentDataList.at(i).Status = internalStatus;
                             }
                         }
                         
@@ -5717,68 +5207,13 @@ namespace CppOverride
     {
         return CppOverrideObj.ReturnsVoid(*this);
     }
-
-    #ifndef INTERNAL_CO_SET_ARGS_IMPL
-        #define INTERNAL_CO_SET_ARGS_IMPL(...) \
-            template<MPT_PREFIX_SUFFIX_ARGS(typename Arg, Type, __VA_ARGS__)> \
-            OverrideInfoSetter& OverrideInfoSetter::SetArgs \
-            ( \
-                MPT_COMPOSE \
-                ( \
-                    MPT_APPEND_LISTS_ITEMS, \
-                    ( \
-                        MPT_COMPOSE2 \
-                        ( \
-                            MPT_PREFIX_SUFFIX_ARGS, \
-                            ( \
-                                typename TypeUnwrapper<Arg, \
-                                Type>::Type, \
-                                __VA_ARGS__ \
-                            ) \
-                        ), \
-                        MPT_COMPOSE2 \
-                        ( \
-                            MPT_COMPOSE3, \
-                            ( \
-                                MPT_CONCAT, \
-                                ( \
-                                    MPT_COUNT_TO_, \
-                                    MPT_ARGS_COUNT(__VA_ARGS__) \
-                                ) \
-                            )(_, /* no suffix */) \
-                        ) \
-                    ) \
-                ) \
-            ) \
-            { \
-                return CppOverrideObj.SetArgs<MPT_PREFIX_SUFFIX_ARGS(Arg, Type, __VA_ARGS__)>(*this, MPT_PREFIX_SUFFIX_ARGS(_, \
-                                                                            /* no suffix */, \
-                                                                            __VA_ARGS__)); \
-            }
-
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_1(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_2(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_3(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_4(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_5(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_6(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_7(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_8(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_9(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_10(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_11(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_12(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_13(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_14(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_15(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_16(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_17(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_18(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_19(/* no prefix */, /* no suffix */))
-        INTERNAL_CO_SET_ARGS_IMPL(MPT_COUNT_TO_20(/* no prefix */, /* no suffix */))
-    #endif
     
-    #undef INTERNAL_CO_SET_ARGS_IMPL
+    template<typename... Args>
+    inline OverrideInfoSetter& 
+    OverrideInfoSetter::SetArgs(typename TypeUnwrapper<Args>::Type... args)
+    {
+        return CppOverrideObj.SetArgs<Args...>(*this, args...);
+    }
     
     template<typename... Args>
     inline OverrideInfoSetter&
@@ -5803,115 +5238,6 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    #if 0
-    inline std::string Internal_RemoveNewlines(std::string functionSig)
-    {
-        std::set<int> newlinesToRemove;
-        for(int i = 0; i < functionSig.size(); i++)
-        {
-            switch(functionSig[i])
-            {
-                case '\n':
-                case '\r':
-                    newlinesToRemove.insert(i);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        for(auto it = newlinesToRemove.rbegin(); it != newlinesToRemove.rend(); it++)
-            functionSig.erase(functionSig.begin() + *it);
-
-        return functionSig;
-    }
-    
-    inline std::string Internal_RemoveSpaces(std::string functionSig)
-    {
-        //Remove any consecutive spaces
-        std::set<int> spacesToRemove;
-        bool isLastSpace = false;
-        for(int i = 0; i < functionSig.size(); i++)
-        {
-            if(isLastSpace)
-            {
-                if(functionSig[i] == ' ')
-                    spacesToRemove.insert(i);
-                else
-                    isLastSpace = false;
-            }
-            else if(functionSig[i] == ' ')
-                isLastSpace = true;
-        }
-        
-        //Remove spaces around parentheses and commas
-        for(int i = 0; i < functionSig.size(); i++)
-        {
-            switch(functionSig[i])
-            {
-                case '(':
-                case ')':
-                case ',':
-                case '*':
-                case '&':
-                case ':':
-                case '<':
-                case '>':
-                    if(i > 0 && functionSig[i - 1] == ' ')
-                        spacesToRemove.insert(i - 1);
-                    
-                    if(i < functionSig.size() - 1 && functionSig[i + 1] == ' ')
-                        spacesToRemove.insert(i + 1);
-                    break;
-                default:
-                    break;
-            }
-        }
-        
-        for(auto it = spacesToRemove.rbegin(); it != spacesToRemove.rend(); it++)
-            functionSig.erase(functionSig.begin() + *it);
-
-        return functionSig;
-    }
-    
-    inline std::string Internal_Trim(std::string functionSig)
-    {
-        //Trimming
-        int firstCharIndex = -1;
-        for(int i = 0; i < functionSig.size(); i++)
-        {
-            if(functionSig[i] != ' ')
-            {
-                firstCharIndex = i;
-                break;
-            }
-        }
-        
-        int lastCharIndex = -1;
-        for(int i = functionSig.size() - 1; i >= 0; i--)
-        {
-            if(functionSig[i] != ' ')
-            {
-                lastCharIndex = i;
-                break;
-            }
-        }
-        
-        return functionSig.substr(firstCharIndex, lastCharIndex - firstCharIndex + 1);
-    }
-    
-    //==============================================================================
-    //Macros and functions for translating function signature to string
-    //==============================================================================
-    inline std::string Internal_ProcessFunctionSig(std::string functionSig)
-    {
-        functionSig = Internal_RemoveNewlines(functionSig);
-        functionSig = Internal_Trim(functionSig);
-        functionSig = Internal_RemoveSpaces(functionSig);
-        return functionSig;
-    }
-    #endif
-
     //==============================================================================
     //Macro for overriding method implementation
     //==============================================================================
@@ -5979,7 +5305,7 @@ namespace CppOverride
                 { \
                     if(INTERNAL_CO_LOG_CO_OVERRIDE_IMPL) \
                         std::cout << "dontReturn: " << dontReturn << std::endl; \
-                    \
+                    /* If we are not returning, we will need to call the result actions */ \
                     if(dontReturn) \
                     { \
                         overrideObjName.Internal_CallReturnOverrideResultExpectedAction \
@@ -5991,6 +5317,7 @@ namespace CppOverride
                     } \
                     else \
                     { \
+                        /* If we are returning, the result action is called inside */ \
                         return  overrideObjName.Internal_OverrideReturn<MPT_REMOVE_PARENTHESIS(returnType)> \
                                 ( \
                                     foundIndex, \
@@ -6001,6 +5328,7 @@ namespace CppOverride
                 } \
                 if(!overrideArgs && !overrideReturn) \
                 { \
+                    /* If we are overriding anything, we still need to call result actions */ \
                     overrideObjName.Internal_CallReturnOverrideResultExpectedAction \
                     ( \
                         __func__, \
