@@ -1,18 +1,14 @@
 #ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_VALIDATOR_HPP
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_VALIDATOR_HPP
 
-#include "../PureType.hpp"
 #include "./Internal_ArgsValuesAppender.hpp"
-#include "./Internal_ConditionArgsTypesChecker.hpp"
-#include "./Internal_ConditionArgsValuesChecker.hpp"
-#include "../TypeCheck.hpp"
-#include "../OverrideStatus.hpp"
 #include "../Internal_OverrideData.hpp"
 
 #include <cassert>
 #include <string>
 #include <unordered_map>
 #include <iostream>
+#include <type_traits>
 
 namespace CppOverride
 {
@@ -20,8 +16,6 @@ namespace CppOverride
     {
         protected:
             Internal_ArgsValuesAppender& ArgsValuesAppender;
-            Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
-            Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
         
             #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 0
 
@@ -99,12 +93,8 @@ namespace CppOverride
                 return true;
             }
         public:
-            inline Internal_ReturnDataValidator(Internal_ArgsValuesAppender& argsValuesAppender,
-                                                Internal_ConditionArgsTypesChecker& argsTypesChecker,
-                                                Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
-                ArgsValuesAppender(argsValuesAppender),
-                ArgsTypesChecker(argsTypesChecker),
-                ArgsValuesChecker(argsValuesChecker)
+            inline Internal_ReturnDataValidator(Internal_ArgsValuesAppender* argsValuesAppender) :
+                ArgsValuesAppender(*argsValuesAppender)
             {}
     };
 }

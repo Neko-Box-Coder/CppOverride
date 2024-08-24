@@ -11,8 +11,6 @@
 #include "./OverriderComponents/Internal_ConditionArgsTypesChecker.hpp"
 #include "./OverriderComponents/Internal_ConditionArgsValuesChecker.hpp"
 #include "./OverriderComponents/Internal_ArgsModifier.hpp"
-//#include "./OverriderComponents/Internal_ReturnDataRetriever.hpp"
-//#include "./OverriderComponents/Internal_ArgsDataRetriever.hpp"
 
 #include "./OverriderComponents/Internal_ReturnDataValidator.hpp"
 #include "./OverriderComponents/Internal_ArgsDataValidator.hpp"
@@ -38,8 +36,6 @@ namespace CppOverride
                         public Internal_ReturnDataValidator,
                         public Internal_ArgsDataValidator,
                         public Internal_RequirementValidator
-                        //public Internal_ReturnDataRetriever,
-                        //public Internal_ArgsDataRetriever
     {
         private:
             std::unordered_map<std::string, Internal_OverrideDataList> OverrideDatas;
@@ -53,11 +49,9 @@ namespace CppOverride
                 Internal_ReturnDataSetter(OverrideDatas),
                 Internal_ArgsDataSetter(OverrideDatas),
                 Internal_RequirementSetter(OverrideDatas),
-                Internal_ReturnDataValidator(*this, *this, *this),
-                Internal_ArgsDataValidator(*this, *this, *this, *this),
+                Internal_ReturnDataValidator(static_cast<Internal_ArgsValuesAppender*>(this)),
+                Internal_ArgsDataValidator(*this, *this),
                 Internal_RequirementValidator(*this, *this, *this)
-                //Internal_ReturnDataRetriever(OverrideDatas, *this, *this, *this),
-                //Internal_ArgsDataRetriever(OverrideDatas, *this, *this, *this, *this)
             {
                 *this = other;
             }
@@ -115,18 +109,9 @@ namespace CppOverride
             inline Overrider() :    Internal_ReturnDataSetter(OverrideDatas),
                                     Internal_ArgsDataSetter(OverrideDatas),
                                     Internal_RequirementSetter(OverrideDatas),
-                                    Internal_ReturnDataValidator(*this, *this, *this),
-                                    Internal_ArgsDataValidator(*this, *this, *this, *this),
+                                    Internal_ReturnDataValidator(*this),
+                                    Internal_ArgsDataValidator(*this, *this),
                                     Internal_RequirementValidator(*this, *this, *this)
-                                    //Internal_ReturnDataRetriever(   OverrideDatas, 
-                                    //                                *this, 
-                                    //                                *this,
-                                    //                                *this),
-                                    //Internal_ArgsDataRetriever( OverrideDatas, 
-                                    //                            *this, 
-                                    //                            *this, 
-                                    //                            *this,
-                                    //                            *this)
             {}
             
             inline ~Overrider()
