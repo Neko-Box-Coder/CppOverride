@@ -47,6 +47,7 @@ CALL :RUN_TEST "%~dp0\%MODE%WhenCalledWithTests.exe"
 CALL :RUN_TEST "%~dp0\%MODE%MixedModifyArgsAndReturnsTest.exe"
 CALL :RUN_TEST "%~dp0\%MODE%MockShapesTests.exe"
 CALL :RUN_TEST "%~dp0\%MODE%FreeFunctionTests.exe"
+CALL :RUN_TEST "%~dp0\%MODE%ArrayParamTests.exe"
 
 EXIT 0
 

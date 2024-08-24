@@ -104,6 +104,22 @@ namespace CppOverrideTest
             return nullptr;
         }
         
+        //Used In:
+        //  ArrayParamTests
+        inline int IntArrayParameterFunc(int nums[4])
+        {
+            CO_OVERRIDE_IMPL(OverrideObj, int, (nums));
+            return nums[0];
+        }
+        
+        //Used In:
+        //  ArrayParamTests
+        inline int CharArrayParameterFunc(char chars[4])
+        {
+            CO_OVERRIDE_IMPL(OverrideObj, int, (chars));
+            return (int)(chars[0]);
+        }
+        
         namespace Object
         {
             //Used In:
@@ -150,11 +166,21 @@ namespace CppOverrideTest
             {
                 CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2));
             }
+            
+            //Used In:
+            //  ArrayParamTests
+            template<typename T>
+            inline int TemplateArgRefFunc(T& testArg)
+            {
+                CO_OVERRIDE_IMPL(OverrideObj, int, (testArg));
+                return 0;
+            }
         }
     }
     
     namespace Const
     {
+        //Used In:
         inline int ConstArgsFunc(const int testArg, const bool testArg2, float testArg3)
         {
             CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2, testArg3));
