@@ -16,10 +16,10 @@ namespace CppOverride
             //Appending arguments from function calls
             inline void AppendArgsValues(std::vector<void*>&) {};
 
-            template<typename T, typename... Args>
+            template<typename T, typename RAW_T = INTERNAL_CO_RAW_TYPE(T), typename... Args>
             inline void AppendArgsValues(std::vector<void*>& argumentsList, T& arg, Args&... args)
             {
-                argumentsList.push_back((INTERNAL_CO_UNCONST(T)*)&arg);
+                argumentsList.push_back((RAW_T*)&arg);
                 AppendArgsValues(argumentsList, args...);
             }
     };

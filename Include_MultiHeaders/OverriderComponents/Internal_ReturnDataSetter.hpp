@@ -45,9 +45,12 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            template<   typename ReturnType,
-                        typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                        typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type>
+            template
+            <
+                typename ReturnType,
+                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
+                typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type
+            >
             inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter, ReturnType returnData)
             {
                 if(!std::is_same<ReturnType, Any>())
@@ -75,10 +78,13 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            template<   typename ReturnType,
-                        typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                        typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
-                        typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type>
+            template
+            <
+                typename ReturnType,
+                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
+                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
+                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type
+            >
             inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter, ReturnType returnData)
             {
                 if(!std::is_same<ReturnType, Any&>())

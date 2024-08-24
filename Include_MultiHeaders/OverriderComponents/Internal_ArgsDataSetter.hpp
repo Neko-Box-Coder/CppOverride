@@ -45,19 +45,17 @@ namespace CppOverride
             template<typename T, typename... Args>
             inline typename std::enable_if
             <
-                !std::is_copy_assignable<INTERNAL_CO_UNWRAPPED(T)>::value && 
-                sizeof...(Args) != 0, 
+                !std::is_copy_assignable<INTERNAL_CO_UNWRAPPED(T)>::value,
                 OverrideInfoSetter&
             >::type
             SetArgs(OverrideInfoSetter& infoSetter,
-                    INTERNAL_CO_UNWRAPPED(T) arg, 
-                    INTERNAL_CO_UNWRAPPED(Args)... args)
+                    INTERNAL_CO_UNWRAPPED(T) arg)
             {
                 static_assert(  CO_ASSERT_FALSE<T>::value, 
                                 "Cannot modify a non copy assignable object. "
                                 "Please use SetArgsByAction instead.");
 
-                return SetArgs<INTERNAL_CO_UNWRAPPED(Args)...>(infoSetter, args...);
+                return infoSetter;
             }
             
             template<typename T>
@@ -205,8 +203,7 @@ namespace CppOverride
                 return infoSetter;
             }
             
-        #undef INTERNAL_CO_UNCONST_UNREF_T
-        #undef INTERNAL_CO_UNCONST_UNREF
+        #undef INTERNAL_CO_UNWRAPPED
         
         public:
             inline Internal_ArgsDataSetter(OverrideDatas& overrideArgumentsInfos) : 

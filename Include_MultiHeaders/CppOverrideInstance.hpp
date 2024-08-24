@@ -19,6 +19,7 @@
 #include "./Internal_OverrideData.hpp"
 #include "./OverrideStatus.hpp"
 #include "./EarlyReturn.hpp"
+#include "./Internal_DataInfo.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -69,20 +70,22 @@ namespace CppOverride
                     //For each override
                     for(int i = 0; i < it->second.size(); i++)
                     {
-                        for(int j = 0; j < it->second[i].ConditionInfo.ArgsCondition.size(); j++)
+                        for(int j = 0; j < it->second.at(i).ConditionInfo.ArgsCondition.size(); j++)
                         {
-                            ArgInfo& currentInfo = it->second[i].ConditionInfo.ArgsCondition[j];
+                            Internal_DataInfo& currentInfo = 
+                                it->second.at(i).ConditionInfo.ArgsCondition.at(j);
                             
-                            if(currentInfo.ArgSet)
+                            if(currentInfo.DataSet)
                             {
-                                currentInfo.ArgDataPointer = 
-                                    currentInfo.CopyConstructor(currentInfo.ArgDataPointer);
+                                currentInfo.Data = 
+                                    currentInfo.CopyConstructor(currentInfo.Data);
                             }
                         }
                         
-                        for(int j = 0; j < it->second[i].ArgumentsDataInfo.size(); j++)
+                        for(int j = 0; j < it->second.at(i).ArgumentsDataInfo.size(); j++)
                         {
-                            Internal_DataInfo& currentInfo = it->second[i].ArgumentsDataInfo[j];
+                            Internal_DataInfo& currentInfo = 
+                                it->second.at(i).ArgumentsDataInfo.at(j);
                             
                             if(currentInfo.DataSet)
                             {
@@ -92,7 +95,7 @@ namespace CppOverride
                         }
                         
                         {
-                            Internal_ReturnDataInfo& currentInfo = it->second[i].ReturnDataInfo;
+                            Internal_ReturnDataInfo& currentInfo = it->second.at(i).ReturnDataInfo;
                             
                             if(currentInfo.DataSet)
                             {
@@ -121,18 +124,19 @@ namespace CppOverride
                     for(int i = 0; i < it->second.size(); i++)
                     {
                         //Free argument condition data
-                        for(int j = 0; j < it->second[i].ConditionInfo.ArgsCondition.size(); j++)
+                        for(int j = 0; j < it->second.at(i).ConditionInfo.ArgsCondition.size(); j++)
                         {
-                            ArgInfo& curArgInfo = it->second[i].ConditionInfo.ArgsCondition[j];
+                            Internal_DataInfo& curArgInfo = 
+                                it->second.at(i).ConditionInfo.ArgsCondition.at(j);
                             
-                            if(curArgInfo.ArgSet)
-                                curArgInfo.Destructor(curArgInfo.ArgDataPointer);
+                            if(curArgInfo.DataSet)
+                                curArgInfo.Destructor(curArgInfo.Data);
                         }
                         
                         //Free arguments data
-                        for(int j = 0; j < it->second[i].ArgumentsDataInfo.size(); j++)
+                        for(int j = 0; j < it->second.at(i).ArgumentsDataInfo.size(); j++)
                         {
-                            Internal_DataInfo& curData = it->second[i].ArgumentsDataInfo[j];
+                            Internal_DataInfo& curData = it->second.at(i).ArgumentsDataInfo.at(j);
                             
                             if(curData.DataSet)
                                 curData.Destructor(curData.Data);
@@ -140,7 +144,7 @@ namespace CppOverride
                         
                         //Free return data
                         {
-                            Internal_ReturnDataInfo& curData = it->second[i].ReturnDataInfo;
+                            Internal_ReturnDataInfo& curData = it->second.at(i).ReturnDataInfo;
                             
                             if(curData.DataSet)
                                 curData.Destructor(curData.Data);
@@ -186,10 +190,10 @@ namespace CppOverride
                 outDontReturn = false;
                 for(int i = 0; i < currentDataList.size(); ++i)
                 {
-                    if( !currentDataList[i].ArgumentsDataInfo.empty() ||
-                        currentDataList[i].ArgumentsDataActionInfo.DataActionSet)
+                    if( !currentDataList.at(i).ArgumentsDataInfo.empty() ||
+                        currentDataList.at(i).ArgumentsDataActionInfo.DataActionSet)
                     {
-                        if(!IsCorrectArgumentsDataInfo( currentDataList[i], 
+                        if(!IsCorrectArgumentsDataInfo( currentDataList.at(i), 
                                                         args...))
                         {
                             if(INTERNAL_CO_LOG_CheckOverride)
@@ -201,11 +205,11 @@ namespace CppOverride
                         outOverrideArgs = true;
                     }
 
-                    if( currentDataList[i].ReturnDataInfo.DataSet ||
-                        currentDataList[i].ReturnDataInfo.ReturnAny ||
-                        currentDataList[i].ReturnDataActionInfo.DataActionSet)
+                    if( currentDataList.at(i).ReturnDataInfo.DataSet ||
+                        currentDataList.at(i).ReturnDataInfo.ReturnAny ||
+                        currentDataList.at(i).ReturnDataActionInfo.DataActionSet)
                     {
-                        if(!IsCorrectReturnDataInfo<ReturnType>(currentDataList[i], args...))
+                        if(!IsCorrectReturnDataInfo<ReturnType>(currentDataList.at(i), args...))
                         {
                             if(INTERNAL_CO_LOG_CheckOverride)
                                 std::cout << "Return not correct at index: " << i << std::endl;
@@ -215,14 +219,14 @@ namespace CppOverride
                         
                         outOverrideReturn = true;
                         
-                        if(currentDataList[i].ReturnDataInfo.ReturnAny)
+                        if(currentDataList.at(i).ReturnDataInfo.ReturnAny)
                             outDontReturn = true;
                         else
                             outDontReturn = false;
                     }
 
                     OverrideStatus internalStatus = OverrideStatus::NO_OVERRIDE;
-                    if(!IsMeetingRequirementForDataInfo<ReturnType>(currentDataList[i], 
+                    if(!IsMeetingRequirementForDataInfo<ReturnType>(currentDataList.at(i), 
                                                                     internalStatus, 
                                                                     args...))
                     {
@@ -231,8 +235,8 @@ namespace CppOverride
                         {
                             for(int i = 0; i < currentDataList.size(); i++)
                             {
-                                if(currentDataList[i].Status != nullptr)
-                                    *currentDataList[i].Status = internalStatus;
+                                if(currentDataList.at(i).Status != nullptr)
+                                    *currentDataList.at(i).Status = internalStatus;
                             }
                         }
                         

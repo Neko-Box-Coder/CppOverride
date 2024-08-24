@@ -3,7 +3,7 @@
 
 #include "../OverrideInfoSetterDeclaration.hpp"
 #include "../Internal_OverrideData.hpp"
-
+#include "../Internal_DataInfo.hpp"
 #include "../StaticAssertFalse.hpp"
 #include "../Any.hpp"
 #include "../PureType.hpp"
@@ -32,7 +32,6 @@ namespace CppOverride
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                             .ConditionInfo
                                                                             .Times = times;
-                
                 return infoSetter;
             }
             
@@ -40,25 +39,54 @@ namespace CppOverride
             {
                 return infoSetter;
             }
-
-            template<typename T, typename... Args>
+            
+            template<   typename T, 
+                        typename... Args, 
+                        typename = typename std::enable_if<std::is_same<INTERNAL_CO_PURE_TYPE(T), 
+                                                                        void>::value>::type,
+                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T)>
             inline OverrideInfoSetter& WhenCalledWith(  OverrideInfoSetter& infoSetter,
                                                         T arg, 
                                                         Args... args)
             {
-                ArgInfo curArg;
-                if(!std::is_same<T, Any>())
+                Internal_DataInfo argData;
+                //T is void*
+                argData.Data = new void*((void*)arg);
+                argData.CopyConstructor = 
+                    [](void* data) { return new void*(*static_cast<void**>(data)); };
+                argData.Destructor = 
+                    [](void* data){ delete static_cast<void**>(data); };
+                argData.DataType = typeid(void*).hash_code();
+                argData.DataSet = true;
+
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
+                                                                            .ConditionInfo
+                                                                            .ArgsCondition
+                                                                            .push_back(argData);
+
+                return WhenCalledWith(infoSetter, args...);
+            }
+            
+            template<   typename T, 
+                        typename... Args, 
+                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(T), 
+                                                                        void>::value>::type>
+            inline OverrideInfoSetter& WhenCalledWith(  OverrideInfoSetter& infoSetter,
+                                                        T arg, 
+                                                        Args... args)
+            {
+                Internal_DataInfo argData;
+                //Other types that are not Any
+                if(!std::is_same<INTERNAL_CO_RAW_TYPE(T), Any>())
                 {
-                    curArg.ArgDataPointer = new T(arg);
-                    curArg.CopyConstructor = [](void* data) { return new T(*static_cast<T*>(data)); };
-                    curArg.Destructor = [](void* data){ delete static_cast<T*>(data); };
-                    curArg.ArgSize = sizeof(T);
-                    curArg.ArgTypeHash = typeid(T).hash_code();
-                    curArg.ArgSet = true;
+                    argData.Data = new T(arg);
+                    argData.CopyConstructor = [](void* data) { return new T(*static_cast<T*>(data)); };
+                    argData.Destructor = [](void* data){ delete static_cast<T*>(data); };
+                    argData.DataType = typeid(INTERNAL_CO_RAW_TYPE(T)).hash_code();
+                    argData.DataSet = true;
                     
                     #if 0
-                        std::cout << "typeid(T).name(): "<<typeid(T).name() <<"\n";
-                        std::cout << "sizeof(T): " << sizeof(T) << "\n";
+                        std::cout << "typeid(T).name(): " << typeid(T).name() <<"\n";
                         std::cout << "typeid(T).hash_code(): " << typeid(T).hash_code() << "\n";
                     #endif
                 }
@@ -66,7 +94,7 @@ namespace CppOverride
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
                                                                             .ConditionInfo
                                                                             .ArgsCondition
-                                                                            .push_back(curArg);
+                                                                            .push_back(argData);
 
                 return WhenCalledWith(infoSetter, args...);
             }
@@ -125,7 +153,6 @@ namespace CppOverride
                 currentData.Status = &result.Status;
                 return infoSetter;
             }
-            
         
         public:
             Internal_RequirementSetter(OverrideDatas& overrideDataLists) :
