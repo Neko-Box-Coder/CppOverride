@@ -452,6 +452,12 @@ as well as registering callbacks when the override is successful or not.
 
 ### When Called With
 
+This will trigger the override only when the value matches. 
+This will also auto dereference any pointer to match for the value if possible, 
+if not it will then try to match pointer instead.
+
+You can use `CO_ANY` to skip matching a particular parameter
+
 Example:
 ```cpp
 CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyReturnValue)
@@ -532,7 +538,7 @@ int ret2 = OverrideMyReturnValue(2, 3.f);   //called is true now
 > `CO_ANY` and `CO_DONT_OVERRIDE_RETURN` to not return anything. So something like:
 > ```cpp
 > //CO_SETUP_OVERRIDE...
-> .Returns<CO_ANY>(CO_DONT_OVERRIDE_RETURN)
+> .Returns<CO_ANY_TYPE>(CO_DONT_OVERRIDE_RETURN)
 > .WhenCalledExpectedly_Do
 > (
 >     //...

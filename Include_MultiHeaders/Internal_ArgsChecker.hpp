@@ -2,7 +2,7 @@
 #define CO_INTERNAL_ARGS_CHECKER_HPP
 
 #include "./Any.hpp"
-#include "./ArgsInfo.hpp"
+#include "./Internal_DataInfo.hpp"
 #include "./PureType.hpp"
 #include <vector>
 #include <iostream>
@@ -15,13 +15,13 @@ namespace CppOverride
         friend class Internal_ArgsDataRetriever;
         
         protected:
-            inline bool CheckArguments( std::vector<ArgInfo>& validArgumentsList, 
+            inline bool CheckArguments( std::vector<Internal_DataInfo>& validArgumentsList, 
                                         int argIndex) { return true; };
 
             #define INTERNAL_CO_LOG_CheckArguments 0
 
             template<typename T, typename... Args>
-            inline bool CheckArguments( std::vector<ArgInfo>& validArgumentsList, 
+            inline bool CheckArguments( std::vector<Internal_DataInfo>& validArgumentsList, 
                                         int argIndex, 
                                         T& arg, 
                                         Args&... args)
@@ -35,29 +35,10 @@ namespace CppOverride
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    if(sizeof(INTERNAL_CO_UNCONST(T)) != validArgumentsList[argIndex].ArgSize)
-                    {
-                        if(INTERNAL_CO_LOG_CheckArguments)
-                        {
-                            std::cout <<    "sizeof(INTERNAL_CO_UNCONST(T)): " <<
-                                            sizeof(INTERNAL_CO_UNCONST(T)) <<
-                                            std::endl;
-                            
-                            std::cout << "sizeof(T): " << sizeof(T) << std::endl;
-                            std::cout <<    "validArgumentsList[" << 
-                                            argIndex << 
-                                            "].ArgSize: " << 
-                                            validArgumentsList[argIndex].ArgSize <<
-                                            std::endl;
-                        }
-                        
-                        return false;
-                    }
-
                     if(typeid(INTERNAL_CO_UNCONST(T)).hash_code() != 
-                            validArgumentsList[argIndex].ArgTypeHash)
+                            validArgumentsList.at(argIndex).DataType)
                     {
                         if(INTERNAL_CO_LOG_CheckArguments)
                         {
@@ -66,9 +47,9 @@ namespace CppOverride
                                             std::endl;
                             
                             std::cout <<    "validArgumentsList["
-                                            <<argIndex << 
+                                            << argIndex << 
                                             "].ArgTypeHash: " <<
-                                            validArgumentsList[argIndex].ArgTypeHash <<
+                                            validArgumentsList.at(argIndex).DataType <<
                                             std::endl;
                         }
                         
@@ -76,13 +57,13 @@ namespace CppOverride
                     }
 
                     if(arg != *reinterpret_cast<INTERNAL_CO_UNCONST(T)*>
-                                (validArgumentsList[argIndex].ArgDataPointer))
+                                (validArgumentsList.at(argIndex).Data))
                     {
                         if(INTERNAL_CO_LOG_CheckArguments)
                         {
                             std::cout << 
                             "arg != *reinterpret_cast<INTERNAL_CO_UNCONST(T)*>\
-                            (validArgumentsList[argIndex].ArgData\n";
+                            (validArgumentsList.at(argIndex).Data" << std::endl;
                         }
                         
                         return false;
@@ -96,7 +77,7 @@ namespace CppOverride
             }
             
             template<typename... Args>
-            inline bool CheckArguments( std::vector<ArgInfo>& validArgumentsList, 
+            inline bool CheckArguments( std::vector<Internal_DataInfo>& validArgumentsList, 
                                         int argIndex, 
                                         Any& arg, 
                                         Args&... args)
@@ -110,7 +91,7 @@ namespace CppOverride
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                     return false;
                 
                 if(INTERNAL_CO_LOG_CheckArguments)
@@ -123,7 +104,7 @@ namespace CppOverride
                         typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
                         typename = typename std::enable_if<!std::is_same<T, const void>::value>::type, 
                         typename... Args>
-            inline bool CheckArguments( std::vector<ArgInfo>& validArgumentsList, 
+            inline bool CheckArguments( std::vector<Internal_DataInfo>& validArgumentsList, 
                                         int argIndex, 
                                         T*& arg, 
                                         Args&... args)
@@ -132,7 +113,7 @@ namespace CppOverride
             }
             
             template<typename T, typename... Args>
-            inline bool CheckArguments( std::vector<ArgInfo>& validArgumentsList, 
+            inline bool CheckArguments( std::vector<Internal_DataInfo>& validArgumentsList, 
                                         int argIndex, 
                                         const T& arg, 
                                         Args&... args)

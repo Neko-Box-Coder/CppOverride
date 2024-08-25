@@ -23,3 +23,4 @@ runTest ./WhenCalledWithTests
 runTest ./MixedModifyArgsAndReturnsTest
 runTest ./MockShapesTests
 runTest ./FreeFunctionTests
+runTest ./ArrayParamTests

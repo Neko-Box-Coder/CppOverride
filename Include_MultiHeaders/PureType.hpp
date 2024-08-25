@@ -11,8 +11,11 @@ namespace CppOverride
     
     #define INTERNAL_CO_UNPOINTER(targetType) typename std::remove_pointer<targetType>::type
     
-    #define INTERNAL_CO_PURE_TYPE(targetType)\
-        INTERNAL_CO_UNCONST(INTERNAL_CO_UNREF(INTERNAL_CO_UNPOINTER(targetType)))
+    #define INTERNAL_CO_RAW_TYPE(targetType) \
+        typename std::decay<INTERNAL_CO_UNCONST(targetType)>::type
+    
+    #define INTERNAL_CO_PURE_TYPE(targetType) \
+        typename std::decay<INTERNAL_CO_UNCONST(INTERNAL_CO_UNPOINTER(targetType))>::type
 }
 
 #endif

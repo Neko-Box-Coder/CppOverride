@@ -2,10 +2,10 @@
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
 
 #include "../Any.hpp"
-#include "../ArgsInfo.hpp"
-#include "../PureType.hpp"
+#include "../Internal_DataInfo.hpp"
 #include "../TypeCheck.hpp"
 #include "../OverrideStatus.hpp"
+#include "../PureType.hpp"
 
 #include <cassert>
 #include <type_traits>
@@ -22,19 +22,21 @@ namespace CppOverride
         friend class Internal_RequirementValidator;
         
         protected:
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>&, 
+            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>&, 
                                                 int,
                                                 OverrideStatus&) { return true; };
 
             #define INTERNAL_CO_LOG_CheckArgumentsValues 0
 
+            //Check type support inequal operator
             template<   typename T, 
-                        typename = typename std::enable_if<!InequalExists<T>::value>::type,
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<!InequalExists<RAW_T>::value>::type,
                         typename... Args>
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
-                                                T&, 
+                                                T& arg, 
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
@@ -47,11 +49,22 @@ namespace CppOverride
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    //NOTE: Cannot check data that doesn't have inequal operator
-                    status = OverrideStatus::CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR;
-                    return false;
+                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    
+                    //Check Reference (Which is converted to pointer when checking)
+                    if(typeid(RAW_T*).hash_code() == curArgInfo.DataType)
+                    {
+                        if((RAW_T*)(&arg) != *(RAW_T**)(curArgInfo.Data))
+                            return false;
+                    }
+                    else
+                    {
+                        //NOTE: Cannot check data that doesn't have inequal operator
+                        status = OverrideStatus::CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR;
+                        return false;
+                    }
                 }
                 
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
@@ -63,11 +76,13 @@ namespace CppOverride
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
+            //Check value or reference
             template<   typename T, 
-                        typename = typename std::enable_if<InequalExists<T>::value>::type,
-                        typename... Args,
-                        typename = void()>
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<InequalExists<RAW_T>::value>::type,
+                        typename = typename std::enable_if<!std::is_pointer<RAW_T>::value>::type,
+                        typename... Args>
+            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -83,40 +98,41 @@ namespace CppOverride
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const ArgInfo& curArgInfo = validArgumentsList[argIndex];
+                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
-                    if( sizeof(INTERNAL_CO_UNCONST(T)*) == curArgInfo.ArgSize &&
-                        typeid(INTERNAL_CO_UNCONST(T)*).hash_code() == curArgInfo.ArgTypeHash)
+                    if(typeid(RAW_T*).hash_code() == curArgInfo.DataType)
                     {
-                        if( &arg != *(INTERNAL_CO_UNCONST(T)**)(curArgInfo.ArgDataPointer))
+                        if((RAW_T*)(&arg) != *(RAW_T**)(curArgInfo.Data))
                             return false;
                     }
                     //Check Value
-                    else if(arg != *static_cast<INTERNAL_CO_UNCONST(T)*>(curArgInfo.ArgDataPointer))
+                    else if(*(RAW_T*)(&arg) != *static_cast<RAW_T*>(curArgInfo.Data))
                         return false;
                 }
                 
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
                 {
                     std::cout << "Line: " << __LINE__ << std::endl;
-                    std::cout <<"CheckArgumentsValues index: "<<argIndex<<" passed\n";
+                    std::cout <<"CheckArgumentsValues index: "<< argIndex << " passed\n";
                 }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
+            //Check pointer or value
             template<   typename T, 
-                        typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
-                        typename = typename std::enable_if<!std::is_same<T, const void>::value>::type,
-                        typename = typename std::enable_if<InequalExists<T>::value>::type,
+                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<std::is_pointer<RAW_T>::value>::type,
+                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(RAW_T), void>::value>::type, 
+                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T),
                         typename... Args>
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
-                                                T*& arg, 
+                                                T& arg, 
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
@@ -129,15 +145,14 @@ namespace CppOverride
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const ArgInfo& curArgInfo = validArgumentsList[argIndex];
+                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Pointer
-                    if( sizeof(INTERNAL_CO_UNCONST(T)*) == curArgInfo.ArgSize &&
-                        typeid(INTERNAL_CO_UNCONST(T)*).hash_code() == curArgInfo.ArgTypeHash)
+                    if(typeid(RAW_T).hash_code() == curArgInfo.DataType)
                     {
-                        if(arg != *(INTERNAL_CO_UNCONST(T)**)(curArgInfo.ArgDataPointer))
+                        if((RAW_T)arg != *(RAW_T*)(curArgInfo.Data))
                             return false;
                     }
                     //Check Value
@@ -146,7 +161,7 @@ namespace CppOverride
                         return CheckArgumentsValues(validArgumentsList, 
                                                     argIndex, 
                                                     status, 
-                                                    *arg, 
+                                                    *(RAW_T)(arg), 
                                                     args...);
                     }
                 }
@@ -160,11 +175,18 @@ namespace CppOverride
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
-            template<typename... Args>
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
+            //Check void*
+            template<   typename T, 
+                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T),
+                        typename = typename std::enable_if<std::is_same<PURE_T, void>::value>::type, 
+                        typename... Args,
+                        typename = void(),
+                        typename = void(),
+                        typename = void()>
+            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
-                                                void*& arg, 
+                                                T& arg, 
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckArgumentsValues)
@@ -177,13 +199,11 @@ namespace CppOverride
                 if(argIndex >= validArgumentsList.size())
                     return false;
 
-                if(validArgumentsList[argIndex].ArgSet)
+                if(validArgumentsList.at(argIndex).DataSet)
                 {
                     //Check void Pointer
-                    if( sizeof(void*) != validArgumentsList[argIndex].ArgSize ||
-                        typeid(void*).hash_code() != 
-                            validArgumentsList[argIndex].ArgTypeHash ||
-                        arg != *(void**)(validArgumentsList[argIndex].ArgDataPointer))
+                    if( typeid(void*).hash_code() != validArgumentsList.at(argIndex).DataType ||
+                        (void*)arg != *(void**)(validArgumentsList.at(argIndex).Data))
                     {
                         return false;
                     }
@@ -196,20 +216,6 @@ namespace CppOverride
                 }
                 
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
-            }
-            
-            template<typename T, typename... Args>
-            inline bool CheckArgumentsValues(   std::vector<ArgInfo>& validArgumentsList, 
-                                                int argIndex, 
-                                                OverrideStatus& status,
-                                                const T& arg, 
-                                                Args&... args)
-            {
-                return CheckArgumentsValues(validArgumentsList, 
-                                            argIndex, 
-                                            status,
-                                            const_cast<INTERNAL_CO_UNCONST(T)&>(arg), 
-                                            args...);
             }
     };
 }

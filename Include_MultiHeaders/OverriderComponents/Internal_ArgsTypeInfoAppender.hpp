@@ -2,10 +2,12 @@
 #define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
 
 #include "../Any.hpp"
-#include "../ArgsInfo.hpp"
-#include "../PureType.hpp"
+#include "../Internal_DataInfo.hpp"
+
 #include <iostream>
 #include <vector>
+#include <type_traits>
+
 namespace CppOverride
 {
     class Internal_ArgsTypeInfoAppender
@@ -15,20 +17,19 @@ namespace CppOverride
         protected:
             #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
             
-            inline void AppendArgsTypeInfo(std::vector<ArgInfo>&) {}
+            inline void AppendArgsTypeInfo(std::vector<Internal_DataInfo>&) {}
             
             template<   typename T, 
                         typename... Args>
-            inline void AppendArgsTypeInfo( std::vector<ArgInfo>& argumentsList, 
+            inline void AppendArgsTypeInfo( std::vector<Internal_DataInfo>& argumentsList, 
                                             T&, 
                                             Args&... args)
             {
-                ArgInfo curArgInfo;
+                Internal_DataInfo curArgInfo;
                 if(!std::is_same<T, Any>())
                 {
-                    curArgInfo.ArgSize = sizeof(T);
-                    curArgInfo.ArgTypeHash = typeid(T).hash_code();
-                    curArgInfo.ArgSet = true;
+                    curArgInfo.DataType = typeid(T).hash_code();
+                    curArgInfo.DataSet = true;
                 }
                 
                 if(INTERNAL_CO_LOG_AppendArgsTypeInfo)

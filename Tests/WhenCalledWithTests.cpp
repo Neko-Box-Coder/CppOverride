@@ -108,9 +108,11 @@ int main()
             
             (CO_SETUP_OVERRIDE  (OverrideObj, ConstVoidPointerFunc)
                                 .WhenCalledWith<const void*, int>(&testArg, 2)
-                                .Returns<int>(1));
+                                .Returns<int>(1))
+                                .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::Const::ConstVoidPointerFunc(&testArg, 2) == 1);
+        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
     };
     
     ssTEST("Pointer Type Argument Should Demote To Value Type For Comparison")

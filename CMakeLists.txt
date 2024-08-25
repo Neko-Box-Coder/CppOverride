@@ -88,6 +88,10 @@ if(CPP_OVERRIDE_BUILD_TEST)
     target_link_libraries(FreeFunctionTests PUBLIC CppOverride ssTest)
     target_compile_options(FreeFunctionTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
 
+    add_executable(ArrayParamTests "${CMAKE_CURRENT_LIST_DIR}/Tests/ArrayParamTests.cpp")
+    target_link_libraries(ArrayParamTests PUBLIC CppOverride ssTest)
+    target_compile_options(ArrayParamTests PUBLIC "${STANDARD_COMPILE_FLAGS}")
+
     if(WIN32)
         execute_process(COMMAND ${CMAKE_COMMAND} -E copy    "${CMAKE_CURRENT_LIST_DIR}/Tests/RunAllTests.bat" 
                                                             "${CMAKE_CURRENT_BINARY_DIR}")

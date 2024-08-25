@@ -6,6 +6,7 @@
 
 namespace CppOverride
 {
+    //NOTE: This is used to avoid auto type translation
     template<typename T>
     struct TypeSpecifier { using Type = T; };
     

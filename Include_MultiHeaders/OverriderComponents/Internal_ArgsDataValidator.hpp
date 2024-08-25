@@ -3,11 +3,9 @@
 
 #include "./Internal_ArgsTypeInfoAppender.hpp"
 #include "./Internal_ArgsValuesAppender.hpp"
-#include "./Internal_ConditionArgsTypesChecker.hpp"
-#include "./Internal_ConditionArgsValuesChecker.hpp"
-#include "../OverrideStatus.hpp"
 #include "../Internal_OverrideData.hpp"
 #include "../AliasTypes.hpp"
+#include "../Internal_DataInfo.hpp"
 
 #include <cassert>
 #include <string>
@@ -21,8 +19,6 @@ namespace CppOverride
         protected:
             Internal_ArgsValuesAppender& ArgsValuesAppender;
             Internal_ArgsTypeInfoAppender& ArgsTypeInfoAppender;
-            Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
-            Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
             
             #define INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo 0
 
@@ -37,7 +33,7 @@ namespace CppOverride
                 std::vector<void*> argumentsList;
                 ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                std::vector<ArgInfo> argumentsTypesList;
+                std::vector<Internal_DataInfo> argumentsTypesList;
                 ArgsTypeInfoAppender.AppendArgsTypeInfo(argumentsTypesList, args...);
                 
                 if(INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo)
@@ -59,17 +55,17 @@ namespace CppOverride
                     
                     for(int i = 0; i < argTypeHashes.size(); i++)
                     {
-                        if( argsTypesSet[i] &&
-                            argTypeHashes[i] != argumentsTypesList[i].ArgTypeHash)
+                        if( argsTypesSet.at(i) &&
+                            argTypeHashes.at(i) != argumentsTypesList.at(i).DataType)
                         {
                             argumentTypeFailedIndex = i;
                             
                             if(INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo)
                             {
                                 std::cout <<    "argTypeHashes[" << i << "]: " << 
-                                                argTypeHashes[i] << std::endl;
+                                                argTypeHashes.at(i) << std::endl;
                                 std::cout <<    "deRefArgumentsList[" << i << "].ArgTypeHash: " <<
-                                                argumentsTypesList[i].ArgTypeHash << std::endl;
+                                                argumentsTypesList.at(i).DataType << std::endl;
                             }
                             
                             break;
@@ -82,11 +78,11 @@ namespace CppOverride
                 {
                     for(int i = 0; i < overrideDataToCheck.ArgumentsDataInfo.size(); i++)
                     {
-                        bool overrideArg =  overrideDataToCheck.ArgumentsDataInfo[i].DataSet;
+                        bool overrideArg =  overrideDataToCheck.ArgumentsDataInfo.at(i).DataSet;
 
                         if( overrideArg && 
-                            overrideDataToCheck.ArgumentsDataInfo[i].DataType != 
-                                argumentsTypesList[i].ArgTypeHash)
+                            overrideDataToCheck.ArgumentsDataInfo.at(i).DataType != 
+                                argumentsTypesList.at(i).DataType)
                         {
                             argumentTypeFailedIndex = i;
                             
@@ -94,9 +90,9 @@ namespace CppOverride
                             {
                                 std::cout << "Failed at checking argument data type" << std::endl;
                                 std::cout <<    "overrideDataToCheck.ArgumentsDataInfo[" << i << "]: " << 
-                                                overrideDataToCheck.ArgumentsDataInfo[i].DataType << std::endl;
+                                                overrideDataToCheck.ArgumentsDataInfo.at(i).DataType << std::endl;
                                 std::cout <<    "deRefArgumentsList[" << i << "].ArgTypeHash: " <<
-                                                argumentsTypesList[i].ArgTypeHash << std::endl;
+                                                argumentsTypesList.at(i).DataType << std::endl;
                             }
                             
                             break;
@@ -131,13 +127,9 @@ namespace CppOverride
         
         public:
             Internal_ArgsDataValidator( Internal_ArgsValuesAppender& argsValuesAppender,
-                                        Internal_ArgsTypeInfoAppender& argsTypeInfoAppender,
-                                        Internal_ConditionArgsTypesChecker& argsTypesChecker,
-                                        Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
+                                        Internal_ArgsTypeInfoAppender& argsTypeInfoAppender) :
                                                 ArgsValuesAppender(argsValuesAppender),
-                                                ArgsTypeInfoAppender(argsTypeInfoAppender),
-                                                ArgsTypesChecker(argsTypesChecker),
-                                                ArgsValuesChecker(argsValuesChecker)
+                                                ArgsTypeInfoAppender(argsTypeInfoAppender)
             {}
     };
 

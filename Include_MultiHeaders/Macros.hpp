@@ -8,115 +8,6 @@
 
 namespace CppOverride
 {
-    #if 0
-    inline std::string Internal_RemoveNewlines(std::string functionSig)
-    {
-        std::set<int> newlinesToRemove;
-        for(int i = 0; i < functionSig.size(); i++)
-        {
-            switch(functionSig[i])
-            {
-                case '\n':
-                case '\r':
-                    newlinesToRemove.insert(i);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        for(auto it = newlinesToRemove.rbegin(); it != newlinesToRemove.rend(); it++)
-            functionSig.erase(functionSig.begin() + *it);
-
-        return functionSig;
-    }
-    
-    inline std::string Internal_RemoveSpaces(std::string functionSig)
-    {
-        //Remove any consecutive spaces
-        std::set<int> spacesToRemove;
-        bool isLastSpace = false;
-        for(int i = 0; i < functionSig.size(); i++)
-        {
-            if(isLastSpace)
-            {
-                if(functionSig[i] == ' ')
-                    spacesToRemove.insert(i);
-                else
-                    isLastSpace = false;
-            }
-            else if(functionSig[i] == ' ')
-                isLastSpace = true;
-        }
-        
-        //Remove spaces around parentheses and commas
-        for(int i = 0; i < functionSig.size(); i++)
-        {
-            switch(functionSig[i])
-            {
-                case '(':
-                case ')':
-                case ',':
-                case '*':
-                case '&':
-                case ':':
-                case '<':
-                case '>':
-                    if(i > 0 && functionSig[i - 1] == ' ')
-                        spacesToRemove.insert(i - 1);
-                    
-                    if(i < functionSig.size() - 1 && functionSig[i + 1] == ' ')
-                        spacesToRemove.insert(i + 1);
-                    break;
-                default:
-                    break;
-            }
-        }
-        
-        for(auto it = spacesToRemove.rbegin(); it != spacesToRemove.rend(); it++)
-            functionSig.erase(functionSig.begin() + *it);
-
-        return functionSig;
-    }
-    
-    inline std::string Internal_Trim(std::string functionSig)
-    {
-        //Trimming
-        int firstCharIndex = -1;
-        for(int i = 0; i < functionSig.size(); i++)
-        {
-            if(functionSig[i] != ' ')
-            {
-                firstCharIndex = i;
-                break;
-            }
-        }
-        
-        int lastCharIndex = -1;
-        for(int i = functionSig.size() - 1; i >= 0; i--)
-        {
-            if(functionSig[i] != ' ')
-            {
-                lastCharIndex = i;
-                break;
-            }
-        }
-        
-        return functionSig.substr(firstCharIndex, lastCharIndex - firstCharIndex + 1);
-    }
-    
-    //==============================================================================
-    //Macros and functions for translating function signature to string
-    //==============================================================================
-    inline std::string Internal_ProcessFunctionSig(std::string functionSig)
-    {
-        functionSig = Internal_RemoveNewlines(functionSig);
-        functionSig = Internal_Trim(functionSig);
-        functionSig = Internal_RemoveSpaces(functionSig);
-        return functionSig;
-    }
-    #endif
-
     //==============================================================================
     //Macro for overriding method implementation
     //==============================================================================
@@ -184,7 +75,7 @@ namespace CppOverride
                 { \
                     if(INTERNAL_CO_LOG_CO_OVERRIDE_IMPL) \
                         std::cout << "dontReturn: " << dontReturn << std::endl; \
-                    \
+                    /* If we are not returning, we will need to call the result actions */ \
                     if(dontReturn) \
                     { \
                         overrideObjName.Internal_CallReturnOverrideResultExpectedAction \
@@ -196,6 +87,7 @@ namespace CppOverride
                     } \
                     else \
                     { \
+                        /* If we are returning, the result action is called inside */ \
                         return  overrideObjName.Internal_OverrideReturn<MPT_REMOVE_PARENTHESIS(returnType)> \
                                 ( \
                                     foundIndex, \
@@ -206,6 +98,7 @@ namespace CppOverride
                 } \
                 if(!overrideArgs && !overrideReturn) \
                 { \
+                    /* If we are overriding anything, we still need to call result actions */ \
                     overrideObjName.Internal_CallReturnOverrideResultExpectedAction \
                     ( \
                         __func__, \
