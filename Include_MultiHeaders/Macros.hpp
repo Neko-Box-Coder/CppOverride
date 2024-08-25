@@ -33,7 +33,7 @@ namespace CppOverride
     
     #define INTERNAL_CO_LOG_CO_OVERRIDE_IMPL 0
     
-    #define CO_OVERRIDE_IMPL(overrideObjName, returnType, args) \
+    #define INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, returnType, args) \
     do \
     { \
         int foundIndex = -1; \
@@ -86,14 +86,28 @@ namespace CppOverride
                         ); \
                     } \
                     else \
-                    { \
+                    {
+    
+    #define INTERNAL_CO_OVERRIDE_IMPL_NORMAL_PART_2(overrideObjName, returnType, args) \
                         /* If we are returning, the result action is called inside */ \
                         return  overrideObjName.Internal_OverrideReturn<MPT_REMOVE_PARENTHESIS(returnType)> \
                                 ( \
                                     foundIndex, \
                                     __func__ \
                                     INTERNAL_CO_ARGS(args) \
-                                ); \
+                                );
+    
+    #define INTERNAL_CO_OVERRIDE_IMPL_NO_RETURN_TYPE_PART_2(overrideObjName, args) \
+                        /* If we are returning, the result action is called inside */ \
+                        overrideObjName.Internal_OverrideReturn<MPT_REMOVE_PARENTHESIS(void)> \
+                        ( \
+                            foundIndex, \
+                            __func__ \
+                            INTERNAL_CO_ARGS(args) \
+                        ); \
+                        return;
+
+    #define INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_3(overrideObjName, returnType, args) \
                     } \
                 } \
                 if(!overrideArgs && !overrideReturn) \
@@ -109,6 +123,11 @@ namespace CppOverride
             } \
         } \
     } while(0)
+
+    #define CO_OVERRIDE_IMPL(overrideObjName, returnType, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, returnType, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_NORMAL_PART_2(overrideObjName, returnType, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_3(overrideObjName, returnType, args)
 
     //-------------------------------------------------------
     //Setup overrides
