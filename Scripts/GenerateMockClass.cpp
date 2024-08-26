@@ -543,8 +543,8 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
         {
             const std::string operatorStr = "operator";
             
-            if( outParser.CurrentTokens[i].size() >= operatorStr.size() &&
-                outParser.CurrentTokens[i].substr(0, operatorStr.size()) == operatorStr)
+            if( outParser.CurrentTokens.at(i).size() >= operatorStr.size() &&
+                outParser.CurrentTokens.at(i).substr(0, operatorStr.size()) == operatorStr)
             {
                 operatorIndex = i;
                 break;
@@ -555,7 +555,7 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
         if(operatorIndex != -1)
         {
             for(int i = operatorIndex; i < outParser.CurrentTokens.size(); ++i)
-                outParser.CurrentFunction.Name += outParser.CurrentTokens[i];
+                outParser.CurrentFunction.Name += outParser.CurrentTokens.at(i);
             
             returnIndexInclusiveEnd = operatorIndex - 1;
         }
@@ -577,7 +577,7 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
         {
             bool returnTypeIsTemplate = false;
             
-            if(outParser.CurrentTokens[returnIndexInclusiveEnd] == ">")
+            if(outParser.CurrentTokens.at(returnIndexInclusiveEnd) == ">")
                 returnTypeIsTemplate = true;
             
             //Handle template for return type
@@ -587,14 +587,14 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
                 
                 do
                 {
-                    if(outParser.CurrentTokens[returnIndexInclusiveEnd] == ">")
+                    if(outParser.CurrentTokens.at(returnIndexInclusiveEnd) == ">")
                         localTemplateBracketCounter++;
-                    else if(outParser.CurrentTokens[returnIndexInclusiveEnd] == "<")
+                    else if(outParser.CurrentTokens.at(returnIndexInclusiveEnd) == "<")
                         localTemplateBracketCounter--;
                     
                     //Add the current token which is considered as template return type
                     outParser.CurrentFunction.ReturnType = 
-                        outParser.CurrentTokens[returnIndexInclusiveEnd] + 
+                        outParser.CurrentTokens.at(returnIndexInclusiveEnd) + 
                         " " +
                         outParser.CurrentFunction.ReturnType;
                     
@@ -609,7 +609,7 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
             //Store return type
             {
                 outParser.CurrentFunction.ReturnType = 
-                    outParser.CurrentTokens[returnIndexInclusiveEnd] + " " + 
+                    outParser.CurrentTokens.at(returnIndexInclusiveEnd) + " " + 
                     outParser.CurrentFunction.ReturnType;
             }
             
@@ -621,8 +621,8 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
                 //Check if previous word has scope operator
                 for(int i = 0; i < 2; ++i)
                 {
-                    if( outParser.CurrentTokens[returnIndexInclusiveEnd + 1].size() > i + 1 &&
-                        outParser.CurrentTokens[returnIndexInclusiveEnd + 1][i] == ':')
+                    if( outParser.CurrentTokens.at(returnIndexInclusiveEnd + 1).size() > i + 1 &&
+                        outParser.CurrentTokens.at(returnIndexInclusiveEnd + 1).at(i) == ':')
                     {
                         ++previousTokenColonCount;
                     }
@@ -636,11 +636,11 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
                 for(int i = 0; i < 2; ++i)
                 {
                     const std::string& currentToken = 
-                        outParser.CurrentTokens[returnIndexInclusiveEnd];
+                        outParser.CurrentTokens.at(returnIndexInclusiveEnd);
                     
                     int currentTokenSize = currentToken.size();
                     
-                    if( currentTokenSize > i + 1 && currentToken[currentTokenSize - 1] == ':')
+                    if( currentTokenSize > i + 1 && currentToken.at(currentTokenSize - 1) == ':')
                         ++currentTokenColonCount;
                     else
                         break;
@@ -650,7 +650,7 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
                     break;
                 
                 outParser.CurrentFunction.ReturnType = 
-                    outParser.CurrentTokens[returnIndexInclusiveEnd] + " " + 
+                    outParser.CurrentTokens.at(returnIndexInclusiveEnd) + " " + 
                     outParser.CurrentFunction.ReturnType;
             
                 --returnIndexInclusiveEnd;
@@ -670,7 +670,7 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
         if(prependIndexInclusiveEnd >= 0)
         {
             for(int i = 0; i <= prependIndexInclusiveEnd; ++i)
-                outParser.CurrentFunction.PrependAttributes.push_back(outParser.CurrentTokens[i]);
+                outParser.CurrentFunction.PrependAttributes.push_back(outParser.CurrentTokens.at(i));
         }
         
         outParser.CurrentState |= ParseState::IN_FUNCTION_DECLARATION;
@@ -1011,8 +1011,8 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                         const std::vector<std::string>& includes,
                         const std::vector<std::string>& excludeNames,
                         std::string originalFileName,
-                        bool useMacroMethod,
-                        bool useInputClasses)
+                        const bool useMacroMethod,
+                        const bool useInputClasses)
 {
     std::string filenameWithoutDir;
     std::unordered_set<std::string> excludeNamesSet;
@@ -1027,10 +1027,13 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         
         for(int i = originalFileName.size() - 1; i >= 0; --i)
         {
-            if(originalFileName[i] == '.' && extensionIndex == -1)
+            if(originalFileName.at(i) == '.' && extensionIndex == -1)
                 extensionIndex = i;
-            else if(parentDirIndex == -1 && (originalFileName[i] == '/' || originalFileName[i] == '\\'))
+            else if(parentDirIndex == -1 && 
+                    (originalFileName.at(i) == '/' || originalFileName.at(i) == '\\'))
+            {
                 parentDirIndex = i;
+            }
         }
         
         int substrStartIndex = parentDirIndex == -1 ? 0 : parentDirIndex + 1;
@@ -1049,7 +1052,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 continue;
             }
             
-            headerGuardName[i] = toupper(headerGuardName[i]);
+            headerGuardName.at(i) = toupper(headerGuardName.at(i));
         }
         
         headerGuardName += "_HPP";
@@ -1069,7 +1072,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         {
             //Output the original includes
             for(int i = 0; i < includes.size(); ++i)
-                std::cout << includes[i] << std::endl;
+                std::cout << includes.at(i) << std::endl;
         }
         
         std::cout << std::endl;
@@ -1080,26 +1083,26 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
     bool changeNamespace = false;
     for(int i = 0; i < classesDetails.size(); ++i)
     {
-        if(excludeNamesSet.count(classesDetails[i].Name))
+        if(excludeNamesSet.count(classesDetails.at(i).Name))
         {
             continue;
         }
         
         for(int j = 0; j < currentNamespaces.size(); ++j)
         {
-            if(excludeNamesSet.count(currentNamespaces[j]))
+            if(excludeNamesSet.count(currentNamespaces.at(j)))
                 continue;
         }
 
         //Namespace check
         {
-            if(currentNamespaces.size() != classesDetails[i].Namespaces.size())
+            if(currentNamespaces.size() != classesDetails.at(i).Namespaces.size())
                 changeNamespace = true;
             else
             {
                 for(int j = 0; j < currentNamespaces.size(); ++j)
                 {
-                    if(currentNamespaces[j] != classesDetails[i].Namespaces[j])
+                    if(currentNamespaces.at(j) != classesDetails.at(i).Namespaces.at(j))
                     {
                         changeNamespace = true;
                         break;
@@ -1114,43 +1117,43 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 for(int j = 0; j < currentNamespaces.size(); ++j)
                     std::cout << "}" << std::endl;
                     
-                for(int j = 0; j < classesDetails[i].Namespaces.size(); ++j)
+                for(int j = 0; j < classesDetails.at(i).Namespaces.size(); ++j)
                 {
-                    std::cout << "namespace " << classesDetails[i].Namespaces[j] << std::endl;
+                    std::cout << "namespace " << classesDetails.at(i).Namespaces.at(j) << std::endl;
                     std::cout << "{" << std::endl << std::endl;
                 }
                 
-                currentNamespaces = classesDetails[i].Namespaces;
+                currentNamespaces = classesDetails.at(i).Namespaces;
             }
         }
         
         //Populate class declaration
-        for(int j = 0; j < classesDetails[i].PrependAttributes.size(); ++j)
-            std::cout << classesDetails[i].PrependAttributes[j] << " ";
+        for(int j = 0; j < classesDetails.at(i).PrependAttributes.size(); ++j)
+            std::cout << classesDetails.at(i).PrependAttributes.at(j) << " ";
         
-        if(!classesDetails[i].PrependAttributes.empty())
+        if(!classesDetails.at(i).PrependAttributes.empty())
             std::cout << std::endl;
         
-        std::cout << "class Mock" << classesDetails[i].Name;
+        std::cout << "class Mock" << classesDetails.at(i).Name;
         
         if(!useInputClasses)
         {
-            for(int j = 0; j < classesDetails[i].AppendAttributes.size(); ++j)
-                std::cout << " " << classesDetails[i].AppendAttributes[j];
+            for(int j = 0; j < classesDetails.at(i).AppendAttributes.size(); ++j)
+                std::cout << " " << classesDetails.at(i).AppendAttributes.at(j);
         }
         else
-            std::cout << " : " << "public " << classesDetails[i].Name;
+            std::cout << " : " << "public " << classesDetails.at(i).Name;
 
         if(useMacroMethod)
         {
             bool hasInheritance = useInputClasses;
             
-            for(int j = 0; j < classesDetails[i].AppendAttributes.size(); ++j)
+            for(int j = 0; j < classesDetails.at(i).AppendAttributes.size(); ++j)
             {
                 if(hasInheritance)
                     break;
                 
-                const std::string& currentAttribute = classesDetails[i].AppendAttributes[j];
+                const std::string& currentAttribute = classesDetails.at(i).AppendAttributes.at(j);
                 
                 if(currentAttribute.empty())
                     continue;
@@ -1166,14 +1169,14 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                         continue;
                 }
                 
-                if(currentAttribute[0] == ':' && currentAttribute[1] != ':')
+                if(currentAttribute.at(0) == ':' && currentAttribute.at(1) != ':')
                 {
                     hasInheritance = true;
                     break;
                 }
                 
-                if( currentAttribute[currentAttribute.size() - 1] == ':' && 
-                    currentAttribute[currentAttribute.size() - 2] != ':')
+                if( currentAttribute.at(currentAttribute.size() - 1) == ':' && 
+                    currentAttribute.at(currentAttribute.size() - 2) != ':')
                 {
                     hasInheritance = true;
                     break;
@@ -1204,19 +1207,20 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         
         std::string currentVisibility = "public";
         
-        //Add onstructor and destructors
-        std::cout << "    inline Mock" << classesDetails[i].Name << "(){}" << std::endl;
-        std::cout << "    inline virtual ~Mock" << classesDetails[i].Name << "(){}" << std::endl;
+        //TODO(NOW): Change this
+        //Add constructor and destructors
+        std::cout << "    inline Mock" << classesDetails.at(i).Name << "(){}" << std::endl;
+        std::cout << "    inline virtual ~Mock" << classesDetails.at(i).Name << "(){}" << std::endl;
 
         //Populate functions
-        for(int j = 0; j < classesDetails[i].Functions.size(); ++j)
+        for(int j = 0; j < classesDetails.at(i).Functions.size(); ++j)
         {
-            const FunctionDetails& currentFunc = classesDetails[i].Functions[j];
+            const FunctionDetails& currentFunc = classesDetails.at(i).Functions.at(j);
             
             if(excludeNamesSet.count(currentFunc.Name))
                 continue;
             
-            if(classesDetails[i].Functions[j].Visibility != currentVisibility)
+            if(classesDetails.at(i).Functions.at(j).Visibility != currentVisibility)
             {
                 std::cout << currentFunc.Visibility << ":" << std::endl;
                 currentVisibility = currentFunc.Visibility;
@@ -1233,10 +1237,10 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
             
             for(int k = 0; k < currentFunc.PrependAttributes.size(); ++k)
             {
-                if(currentFunc.PrependAttributes[k] == "inline")
+                if(currentFunc.PrependAttributes.at(k) == "inline")
                     continue;
                 
-                currentPrepend += currentFunc.PrependAttributes[k];
+                currentPrepend += currentFunc.PrependAttributes.at(k);
                 
                 if(k != currentFunc.PrependAttributes.size() - 1)
                     currentPrepend += " ";
@@ -1247,7 +1251,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
             ClearStringVectorIfAllEmpty(filteredPrependAttributes);
             if( filteredPrependAttributes.empty() || 
                 (filteredPrependAttributes.size() == 1 && 
-                filteredPrependAttributes[0] == "inline"))
+                filteredPrependAttributes.at(0) == "inline"))
             {
                 currentPrepend = "/* no prepend */";
             }
@@ -1269,10 +1273,10 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 std::cout << currentFunc.Name << ", (";
                 for(int k = 0; k < currentFunc.ArgTypes.size(); ++k)
                 {
-                    if(currentFunc.ArgTypes[k].find(',') != std::string::npos)
-                        std::cout << "(" << currentFunc.ArgTypes[k] <<")";
+                    if(currentFunc.ArgTypes.at(k).find(',') != std::string::npos)
+                        std::cout << "(" << currentFunc.ArgTypes.at(k) <<")";
                     else
-                        std::cout << currentFunc.ArgTypes[k];
+                        std::cout << currentFunc.ArgTypes.at(k);
                     
                     if(k != currentFunc.ArgTypes.size() - 1)
                         std::cout << ", ";
@@ -1283,8 +1287,8 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 TrimStringVector(currentFunc.ArgDefaultValues, filteredDefaultValues);
                 for(int k = 0; k < filteredDefaultValues.size(); ++k)
                 {
-                    if(!filteredDefaultValues[k].empty())
-                        std::cout << "= " << filteredDefaultValues[k];
+                    if(!filteredDefaultValues.at(k).empty())
+                        std::cout << "= " << filteredDefaultValues.at(k);
                     else
                         std::cout << "/* no default */";
                     
@@ -1299,10 +1303,10 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 std::string currentAppend;
                 for(int k = 0; k < filteredAppendAttributes.size(); ++k)
                 {
-                    if(filteredAppendAttributes[k] == "=")
+                    if(filteredAppendAttributes.at(k) == "=")
                         break;
                     
-                    currentAppend += filteredAppendAttributes[k];
+                    currentAppend += filteredAppendAttributes.at(k);
                     
                     if(k != filteredAppendAttributes.size() - 1)
                         currentAppend += " ";
@@ -1325,10 +1329,10 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
     
                 for(int k = 0; k < filteredPrependAttributes.size(); ++k)
                 {
-                    if(filteredPrependAttributes[k] == "inline")
+                    if(filteredPrependAttributes.at(k) == "inline")
                         hasInlineInPrepend = true;
     
-                    currentPrepend += filteredPrependAttributes[k] + " ";
+                    currentPrepend += filteredPrependAttributes.at(k) + " ";
                 }
     
                 if(!hasInlineInPrepend)
@@ -1341,9 +1345,9 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 
                 for(int k = 0; k < currentFunc.ArgTypes.size(); ++k)
                 {
-                    std::cout << currentFunc.ArgTypes[k] << " arg" << std::to_string(k);
-                    if(!currentFunc.ArgDefaultValues[k].empty())
-                        std::cout << " = " << currentFunc.ArgDefaultValues[k];
+                    std::cout << currentFunc.ArgTypes.at(k) << " arg" << std::to_string(k);
+                    if(!currentFunc.ArgDefaultValues.at(k).empty())
+                        std::cout << " = " << currentFunc.ArgDefaultValues.at(k);
                     
                     if(k != currentFunc.ArgTypes.size() - 1)
                         std::cout << ", ";
@@ -1352,10 +1356,10 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 
                 for(int k = 0; k < currentFunc.AppendAttributes.size(); ++k)
                 {
-                    if(currentFunc.AppendAttributes[k] == "=")
+                    if(currentFunc.AppendAttributes.at(k) == "=")
                         break;
                     
-                    std::cout << currentFunc.AppendAttributes[k] << " ";
+                    std::cout << currentFunc.AppendAttributes.at(k) << " ";
                 }
                 std::cout << std::endl;
                 
