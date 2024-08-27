@@ -73,19 +73,12 @@ namespace CppOverride
                 
                 if(!std::is_same<T, Any>())
                 {
-                    lastData.ArgumentsDataInfo.back().Data = new INTERNAL_CO_UNWRAPPED(T)(arg);
-                    lastData.ArgumentsDataInfo.back().CopyConstructor = 
-                        [](void* data) 
-                        { 
-                            return new INTERNAL_CO_UNWRAPPED(T)
-                            (
-                                *static_cast<INTERNAL_CO_UNWRAPPED(T)*>(data)
-                            ); 
-                        };
-                    
-                    lastData.ArgumentsDataInfo.back().Destructor = 
-                        [](void* data) { delete static_cast<INTERNAL_CO_UNWRAPPED(T)*>(data); };
-
+                    lastData.ArgumentsDataInfo.back().Data = 
+                        std::shared_ptr<void>(  new INTERNAL_CO_UNWRAPPED(T)(arg), 
+                                                [](void* p)
+                                                { 
+                                                    delete static_cast<INTERNAL_CO_UNWRAPPED(T)*>(p); 
+                                                });
                     lastData.ArgumentsDataInfo.back().DataSet = true;
                     lastData.ArgumentsDataInfo.back().DataType = 
                         typeid(T).hash_code();

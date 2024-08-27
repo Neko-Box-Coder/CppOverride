@@ -56,8 +56,8 @@ namespace CppOverride
                         return false;
                     }
 
-                    if(arg != *reinterpret_cast<INTERNAL_CO_UNCONST(T)*>
-                                (validArgumentsList.at(argIndex).Data))
+                    if(arg != *static_cast<INTERNAL_CO_UNCONST(T)*>
+                                (validArgumentsList.at(argIndex).Data.get()))
                     {
                         if(INTERNAL_CO_LOG_CheckArguments)
                         {

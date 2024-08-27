@@ -4,15 +4,14 @@
 #include <cstddef>
 #include <functional>
 #include <vector>
+#include <memory>
 
 namespace CppOverride
 {
     struct Internal_DataInfo
     {
         std::size_t DataType = 0;
-        void* Data = nullptr;
-        std::function<void*(void*)> CopyConstructor;
-        std::function<void(void*)> Destructor;
+        std::shared_ptr<void> Data = nullptr;
         bool DataSet = false;
     };
     
