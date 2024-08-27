@@ -25,7 +25,7 @@ namespace CppOverride
         
         //Result of the override
         Internal_ResultActionInfo ResultActionInfo;
-        OverrideStatus* Status = nullptr;
+        std::shared_ptr<OverrideStatus> Status = nullptr;
     };
     
     using Internal_OverrideDataList = std::vector<Internal_OverrideData>;
