@@ -56,7 +56,7 @@ namespace CppOverride
                     //Check Reference (Which is converted to pointer when checking)
                     if(typeid(RAW_T*).hash_code() == curArgInfo.DataType)
                     {
-                        if((RAW_T*)(&arg) != *(RAW_T**)(curArgInfo.Data))
+                        if((RAW_T*)&arg != *static_cast<RAW_T**>(curArgInfo.Data.get()))
                             return false;
                     }
                     else
@@ -105,11 +105,11 @@ namespace CppOverride
                     //Check Reference (Which is converted to pointer when checking)
                     if(typeid(RAW_T*).hash_code() == curArgInfo.DataType)
                     {
-                        if((RAW_T*)(&arg) != *(RAW_T**)(curArgInfo.Data))
+                        if((RAW_T*)&arg != *static_cast<RAW_T**>(curArgInfo.Data.get()))
                             return false;
                     }
                     //Check Value
-                    else if(*(RAW_T*)(&arg) != *static_cast<RAW_T*>(curArgInfo.Data))
+                    else if(*(RAW_T*)&arg != *static_cast<RAW_T*>(curArgInfo.Data.get()))
                         return false;
                 }
                 
@@ -152,7 +152,7 @@ namespace CppOverride
                     //Check Pointer
                     if(typeid(RAW_T).hash_code() == curArgInfo.DataType)
                     {
-                        if((RAW_T)arg != *(RAW_T*)(curArgInfo.Data))
+                        if((RAW_T)arg != *static_cast<RAW_T*>(curArgInfo.Data.get()))
                             return false;
                     }
                     //Check Value
@@ -203,7 +203,7 @@ namespace CppOverride
                 {
                     //Check void Pointer
                     if( typeid(void*).hash_code() != validArgumentsList.at(argIndex).DataType ||
-                        (void*)arg != *(void**)(validArgumentsList.at(argIndex).Data))
+                        (void*)arg != *static_cast<void**>(validArgumentsList.at(argIndex).Data.get()))
                     {
                         return false;
                     }

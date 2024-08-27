@@ -59,7 +59,7 @@ namespace CppOverride
                 if(argsData.at(index).DataSet)
                 {
                     RAW_T& pureArg = (RAW_T&)(arg); 
-                    pureArg = *(RAW_T*)(argsData.at(index).Data);
+                    pureArg = *static_cast<RAW_T*>(argsData.at(index).Data.get());
                     if(INTERNAL_CO_LOG_ModifyArgs)
                     {
                         std::cout << std::endl << __func__ << " called" << std::endl;
@@ -95,7 +95,7 @@ namespace CppOverride
 
                         std::cout << "modified value bytes:" << std::endl;
                         
-                        PRINT_BYTES(*(RAW_T*)(argsData.at(index).Data));
+                        PRINT_BYTES(*static_cast<RAW_T*>(argsData.at(index).Data.get()));
                         std::cout << std::endl;
                     }
                 }

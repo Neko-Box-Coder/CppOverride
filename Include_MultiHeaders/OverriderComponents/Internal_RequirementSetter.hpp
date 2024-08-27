@@ -51,11 +51,8 @@ namespace CppOverride
             {
                 Internal_DataInfo argData;
                 //T is void*
-                argData.Data = new void*((void*)arg);
-                argData.CopyConstructor = 
-                    [](void* data) { return new void*(*static_cast<void**>(data)); };
-                argData.Destructor = 
-                    [](void* data){ delete static_cast<void**>(data); };
+                argData.Data = std::shared_ptr<void>(   new void*((void*)arg), 
+                                                        [](void* p){ delete static_cast<char*>(p); });
                 argData.DataType = typeid(void*).hash_code();
                 argData.DataSet = true;
 
@@ -79,9 +76,8 @@ namespace CppOverride
                 //Other types that are not Any
                 if(!std::is_same<INTERNAL_CO_RAW_TYPE(T), Any>())
                 {
-                    argData.Data = new T(arg);
-                    argData.CopyConstructor = [](void* data) { return new T(*static_cast<T*>(data)); };
-                    argData.Destructor = [](void* data){ delete static_cast<T*>(data); };
+                    argData.Data = std::shared_ptr<void>(   new T(arg), 
+                                                            [](void* p){ delete static_cast<T*>(p); });
                     argData.DataType = typeid(INTERNAL_CO_RAW_TYPE(T)).hash_code();
                     argData.DataSet = true;
                     
@@ -150,7 +146,7 @@ namespace CppOverride
                 Internal_OverrideData& currentData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
-                currentData.Status = &result.Status;
+                currentData.Status = result.GetStatusRef();
                 return infoSetter;
             }
         

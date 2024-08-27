@@ -63,49 +63,6 @@ namespace CppOverride
                     return *this;
             
                 OverrideDatas = other.OverrideDatas;
-            
-                //For each function
-                for(auto it = OverrideDatas.begin(); it != OverrideDatas.end(); it++)
-                {
-                    //For each override
-                    for(int i = 0; i < it->second.size(); i++)
-                    {
-                        for(int j = 0; j < it->second.at(i).ConditionInfo.ArgsCondition.size(); j++)
-                        {
-                            Internal_DataInfo& currentInfo = 
-                                it->second.at(i).ConditionInfo.ArgsCondition.at(j);
-                            
-                            if(currentInfo.DataSet)
-                            {
-                                currentInfo.Data = 
-                                    currentInfo.CopyConstructor(currentInfo.Data);
-                            }
-                        }
-                        
-                        for(int j = 0; j < it->second.at(i).ArgumentsDataInfo.size(); j++)
-                        {
-                            Internal_DataInfo& currentInfo = 
-                                it->second.at(i).ArgumentsDataInfo.at(j);
-                            
-                            if(currentInfo.DataSet)
-                            {
-                                currentInfo.Data = 
-                                    currentInfo.CopyConstructor(currentInfo.Data);
-                            }
-                        }
-                        
-                        {
-                            Internal_ReturnDataInfo& currentInfo = it->second.at(i).ReturnDataInfo;
-                            
-                            if(currentInfo.DataSet)
-                            {
-                                currentInfo.Data = 
-                                    currentInfo.CopyConstructor(currentInfo.Data);
-                            }
-                        }
-                    }
-                }
-                
                 return *this;
             }
                 
@@ -118,40 +75,7 @@ namespace CppOverride
             {}
             
             inline ~Overrider()
-            {
-                for(auto it = OverrideDatas.begin(); it != OverrideDatas.end(); it++)
-                {
-                    for(int i = 0; i < it->second.size(); i++)
-                    {
-                        //Free argument condition data
-                        for(int j = 0; j < it->second.at(i).ConditionInfo.ArgsCondition.size(); j++)
-                        {
-                            Internal_DataInfo& curArgInfo = 
-                                it->second.at(i).ConditionInfo.ArgsCondition.at(j);
-                            
-                            if(curArgInfo.DataSet)
-                                curArgInfo.Destructor(curArgInfo.Data);
-                        }
-                        
-                        //Free arguments data
-                        for(int j = 0; j < it->second.at(i).ArgumentsDataInfo.size(); j++)
-                        {
-                            Internal_DataInfo& curData = it->second.at(i).ArgumentsDataInfo.at(j);
-                            
-                            if(curData.DataSet)
-                                curData.Destructor(curData.Data);
-                        }
-                        
-                        //Free return data
-                        {
-                            Internal_ReturnDataInfo& curData = it->second.at(i).ReturnDataInfo;
-                            
-                            if(curData.DataSet)
-                                curData.Destructor(curData.Data);
-                        }
-                    }
-                }
-            }
+            {}
 
             //------------------------------------------------------------------------------
             //Check overrides available
@@ -265,8 +189,7 @@ namespace CppOverride
                                                                             int overrideIndex,
                                                                             Args&... args)
             {
-                Internal_OverrideData& correctData = OverrideDatas[functionName][overrideIndex];
-                
+                Internal_OverrideData& correctData = OverrideDatas.at(functionName).at(overrideIndex);
                 if(correctData.ResultActionInfo.CorrectActionSet)
                 {
                     std::vector<void*> argumentsList;
@@ -320,7 +243,7 @@ namespace CppOverride
                 Internal_CallReturnOverrideResultExpectedAction(functionName, dataIndex, args...);
                 
                 if(correctData.ReturnDataInfo.DataSet)
-                    return *reinterpret_cast<ReturnType*>(correctData.ReturnDataInfo.Data);
+                    return *static_cast<ReturnType*>(correctData.ReturnDataInfo.Data.get());
                 else if(correctData.ReturnDataActionInfo.DataActionSet)
                 {
                     ReturnType returnRef;
@@ -358,7 +281,7 @@ namespace CppOverride
                 {
                     return *reinterpret_cast<INTERNAL_CO_UNREF(ReturnType)*>
                     (
-                        correctData.ReturnDataInfo.Data
+                        correctData.ReturnDataInfo.Data.get()
                     );
                 }
                 else if(correctData.ReturnDataActionInfo.DataActionSet)
