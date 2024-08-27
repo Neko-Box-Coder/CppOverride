@@ -8,11 +8,16 @@
 #include "./Internal_ArgsDataActionInfo.hpp"
 #include "./OverrideStatus.hpp"
 
+#include <memory>
 
 namespace CppOverride
 {
     struct Internal_OverrideData
     {
+        //The object instance we are overriding if specified, 
+        //  nullptr for non specified or free function
+        void* Instance = nullptr;
+        
         //Condition for override
         Internal_ConditionInfo ConditionInfo;
         

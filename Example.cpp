@@ -84,7 +84,7 @@ void OverrideReturnsWithActionLambda()
     CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyReturnValue)
                         .ReturnsByAction<int>
                         ( 
-                            [](const std::vector<void*>&, void* out)
+                            [](void*, const std::vector<void*>&, void* out)
                             { 
                                 *static_cast<int*>(out) = 5;
                             }
@@ -100,7 +100,7 @@ void OverrideArgumentsWithActionLambda()
     CO_SETUP_OVERRIDE(OverrideInstanceName, OverrideMyArgs)
                     .SetArgsByAction<float&, int*>
                     (
-                        [](std::vector<void*>& args)
+                        [](void*, std::vector<void*>& args)
                         {
                             *static_cast<float*>(args.at(0)) = 1.f;
                             **static_cast<int**>(args.at(1)) = 2;
@@ -159,7 +159,7 @@ void IfConditionLambdaExample()
     CO_SETUP_OVERRIDE   (OverrideInstanceName, OverrideMyReturnValue)
                         .If
                         (
-                            [](const std::vector<void*>& args)
+                            [](void*, const std::vector<void*>& args)
                             {
                                 if(*static_cast<int*>(args.at(0)) == 1)
                                     return true;
@@ -186,7 +186,7 @@ void WhenCalledExpectedlyDoLambdaExample()
                         .Returns<int>(1)
                         .WhenCalledExpectedly_Do
                         (
-                            [&called](const std::vector<void*>&)
+                            [&called](...)
                             {
                                 called = true;
                             }
@@ -207,7 +207,7 @@ void OtherwiseDoLambdaExample()
                         .Returns<int>(1)
                         .Otherwise_Do
                         (
-                            [&called](const std::vector<void*>&)
+                            [&called](...)
                             {
                                 called = true;
                             }

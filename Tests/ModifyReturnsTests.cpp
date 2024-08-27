@@ -62,7 +62,7 @@ int main()
         ssTEST_OUTPUT_SETUP
         (
             result = CppOverride::OverrideResult();
-            OverrideObj.ClearAllOverrideInfo();
+            CO_CLEAR_ALL_OVERRIDE_SETUP(OverrideObj);
             CO_SETUP_OVERRIDE   (OverrideObj, AssignArgInternallyFunc)
                                 .Returns<void>()
                                 .AssignOverrideResult(result);
@@ -176,7 +176,7 @@ int main()
             CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
                                 .ReturnsByAction<int>
                                 (
-                                    [](const std::vector<void *>&, void* out)
+                                    [](void*, const std::vector<void *>&, void* out)
                                     {
                                         (*(int*)(out)) = 10;
                                     }

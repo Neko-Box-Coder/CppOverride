@@ -24,3 +24,4 @@ runTest ./MixedModifyArgsAndReturnsTest
 runTest ./MockShapesTests
 runTest ./FreeFunctionTests
 runTest ./ArrayParamTests
+runTest ./GlobalInstanceMockShapesTests

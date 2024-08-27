@@ -37,19 +37,26 @@ namespace CppOverride
             template<typename... Args>
             OverrideInfoSetter& WhenCalledWith(Args... args);
             
-            OverrideInfoSetter& If(std::function<bool(const std::vector<void*>& args)> condition);
+            OverrideInfoSetter& If(std::function<bool(  void* instance, 
+                                                        const std::vector<void*>& args)> condition);
 
             OverrideInfoSetter& 
-            Otherwise_Do(std::function<void(const std::vector<void*>& args)> action);
+            Otherwise_Do(std::function<void(void* instance,
+                                            const std::vector<void*>& args)> action);
 
             OverrideInfoSetter& 
-            WhenCalledExpectedly_Do(std::function<void(const std::vector<void*>& args)> action);
+            WhenCalledExpectedly_Do(std::function<void( void* instance,
+                                                        const std::vector<void*>& args)> action);
             
             OverrideInfoSetter& AssignOverrideResult(OverrideResult& result);
             
+            OverrideInfoSetter& OverrideObject(const void* instance);
+            
+            OverrideInfoSetter& OverrideAny();
             
             template<typename ReturnType>
-            OverrideInfoSetter& ReturnsByAction(std::function<void( const std::vector<void*>& args, 
+            OverrideInfoSetter& ReturnsByAction(std::function<void( void* instance,
+                                                                    const std::vector<void*>& args, 
                                                                     void* out)> returnAction);
     
             template<typename ReturnType>
@@ -66,7 +73,8 @@ namespace CppOverride
             
             template<typename... Args>
             OverrideInfoSetter& 
-            SetArgsByAction(std::function<void(std::vector<void*>& args)> setArgsAction);
+            SetArgsByAction(std::function<void( void* instance, 
+                                                std::vector<void*>& args)> setArgsAction);
     };
 
 

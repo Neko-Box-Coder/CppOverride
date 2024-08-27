@@ -23,19 +23,23 @@ namespace CppOverride
     }
 
     inline OverrideInfoSetter& 
-    OverrideInfoSetter::If(std::function<bool(const std::vector<void*>& args)> condition)
+    OverrideInfoSetter::If(std::function<bool(  void* instance, 
+                                                const std::vector<void*>& args)> condition)
     {
         return CppOverrideObj.If(*this, condition);
     }
 
     inline OverrideInfoSetter& 
-    OverrideInfoSetter::Otherwise_Do(std::function<void(const std::vector<void*>& args)> action)
+    OverrideInfoSetter::Otherwise_Do(std::function<void(void* instance,
+                                                        const std::vector<void*>& args)> action)
     {
         return CppOverrideObj.Otherwise_Do(*this, action);
     }
 
     inline OverrideInfoSetter& 
-    OverrideInfoSetter::WhenCalledExpectedly_Do(std::function<void(const std::vector<void*>& args)> action)
+    OverrideInfoSetter::
+    WhenCalledExpectedly_Do(std::function<void( void* instance,
+                                                const std::vector<void*>& args)> action)
     {
         return CppOverrideObj.WhenCalledExpectedly_Do(*this, action);
     }
@@ -46,9 +50,20 @@ namespace CppOverride
         return CppOverrideObj.AssignOverrideResult(*this, result);
     }
 
+    inline OverrideInfoSetter& OverrideInfoSetter::OverrideObject(const void* instance)
+    {
+        return CppOverrideObj.OverrideObject(*this, (void*)instance);
+    }
+
+    inline OverrideInfoSetter& OverrideInfoSetter::OverrideAny()
+    {
+        return CppOverrideObj.OverrideObject(*this, nullptr);
+    }
+
     template<typename ReturnType>
     inline OverrideInfoSetter& 
-    OverrideInfoSetter::ReturnsByAction(std::function<void( const std::vector<void*>& args, 
+    OverrideInfoSetter::ReturnsByAction(std::function<void( void* instance,
+                                                            const std::vector<void*>& args, 
                                                             void* out)> returnAction)
     {
         return CppOverrideObj.ReturnsByAction<ReturnType>(*this, returnAction);
@@ -83,7 +98,9 @@ namespace CppOverride
     
     template<typename... Args>
     inline OverrideInfoSetter&
-    OverrideInfoSetter::SetArgsByAction(std::function<void(std::vector<void*>& args)> setArgsAction)
+    OverrideInfoSetter::
+    SetArgsByAction(std::function<void( void* instance, 
+                                        std::vector<void*>& args)> setArgsAction)
     {
         return CppOverrideObj.SetArgsByAction<Args...>(*this, setArgsAction);
     }

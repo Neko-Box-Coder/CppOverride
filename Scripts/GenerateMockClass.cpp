@@ -666,6 +666,9 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
         //If this is not a constuctor or destructor
         if(returnIndexInclusiveEnd >= 1)
             prependIndexInclusiveEnd = returnIndexInclusiveEnd - 1;
+        //Constructor or destructor, anything before the function name should be prepended
+        else
+            prependIndexInclusiveEnd = outParser.CurrentTokens.size() - 2;
         
         if(prependIndexInclusiveEnd >= 0)
         {
@@ -1011,8 +1014,10 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                         const std::vector<std::string>& includes,
                         const std::vector<std::string>& excludeNames,
                         std::string originalFileName,
-                        const bool useMacroMethod,
-                        const bool useInputClasses)
+                        const bool useMacroMockMethod,
+                        const bool useInputClasses,
+                        const bool overrideConstructor,
+                        const bool globalInstance)
 {
     std::string filenameWithoutDir;
     std::unordered_set<std::string> excludeNamesSet;
@@ -1041,7 +1046,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                             originalFileName.size() - substrStartIndex :
                             extensionIndex - substrStartIndex - 1;
         
-        headerGuardName = originalFileName.substr(substrStartIndex, substrLength);
+        headerGuardName = std::string("MOCK_") + originalFileName.substr(substrStartIndex, substrLength);
         filenameWithoutDir = originalFileName.substr(substrStartIndex);
         
         for(int i = 0; i < headerGuardName.size(); ++i)
@@ -1078,15 +1083,17 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         std::cout << std::endl;
     }
     
+    //Declare global instance reference
+    if(globalInstance)
+        std::cout << "extern CO_DECLARE_INSTANCE(OverrideInstanceName);" << std::endl << std::endl;
+    
     //For each class
     std::vector<std::string> currentNamespaces;
     bool changeNamespace = false;
     for(int i = 0; i < classesDetails.size(); ++i)
     {
         if(excludeNamesSet.count(classesDetails.at(i).Name))
-        {
             continue;
-        }
         
         for(int j = 0; j < currentNamespaces.size(); ++j)
         {
@@ -1134,8 +1141,10 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         if(!classesDetails.at(i).PrependAttributes.empty())
             std::cout << std::endl;
         
+        //Declaring mock class
         std::cout << "class Mock" << classesDetails.at(i).Name;
         
+        //Inheriting classes the original class inherits
         if(!useInputClasses)
         {
             for(int j = 0; j < classesDetails.at(i).AppendAttributes.size(); ++j)
@@ -1144,20 +1153,18 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         else
             std::cout << " : " << "public " << classesDetails.at(i).Name;
 
-        if(useMacroMethod)
+        //Inheriting from mock class
+        if(useMacroMockMethod)
         {
             bool hasInheritance = useInputClasses;
-            
             for(int j = 0; j < classesDetails.at(i).AppendAttributes.size(); ++j)
             {
                 if(hasInheritance)
                     break;
                 
                 const std::string& currentAttribute = classesDetails.at(i).AppendAttributes.at(j);
-                
                 if(currentAttribute.empty())
                     continue;
-                
                 if(currentAttribute.size() == 1)
                 {
                     if(currentAttribute.front() == ':')
@@ -1168,13 +1175,11 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                     else
                         continue;
                 }
-                
                 if(currentAttribute.at(0) == ':' && currentAttribute.at(1) != ':')
                 {
                     hasInheritance = true;
                     break;
                 }
-                
                 if( currentAttribute.at(currentAttribute.size() - 1) == ':' && 
                     currentAttribute.at(currentAttribute.size() - 2) != ':')
                 {
@@ -1193,13 +1198,14 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
 
         std::cout << std::endl << "{" << std::endl;
         
-        if(!useMacroMethod)
+        //Declare override instances
+        if(!useMacroMockMethod && !globalInstance)
         {
             std::cout << "private:" << std::endl;
-            std::cout << "    CO_DECLARE_MEMBER_INSTANCE(OverrideInstance);" << std::endl;
+            std::cout << "    CO_DECLARE_MEMBER_INSTANCE(OverrideInstanceName);" << std::endl;
             std::cout << std::endl;
             std::cout << "public:" << std::endl;
-            std::cout << "    CO_DECLARE_OVERRIDE_METHODS(OverrideInstance);" << std::endl;
+            std::cout << "    CO_DECLARE_OVERRIDE_METHODS(OverrideInstanceName);" << std::endl;
             std::cout << std::endl;
         }
         else
@@ -1207,11 +1213,6 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         
         std::string currentVisibility = "public";
         
-        //TODO(NOW): Change this
-        //Add constructor and destructors
-        std::cout << "    inline Mock" << classesDetails.at(i).Name << "(){}" << std::endl;
-        std::cout << "    inline virtual ~Mock" << classesDetails.at(i).Name << "(){}" << std::endl;
-
         //Populate functions
         for(int j = 0; j < classesDetails.at(i).Functions.size(); ++j)
         {
@@ -1226,51 +1227,66 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 currentVisibility = currentFunc.Visibility;
             }
             
-            if(currentFunc.ReturnType.empty())
-            {
-                //std::cout << "    /* Insert Constructor/Destructor Here */" << std::endl;
-                //std::cout << std::endl;
-                continue;
-            }
-            
-            std::string currentPrepend;
-            
-            for(int k = 0; k < currentFunc.PrependAttributes.size(); ++k)
-            {
-                if(currentFunc.PrependAttributes.at(k) == "inline")
+            #if 0
+                if(currentFunc.ReturnType.empty())
+                {
+                    //std::cout << "    /* Insert Constructor/Destructor Here */" << std::endl;
+                    //std::cout << std::endl;
                     continue;
-                
-                currentPrepend += currentFunc.PrependAttributes.at(k);
-                
-                if(k != currentFunc.PrependAttributes.size() - 1)
-                    currentPrepend += " ";
-            }
+                }
+            #endif
             
             std::vector<std::string> filteredPrependAttributes;
             TrimStringVector(currentFunc.PrependAttributes, filteredPrependAttributes);
             ClearStringVectorIfAllEmpty(filteredPrependAttributes);
-            if( filteredPrependAttributes.empty() || 
-                (filteredPrependAttributes.size() == 1 && 
-                filteredPrependAttributes.at(0) == "inline"))
-            {
-                currentPrepend = "/* no prepend */";
-            }
             
-            if(useMacroMethod)
+            const bool isConstructorDestructor = 
+                currentFunc.ReturnType.empty() && 
+                (currentFunc.Name == classesDetails.at(i).Name ||
+                currentFunc.Name == (std::string("~") + classesDetails.at(i).Name));
+            
+            //CO_MOCK_METHOD
+            if(useMacroMockMethod && !isConstructorDestructor)
             {
                 std::cout << "    CO_MOCK_METHOD(";
                 
-                if(currentPrepend.find(',') != std::string::npos)
-                    std::cout << "(" << currentPrepend << "), ";
-                else
-                    std::cout << currentPrepend << ", ";
+                //Prepend
+                {
+                    std::string currentPrepend;
                 
+                    for(int k = 0; k < currentFunc.PrependAttributes.size(); ++k)
+                    {
+                        if(currentFunc.PrependAttributes.at(k) == "inline")
+                            continue;
+                        
+                        currentPrepend += currentFunc.PrependAttributes.at(k);
+                        if(k != currentFunc.PrependAttributes.size() - 1)
+                            currentPrepend += " ";
+                    }
+                    
+                    if( filteredPrependAttributes.empty() || 
+                        (filteredPrependAttributes.size() == 1 && 
+                        filteredPrependAttributes.at(0) == "inline"))
+                    {
+                        currentPrepend = "/* no prepend */";
+                    }
+                    
+                    if(currentPrepend.find(',') != std::string::npos)
+                        std::cout << "(" << currentPrepend << "), ";
+                    else
+                        std::cout << currentPrepend << ", ";
+                }
+                
+                //Return type
                 if(currentFunc.ReturnType.find(',') != std::string::npos)
                     std::cout << "(" << currentFunc.ReturnType << "), ";
                 else
                     std::cout << currentFunc.ReturnType << ", ";
-                    
+                
+                //Function name
                 std::cout << currentFunc.Name << ", (";
+                
+                //Arguments types
                 for(int k = 0; k < currentFunc.ArgTypes.size(); ++k)
                 {
                     if(currentFunc.ArgTypes.at(k).find(',') != std::string::npos)
@@ -1283,77 +1299,115 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 }
                 std::cout << "), (";
                 
-                std::vector<std::string> filteredDefaultValues;
-                TrimStringVector(currentFunc.ArgDefaultValues, filteredDefaultValues);
-                for(int k = 0; k < filteredDefaultValues.size(); ++k)
+                //Default values
                 {
-                    if(!filteredDefaultValues.at(k).empty())
-                        std::cout << "= " << filteredDefaultValues.at(k);
-                    else
-                        std::cout << "/* no default */";
-                    
-                    if(k != currentFunc.ArgTypes.size() - 1)
-                        std::cout << ", ";
-                }
-                std::cout << "), ";
-                
-                std::vector<std::string> filteredAppendAttributes;
-                TrimStringVector(currentFunc.AppendAttributes, filteredAppendAttributes);
-                ClearStringVectorIfAllEmpty(filteredAppendAttributes);
-                std::string currentAppend;
-                for(int k = 0; k < filteredAppendAttributes.size(); ++k)
-                {
-                    if(filteredAppendAttributes.at(k) == "=")
-                        break;
-                    
-                    currentAppend += filteredAppendAttributes.at(k);
-                    
-                    if(k != filteredAppendAttributes.size() - 1)
-                        currentAppend += " ";
+                    std::vector<std::string> filteredDefaultValues;
+                    TrimStringVector(currentFunc.ArgDefaultValues, filteredDefaultValues);
+                    for(int k = 0; k < filteredDefaultValues.size(); ++k)
+                    {
+                        if(!filteredDefaultValues.at(k).empty())
+                            std::cout << "= " << filteredDefaultValues.at(k);
+                        else
+                            std::cout << "/* no default */";
+                        
+                        if(k != currentFunc.ArgTypes.size() - 1)
+                            std::cout << ", ";
+                    }
+                    std::cout << "), ";
                 }
                 
-                if(filteredAppendAttributes.empty())
-                    std::cout << "/* no append */";
+                //Append
+                {
+                    std::vector<std::string> filteredAppendAttributes;
+                    TrimStringVector(currentFunc.AppendAttributes, filteredAppendAttributes);
+                    ClearStringVectorIfAllEmpty(filteredAppendAttributes);
+                    std::string currentAppend;
+                    for(int k = 0; k < filteredAppendAttributes.size(); ++k)
+                    {
+                        if(filteredAppendAttributes.at(k) == "=")
+                            break;
+                        
+                        currentAppend += filteredAppendAttributes.at(k);
+                        
+                        if(k != filteredAppendAttributes.size() - 1)
+                            currentAppend += " ";
+                    }
+                    
+                    if(filteredAppendAttributes.empty())
+                        std::cout << "/* no append */";
 
-                if(currentAppend.find(',') != std::string::npos)
-                    std::cout << "(" << currentAppend << ")";
-                else
-                    std::cout << currentAppend;
+                    if(currentAppend.find(',') != std::string::npos)
+                        std::cout << "(" << currentAppend << ")";
+                    else
+                        std::cout << currentAppend;
+                }
                 
                 std::cout << ")" << std::endl;
             }
+            //CO_OVERRIDE_IMPL
             else
             {
-                bool hasInlineInPrepend = false;
-                std::string currentPrepend;
-    
-                for(int k = 0; k < filteredPrependAttributes.size(); ++k)
+                //Prepend
                 {
-                    if(filteredPrependAttributes.at(k) == "inline")
-                        hasInlineInPrepend = true;
-    
-                    currentPrepend += filteredPrependAttributes.at(k) + " ";
+                    bool hasInlineInPrepend = false;
+                    std::string currentPrepend;
+        
+                    for(int k = 0; k < filteredPrependAttributes.size(); ++k)
+                    {
+                        if(filteredPrependAttributes.at(k) == "inline")
+                            hasInlineInPrepend = true;
+        
+                        currentPrepend += filteredPrependAttributes.at(k) + " ";
+                    }
+        
+                    if(!hasInlineInPrepend)
+                        currentPrepend += "inline ";
+        
+                    std::cout << "    " << currentPrepend;
                 }
-    
-                if(!hasInlineInPrepend)
-                    currentPrepend += "inline ";
-    
-                std::cout <<    "    " << 
-                                currentPrepend << 
-                                currentFunc.ReturnType << " " << 
-                                currentFunc.Name << "(";
                 
-                for(int k = 0; k < currentFunc.ArgTypes.size(); ++k)
+                //Return type
+                if(!isConstructorDestructor)
+                    std::cout << currentFunc.ReturnType << " ";
+                
+                //Function name
+                if(isConstructorDestructor && !currentFunc.Name.empty())
                 {
-                    std::cout << currentFunc.ArgTypes.at(k) << " arg" << std::to_string(k);
-                    if(!currentFunc.ArgDefaultValues.at(k).empty())
-                        std::cout << " = " << currentFunc.ArgDefaultValues.at(k);
+                    if(currentFunc.Name.front() == '~')
+                        std::cout << "~Mock" << classesDetails.at(i).Name;
+                    else
+                        std::cout << "Mock" << classesDetails.at(i).Name;
+                }
+                else
+                    std::cout << currentFunc.Name;
+                
+                std::cout << "(";
+                
+                //Arguments types
+                {
+                    //Empty constructor/destructor
+                    if(isConstructorDestructor && !overrideConstructor)
+                    {
+                        if(currentFunc.Name.front() != '~')
+                            std::cout << "...";
+                    }
+                    else
+                    {
+                        for(int k = 0; k < currentFunc.ArgTypes.size(); ++k)
+                        {
+                            std::cout << currentFunc.ArgTypes.at(k) << " arg" << std::to_string(k);
+                            if(!currentFunc.ArgDefaultValues.at(k).empty())
+                                std::cout << " = " << currentFunc.ArgDefaultValues.at(k);
+                            
+                            if(k != currentFunc.ArgTypes.size() - 1)
+                                std::cout << ", ";
+                        }
+                    }
                     
-                    if(k != currentFunc.ArgTypes.size() - 1)
-                        std::cout << ", ";
+                    std::cout << ") ";
                 }
-                std::cout << ") ";
                 
+                //Append
                 for(int k = 0; k < currentFunc.AppendAttributes.size(); ++k)
                 {
                     if(currentFunc.AppendAttributes.at(k) == "=")
@@ -1363,25 +1417,59 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 }
                 std::cout << std::endl;
                 
-                std::cout << "    {" << std::endl;
-                std::cout << "    ";
-                std::cout << "    CO_OVERRIDE_IMPL(OverrideInstanceName, ";
-                
-                if(currentFunc.ReturnType.find(',') != std::string::npos)
-                    std::cout << "(" << currentFunc.ReturnType << "), ";
-                else
-                    std::cout << currentFunc.ReturnType << ", ";
-                
-                std::cout << "(";
-                for(int k = 0; k < currentFunc.ArgTypes.size(); ++k)
+                //Function content
                 {
-                    std::cout << "arg" << std::to_string(k);
+                    std::cout << "    {" << std::endl;
                     
-                    if(k != currentFunc.ArgTypes.size() - 1)
-                        std::cout << ", ";
+                    do
+                    {
+                        //Empty constructor/destructor
+                        if(isConstructorDestructor && !overrideConstructor)
+                            break;
+                        
+                        std::cout << "    ";
+                        //Override constructor and destructor, globalInstance is true here
+                        if(isConstructorDestructor)
+                            std::cout << "    CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(OverrideInstanceName, ";
+                        else
+                        {
+                            if(globalInstance)
+                                std::cout << "    CO_OVERRIDE_IMPL_INSTNACE(OverrideInstanceName, ";
+                            else
+                                std::cout << "    CO_OVERRIDE_IMPL(OverrideInstanceName, ";
+                            
+                            //Return type
+                            if(currentFunc.ReturnType.find(',') != std::string::npos)
+                                std::cout << "(" << currentFunc.ReturnType << "), ";
+                            else
+                                std::cout << currentFunc.ReturnType << ", ";
+                        }
+                        
+                        //Arguments
+                        {
+                            std::cout << "(";
+                            
+                            for(int k = 0; k < currentFunc.ArgTypes.size(); ++k)
+                            {
+                                std::cout << "arg" << std::to_string(k);
+                                
+                                if(k != currentFunc.ArgTypes.size() - 1)
+                                    std::cout << ", ";
+                            }
+                            std::cout << "));" << std::endl;
+                        }
+                        
+                        //Return statement
+                        if(!isConstructorDestructor)
+                        {
+                            std::cout <<    "        return " << currentFunc.ReturnType << "();" <<
+                                            std::endl;
+                        }
+                    }
+                    while(0);
+                    
+                    std::cout << "    }" << std::endl << std::endl;
                 }
-                std::cout << "));" << std::endl;
-                std::cout << "    }" << std::endl << std::endl;
             }
         }
         
@@ -1406,76 +1494,7 @@ void PrintMockClassContents(const std::vector<ClassDetails>& classesDetails,
     std::stringstream ss;
     
     for(int i = 0; i < classesDetails.size(); ++i)
-    {
         classesDetails[i].ToString("", ss);
-        
-        
-        #if 0
-        std::cout << "Class: " << classesDetails[i].Name << std::endl;
-        
-        std::cout << "    Namespaces:" << std::endl;
-        for(int j = 0; j < classesDetails[i].Namespaces.size(); ++j)
-            std::cout << "    -   " << classesDetails[i].Namespaces[j] << std::endl;
-        
-        std::cout << "    PrependAttributes:" << std::endl;
-        for(int j = 0; j < classesDetails[i].PrependAttributes.size(); ++j)
-            std::cout << "    -   " << classesDetails[i].PrependAttributes[j] << std::endl;
-        
-        std::cout << "    AppendAttributes:" << std::endl;
-        for(int j = 0; j < classesDetails[i].AppendAttributes.size(); ++j)
-            std::cout << "    -   " << classesDetails[i].AppendAttributes[j] << std::endl;
-        
-        for(int j = 0; j < classesDetails[i].Functions.size(); ++j)
-        {
-            std::cout << "    Function: " << classesDetails[i].Functions[j].Name << std::endl;
-            
-            {
-                std::cout << "        Prepend Attributes: " << std::endl;
-                for(int k = 0; k < classesDetails[i].Functions[j].PrependAttributes.size(); ++k)
-                {
-                    std::cout << "        -   " << classesDetails[i].Functions[j].PrependAttributes[k];
-                    if(k < classesDetails[i].Functions[j].PrependAttributes.size() - 1)
-                        std::cout << std::endl;
-                }
-                
-                std::cout << std::endl;
-            }
-            std::cout << "        Return Type: " << classesDetails[i].Functions[j].ReturnType << std::endl;
-            
-            {
-                std::cout << "        Arguments Types: " << std::endl;
-                for(int k = 0; k < classesDetails[i].Functions[j].ArgTypes.size(); ++k)
-                {
-                    std::cout << "        -   " << classesDetails[i].Functions[j].ArgTypes[k];
-                    if(k < classesDetails[i].Functions[j].ArgTypes.size() - 1)
-                        std::cout << std::endl;
-                }
-                std::cout << std::endl;
-
-                std::cout << "        Arguments Values: " << std::endl;
-                for(int k = 0; k < classesDetails[i].Functions[j].ArgTypes.size(); ++k)
-                {
-                    std::cout << "        -   \"" << classesDetails[i].Functions[j].ArgDefaultValues[k] << "\"";
-                    if(k < classesDetails[i].Functions[j].ArgDefaultValues.size() - 1)
-                        std::cout << std::endl;
-                }
-                std::cout << std::endl;
-            }
-            
-            std::cout << "        Append Attributes: " << std::endl;
-            for(int k = 0; k < classesDetails[i].Functions[j].AppendAttributes.size(); ++k)
-            {
-                std::cout << "        -   " << classesDetails[i].Functions[j].AppendAttributes[k];
-                if(k < classesDetails[i].Functions[j].AppendAttributes.size() - 1)
-                        std::cout << std::endl;
-            }
-            
-            std::cout << std::endl << std::endl;
-        }
-        
-        std::cout << std::endl;
-        #endif
-    }
     
     if(ss.rdbuf()->in_avail() != 0)
         std::cout << ss.rdbuf();
@@ -1490,39 +1509,71 @@ int main(int argc, char** argv)
     {
         std::cout << "Usage: " << argv[0] << " [options] <input file>" << std::endl;
         std::cout << "Options: " << std::endl;
-        std::cout <<    "-h, --help             " << 
-                        "Prints this help message" <<   std::endl;
+        std::cout <<    "-h, --help                     " << 
+                        "Prints this help message." <<   std::endl;
         
-        std::cout <<    "-p, --print            " << 
-                        "Prints parsed contents instead of generated mock class" << std::endl;
+        std::cout <<    std::endl;
+        std::cout <<    "-p, --print                    " << 
+                        "Prints parsed contents instead of generated mock class." << std::endl;
         
-        std::cout <<    "-m, --macro-method     " << 
-                        "Use macro methods and inherits from CppOverride::MockClass instead. " << std::endl;
-        std::cout <<    "                       " << 
-                        "This creates a shorter file but more prone to preprocessing errors." << std::endl;
+        std::cout <<    std::endl;
+        std::cout <<    "-m, --mock-method              " << 
+                        "Use macro mock methods and inherits from CppOverride::MockClass instead. " << 
+                        std::endl;
+        std::cout <<    "                               " << 
+                        "This will NOT generate constructor and destructor unless -c is given." <<
+                        std::endl;
+        std::cout <<    "                               " << 
+                        "This creates a shorter file but more prone to preprocessing errors." << 
+                        std::endl;
 
-        std::cout <<    "-i, --use-input-classes" << 
-                        "This includes the input file and inherits the classes we are mocking" << std::endl;
+        std::cout <<    std::endl;
+        std::cout <<    "-c, --override-ctor            " <<
+                        "This will create constructor/destructor with CO_OVERRIDE_IMPL_CTOR_DTOR" <<
+                        std::endl;
+        std::cout <<    "                               " << 
+                        "This must be used with -g since the lifetime of the override instnace" <<
+                        std::endl;
+        std::cout <<    "                               " << 
+                        "must outlive the object we are mocking." << std::endl;
+        std::cout <<    "                               " << 
+                        "If this option is not given, an empty constructor/destructor will be " << std::endl;
+        std::cout <<    "                               " << 
+                        "generated instead." << std::endl;
 
-        std::cout <<    "-e, --exclude-names    " << 
+        std::cout <<    std::endl;
+        std::cout <<    "-g, --global-instance          " <<
+                        "This will use global override instance instead of declaring its instance." <<
+                        std::endl;
+        std::cout <<    "                               " << 
+                        "This will put the object pointer (this) as the first override argument." <<
+                        std::endl;
+        std::cout <<    "                               " << 
+                        "This cannot be used together with -m." <<
+                        std::endl;
+
+        std::cout <<    std::endl;
+        std::cout <<    "-i, --use-input-classes        " << 
+                        "This includes the input file and inherits the classes we are mocking." << 
+                        std::endl;
+
+        std::cout <<    std::endl;
+        std::cout <<    "-e, --exclude-names            " << 
                         "Anything that matches the specified names (case sensitive) " << std::endl;
-        std::cout <<    "                       " << 
+        std::cout <<    "                               " << 
                         "will not be generated as mock function/class." << std::endl;
-        std::cout <<    "                       " << 
-                        "This expects a comma separated list of names" << std::endl;
+        std::cout <<    "                               " << 
+                        "This expects a comma separated list of names." << std::endl;
     };
     
     if(argc < 2)
     {
-        //std::cout << "Usage: " << argv[0] << " <filename>" << std::endl;
         printHelp();
         return 1;
     }
     
     std::unordered_map<std::string, std::string> options;
-
     std::string inputFile;
-    
     std::string previousOption = "";
     
     for(int i = 1; i < argc; ++i)
@@ -1533,33 +1584,36 @@ int main(int argc, char** argv)
         if(current_arg.empty())
             continue;
         
+        //Matching "-..."
         if(current_arg.size() >= 2 && current_arg[0] == '-')
         {
             options[current_arg] = "";
             previousOption = current_arg;
         }
+        //Value
         else
         {
+            //If we have set an option last time, this value is for that option
             if(!previousOption.empty())
-            {
                 options[previousOption] = current_arg;
-            }
+            //If we don't have an option last time, this means this value is input value
             else if(i != argc - 1)
             {
                 std::cout << "inputFile must be the last argument" << std::endl;
                 return 1;
             }
-            
             previousOption = "";
         }
     }
     
+    //Match help
     if(options.count("-h") || options.count("--help"))
     {
         printHelp();
         return 0;
     }
     
+    //Get last arg and check
     std::string lastArg(argv[argc - 1]);
     if(lastArg[0] != '-')
         inputFile = lastArg;
@@ -1580,7 +1634,6 @@ int main(int argc, char** argv)
         const std::string& excludeString =  options.count("-e") ? 
                                             options.at("-e") : 
                                             options.at("-exclude-names");
-        
         int lastIndex = 0;
         for(int i = 0; i < excludeString.size(); ++i)
         {
@@ -1590,7 +1643,6 @@ int main(int argc, char** argv)
                                                                     excludeString[i] == ',' ?
                                                                     i - lastIndex :
                                                                     i - lastIndex + 1)));
-                
                 lastIndex = i + 1;
             }
         }
@@ -1600,12 +1652,33 @@ int main(int argc, char** argv)
         PrintMockClassContents(classesDetails, includes);
     else
     {
+        const bool useMockClass = options.count("-m") || options.count("--mock-method");
+        const bool useInputClasses = options.count("-i") || options.count("--use-input-classes");
+        const bool overrideCtor = options.count("-c") || options.count("--override-ctor");
+        const bool globalInstance = options.count("-g") || options.count("--global-instnace");
+        
+        if(useMockClass && globalInstance)
+        {
+            std::cout <<    "-m/--mock-method cannot be used together with -g/--global-instnace" << 
+                            std::endl;
+            return 1;
+        }
+        
+        if(overrideCtor && !globalInstance)
+        {
+            std::cout <<    "-c/--override-ctor must used together with -g/--global-instnace" << 
+                            std::endl;
+            return 1;
+        }
+        
         GenerateMockClass(  classesDetails, 
                             includes, 
                             excludeNames,
                             inputFile, 
-                            options.count("-m") || options.count("--macro-method"), 
-                            options.count("-i") || options.count("--use-input-classes"));
+                            useMockClass, 
+                            useInputClasses,
+                            overrideCtor,
+                            globalInstance);
     }
 
     return 0;

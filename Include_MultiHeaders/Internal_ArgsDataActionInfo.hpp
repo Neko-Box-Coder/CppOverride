@@ -8,7 +8,7 @@ namespace CppOverride
 {
     struct Internal_ArgsDataActionInfo
     {
-        std::function<void(std::vector<void*>& args)> DataAction;
+        std::function<void(void* instance, std::vector<void*>& args)> DataAction;
         std::vector<std::size_t> DataTypes;
         std::vector<bool> DataTypesSet;
         bool DataActionSet = false;

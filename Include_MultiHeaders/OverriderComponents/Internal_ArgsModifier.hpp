@@ -166,11 +166,12 @@ namespace CppOverride
                 ModifyArgs(argsData, ++index, status, args...);
             }
             
-            inline void ModifyArgs( std::vector<void*>& argumentsList, 
+            inline void ModifyArgs( void* instance,
+                                    std::vector<void*>& argumentsList, 
                                     Internal_ArgsDataActionInfo& argsDataAction)
             {
                 if(argsDataAction.DataActionSet)
-                    argsDataAction.DataAction(argumentsList);
+                    argsDataAction.DataAction(instance, argumentsList);
             }
     };
 }

@@ -170,7 +170,8 @@ namespace CppOverride
             template<typename... Args>
             inline OverrideInfoSetter& 
             SetArgsByAction(OverrideInfoSetter& infoSetter,
-                            std::function<void(std::vector<void*>& args)> setArgsAction)
+                            std::function<void( void* instance, 
+                                                std::vector<void*>& args)> setArgsAction)
             {
                 Internal_OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();

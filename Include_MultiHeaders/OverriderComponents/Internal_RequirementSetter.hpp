@@ -97,46 +97,48 @@ namespace CppOverride
             
             inline OverrideInfoSetter& 
             If( OverrideInfoSetter& infoSetter, 
-                std::function<bool(const std::vector<void*>& args)> condition)
+                std::function<bool(void* instance, const std::vector<void*>& args)> condition)
             {
-                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ConditionInfo
-                                                                            .LambdaCondition = condition;
-                        
-                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ConditionInfo
-                                                                            .DataConditionSet = true;
-
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
+                                    .back()
+                                    .ConditionInfo
+                                    .LambdaCondition = condition;
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
+                                    .back()
+                                    .ConditionInfo
+                                    .DataConditionSet = true;
                 return infoSetter;
             }
             
             inline OverrideInfoSetter& 
             Otherwise_Do(   OverrideInfoSetter& infoSetter, 
-                            std::function<void(const std::vector<void*>& args)> action)
+                            std::function<void( void* instance, 
+                                                const std::vector<void*>& args)> action)
             {
-                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ResultActionInfo
-                                                                            .OtherwiseAction = action;
-                    
-                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ResultActionInfo
-                                                                            .OtherwiseActionSet = true;
-                
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
+                                    .back()
+                                    .ResultActionInfo
+                                    .OtherwiseAction = action;
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
+                                    .back()
+                                    .ResultActionInfo
+                                    .OtherwiseActionSet = true;
                 return infoSetter;
             }
             
             inline OverrideInfoSetter& 
             WhenCalledExpectedly_Do(OverrideInfoSetter& infoSetter, 
-                                    std::function<void(const std::vector<void*>& args)> action)
+                                    std::function<void( void* instance, 
+                                                        const std::vector<void*>& args)> action)
             {
-                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ResultActionInfo
-                                                                            .CorrectAction = action;
-                
-                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ResultActionInfo
-                                                                            .CorrectActionSet = true;
-
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
+                                    .back()
+                                    .ResultActionInfo
+                                    .CorrectAction = action;
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
+                                    .back()
+                                    .ResultActionInfo
+                                    .CorrectActionSet = true;
                 return infoSetter;
             }
             
@@ -147,6 +149,16 @@ namespace CppOverride
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 currentData.Status = result.GetStatusRef();
+                return infoSetter;
+            }
+        
+            inline OverrideInfoSetter& OverrideObject(  OverrideInfoSetter& infoSetter, 
+                                                        void* instance)
+            {
+                Internal_OverrideData& currentData = 
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
+                
+                currentData.Instance = instance;
                 return infoSetter;
             }
         
