@@ -33,8 +33,8 @@ This framework is header only so you can just include it with
 
 Additionally, you can add the include directory with
 
-- `#!cmake AddSubDirectory(CppOverride)`
-- `#!cmake TargetLinkLibrary(YourTarget CppOverride)`
+- `AddSubDirectory(CppOverride)`
+- `TargetLinkLibrary(YourTarget CppOverride)`
 
 ---
 
@@ -81,7 +81,7 @@ int main()
 class DummyMockClass : public CppOverride::Overridable
 {
     public:
-        CO_MOCK_METHOD(int, MemberFunction, (int), /* no append */)
+        CO_OVERRIDE_METHOD(int, MemberFunction, (int), /* no append */)
 };
 
 int main()
