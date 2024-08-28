@@ -204,16 +204,16 @@ namespace CppOverride
             INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes) \
         )
 
-    #define CO_MOCK_METHOD(...) \
-        MPT_OVERLOAD_MACRO(INTERNAL_CO_MOCK_METHOD, __VA_ARGS__)
+    #define CO_OVERRIDE_METHOD(...) \
+        MPT_OVERLOAD_MACRO(INTERNAL_CO_OVERRIDE_METHOD, __VA_ARGS__)
 
-    #define INTERNAL_CO_MOCK_METHOD_0(...) \
-        static_assert(false, "CO_MOCK_METHOD must have 3 to 6 arguments, 0 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_1(...) \
-        static_assert(false, "CO_MOCK_METHOD must have 3 to 6 arguments, 1 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_2(...) \
-        static_assert(false, "CO_MOCK_METHOD must have 3 to 6 arguments, 2 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_3(returnType, functionName, argsTypes) \
+    #define INTERNAL_CO_OVERRIDE_METHOD_0(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 0 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_1(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 1 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_2(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 2 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_3(returnType, functionName, argsTypes) \
         inline MPT_REMOVE_PARENTHESIS(returnType) functionName \
         ( \
             MPT_REMOVE_PARENTHESIS_IN_LIST( INTERNAL_POPULATE_ARGS_FIELD(argsTypes) ) \
@@ -222,7 +222,7 @@ namespace CppOverride
             CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
             return MPT_REMOVE_PARENTHESIS(returnType)(); \
         }
-    #define INTERNAL_CO_MOCK_METHOD_4(returnType, functionName, argsTypes, functionAppend) \
+    #define INTERNAL_CO_OVERRIDE_METHOD_4(returnType, functionName, argsTypes, functionAppend) \
         inline MPT_REMOVE_PARENTHESIS(returnType) functionName \
         ( \
             MPT_REMOVE_PARENTHESIS_IN_LIST( INTERNAL_POPULATE_ARGS_FIELD(argsTypes) ) \
@@ -231,7 +231,7 @@ namespace CppOverride
             CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
             return MPT_REMOVE_PARENTHESIS(returnType)(); \
         }
-    #define INTERNAL_CO_MOCK_METHOD_5(functionPrepend, returnType, functionName, argsTypes, functionAppend) \
+    #define INTERNAL_CO_OVERRIDE_METHOD_5(functionPrepend, returnType, functionName, argsTypes, functionAppend) \
         MPT_REMOVE_PARENTHESIS(functionPrepend) inline MPT_REMOVE_PARENTHESIS(returnType) functionName \
         ( \
             MPT_REMOVE_PARENTHESIS_IN_LIST( INTERNAL_POPULATE_ARGS_FIELD(argsTypes) ) \
@@ -240,7 +240,7 @@ namespace CppOverride
             CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
             return MPT_REMOVE_PARENTHESIS(returnType)(); \
         }
-    #define INTERNAL_CO_MOCK_METHOD_6(functionPrepend, returnType, functionName, argsTypes, argsDefaults, functionAppend) \
+    #define INTERNAL_CO_OVERRIDE_METHOD_6(functionPrepend, returnType, functionName, argsTypes, argsDefaults, functionAppend) \
         MPT_REMOVE_PARENTHESIS(functionPrepend) inline MPT_REMOVE_PARENTHESIS(returnType) functionName \
         ( \
             MPT_REMOVE_PARENTHESIS_IN_LIST \
@@ -256,14 +256,14 @@ namespace CppOverride
             CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
             return MPT_REMOVE_PARENTHESIS(returnType)(); \
         }
-    #define INTERNAL_CO_MOCK_METHOD_7(...) \
-        static_assert(false, "CO_MOCK_METHOD must have 3 to 6 arguments, 7 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_8(...) \
-        static_assert(false, "CO_MOCK_METHOD must have 3 to 6 arguments, 8 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_9(...) \
-        static_assert(false, "CO_MOCK_METHOD must have 3 to 6 arguments, 9 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_10(...) \
-        static_assert(false, "CO_MOCK_METHOD must have 3 to 6 arguments, 10 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_7(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 7 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_8(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 8 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_9(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 9 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_10(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 10 given currently")
     
     //#if 1
     #ifdef CO_NO_OVERRIDE
@@ -275,7 +275,7 @@ namespace CppOverride
         #undef CO_DECLARE_MEMBER_INSTANCE
         #undef CO_DECLARE_INSTANCE
         #undef CO_DECLARE_OVERRIDE_METHODS
-        #undef CO_MOCK_METHOD
+        #undef CO_OVERRIDE_METHOD
         #undef CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR
     
         #define CO_OVERRIDE_IMPL(...)
@@ -286,7 +286,7 @@ namespace CppOverride
         #define CO_DECLARE_MEMBER_INSTANCE(...)
         #define CO_DECLARE_INSTANCE(...)
         #define CO_DECLARE_OVERRIDE_METHODS(...)
-        #define CO_MOCK_METHOD(...)
+        #define CO_OVERRIDE_METHOD(...)
         #define CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(...)
     #endif
 }

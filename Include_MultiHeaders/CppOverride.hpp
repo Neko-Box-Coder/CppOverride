@@ -9,7 +9,7 @@
 
 namespace CppOverride
 {
-    class MockClass
+    class Overridable
     {
         protected:
             CO_DECLARE_MEMBER_INSTANCE(CurrentOverrideInstance);

@@ -1153,7 +1153,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         else
             std::cout << " : " << "public " << classesDetails.at(i).Name;
 
-        //Inheriting from mock class
+        //Inheriting from Overridable
         if(useMacroMockMethod)
         {
             bool hasInheritance = useInputClasses;
@@ -1193,7 +1193,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
             else
                 std::cout << ", ";
             
-            std::cout << "public CppOverride::MockClass";
+            std::cout << "public CppOverride::Overridable";
         }
 
         std::cout << std::endl << "{" << std::endl;
@@ -1245,10 +1245,10 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 (currentFunc.Name == classesDetails.at(i).Name ||
                 currentFunc.Name == (std::string("~") + classesDetails.at(i).Name));
             
-            //CO_MOCK_METHOD
+            //CO_OVERRIDE_METHOD
             if(useMacroMockMethod && !isConstructorDestructor)
             {
-                std::cout << "    CO_MOCK_METHOD(";
+                std::cout << "    CO_OVERRIDE_METHOD(";
                 
                 //Prepend
                 {
@@ -1517,8 +1517,8 @@ int main(int argc, char** argv)
                         "Prints parsed contents instead of generated mock class." << std::endl;
         
         std::cout <<    std::endl;
-        std::cout <<    "-m, --mock-method              " << 
-                        "Use macro mock methods and inherits from CppOverride::MockClass instead. " << 
+        std::cout <<    "-m, --override-methods         " << 
+                        "Use macro override methods and inherits from CppOverride::Overridable instead. " << 
                         std::endl;
         std::cout <<    "                               " << 
                         "This will NOT generate constructor and destructor unless -c is given." <<
@@ -1558,7 +1558,7 @@ int main(int argc, char** argv)
                         std::endl;
 
         std::cout <<    std::endl;
-        std::cout <<    "-e, --exclude-names            " << 
+        std::cout <<    "-e, --exclude-names <names>    " << 
                         "Anything that matches the specified names (case sensitive) " << std::endl;
         std::cout <<    "                               " << 
                         "will not be generated as mock function/class." << std::endl;
@@ -1652,7 +1652,7 @@ int main(int argc, char** argv)
         PrintMockClassContents(classesDetails, includes);
     else
     {
-        const bool useMockClass = options.count("-m") || options.count("--mock-method");
+        const bool useMockClass = options.count("-m") || options.count("--override-methods");
         const bool useInputClasses = options.count("-i") || options.count("--use-input-classes");
         const bool overrideCtor = options.count("-c") || options.count("--override-ctor");
         const bool globalInstance = options.count("-g") || options.count("--global-instnace");
