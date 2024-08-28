@@ -107,4 +107,7 @@ int main()
 ```
 
 This is just a quick taste on what it looks like. 
-There are many other things you can do. For a more detailed guide, check out the user guide
+There are many other things you can do. 
+
+For a more detailed guide, check out the user guide
+[https://neko-box-coder.github.io/CppOverride/](https://neko-box-coder.github.io/CppOverride/)
