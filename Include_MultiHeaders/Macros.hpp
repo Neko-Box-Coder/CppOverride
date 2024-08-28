@@ -33,7 +33,7 @@ namespace CppOverride
     
     #define INTERNAL_CO_LOG_CO_OVERRIDE_IMPL 0
     
-    #define INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, returnType, args) \
+    #define INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, returnType, instance, args) \
     do \
     { \
         int foundIndex = -1; \
@@ -46,7 +46,8 @@ namespace CppOverride
                             foundIndex, \
                             overrideReturn, \
                             overrideArgs, \
-                            dontReturn \
+                            dontReturn, \
+                            (void*)instance \
                             INTERNAL_CO_ARGS(args) \
                         ); \
         \
@@ -66,7 +67,8 @@ namespace CppOverride
                 { \
                     overrideObjName.Internal_OverrideArgs(  foundIndex, \
                                                             __func__, \
-                                                            !overrideReturn \
+                                                            !overrideReturn, \
+                                                            (void*)instance \
                                                             INTERNAL_CO_ARGS(args)); \
                     \
                 } \
@@ -81,33 +83,36 @@ namespace CppOverride
                         overrideObjName.Internal_CallReturnOverrideResultExpectedAction \
                         ( \
                             __func__, \
-                            foundIndex \
+                            foundIndex, \
+                            (void*)instance \
                             INTERNAL_CO_ARGS(args) \
                         ); \
                     } \
                     else \
                     {
     
-    #define INTERNAL_CO_OVERRIDE_IMPL_NORMAL_PART_2(overrideObjName, returnType, args) \
+    #define INTERNAL_CO_OVERRIDE_IMPL_NORMAL_PART_2(overrideObjName, returnType, instance, args) \
                         /* If we are returning, the result action is called inside */ \
                         return  overrideObjName.Internal_OverrideReturn<MPT_REMOVE_PARENTHESIS(returnType)> \
                                 ( \
                                     foundIndex, \
-                                    __func__ \
+                                    __func__, \
+                                    (void*)instance \
                                     INTERNAL_CO_ARGS(args) \
                                 );
     
-    #define INTERNAL_CO_OVERRIDE_IMPL_NO_RETURN_TYPE_PART_2(overrideObjName, args) \
+    #define INTERNAL_CO_OVERRIDE_IMPL_NO_RETURN_TYPE_PART_2(overrideObjName, instance, args) \
                         /* If we are returning, the result action is called inside */ \
                         overrideObjName.Internal_OverrideReturn<MPT_REMOVE_PARENTHESIS(void)> \
                         ( \
                             foundIndex, \
-                            __func__ \
+                            __func__, \
+                            (void*)instance \
                             INTERNAL_CO_ARGS(args) \
                         ); \
                         return;
 
-    #define INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_3(overrideObjName, returnType, args) \
+    #define INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_3(overrideObjName, returnType, instance, args) \
                     } \
                 } \
                 if(!overrideArgs && !overrideReturn) \
@@ -116,7 +121,8 @@ namespace CppOverride
                     overrideObjName.Internal_CallReturnOverrideResultExpectedAction \
                     ( \
                         __func__, \
-                        foundIndex \
+                        foundIndex, \
+                        (void*)instance \
                         INTERNAL_CO_ARGS(args) \
                     ); \
                 } \
@@ -125,9 +131,20 @@ namespace CppOverride
     } while(0)
 
     #define CO_OVERRIDE_IMPL(overrideObjName, returnType, args) \
-        INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, returnType, args) \
-        INTERNAL_CO_OVERRIDE_IMPL_NORMAL_PART_2(overrideObjName, returnType, args) \
-        INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_3(overrideObjName, returnType, args)
+        INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, returnType, nullptr, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_NORMAL_PART_2(overrideObjName, returnType, nullptr, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_3(overrideObjName, returnType, nullptr, args)
+
+    #define CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(overrideObjName, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, void, this, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_NO_RETURN_TYPE_PART_2(overrideObjName, this, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_3(overrideObjName, void, this, args)
+
+    #define CO_OVERRIDE_IMPL_INSTNACE(overrideObjName, returnType, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, returnType, this, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_NORMAL_PART_2(overrideObjName, returnType, this, args) \
+        INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_3(overrideObjName, returnType, this, args)
+
 
     //-------------------------------------------------------
     //Setup overrides
@@ -147,7 +164,7 @@ namespace CppOverride
     //-------------------------------------------------------
     #define CO_DECLARE_MEMBER_INSTANCE(OverrideObjName) mutable CppOverride::Overrider OverrideObjName
     #define CO_DECLARE_INSTANCE(OverrideObjName) CppOverride::Overrider OverrideObjName
-            
+    
     #define CO_DECLARE_OVERRIDE_METHODS(OverrideObjName) \
     inline CppOverride::OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName) \
     { \
@@ -187,15 +204,25 @@ namespace CppOverride
             INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes) \
         )
 
-    #define CO_MOCK_METHOD(...) \
-        MPT_OVERLOAD_MACRO(INTERNAL_CO_MOCK_METHOD, __VA_ARGS__)
+    #define CO_OVERRIDE_METHOD(...) \
+        MPT_OVERLOAD_MACRO(INTERNAL_CO_OVERRIDE_METHOD, __VA_ARGS__)
 
-    #define INTERNAL_CO_MOCK_METHOD_0(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 0 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_1(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 1 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_2(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 2 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_3(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 3 given currently")
-
-    #define INTERNAL_CO_MOCK_METHOD_4(returnType, functionName, argsTypes, functionAppend) \
+    #define INTERNAL_CO_OVERRIDE_METHOD_0(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 0 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_1(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 1 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_2(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 2 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_3(returnType, functionName, argsTypes) \
+        inline MPT_REMOVE_PARENTHESIS(returnType) functionName \
+        ( \
+            MPT_REMOVE_PARENTHESIS_IN_LIST( INTERNAL_POPULATE_ARGS_FIELD(argsTypes) ) \
+        ) \
+        { \
+            CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
+            return MPT_REMOVE_PARENTHESIS(returnType)(); \
+        }
+    #define INTERNAL_CO_OVERRIDE_METHOD_4(returnType, functionName, argsTypes, functionAppend) \
         inline MPT_REMOVE_PARENTHESIS(returnType) functionName \
         ( \
             MPT_REMOVE_PARENTHESIS_IN_LIST( INTERNAL_POPULATE_ARGS_FIELD(argsTypes) ) \
@@ -204,8 +231,7 @@ namespace CppOverride
             CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
             return MPT_REMOVE_PARENTHESIS(returnType)(); \
         }
-
-    #define INTERNAL_CO_MOCK_METHOD_5(functionPrepend, returnType, functionName, argsTypes, functionAppend) \
+    #define INTERNAL_CO_OVERRIDE_METHOD_5(functionPrepend, returnType, functionName, argsTypes, functionAppend) \
         MPT_REMOVE_PARENTHESIS(functionPrepend) inline MPT_REMOVE_PARENTHESIS(returnType) functionName \
         ( \
             MPT_REMOVE_PARENTHESIS_IN_LIST( INTERNAL_POPULATE_ARGS_FIELD(argsTypes) ) \
@@ -214,8 +240,7 @@ namespace CppOverride
             CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
             return MPT_REMOVE_PARENTHESIS(returnType)(); \
         }
-    
-    #define INTERNAL_CO_MOCK_METHOD_6(functionPrepend, returnType, functionName, argsTypes, argsDefaults, functionAppend) \
+    #define INTERNAL_CO_OVERRIDE_METHOD_6(functionPrepend, returnType, functionName, argsTypes, argsDefaults, functionAppend) \
         MPT_REMOVE_PARENTHESIS(functionPrepend) inline MPT_REMOVE_PARENTHESIS(returnType) functionName \
         ( \
             MPT_REMOVE_PARENTHESIS_IN_LIST \
@@ -231,31 +256,38 @@ namespace CppOverride
             CO_OVERRIDE_IMPL(CurrentOverrideInstance, returnType, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
             return MPT_REMOVE_PARENTHESIS(returnType)(); \
         }
-
-    #define INTERNAL_CO_MOCK_METHOD_7(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 7 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_8(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 8 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_9(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 9 given currently")
-    #define INTERNAL_CO_MOCK_METHOD_10(...) static_assert(false, "CO_MOCK_METHOD must have 4, 5 or 6 arguments, 10 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_7(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 7 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_8(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 8 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_9(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 9 given currently")
+    #define INTERNAL_CO_OVERRIDE_METHOD_10(...) \
+        static_assert(false, "CO_OVERRIDE_METHOD must have 3 to 6 arguments, 10 given currently")
     
     //#if 1
     #ifdef CO_NO_OVERRIDE
         #undef CO_OVERRIDE_IMPL
+        #undef CO_OVERRIDE_IMPL_INSTANCE
         #undef CO_SETUP_OVERRIDE
         #undef CO_REMOVE_OVERRIDE_SETUP
         #undef CO_CLEAR_ALL_OVERRIDE_SETUP
         #undef CO_DECLARE_MEMBER_INSTANCE
         #undef CO_DECLARE_INSTANCE
         #undef CO_DECLARE_OVERRIDE_METHODS
-        #undef CO_MOCK_METHOD
+        #undef CO_OVERRIDE_METHOD
+        #undef CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR
     
         #define CO_OVERRIDE_IMPL(...)
+        #define CO_OVERRIDE_IMPL_INSTANCE(...)
         #define CO_SETUP_OVERRIDE(...)
         #define CO_REMOVE_OVERRIDE_SETUP(...)
         #define CO_CLEAR_ALL_OVERRIDE_SETUP(...)
         #define CO_DECLARE_MEMBER_INSTANCE(...)
         #define CO_DECLARE_INSTANCE(...)
         #define CO_DECLARE_OVERRIDE_METHODS(...)
-        #define CO_MOCK_METHOD(...)
+        #define CO_OVERRIDE_METHOD(...)
+        #define CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(...)
     #endif
 }
 

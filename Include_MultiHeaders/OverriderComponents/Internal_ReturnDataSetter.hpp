@@ -26,7 +26,8 @@ namespace CppOverride
             template<typename ReturnType>
             inline OverrideInfoSetter& 
             ReturnsByAction(OverrideInfoSetter& infoSetter, 
-                            std::function<void( const std::vector<void*>& args, 
+                            std::function<void( void* instance,
+                                                const std::vector<void*>& args, 
                                                 void* out)> returnAction)
             {
                 static_assert(  !std::is_same<ReturnType, Any>(), 
@@ -51,7 +52,8 @@ namespace CppOverride
                 typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
                 typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type
             >
-            inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter, ReturnType returnData)
+            inline OverrideInfoSetter& Returns( OverrideInfoSetter& infoSetter, 
+                                                ReturnType returnData)
             {
                 if(!std::is_same<ReturnType, Any>())
                 {
@@ -81,7 +83,8 @@ namespace CppOverride
                 typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
                 typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type
             >
-            inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter, ReturnType returnData)
+            inline OverrideInfoSetter& Returns( OverrideInfoSetter& infoSetter, 
+                                                ReturnType returnData)
             {
                 if(!std::is_same<ReturnType, Any&>())
                 {
@@ -117,7 +120,8 @@ namespace CppOverride
             }
             
             template<   typename ReturnType,
-                        typename = typename std::enable_if<std::is_same<ReturnType, void>::value>::type>
+                        typename = typename std::enable_if<std::is_same<ReturnType, 
+                                                                        void>::value>::type>
             inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter)
             {
                 return ReturnsVoid(infoSetter);

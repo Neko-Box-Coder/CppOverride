@@ -108,15 +108,16 @@ int main()
         (
             CppOverrideTest::TestClass testClass;
             CppOverride::OverrideResult result;
-            CO_SETUP_OVERRIDE   (OverrideObj, SetObjectFunc)
-                                .SetArgs<   CO_ANY_TYPE, 
-                                            CO_ANY_TYPE, 
-                                            CO_ANY_TYPE, 
-                                            CppOverrideTest::TestClass&>(   CO_DONT_SET, 
-                                                                            CO_DONT_SET, 
-                                                                            CO_DONT_SET, 
-                                                                            CppOverrideTest::TestClass(1, 2.0, "test"))
-                                .AssignOverrideResult(result);
+            CO_SETUP_OVERRIDE
+                (OverrideObj, SetObjectFunc)
+                .SetArgs<   CO_ANY_TYPE, 
+                            CO_ANY_TYPE, 
+                            CO_ANY_TYPE, 
+                            CppOverrideTest::TestClass&>(   CO_DONT_SET, 
+                                                            CO_DONT_SET, 
+                                                            CO_DONT_SET, 
+                                                            CppOverrideTest::TestClass(1, 2.0, "test"))
+                .AssignOverrideResult(result);
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -251,7 +252,7 @@ int main()
             CppOverride::OverrideResult result;
             CppOverrideTest::Rectangle rect(5, 5);
             float outWidth = 0;
-            CO_SETUP_OVERRIDE   (rect, GetWidth).SetArgs<float&, CO_ANY_TYPE>(2, CO_DONT_SET)
+            CO_SETUP_OVERRIDE(rect, GetWidth)   .SetArgs<float&, CO_ANY_TYPE>(2, CO_DONT_SET)
                                                 .ReturnsVoid()
                                                 .AssignOverrideResult(result);
         );
@@ -266,11 +267,9 @@ int main()
         (
             CppOverride::OverrideResult result;
             CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
-                                .SetArgs<   CO_ANY_TYPE, 
-                                            CO_ANY_TYPE, 
-                                            CO_ANY_TYPE>(   CO_DONT_SET, 
-                                                            CO_DONT_SET, 
-                                                            CO_DONT_SET)
+                                .SetArgs<CO_ANY_TYPE, CO_ANY_TYPE, CO_ANY_TYPE>(CO_DONT_SET, 
+                                                                                CO_DONT_SET, 
+                                                                                CO_DONT_SET)
                                 .AssignOverrideResult(result);
             
             float testArg = 2.f;
@@ -320,7 +319,7 @@ int main()
             CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgsByAction<int, float*, std::string&>
                                 (
-                                    [](std::vector<void*>& args)
+                                    [](void*, std::vector<void*>& args)
                                     {
                                         **((float**)args.at(1)) = 2.f;
                                         *((std::string*)args.at(2)) = "test";
@@ -352,7 +351,7 @@ int main()
                                                     CO_ANY_TYPE, 
                                                     CppOverrideTest::TestClass&>
                                 (
-                                    [](std::vector<void*>& args)
+                                    [](void*, std::vector<void*>& args)
                                     {
                                         *((CppOverrideTest::TestClass*)args.at(3)) = 
                                             CppOverrideTest::TestClass(1, 2.0, "test");
@@ -380,7 +379,7 @@ int main()
             CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgsByAction<CO_ANY_TYPE, float*, std::string&>
                                 (
-                                    [](std::vector<void*>& args)
+                                    [](void*, std::vector<void*>& args)
                                     {
                                         **((float**)args.at(1)) = 4.f;
                                         *((std::string*)args.at(2)) = "Test";
@@ -391,7 +390,7 @@ int main()
             CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .SetArgsByAction<CO_ANY_TYPE, float&, float*>
                                 (
-                                    [](std::vector<void*>& args)
+                                    [](void*, std::vector<void*>& args)
                                     {
                                         *((float*)args.at(1)) = 5.f;
                                         **((float**)args.at(2)) = 3.f;

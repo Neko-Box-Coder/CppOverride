@@ -88,6 +88,7 @@ namespace CppOverride
                                                 bool& outOverrideReturn,
                                                 bool& outOverrideArgs,
                                                 bool& outDontReturn,
+                                                void* instance,
                                                 Args&... args)
             {
                 outOverrideIndex = -1;
@@ -114,6 +115,13 @@ namespace CppOverride
                 outDontReturn = false;
                 for(int i = 0; i < currentDataList.size(); ++i)
                 {
+                    //Match the correct instance if any
+                    if( currentDataList.at(i).Instance != nullptr && 
+                        currentDataList.at(i).Instance != instance)
+                    {
+                        continue;
+                    }
+                    
                     if( !currentDataList.at(i).ArgumentsDataInfo.empty() ||
                         currentDataList.at(i).ArgumentsDataActionInfo.DataActionSet)
                     {
@@ -152,6 +160,7 @@ namespace CppOverride
                     OverrideStatus internalStatus = OverrideStatus::NO_OVERRIDE;
                     if(!IsMeetingRequirementForDataInfo<ReturnType>(currentDataList.at(i), 
                                                                     internalStatus, 
+                                                                    instance,
                                                                     args...))
                     {
                         //If something is wrong internally, notify everything
@@ -185,20 +194,23 @@ namespace CppOverride
             }
 
             template<typename... Args>
-            inline void Internal_CallReturnOverrideResultExpectedAction(    std::string functionName,
-                                                                            int overrideIndex,
-                                                                            Args&... args)
+            inline void 
+            Internal_CallReturnOverrideResultExpectedAction(std::string functionName,
+                                                            int overrideIndex,
+                                                            void* instance,
+                                                            Args&... args)
             {
-                Internal_OverrideData& correctData = OverrideDatas.at(functionName).at(overrideIndex);
+                Internal_OverrideData& correctData = 
+                    OverrideDatas.at(functionName).at(overrideIndex);
+                
                 if(correctData.ResultActionInfo.CorrectActionSet)
                 {
                     std::vector<void*> argumentsList;
                     AppendArgsValues(argumentsList, args...);
-                    correctData.ResultActionInfo.CorrectAction(argumentsList); 
+                    correctData.ResultActionInfo.CorrectAction(instance, argumentsList);
                 }
                 
                 correctData.ConditionInfo.CalledTimes++;
-                
                 if(correctData.Status != nullptr)
                     *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
             }
@@ -209,23 +221,34 @@ namespace CppOverride
 
             #define INTERNAL_CO_LOG_CheckOverrideAndReturn 0
 
-            template<   typename ReturnType, 
-                        typename = typename std::enable_if<std::is_same<ReturnType, void>::value>::type,
-                        typename... Args>
+            template
+            <
+                typename ReturnType, 
+                typename = typename std::enable_if<std::is_same<ReturnType, void>::value>::type,
+                typename... Args
+            >
             inline ReturnType Internal_OverrideReturn(  int dataIndex,
                                                         std::string functionName, 
+                                                        void* instance,
                                                         Args&... args)
             {
-                Internal_CallReturnOverrideResultExpectedAction(functionName, dataIndex, args...);
+                Internal_CallReturnOverrideResultExpectedAction(functionName, 
+                                                                dataIndex, 
+                                                                instance, 
+                                                                args...);
                 return ReturnType();
             }
 
-            template<   typename ReturnType, 
-                        typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                        typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type,
-                        typename... Args>
+            template
+            <
+                typename ReturnType, 
+                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
+                typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type,
+                typename... Args
+            >
             inline ReturnType Internal_OverrideReturn(  int dataIndex,
                                                         std::string functionName, 
+                                                        void* instance, 
                                                         Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
@@ -240,27 +263,36 @@ namespace CppOverride
                 AppendArgsValues(argumentsList, args...);
                 
                 Internal_OverrideData& correctData = currentDataList.at(dataIndex);
-                Internal_CallReturnOverrideResultExpectedAction(functionName, dataIndex, args...);
+                Internal_CallReturnOverrideResultExpectedAction(functionName, 
+                                                                dataIndex, 
+                                                                instance, 
+                                                                args...);
                 
                 if(correctData.ReturnDataInfo.DataSet)
                     return *static_cast<ReturnType*>(correctData.ReturnDataInfo.Data.get());
                 else if(correctData.ReturnDataActionInfo.DataActionSet)
                 {
                     ReturnType returnRef;
-                    correctData.ReturnDataActionInfo.DataAction(argumentsList, &returnRef);
+                    correctData.ReturnDataActionInfo.DataAction(instance, 
+                                                                argumentsList, 
+                                                                &returnRef);
                     return returnRef;
                 }
                 
                 return ReturnType();
             }
             
-            template<   typename ReturnType, 
-                        typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                        typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
-                        typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
-                        typename... Args>
-            inline ReturnType Internal_OverrideReturn( int dataIndex,
+            template
+            <
+                typename ReturnType, 
+                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
+                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
+                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
+                typename... Args
+            >
+            inline ReturnType Internal_OverrideReturn(  int dataIndex,
                                                         std::string functionName, 
+                                                        void* instance,
                                                         Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
@@ -275,7 +307,10 @@ namespace CppOverride
                 AppendArgsValues(argumentsList, args...);
                 
                 Internal_OverrideData& correctData = currentDataList.at(dataIndex);
-                Internal_CallReturnOverrideResultExpectedAction(functionName, dataIndex, args...);
+                Internal_CallReturnOverrideResultExpectedAction(functionName, 
+                                                                dataIndex, 
+                                                                instance, 
+                                                                args...);
 
                 if(correctData.ReturnDataInfo.DataSet)
                 {
@@ -287,7 +322,7 @@ namespace CppOverride
                 else if(correctData.ReturnDataActionInfo.DataActionSet)
                 {
                     INTERNAL_CO_UNREF(ReturnType)* returnRef;
-                    correctData.ReturnDataActionInfo.DataAction(argumentsList, &returnRef);
+                    correctData.ReturnDataActionInfo.DataAction(instance, argumentsList, &returnRef);
                     return *returnRef;
                 }
                 
@@ -303,6 +338,7 @@ namespace CppOverride
             inline void Internal_OverrideArgs(  int dataIndex,
                                                 std::string functionName, 
                                                 bool performResultAction,
+                                                void* instance,
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_CheckOverrideAndSetArgs)
@@ -319,7 +355,7 @@ namespace CppOverride
                 OverrideStatus overrideStatus = OverrideStatus::OVERRIDE_SUCCESS;
                 
                 if(correctData.ArgumentsDataActionInfo.DataActionSet)
-                    ModifyArgs(argumentsList, correctData.ArgumentsDataActionInfo);
+                    ModifyArgs(instance, argumentsList, correctData.ArgumentsDataActionInfo);
                 else
                 {
                     ModifyArgs( correctData.ArgumentsDataInfo, 
@@ -336,6 +372,7 @@ namespace CppOverride
                 {
                     Internal_CallReturnOverrideResultExpectedAction(functionName, 
                                                                     dataIndex, 
+                                                                    instance, 
                                                                     args...);
                 }
             }

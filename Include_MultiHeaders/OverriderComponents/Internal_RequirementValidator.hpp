@@ -29,6 +29,7 @@ namespace CppOverride
                         typename... Args>
             inline bool IsMeetingRequirementForDataInfo(Internal_OverrideData& overrideDataToCheck,
                                                         OverrideStatus& outInternalStatus,
+                                                        void* instance,
                                                         Args&... args)
             {
                 if(INTERNAL_CO_LOG_IsCorrectDataInfo)
@@ -65,27 +66,40 @@ namespace CppOverride
                         std::cout << "Failed at Check parameter" << std::endl;
                     
                     if(overrideDataToCheck.Status != nullptr)
-                        *overrideDataToCheck.Status = OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
+                    {
+                        *overrideDataToCheck.Status = 
+                            OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
+                    }
                     
                     if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
-                        overrideDataToCheck.ResultActionInfo.OtherwiseAction(argumentsList);
-                    
+                    {
+                        overrideDataToCheck .ResultActionInfo
+                                            .OtherwiseAction(instance, argumentsList);
+                    }
                     return false;
                 }
                 
-                
                 //Check condition lambda
                 if( overrideDataToCheck.ConditionInfo.DataConditionSet && 
-                    !overrideDataToCheck.ConditionInfo.LambdaCondition(argumentsList))
+                    !overrideDataToCheck.ConditionInfo
+                                        .LambdaCondition(   instance,
+                                                            argumentsList))
                 {
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check condition" << std::endl;
                     
                     if(overrideDataToCheck.Status != nullptr)
-                        *overrideDataToCheck.Status = OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
+                    {
+                        *overrideDataToCheck.Status = 
+                            OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
+                    }
                     
                     if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
-                        overrideDataToCheck.ResultActionInfo.OtherwiseAction(argumentsList);
+                    {
+                        overrideDataToCheck .ResultActionInfo
+                                            .OtherwiseAction(   instance, 
+                                                                argumentsList);
+                    }
                     
                     return false;
                 }
@@ -99,10 +113,16 @@ namespace CppOverride
                         std::cout << "Failed at Check times" << std::endl;
                     
                     if(overrideDataToCheck.Status != nullptr)
-                        *overrideDataToCheck.Status = OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
+                    {
+                        *overrideDataToCheck.Status = 
+                            OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
+                    }
                     
                     if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
-                        overrideDataToCheck.ResultActionInfo.OtherwiseAction(argumentsList);
+                    {
+                        overrideDataToCheck .ResultActionInfo
+                                            .OtherwiseAction(instance, argumentsList);
+                    }
 
                     return false;
                 }
@@ -113,9 +133,10 @@ namespace CppOverride
                 return true;
             }
         public:
-            inline Internal_RequirementValidator(   Internal_ArgsValuesAppender& argsValuesAppender,
-                                                    Internal_ConditionArgsTypesChecker& argsTypesChecker,
-                                                    Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
+            inline 
+            Internal_RequirementValidator(  Internal_ArgsValuesAppender& argsValuesAppender,
+                                            Internal_ConditionArgsTypesChecker& argsTypesChecker,
+                                            Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
                 ArgsValuesAppender(argsValuesAppender),
                 ArgsTypesChecker(argsTypesChecker),
                 ArgsValuesChecker(argsValuesChecker)

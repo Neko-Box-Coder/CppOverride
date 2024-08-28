@@ -10,7 +10,7 @@ namespace CppOverride
 {
     struct Internal_ConditionInfo
     {
-        std::function<bool(const std::vector<void*>& args)> LambdaCondition;
+        std::function<bool(void* instance, const std::vector<void*>& args)> LambdaCondition;
         std::vector<Internal_DataInfo> ArgsCondition = {};
         int Times = -1;
         int CalledTimes = 0;

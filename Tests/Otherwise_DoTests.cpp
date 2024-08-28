@@ -25,7 +25,7 @@ int main()
                                 .Returns<float>(6.f)
                                 .Otherwise_Do
                                 (
-                                    [&otherwiseDoCalled] (const std::vector<void *>&)
+                                    [&otherwiseDoCalled](...)
                                     {
                                         otherwiseDoCalled = true;
                                     }
@@ -53,7 +53,7 @@ int main()
             CO_SETUP_OVERRIDE   (rect, GetWidth)
                                 .If
                                 (
-                                    [] (const std::vector<void *>& args)
+                                    [](void*, const std::vector<void *>& args)
                                     {
                                         return (*(float*)args[0] == 2.f);
                                     }
@@ -61,7 +61,7 @@ int main()
                                 .Returns<float>(6.f)
                                 .Otherwise_Do
                                 (
-                                    [&otherwiseDoCalled] (const std::vector<void *>&)
+                                    [&otherwiseDoCalled](...)
                                     {
                                         otherwiseDoCalled = true;
                                     }
@@ -95,7 +95,7 @@ int main()
                                                             "test")
                                 .Otherwise_Do
                                 (
-                                    [&otherwiseDoCalled] (const std::vector<void *>&)
+                                    [&otherwiseDoCalled](...)
                                     {
                                         otherwiseDoCalled = true;
                                     }
@@ -123,7 +123,7 @@ int main()
             CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsAndArgsToSetFunc)
                                 .If
                                 (
-                                    [] (const std::vector<void *>& args)
+                                    [](void*, const std::vector<void *>& args)
                                     {
                                         return (*(int*)args[0] == 1) && (*(float*)args[1] == 2.f);
                                     }
@@ -135,7 +135,7 @@ int main()
                                                             "test")
                                 .Otherwise_Do
                                 (
-                                    [&otherwiseDoCalled] (const std::vector<void *>&)
+                                    [&otherwiseDoCalled](...)
                                     {
                                         otherwiseDoCalled = true;
                                     }

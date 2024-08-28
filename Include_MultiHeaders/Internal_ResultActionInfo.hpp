@@ -8,8 +8,8 @@ namespace CppOverride
 {
     struct Internal_ResultActionInfo
     {
-        std::function<void(const std::vector<void*>& args)> OtherwiseAction;
-        std::function<void(const std::vector<void*>& args)> CorrectAction;
+        std::function<void(void* instance, const std::vector<void*>& args)> OtherwiseAction;
+        std::function<void(void* instance, const std::vector<void*>& args)> CorrectAction;
         bool OtherwiseActionSet = false;
         bool CorrectActionSet = false;
     };

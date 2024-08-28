@@ -20,7 +20,7 @@ int main()
             CO_SETUP_OVERRIDE   (OverrideObj, ArgsFunc)
                                 .If
                                 (
-                                    [] (const std::vector<void *>& args) -> bool
+                                    [] (void*, const std::vector<void *>& args) -> bool
                                     {
                                         if( *static_cast<const int*>(args.at(0)) == 1 &&
                                             *static_cast<const bool*>(args.at(1)) == true &&
@@ -59,7 +59,7 @@ int main()
             CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
                                 .If
                                 (
-                                    [] (const std::vector<void *>& args) -> bool
+                                    [] (void*, const std::vector<void *>& args) -> bool
                                     {
                                         if( *static_cast<int*>(args.at(0)) == 1 &&
                                             **static_cast<float**>(args.at(1)) == 2.f &&

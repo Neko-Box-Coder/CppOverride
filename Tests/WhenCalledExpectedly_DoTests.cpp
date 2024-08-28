@@ -25,9 +25,8 @@ int main()
                                 .Returns<float>(6.f)
                                 .WhenCalledExpectedly_Do
                                 (
-                                    [&calledExpectedly] (const std::vector<void *>& args)
+                                    [&calledExpectedly](...)
                                     {
-                                        (void)args;
                                         calledExpectedly = true;
                                     }
                                 );
@@ -60,7 +59,7 @@ int main()
                                                             "test")
                                 .WhenCalledExpectedly_Do
                                 (
-                                    [&calledExpectedly] (const std::vector<void *>&)
+                                    [&calledExpectedly](...)
                                     {
                                         calledExpectedly = true;
                                     }
