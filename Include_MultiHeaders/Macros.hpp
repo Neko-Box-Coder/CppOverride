@@ -140,7 +140,7 @@ namespace CppOverride
         INTERNAL_CO_OVERRIDE_IMPL_NO_RETURN_TYPE_PART_2(overrideObjName, this, args) \
         INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_3(overrideObjName, void, this, args)
 
-    #define CO_OVERRIDE_IMPL_INSTNACE(overrideObjName, returnType, args) \
+    #define CO_OVERRIDE_IMPL_INSTANCE(overrideObjName, returnType, args) \
         INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, returnType, this, args) \
         INTERNAL_CO_OVERRIDE_IMPL_NORMAL_PART_2(overrideObjName, returnType, this, args) \
         INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_3(overrideObjName, returnType, this, args)

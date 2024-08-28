@@ -1434,7 +1434,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                         else
                         {
                             if(globalInstance)
-                                std::cout << "    CO_OVERRIDE_IMPL_INSTNACE(OverrideInstanceName, ";
+                                std::cout << "    CO_OVERRIDE_IMPL_INSTANCE(OverrideInstanceName, ";
                             else
                                 std::cout << "    CO_OVERRIDE_IMPL(OverrideInstanceName, ";
                             
