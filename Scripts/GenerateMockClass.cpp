@@ -8,6 +8,7 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <cassert>
 
 enum class ParseState
 {
@@ -1153,8 +1154,8 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         else
             std::cout << " : " << "public " << classesDetails.at(i).Name;
 
-        //Inheriting from Overridable
-        if(useMacroMockMethod)
+        //Add inheritance for overridable
+        if(!globalInstance)
         {
             bool hasInheritance = useInputClasses;
             for(int j = 0; j < classesDetails.at(i).AppendAttributes.size(); ++j)
@@ -1240,15 +1241,67 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
             TrimStringVector(currentFunc.PrependAttributes, filteredPrependAttributes);
             ClearStringVectorIfAllEmpty(filteredPrependAttributes);
             
-            const bool isConstructorDestructor = 
-                currentFunc.ReturnType.empty() && 
-                (currentFunc.Name == classesDetails.at(i).Name ||
-                currentFunc.Name == (std::string("~") + classesDetails.at(i).Name));
+            const bool isConstructor =  currentFunc.ReturnType.empty() && 
+                                        currentFunc.Name == classesDetails.at(i).Name;
+            const bool isDestructor =   currentFunc.ReturnType.empty() && 
+                                        currentFunc.Name == 
+                                        (std::string("~") + classesDetails.at(i).Name);
             
-            //CO_OVERRIDE_METHOD
-            if(useMacroMockMethod && !isConstructorDestructor)
+            bool useMacroOverrideMethodForThisFunc = useMacroMockMethod;
+            
+            //Populate empty constructor or destructor if we are not overriding them
+            if((isConstructor || isDestructor) && !overrideConstructor)
+                useMacroOverrideMethodForThisFunc = false;
+            
+            //CO_OVERRIDE_MEMBER_METHOD
+            if(useMacroOverrideMethodForThisFunc)
             {
-                std::cout << "    CO_OVERRIDE_METHOD(";
+                if(isConstructor)
+                    std::cout << "    CO_OVERRIDE_MEMBER_METHOD_CTOR(";
+                else if(isDestructor)
+                    std::cout << "    CO_OVERRIDE_MEMBER_METHOD_DTOR(";
+                else
+                    std::cout << "    CO_OVERRIDE_MEMBER_METHOD(";
+                
+                //Override Instance
+                {
+                    if(globalInstance)
+                        std::cout << "OverrideInstanceName, ";
+                    else
+                        std::cout << "*this, ";
+                }
+                
+                //Return type
+                if(!isConstructor && !isDestructor)
+                {
+                    if(currentFunc.ReturnType.find(',') != std::string::npos)
+                        std::cout << "(" << currentFunc.ReturnType << "), ";
+                    else
+                        std::cout << currentFunc.ReturnType << ", ";
+                }
+                
+                //Function name/Class name
+                if(isConstructor || isDestructor)
+                    std::cout << "Mock" << classesDetails.at(i).Name << ", ";
+                else
+                    std::cout << currentFunc.Name << ", ";
+                
+                //Arguments types
+                if(!isDestructor)
+                {
+                    std::cout << "(";
+                    for(int k = 0; k < currentFunc.ArgTypes.size(); ++k)
+                    {
+                        if(currentFunc.ArgTypes.at(k).find(',') != std::string::npos)
+                            std::cout << "(" << currentFunc.ArgTypes.at(k) <<")";
+                        else
+                            std::cout << currentFunc.ArgTypes.at(k);
+                        
+                        if(k != currentFunc.ArgTypes.size() - 1)
+                            std::cout << ", ";
+                    }
+                    std::cout << "), ";
+                }
                 
                 //Prepend
                 {
@@ -1277,45 +1330,6 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                         std::cout << currentPrepend << ", ";
                 }
                 
-                //Return type
-                if(currentFunc.ReturnType.find(',') != std::string::npos)
-                    std::cout << "(" << currentFunc.ReturnType << "), ";
-                else
-                    std::cout << currentFunc.ReturnType << ", ";
-                
-                //Function name
-                std::cout << currentFunc.Name << ", (";
-                
-                //Arguments types
-                for(int k = 0; k < currentFunc.ArgTypes.size(); ++k)
-                {
-                    if(currentFunc.ArgTypes.at(k).find(',') != std::string::npos)
-                        std::cout << "(" << currentFunc.ArgTypes.at(k) <<")";
-                    else
-                        std::cout << currentFunc.ArgTypes.at(k);
-                    
-                    if(k != currentFunc.ArgTypes.size() - 1)
-                        std::cout << ", ";
-                }
-                std::cout << "), (";
-                
-                //Default values
-                {
-                    std::vector<std::string> filteredDefaultValues;
-                    TrimStringVector(currentFunc.ArgDefaultValues, filteredDefaultValues);
-                    for(int k = 0; k < filteredDefaultValues.size(); ++k)
-                    {
-                        if(!filteredDefaultValues.at(k).empty())
-                            std::cout << "= " << filteredDefaultValues.at(k);
-                        else
-                            std::cout << "/* no default */";
-                        
-                        if(k != currentFunc.ArgTypes.size() - 1)
-                            std::cout << ", ";
-                    }
-                    std::cout << "), ";
-                }
-                
                 //Append
                 {
                     std::vector<std::string> filteredAppendAttributes;
@@ -1342,9 +1356,31 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                         std::cout << currentAppend;
                 }
                 
+                if(!isDestructor)
+                {
+                    std::cout << ", (";
+                    
+                    //Default values
+                    {
+                        std::vector<std::string> filteredDefaultValues;
+                        TrimStringVector(currentFunc.ArgDefaultValues, filteredDefaultValues);
+                        for(int k = 0; k < filteredDefaultValues.size(); ++k)
+                        {
+                            if(!filteredDefaultValues.at(k).empty())
+                                std::cout << "= " << filteredDefaultValues.at(k);
+                            else
+                                std::cout << "/* no default */";
+                            
+                            if(k != currentFunc.ArgTypes.size() - 1)
+                                std::cout << ", ";
+                        }
+                        std::cout << ")";
+                    }
+                }
+                
                 std::cout << ")" << std::endl;
             }
-            //CO_OVERRIDE_IMPL
+            //CO_OVERRIDE_MEMBER_IMPL
             else
             {
                 //Prepend
@@ -1367,18 +1403,15 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 }
                 
                 //Return type
-                if(!isConstructorDestructor)
+                if(!isConstructor && !isDestructor)
                     std::cout << currentFunc.ReturnType << " ";
                 
                 //Function name
-                if(isConstructorDestructor && !currentFunc.Name.empty())
-                {
-                    if(currentFunc.Name.front() == '~')
-                        std::cout << "~Mock" << classesDetails.at(i).Name;
-                    else
-                        std::cout << "Mock" << classesDetails.at(i).Name;
-                }
-                else
+                if(isConstructor)
+                    std::cout << "Mock" << classesDetails.at(i).Name;
+                else if(isDestructor)
+                    std::cout << "~Mock" << classesDetails.at(i).Name;
+                else if(!currentFunc.Name.empty())
                     std::cout << currentFunc.Name;
                 
                 std::cout << "(";
@@ -1386,9 +1419,9 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 //Arguments types
                 {
                     //Empty constructor/destructor
-                    if(isConstructorDestructor && !overrideConstructor)
+                    if((isConstructor || isDestructor)  && !overrideConstructor)
                     {
-                        if(currentFunc.Name.front() != '~')
+                        if(!isDestructor)
                             std::cout << "...";
                     }
                     else
@@ -1423,20 +1456,23 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                     
                     do
                     {
-                        //Empty constructor/destructor
-                        if(isConstructorDestructor && !overrideConstructor)
+                        //Empty constructor/destructor, don't fill function implementation
+                        if((isConstructor || isDestructor) && !overrideConstructor)
                             break;
                         
                         std::cout << "    ";
-                        //Override constructor and destructor, globalInstance is true here
-                        if(isConstructorDestructor)
-                            std::cout << "    CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(OverrideInstanceName, ";
+                        //Override constructor and destructor, globalInstance must be true here
+                        if(isConstructor || isDestructor)
+                        {
+                            assert(overrideConstructor);
+                            std::cout << "    CO_OVERRIDE_MEMBER_IMPL_CTOR_DTOR(OverrideInstanceName, ";
+                        }
                         else
                         {
                             if(globalInstance)
-                                std::cout << "    CO_OVERRIDE_IMPL_INSTANCE(OverrideInstanceName, ";
+                                std::cout << "    CO_OVERRIDE_MEMBER_IMPL(OverrideInstanceName, ";
                             else
-                                std::cout << "    CO_OVERRIDE_IMPL(OverrideInstanceName, ";
+                                std::cout << "    CO_OVERRIDE_MEMBER_IMPL(*this, ";
                             
                             //Return type
                             if(currentFunc.ReturnType.find(',') != std::string::npos)
@@ -1460,7 +1496,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                         }
                         
                         //Return statement
-                        if(!isConstructorDestructor)
+                        if(!isConstructor && !isDestructor)
                         {
                             std::cout <<    "        return " << currentFunc.ReturnType << "();" <<
                                             std::endl;
@@ -1518,8 +1554,7 @@ int main(int argc, char** argv)
         
         std::cout <<    std::endl;
         std::cout <<    "-m, --override-methods         " << 
-                        "Use macro override methods and inherits from CppOverride::Overridable instead. " << 
-                        std::endl;
+                        "Use macro override methods" << std::endl;
         std::cout <<    "                               " << 
                         "This will NOT generate constructor and destructor unless -c is given." <<
                         std::endl;
@@ -1529,7 +1564,7 @@ int main(int argc, char** argv)
 
         std::cout <<    std::endl;
         std::cout <<    "-c, --override-ctor            " <<
-                        "This will create constructor/destructor with CO_OVERRIDE_IMPL_CTOR_DTOR" <<
+                        "This will create overrided constructor/destructor" <<
                         std::endl;
         std::cout <<    "                               " << 
                         "This must be used with -g since the lifetime of the override instnace" <<
@@ -1543,13 +1578,7 @@ int main(int argc, char** argv)
 
         std::cout <<    std::endl;
         std::cout <<    "-g, --global-instance          " <<
-                        "This will use global override instance instead of declaring its instance." <<
-                        std::endl;
-        std::cout <<    "                               " << 
-                        "This will put the object pointer (this) as the first override argument." <<
-                        std::endl;
-        std::cout <<    "                               " << 
-                        "This cannot be used together with -m." <<
+                        "This will use global override instance instead of local one" <<
                         std::endl;
 
         std::cout <<    std::endl;
@@ -1656,13 +1685,6 @@ int main(int argc, char** argv)
         const bool useInputClasses = options.count("-i") || options.count("--use-input-classes");
         const bool overrideCtor = options.count("-c") || options.count("--override-ctor");
         const bool globalInstance = options.count("-g") || options.count("--global-instnace");
-        
-        if(useMockClass && globalInstance)
-        {
-            std::cout <<    "-m/--mock-method cannot be used together with -g/--global-instnace" << 
-                            std::endl;
-            return 1;
-        }
         
         if(overrideCtor && !globalInstance)
         {
