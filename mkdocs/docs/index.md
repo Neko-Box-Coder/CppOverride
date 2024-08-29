@@ -51,7 +51,17 @@ extern CO_DECLARE_INSTANCE(MyOverrideInstance);
 #### Class Scope
 Declaring it in class scope is more similar to the traditional mock class approach
 
-```c++
+You can do so by inheriting from `CppOverride::Overridable`
+
+```cpp
+class YourClass : public CppOverride::Overridable
+{
+}
+```
+
+Or if you want to declare it manually, you can do
+
+```cpp
 class YourClass
 {
     private:
@@ -62,19 +72,6 @@ class YourClass
         ...
 };
 ```
-
-Or alternatively inherits from `#!cpp CppOverride::Overridable`.
-Inheriting from it has less flexibility but easier to setup. 
-
-See [📥️ 8. Inheriting from Overridable](#8-inheriting-from-overridable) for more details
-
-<!-- ```cpp -->
-<!-- //CO_DECLARE_MEMBER_INSTANCE and CO_DECLARE_OVERRIDE_METHODS is inside CppOverride::MockClass -->
-<!-- class YourMockClass : public CppOverride::MockClass -->
-<!-- { -->
-<!--     ... -->
-<!-- } -->
-<!-- ``` -->
 
 !!! tip
     Declaring override instance in **Global/File scope** is recommended for overriding 
@@ -88,6 +85,79 @@ See [📥️ 8. Inheriting from Overridable](#8-inheriting-from-overridable) for
 ### ⚙️ 3. Insert Override Implementations
 After declaring the override instance,
 we are now ready to override any function using override implementations macros
+
+You can easily override a function fully with the macros below:
+
+```cpp
+CO_OVERRIDE_MEMBER_METHOD_CTOR(Override Instance, Class Name, (Args Types))
+CO_OVERRIDE_MEMBER_METHOD_CTOR(Override Instance, Class Name, (Args Types), Function Prepend)
+CO_OVERRIDE_MEMBER_METHOD_CTOR(Override Instance, Class Name, (Args Types), Function Prepend, Function Append)
+CO_OVERRIDE_MEMBER_METHOD_CTOR(Override Instance, Class Name, (Args Types), Function Prepend, Function Append, (Args Defaults))
+
+CO_OVERRIDE_MEMBER_METHOD_DTOR(Override Instance, Class Name)
+CO_OVERRIDE_MEMBER_METHOD_DTOR(Override Instance, Class Name, Function Prepend)
+CO_OVERRIDE_MEMBER_METHOD_DTOR(Override Instance, Class Name, Function Prepend, Function Append)
+
+CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types))
+CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend)
+CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append)
+CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append, (Args Defaults))
+
+CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types))
+CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend)
+CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append)
+CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append, (Args Defaults))
+```
+
+There are 2 variants of the macro, one is `CO_OVERRIDE_MEMBER_METHOD(...)` and the other one is
+`CO_OVERRIDE_METHOD(...)`.
+
+The difference between them is that the `CO_OVERRIDE_MEMBER_METHOD(...)` variant captures the 
+object pointer (`this`) where as the `CO_OVERRIDE_METHOD(...)` one does not.
+
+When inheriting `CppOverride::Overridable`, you can just pass `*this` as `Override Instance` to 
+the macro.
+
+???+ example
+    ```cpp
+    CO_DECLARE_INSTANCE(MyOverrideInstance);
+
+    class MockMyClass
+    {
+        //MockMyClass(int value1, float value2)
+        CO_OVERRIDE_MEMBER_METHOD_CTOR(MyOverrideInstance, MockMyClass, (int, float))
+        
+        //virtual ~MockMyClass()
+        CO_OVERRIDE_MEMBER_METHOD_DTOR(MyOverrideInstance, MockMyClass, virtual)
+        
+        //int MemberFunction(int value1, float value2)
+        CO_OVERRIDE_MEMBER_METHOD(MyOverrideInstance, int, MemberFunction, (int, float))
+
+        //void MemberFunction2(float& value1, int* value2) const
+        CO_OVERRIDE_MEMBER_METHOD(MyOverrideInstance, void, MemberFunction2, (float&, int*), 
+            /* no prepend */, const)
+
+        //virtual int MemberFunction3(int value1, float value2 = 1.f) const override
+        CO_OVERRIDE_MEMBER_METHOD(MyOverrideInstance, int, MemberFunction3, (int, float), 
+            virtual, const override, (/* no default */, = 1.f))
+    };
+    ```
+
+!!! important
+    If you have comma in your return type (such as `#!cpp std::tuple<int, int>`), you need to add an extra
+    parenthesis to protect it against macro.
+
+    For example:
+    ```cpp
+    //std::tuple<int, int> MemberFunction(std::tuple<int, int> value1, float value2)
+    CO_OVERRIDE_METHOD(MyOverrideInstance, (std::tuple<int, int>), MemberFunction, 
+        ((std::tuple<int, int>), float), /* no append */)
+    ```
+
+---
+
+You can also override any existing functions with `CO_OVERRIDE_IMPL(...)`. 
+This is what `CO_OVERRIDE_METHOD(...)` use under the hood.
 
 ```cpp
 CO_OVERRIDE_IMPL(Override Instance, Return Type, (Arguments))
@@ -103,16 +173,17 @@ CO_OVERRIDE_IMPL(Override Instance, Return Type, (Arguments))
     }
     ```
 
-For overriding member functions, you can use this
+For overriding member functions, you can use `CO_OVERRIDE_MEMBER_IMPL(...)`.
+This is what `CO_OVERRIDE_MEMBER_METHOD(...)` use under the hood.
 
 ```cpp
-CO_OVERRIDE_IMPL_INSTANCE(Override Instance, Return Type, (Arguments))
+CO_OVERRIDE_MEMBER_IMPL(Override Instance, Return Type, (Arguments))
 ```
 
-and 
+For constructors and destructors:
 
 ```cpp
-CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(Override Instance, (Arguments))
+CO_OVERRIDE_MEMBER_IMPL_CTOR_DTOR(Override Instance, (Arguments))
 ```
 
 ??? example
@@ -136,8 +207,8 @@ CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(Override Instance, (Arguments))
     ```
 
 !!! important
-    If you have comma in your return type (such as `#!cpp std::tuple<int, int>`), you need to add an extra
-    parenthesis to protect it against macro.
+    Similar to `CO_OVERRIDE_METHOD(...)`, 
+    any type that has a comma in it needs to be protected with parenthesis
     
     For a function like 
     
@@ -769,46 +840,7 @@ CO_SETUP_OVERRIDE(Override Instance, Your Function)
 
 ---
 
-### 📥️ 8. Inheriting from Overridable
-
-We have talked about inheriting `#!cpp CppOverride::Overridable` briefly in [📢 2. Declare Override Instance](#2-declare-override-instance)
-
-Similarly to other mocking frameworks, we provide macros for you to automatically declare 
-and create the methods to be overridden using the override instance in `#!cpp CppOverride::Overridable`
-
-This comes in as an overloaded macro so you can use the one you need.
-
-```cpp
-CO_OVERRIDE_METHOD(Return Type, Function Name, (Args Types), Function Append)
-CO_OVERRIDE_METHOD(Function Prepend, Return Type, Function Name, (Args Types), Function Append)
-CO_OVERRIDE_METHOD(Function Prepend, Return Type, Function Name, (Args Types), (Args Defaults), Function Append)
-```
-
-???+ example
-    ```cpp
-    class MockMyClass : public CppOverride::Overridable
-    {
-        //int MemberFunction(int value1, float value2)
-        CO_OVERRIDE_METHOD(int, MemberFunction, (int, float), /* no append */)
-
-        //void MemberFunction2(float& value1, int* value2) const
-        CO_OVERRIDE_METHOD(/* no prepend */, void, MemberFunction2, (float&, int*), const)
-
-        //virtual int MemberFunction3(int value1, float value2 = 1.f) const override
-        CO_OVERRIDE_METHOD(virtual, int, MemberFunction3, (int, float), (/* no default */, = 1.f), const override)
-    };
-    ```
-
-!!! important
-    Similar to `CO_OVERRIDE_IMPL`, any type that has a comma in it needs to be protected with parenthesis
-
-    For example:
-    ```cpp
-    //std::tuple<int, int> MemberFunction(std::tuple<int, int> value1, float value2)
-    CO_OVERRIDE_METHOD((std::tuple<int, int>), MemberFunction, ((std::tuple<int, int>), float), /* no append */)
-    ```
-
-### 📠 9. Mock Class Generator
+### 📠 8. Mock Class Generator
 
 Unlike other mocking frameworks, we ship with a mock class generator that is built along with
 the project that parses a given header and output the equivalent mock class header.
@@ -828,7 +860,7 @@ or in Windows Powershell
 ./GenerateMockClass <options...> <input header> | Set-Content -Encoding UTF8NoBOM ./MyMockClass.hpp
 ```
 
-### 🔌 10. Overriding External Functions and Objects
+### 🔌 9. Overriding External Functions and Objects
 
 It is very difficult to override external functions or objects since unlike other languages like C#,
 everything is compiled and there's no way to change the behavior of it.

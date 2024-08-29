@@ -77,6 +77,11 @@ namespace CppOverride
             inline ~Overrider()
             {}
 
+            inline Overrider& GetOverrideObject()
+            {
+                return *this;
+            }
+            
             //------------------------------------------------------------------------------
             //Check overrides available
             //------------------------------------------------------------------------------

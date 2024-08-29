@@ -81,7 +81,8 @@ int main()
 class DummyMockClass : public CppOverride::Overridable
 {
     public:
-        CO_OVERRIDE_METHOD(int, MemberFunction, (int), /* no append */)
+        //int MemberFunction(int value1);
+        CO_OVERRIDE_METHOD(*this, int, MemberFunction, (int))
 };
 
 int main()

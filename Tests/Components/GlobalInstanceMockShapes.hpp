@@ -12,124 +12,31 @@ namespace CppOverrideTest
 class MockShape
 {
 public:
-    virtual inline float GetArea(float arg0 = 1.f) const 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, float, (arg0));
-        return float();
-    }
-
-    virtual inline float GetPerimeter(float arg0 = 1.f) const 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, float, (arg0));
-        return float();
-    }
-
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, float, GetArea, (float), virtual, const , (= 1.f))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, float, GetPerimeter, (float), virtual, const , (= 1.f))
 };
 
 template < typename T > 
 class MockSquare : public Shape
 {
 public:
-    template < typename T2 > inline std::tuple < float , T2 > TestTemplateFunc(const std::tuple < float , T2 > & arg0, float arg1 = 1.f) 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, (std::tuple < float , T2 >), (arg0, arg1));
-        return std::tuple < float , T2 >();
-    }
-
-    inline void TestComplexTypes(std::tuple < int , char > arg0, float arg1 = 1.f) 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, void, (arg0, arg1));
-        return void();
-    }
-
-    inline bool operator==(const Square < T > & arg0) const 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, bool, (arg0));
-        return bool();
-    }
-
-    inline bool operator!=(const Square < T > & arg0) const 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, bool, (arg0));
-        return bool();
-    }
-
-    inline MockSquare(float arg0, T arg1) 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(OverrideObj, (arg0, arg1));
-    }
-
-    virtual inline ~MockSquare() 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(OverrideObj, ());
-    }
-
-    inline virtual float GetArea(float arg0 = 1.f) const override 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, float, (arg0));
-        return float();
-    }
-
-    inline virtual float GetPerimeter(float arg0 = 1.f) const override 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, float, (arg0));
-        return float();
-    }
-
-    inline virtual void SetWidth(float arg0) 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, void, (arg0));
-        return void();
-    }
-
-    inline virtual void SetWidth(int arg0) 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, void, (arg0));
-        return void();
-    }
-
-    inline virtual float GetWidth(float arg0 = 1.f) const 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, float, (arg0));
-        return float();
-    }
-
-    inline virtual void GetWidth(float& arg0, float arg1 = 1.f) 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, void, (arg0, arg1));
-        return void();
-    }
-
-    inline virtual void GetWidth(float* arg0, float arg1 = 1.f) const 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, void, (arg0, arg1));
-        return void();
-    }
-
-    inline virtual void SetMetaData(T arg0) 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, void, (arg0));
-        return void();
-    }
-
-    inline virtual T GetMetaData() const 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, T, ());
-        return T();
-    }
-
-    inline virtual void GetMetaData(T& arg0) const 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, void, (arg0));
-        return void();
-    }
-
-    inline virtual void GetMetaData(T* arg0) const 
-    {
-        CO_OVERRIDE_IMPL_INSTANCE(OverrideObj, void, (arg0));
-        return void();
-    }
-
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, (std::tuple < float , T2 >), TestTemplateFunc, ((const std::tuple < float , T2 > &), float), template < typename T2 > , /* no append */, (/* no default */, = 1.f))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, void, TestComplexTypes, ((std::tuple < int , char >), float), /* no prepend */, /* no append */, (/* no default */, = 1.f))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, bool, operator==, (const Square < T > &), /* no prepend */, const, (/* no default */))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, bool, operator!=, (const Square < T > &), /* no prepend */, const, (/* no default */))
+    CO_OVERRIDE_MEMBER_METHOD_CTOR(OverrideObj, MockSquare, (float, T), /* no prepend */, /* no append */, (/* no default */, /* no default */))
+    CO_OVERRIDE_MEMBER_METHOD_DTOR(OverrideObj, MockSquare, virtual , /* no append */)
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, float, GetArea, (float), virtual, const override, (= 1.f))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, float, GetPerimeter, (float), virtual, const override, (= 1.f))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, void, SetWidth, (float), virtual, /* no append */, (/* no default */))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, void, SetWidth, (int), virtual, /* no append */, (/* no default */))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, float, GetWidth, (float), virtual, const, (= 1.f))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, void, GetWidth, (float&, float), virtual, /* no append */, (/* no default */, = 1.f))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, void, GetWidth, (float*, float), virtual, const, (/* no default */, = 1.f))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, void, SetMetaData, (T), virtual, /* no append */, (/* no default */))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, T, GetMetaData, (), virtual, const, ())
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, void, GetMetaData, (T&), virtual, const, (/* no default */))
+    CO_OVERRIDE_MEMBER_METHOD(OverrideObj, void, GetMetaData, (T*), virtual, const, (/* no default */))
 };
 
 }
