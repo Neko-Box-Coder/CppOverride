@@ -5482,6 +5482,16 @@ namespace CppOverride
             INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes) \
         )
 
+    #define INTERNAL_CO_OVERRIDE_METHOD_BASE_NO_DEF(overrideObjName, instance, functionPrepend, returnType, functionName, argsTypes, functionAppend) \
+        MPT_REMOVE_PARENTHESIS(functionPrepend) inline MPT_REMOVE_PARENTHESIS(returnType) functionName \
+        ( \
+            MPT_REMOVE_PARENTHESIS_IN_LIST( INTERNAL_POPULATE_ARGS_FIELD(argsTypes) ) \
+        ) MPT_REMOVE_PARENTHESIS(functionAppend) \
+        { \
+            INTERNAL_CO_OVERRIDE_IMPL_BASE(overrideObjName, returnType, instance, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
+            return MPT_REMOVE_PARENTHESIS(returnType)(); \
+        }
+
     #define INTERNAL_CO_OVERRIDE_METHOD_BASE(overrideObjName, instance, functionPrepend, returnType, functionName, argsTypes, argsDefaults, functionAppend) \
         MPT_REMOVE_PARENTHESIS(functionPrepend) inline MPT_REMOVE_PARENTHESIS(returnType) functionName \
         ( \
@@ -5497,6 +5507,15 @@ namespace CppOverride
         { \
             INTERNAL_CO_OVERRIDE_IMPL_BASE(overrideObjName, returnType, instance, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
             return MPT_REMOVE_PARENTHESIS(returnType)(); \
+        }
+
+    #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_BASE_NO_DEF(overrideObjName, functionPrepend, className, argsTypes, functionAppend) \
+        MPT_REMOVE_PARENTHESIS(functionPrepend) inline className \
+        ( \
+            MPT_REMOVE_PARENTHESIS_IN_LIST( INTERNAL_POPULATE_ARGS_FIELD(argsTypes) ) \
+        ) MPT_REMOVE_PARENTHESIS(functionAppend) \
+        { \
+            CO_OVERRIDE_MEMBER_IMPL_CTOR_DTOR(overrideObjName, (INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes))); \
         }
 
     #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_BASE(overrideObjName, functionPrepend, className, argsTypes, argsDefaults, functionAppend) \
@@ -5552,13 +5571,13 @@ namespace CppOverride
         static_assert(false, "CO_OVERRIDE_METHOD must have 4 to 7 arguments, 3 given currently")
     
     #define INTERNAL_CO_OVERRIDE_METHOD_4(overrideObjName, returnType, functionName, argsTypes) \
-        INTERNAL_CO_OVERRIDE_METHOD_BASE(overrideObjName, nullptr, /*functionPrepend*/, returnType, functionName, argsTypes, /*argsDefaults*/, /*functionAppend*/)
+        INTERNAL_CO_OVERRIDE_METHOD_BASE_NO_DEF(overrideObjName, nullptr, /*functionPrepend*/, returnType, functionName, argsTypes, /*functionAppend*/)
     
     #define INTERNAL_CO_OVERRIDE_METHOD_5(overrideObjName, returnType, functionName, argsTypes, functionPrepend) \
-        INTERNAL_CO_OVERRIDE_METHOD_BASE(overrideObjName, nullptr, functionPrepend, returnType, functionName, argsTypes, /*argsDefaults*/, /*functionAppend*/)
+        INTERNAL_CO_OVERRIDE_METHOD_BASE_NO_DEF(overrideObjName, nullptr, functionPrepend, returnType, functionName, argsTypes, /*functionAppend*/)
     
     #define INTERNAL_CO_OVERRIDE_METHOD_6(overrideObjName, returnType, functionName, argsTypes, functionPrepend, functionAppend) \
-        INTERNAL_CO_OVERRIDE_METHOD_BASE(overrideObjName, nullptr, functionPrepend, returnType, functionName, argsTypes, /*argsDefaults*/, functionAppend)
+        INTERNAL_CO_OVERRIDE_METHOD_BASE_NO_DEF(overrideObjName, nullptr, functionPrepend, returnType, functionName, argsTypes, functionAppend)
         
     #define INTERNAL_CO_OVERRIDE_METHOD_7(overrideObjName, returnType, functionName, argsTypes, functionPrepend, functionAppend, argsDefaults) \
         INTERNAL_CO_OVERRIDE_METHOD_BASE(overrideObjName, nullptr, functionPrepend, returnType, functionName, argsTypes, argsDefaults, functionAppend)
@@ -5585,13 +5604,13 @@ namespace CppOverride
         static_assert(false, "CO_OVERRIDE_MEMBER_METHOD must have 4 to 7 arguments, 3 given currently")
     
     #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_4(overrideObjName, returnType, functionName, argsTypes) \
-        INTERNAL_CO_OVERRIDE_METHOD_BASE(overrideObjName, this, /*functionPrepend*/, returnType, functionName, argsTypes, /*argsDefaults*/, /*functionAppend*/)
+        INTERNAL_CO_OVERRIDE_METHOD_BASE_NO_DEF(overrideObjName, this, /*functionPrepend*/, returnType, functionName, argsTypes, /*functionAppend*/)
     
     #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_5(overrideObjName, returnType, functionName, argsTypes, functionPrepend) \
-        INTERNAL_CO_OVERRIDE_METHOD_BASE(overrideObjName, this, functionPrepend, returnType, functionName, argsTypes, /*argsDefaults*/, /*functionAppend*/)
+        INTERNAL_CO_OVERRIDE_METHOD_BASE_NO_DEF(overrideObjName, this, functionPrepend, returnType, functionName, argsTypes, /*functionAppend*/)
     
     #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_6(overrideObjName, returnType, functionName, argsTypes, functionPrepend, functionAppend) \
-        INTERNAL_CO_OVERRIDE_METHOD_BASE(overrideObjName, this, functionPrepend, returnType, functionName, argsTypes, /*argsDefaults*/, functionAppend)
+        INTERNAL_CO_OVERRIDE_METHOD_BASE_NO_DEF(overrideObjName, this, functionPrepend, returnType, functionName, argsTypes, functionAppend)
         
     #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_7(overrideObjName, returnType, functionName, argsTypes, functionPrepend, functionAppend, argsDefaults) \
         INTERNAL_CO_OVERRIDE_METHOD_BASE(overrideObjName, this, functionPrepend, returnType, functionName, argsTypes, argsDefaults, functionAppend)
@@ -5616,13 +5635,13 @@ namespace CppOverride
         static_assert(false, "CO_OVERRIDE_MEMBER_METHOD_CTOR must have 3 to 6 arguments, 2 given currently")
     
     #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_3(overrideObjName, className, argsTypes) \
-        INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_BASE(overrideObjName, /*functionPrepend*/, className, argsTypes, /*argsDefaults*/, /*functionAppend*/)
+        INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_BASE_NO_DEF(overrideObjName, /*functionPrepend*/, className, argsTypes, /*functionAppend*/)
     
     #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_4(overrideObjName, className, argsTypes, functionPrepend) \
-        INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_BASE(overrideObjName, functionPrepend, className, argsTypes, /*argsDefaults*/, /*functionAppend*/) \
+        INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_BASE_NO_DEF(overrideObjName, functionPrepend, className, argsTypes, /*functionAppend*/) \
     
     #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_5(overrideObjName, className, argsTypes, functionPrepend, functionAppend) \
-        INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_BASE(overrideObjName, functionPrepend, className, argsTypes, /*argsDefaults*/, functionAppend)
+        INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_BASE_NO_DEF(overrideObjName, functionPrepend, className, argsTypes, functionAppend)
     
     #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_6(overrideObjName, className, argsTypes, functionPrepend, functionAppend, argsDefaults) \
         INTERNAL_CO_OVERRIDE_MEMBER_METHOD_CTOR_BASE(overrideObjName, functionPrepend, className, argsTypes, argsDefaults, functionAppend)
