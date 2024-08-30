@@ -19,26 +19,26 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::OverrideResult result;
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             CO_SETUP_OVERRIDE   (OverrideObj, MockSquare)
                                 .WhenCalledWith<float, int>(1.f, 2)
-                                .AssignOverrideResult(result);
+                                .AssignResult(result);
         );
         ssTEST_OUTPUT_EXECUTION
         (
             CppOverrideTest::MockSquare<int> testSquare(1.f, 2);
         );
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
     
         ssTEST_OUTPUT_SETUP
         (
-            result = CppOverride::OverrideResult();
+            result->ClearStatuses();
         );
         ssTEST_OUTPUT_EXECUTION
         (
             CppOverrideTest::MockSquare<int> testSquare2(2.f, 3);
         );
-        ssTEST_OUTPUT_ASSERT(   result.Status == 
+        ssTEST_OUTPUT_ASSERT(   result->GetLastStatus() == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
 
@@ -48,7 +48,7 @@ int main()
         (
             void* createdInstance = nullptr;
             void* destructInstance = nullptr;
-            CppOverride::OverrideResult result;
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
         );
         {
             ssTEST_OUTPUT_SETUP
@@ -65,11 +65,11 @@ int main()
                                         }
                                     )
                                     .OverrideObject(&testSquare)
-                                    .AssignOverrideResult(result);
+                                    .AssignResult(result);
             );
         }
         
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
         ssTEST_OUTPUT_ASSERT(createdInstance == destructInstance);
     };
 
@@ -77,23 +77,23 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::OverrideResult result;
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             CppOverrideTest::MockSquare<int> testSquare(1.f, 2);
             CO_SETUP_OVERRIDE   (OverrideObj, GetArea)
                                 .Returns<float>(13.f)
                                 .WhenCalledWith(42.f)
                                 .OverrideObject(&testSquare)
-                                .AssignOverrideResult(result);
+                                .AssignResult(result);
         );
         ssTEST_OUTPUT_ASSERT(testSquare.GetArea(42.f) == 13.f);
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
         
         ssTEST_OUTPUT_SETUP
         (
-            result = CppOverride::OverrideResult();
+            result->ClearStatuses();
         );
         ssTEST_OUTPUT_ASSERT(testSquare.GetArea(43.f) != 13.f);
-        ssTEST_OUTPUT_ASSERT(   result.Status == 
+        ssTEST_OUTPUT_ASSERT(   result->GetLastStatus() == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
 
@@ -101,23 +101,23 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::OverrideResult result;
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             CppOverrideTest::MockSquare<int> testSquare(1.f, 2);
             CO_SETUP_OVERRIDE   (OverrideObj, GetArea)
                                 .Returns<float>(13.f)
                                 .WhenCalledWith(42.f)
                                 .OverrideAny()
-                                .AssignOverrideResult(result);
+                                .AssignResult(result);
         );
         ssTEST_OUTPUT_ASSERT(testSquare.GetArea(42.f) == 13.f);
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
         
         ssTEST_OUTPUT_SETUP
         (
-            result = CppOverride::OverrideResult();
+            result->ClearStatuses();
         );
         ssTEST_OUTPUT_ASSERT(testSquare.GetArea(43.f) != 13.f);
-        ssTEST_OUTPUT_ASSERT(   result.Status == 
+        ssTEST_OUTPUT_ASSERT(   result->GetLastStatus() == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
     };
 

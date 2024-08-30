@@ -30,26 +30,26 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::OverrideResult result;
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             CO_SETUP_OVERRIDE   (OverrideObj, MockFreeFunctionA)
                                 .Returns<int>(10)
-                                .AssignOverrideResult(result);
+                                .AssignResult(result);
             
             CO_SETUP_OVERRIDE   (OverrideObj, MockFreeFunctionB)
                                 .Returns<int>(10)
-                                .AssignOverrideResult(result);
+                                .AssignResult(result);
         );
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionA(1) == 10);
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
         
         ssTEST_OUTPUT_SETUP
         (
-            result = CppOverride::OverrideResult();
+            result->ClearStatuses();
         );
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionB(1, 2) == 10);
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
     };
     
     #ifdef FreeFunctionA

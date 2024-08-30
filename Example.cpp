@@ -222,17 +222,18 @@ void OtherwiseDoLambdaExample()
 
 void AssignStatusExample()
 {
-    CppOverride::OverrideResult result;
+    std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
     CO_SETUP_OVERRIDE (OverrideInstanceName, OverrideMyReturnValue)
                         .WhenCalledWith(2, 3.f)
                         .Returns<int>(1)
-                        .AssignOverrideResult(result);
+                        .AssignResult(result);
     
     int ret1 = OverrideMyReturnValue(1, 2.f);
     
     //status will be OverrideStatus::MATCHING_CONDITION_VALUE_FAILED
     CO_QUICK_ASSERT(ret1 != 1);
-    CO_QUICK_ASSERT(result.Status == CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
+    CO_QUICK_ASSERT(result->GetLastStatus() == 
+                    CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
 
     ResetAll();
 }

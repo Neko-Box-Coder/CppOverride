@@ -86,7 +86,66 @@ class YourClass
 After declaring the override instance,
 we are now ready to override any function using override implementations macros
 
+There are 2 variants of the macro, one is `CO_OVERRIDE_MEMBER_METHOD(...)` and the other one is
+`CO_OVERRIDE_METHOD(...)`.
+
+The difference between them is that the `CO_OVERRIDE_MEMBER_METHOD(...)` variant captures the 
+object pointer (`this`) where as the `CO_OVERRIDE_METHOD(...)` one does not.
+
 You can easily override a function fully with the macros below:
+
+```cpp
+CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types))
+CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend)
+CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append)
+CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append, (Args Defaults))
+
+CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types))
+CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend)
+CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append)
+CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append, (Args Defaults))
+```
+
+Macro Arguments:
+
+- `Override Instance`: The override instance to get the override data from. 
+When inheriting `CppOverride::Overridable`, you can just pass `*this`.
+- `Return Type`: The return type of the function we are overriding
+- `Function Name`: The name of the function we are overriding
+- `(Args Types)`: List of arguments types **wrapped in** `()` separated by comma (`,`) to this function.
+- `Function Prepend` (Optional): Prepend tokens to the function
+- `Function Append` (Optional): Append tokens to the function
+- `(Args Defaults)` (Optional): List of arguments defaults **wrapped in** `()` separated by 
+comma (`,`) to this function.
+The syntax is just anything after the argument name. For example an argument `int arg = 2` would be
+`= 2`. Nothing need to be put in for the arguments that do not have defaults. 
+The Number of commas here **MUST** match the commas in `(Args Types)`.
+
+???+ example
+    ```cpp
+    CO_DECLARE_INSTANCE(MyOverrideInstance);
+
+    class MockMyClass : public MyClass
+    {
+        //int MemberFunction(int value1, float value2)
+        CO_OVERRIDE_MEMBER_METHOD(MyOverrideInstance, int, MemberFunction, (int, float))
+
+        //void MemberFunction2(float& value1, int* value2) const
+        CO_OVERRIDE_MEMBER_METHOD(MyOverrideInstance, void, MemberFunction2, (float&, int*), 
+            /* no prepend */, const)
+
+        //virtual int MemberFunction3(int value1, float value2 = 1.f) const override
+        CO_OVERRIDE_MEMBER_METHOD(MyOverrideInstance, int, MemberFunction3, (int, float), 
+            virtual, const override, (/* no default */, = 1.f))
+    };
+    
+    //MockMyClass CloneMockClass(const MockMyClass& other);
+    CO_OVERRIDE_METHOD(MyOverrideInstance, MockMyClass, CloneMockClass, (const MockMyClass&));
+    ```
+---
+
+For overriding constructor and destructor, a special macro is needed because they don't return
+anything, not even `#!cpp void`.
 
 ```cpp
 CO_OVERRIDE_MEMBER_METHOD_CTOR(Override Instance, Class Name, (Args Types))
@@ -97,26 +156,16 @@ CO_OVERRIDE_MEMBER_METHOD_CTOR(Override Instance, Class Name, (Args Types), Func
 CO_OVERRIDE_MEMBER_METHOD_DTOR(Override Instance, Class Name)
 CO_OVERRIDE_MEMBER_METHOD_DTOR(Override Instance, Class Name, Function Prepend)
 CO_OVERRIDE_MEMBER_METHOD_DTOR(Override Instance, Class Name, Function Prepend, Function Append)
-
-CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types))
-CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend)
-CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append)
-CO_OVERRIDE_MEMBER_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append, (Args Defaults))
-
-CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types))
-CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend)
-CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append)
-CO_OVERRIDE_METHOD(Override Instance, Return Type, Function Name, (Args Types), Function Prepend, Function Append, (Args Defaults))
 ```
 
-There are 2 variants of the macro, one is `CO_OVERRIDE_MEMBER_METHOD(...)` and the other one is
-`CO_OVERRIDE_METHOD(...)`.
+This macro arguments are mostly the same as `CO_OVERRIDE_METHOD(...)` and 
+`CO_OVERRIDE_MEMBER_METHOD(...)`, only with slight differences.
 
-The difference between them is that the `CO_OVERRIDE_MEMBER_METHOD(...)` variant captures the 
-object pointer (`this`) where as the `CO_OVERRIDE_METHOD(...)` one does not.
+1. `Class Name` instead of `Function Name`
+2. Destructor version (`CO_OVERRIDE_MEMBER_METHOD_DTOR(...)`) doesn't need any `(Args Types)` nor 
+`(Args Defaults)`, since you cannot pass any arguments to a destructor.
 
-When inheriting `CppOverride::Overridable`, you can just pass `*this` as `Override Instance` to 
-the macro.
+---
 
 ???+ example
     ```cpp
@@ -129,17 +178,6 @@ the macro.
         
         //virtual ~MockMyClass()
         CO_OVERRIDE_MEMBER_METHOD_DTOR(MyOverrideInstance, MockMyClass, virtual)
-        
-        //int MemberFunction(int value1, float value2)
-        CO_OVERRIDE_MEMBER_METHOD(MyOverrideInstance, int, MemberFunction, (int, float))
-
-        //void MemberFunction2(float& value1, int* value2) const
-        CO_OVERRIDE_MEMBER_METHOD(MyOverrideInstance, void, MemberFunction2, (float&, int*), 
-            /* no prepend */, const)
-
-        //virtual int MemberFunction3(int value1, float value2 = 1.f) const override
-        CO_OVERRIDE_MEMBER_METHOD(MyOverrideInstance, int, MemberFunction3, (int, float), 
-            virtual, const override, (/* no default */, = 1.f))
     };
     ```
 
@@ -265,12 +303,12 @@ CO_SETUP_OVERRIDE(Override Instance, Function Name)
         std::cout << "result: " << result << std::endl; //result: 42
         
         result = FreeFunction(2, 3.f);
-        std::cout << "result: " << result << std::endl; //result: 6
+        std::cout << "result: " << result << std::endl; //result: 6 (2 * 3.f)
     }
     ```
 
-If you have your override instance declared inside a class, pass that object as 
-`Override Instance` instead
+If you have your override instance declared inside a class or inheriting from `CppOverride::Overridable`, 
+pass that object as `Override Instance` instead
 
 ???+ example
     ```cpp
@@ -284,6 +322,12 @@ If you have your override instance declared inside a class, pass that object as
         public:
             CO_DECLARE_OVERRIDE_METHODS(MyOverrideInstance);
             int MemberFunction(int value1, float value2);
+            ...
+    };
+    
+    //Or
+    class YourClass : public CppOverride::Overridable
+    {
             ...
     };
     ...
@@ -314,7 +358,8 @@ CO_SETUP_OVERRIDE(Override Instance, Your Function)
 ```
 
 !!! note
-    This requires `CO_OVERRIDE_IMPL_INSTANCE(...)` to be used instead of `CO_OVERRIDE_IMPL(...)`
+    This requires `CO_OVERRIDE_MEMBER_IMPL(...)` (Or `CO_OVERRIDE_MEMBER_METHOD(...)`) 
+    to be used instead of `CO_OVERRIDE_IMPL(...)`
 
 ???+ example
     ```cpp
@@ -335,61 +380,128 @@ CO_SETUP_OVERRIDE(Override Instance, Your Function)
 
 ---
 
-#### Get Override Result
+#### Override Result
 
-To get the result of an override action, whether it was successful or not, you can use
+Everytime where there's an attempt to override the function 
+(assuming the function name and types match), the result of it can be recorded, 
+whether it was successful or not.
+
+To do so, we first need to create a result object that holds all the results.
+
+```cpp
+auto result = CppOverride::CreateOverrideResult();
+//Or 
+std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
+```
+
+??? info
+    The reason why shared pointer is used is because when we assign this result object to an
+    override action, and the override instance holds the reference of it. 
+    If the result object goes out of scope, the program will crash when 
+    the override instance is trying to dereference and modify this result object
+
+To bind the result object to an override action:
 
 ```cpp
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
-                 .AssignOverrideResult(Result Object)
+                 .AssignResult(Result Object)
 ```
 
-The status of the result can be read with `.Status`
+Each time when there's an override attempt (whether successful or not), 
+it will add to the list of override status.
+
+To get the list of status:
+```cpp
+std::vector<OverrideStatus> statuses = result.GetAllStatuses();
+```
+
+??? info "List of possible status"
+    ```cpp
+    enum class OverrideStatus
+    {
+        //Default status.
+        //  Any matching override will modify the status to not be this value.
+        //  If the status is not modified (i.e. staying in this value), 
+        //  Could be one of these reasons:
+        //  - Function name not matching
+        //  - Argument types not matching
+        //  - Return type not matching
+        NO_OVERRIDE,
+        
+        //The last override was successful. 
+        //  Please reset the status to NO_OVERRIDE before every expected override. 
+        //  If the status is not reset, it will not be modified if no matching override is found.
+        OVERRIDE_SUCCESS,
+        
+        MATCHING_CONDITION_VALUE_FAILED,
+        MATCHING_CONDITION_ACTION_FAILED,
+        MATCHING_OVERRIDE_TIMES_FAILED,
+        
+        //------------------------------------------
+        //Internal error
+        //------------------------------------------
+        INTERNAL_MISSING_CHECK_ERROR,
+        
+        //------------------------------------------
+        //Unsupported operation errors
+        //------------------------------------------
+        MODIFY_NON_ASSIGNABLE_ARG_ERROR,
+        MODIFY_CONST_ARG_ERROR,
+        CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR,
+    };
+    ```
+
+Here are a list of helper functions to perform the most common actions:
+```cpp
+class OverrideResult
+{
+    //Returns true if status list is not empty and last one is OVERRIDE_SUCCESS
+    bool LastStatusSucceed();
+    
+    //Returns true if status list is not empty and last one is **NOT** OVERRIDE_SUCCESS
+    bool LastStatusFailed();
+    
+    //Returns the last status if the status list is not empty, otherwise NO_OVERRIDE
+    OverrideStatus GetLastStatus();
+    
+    //Returns true if the status list contains said status
+    bool HasStatus(OverrideStatus status);
+    
+    //Returns the number of status in the status list
+    int GetStatusCount();
+    
+    //Returns the number of statuses that are OVERRIDE_SUCCESS
+    int GetSucceedCount();
+    
+    //Returns the number of statuses that are **NOT** OVERRIDE_SUCCESS
+    int GetFailedCount();
+    
+    //Removes all the status from the status list
+    void ClearStatuses()
+    
+    //Get a copy of the status list
+    std::vector<OverrideStatus> GetAllStatuses()
+};
+```
 
 ???+ example
     ```cpp
     CO_DECLARE_INSTANCE(MyOverrideInstance);
     int FreeFunction(int value1, float value2);
     ...
-    CppOverride::OverrideResult result;
+    using namespace CppOverride;
+    std::shared_ptr<OverrideResult> result = CreateOverrideResult();
     CO_SETUP_OVERRIDE(MyOverrideInstance, FreeFunction)
                      .WhenCalledWith(2, 3.f)
                      .Returns<int>(1)
-                     .AssignOverrideResult(result);
+                     .AssignResult(result);
 
     int ret1 = FreeFunction(1, 2.f);
-    //result.Status will be OverrideStatus::MATCHING_CONDITION_VALUE_FAILED
+    assert(result->GetLastStatus() == OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
 
     ret1 = FreeFunction(2, 3.f);
-    //result.Status will be OverrideStatus::OVERRIDE_SUCCESS
+    assert(result->LastStatusSucceed());
     ```
-
-Here are the list of possible status
-
-```cpp
-enum class OverrideStatus
-{
-    //Default status.
-    //  Any matching override will modify the status to not be this value.
-    //  If the status is not modified (i.e. staying in this value), 
-    //  Could be one of these reasons:
-    //  - Function name not matching
-    //  - Argument types not matching
-    //  - Return type not matching
-    NO_OVERRIDE,
-    
-    //The last override was successful. 
-    //  Please reset the status to NO_OVERRIDE before every expected override. 
-    //  If the status is not reset, it will not be modified if no matching override is found.
-    OVERRIDE_SUCCESS,
-    
-    MATCHING_CONDITION_VALUE_FAILED,
-    MATCHING_CONDITION_ACTION_FAILED,
-    MATCHING_OVERRIDE_TIMES_FAILED,
-    
-    ...
-};
-```
 
 You can convert the result status to string with 
 ```cpp

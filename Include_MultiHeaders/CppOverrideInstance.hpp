@@ -173,8 +173,8 @@ namespace CppOverride
                         {
                             for(int i = 0; i < currentDataList.size(); i++)
                             {
-                                if(currentDataList.at(i).Status != nullptr)
-                                    *currentDataList.at(i).Status = internalStatus;
+                                if(currentDataList.at(i).Result != nullptr)
+                                    currentDataList.at(i).Result->AddStatus(internalStatus);
                             }
                         }
                         
@@ -216,8 +216,8 @@ namespace CppOverride
                 }
                 
                 correctData.ConditionInfo.CalledTimes++;
-                if(correctData.Status != nullptr)
-                    *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
+                if(correctData.Result != nullptr)
+                    correctData.Result->AddStatus(OverrideStatus::OVERRIDE_SUCCESS);
             }
 
             //------------------------------------------------------------------------------
@@ -369,8 +369,8 @@ namespace CppOverride
                                 args...);
                 }
                 
-                if(correctData.Status != nullptr)
-                    *correctData.Status = overrideStatus;
+                if(correctData.Result != nullptr)
+                    correctData.Result->AddStatus(overrideStatus);
                 
                 if( performResultAction && 
                     overrideStatus == OverrideStatus::OVERRIDE_SUCCESS)

@@ -3,38 +3,97 @@
 
 #include "./OverrideStatus.hpp"
 
+#include <vector>
 #include <memory>
 
 namespace CppOverride
 {
-    struct OverrideResult
+    class OverrideResult
     {
         private:
-            std::shared_ptr<OverrideStatus> InnerStatus;
-        public:
-            OverrideStatus& Status;
+            std::vector<OverrideStatus> Statuses;
 
-        inline OverrideResult() : 
-            InnerStatus(std::make_shared<OverrideStatus>(OverrideStatus::NO_OVERRIDE)),
-            Status(std::ref(*InnerStatus))
-        {}
+        public:
+            inline void AddStatus(OverrideStatus status)
+            {
+                Statuses.push_back(status);
+            }
         
-        inline OverrideResult(const OverrideResult& other) : 
-            InnerStatus(other.InnerStatus),
-            Status(std::ref(*InnerStatus))
-        {}
-        
-        inline OverrideResult& operator=(const OverrideResult& other)
-        {
-            Status = other.Status;
-            return *this;
-        }
-        
-        inline std::shared_ptr<OverrideStatus> GetStatusRef()
-        {
-            return InnerStatus;
-        }
+            inline void ClearStatuses()
+            {
+                Statuses.clear();
+            }
+            
+            inline std::vector<OverrideStatus> GetAllStatuses()
+            {
+                return Statuses;
+            }
+            
+            //Helpers
+            inline int GetSucceedCount()
+            {
+                int succeedCounter = 0;
+                for(int i = 0; i < Statuses.size(); ++i)
+                {
+                    if(Statuses.at(i) == OverrideStatus::OVERRIDE_SUCCESS)
+                        ++succeedCounter;
+                }
+                
+                return succeedCounter;
+            }
+            
+            inline int GetFailedCount()
+            {
+                int failedCounter = 0;
+                for(int i = 0; i < Statuses.size(); ++i)
+                {
+                    if(Statuses.at(i) != OverrideStatus::OVERRIDE_SUCCESS)
+                        ++failedCounter;
+                }
+                
+                return failedCounter;
+            }
+            
+            inline int GetStatusCount()
+            {
+                return Statuses.size();
+            }
+            
+            inline bool LastStatusSucceed()
+            {
+                return  Statuses.empty() ? 
+                        false : 
+                        Statuses.back() == OverrideStatus::OVERRIDE_SUCCESS;
+            }
+            
+            inline bool LastStatusFailed()
+            {
+                return  Statuses.empty() ? 
+                        false : 
+                        Statuses.back() != OverrideStatus::OVERRIDE_SUCCESS;
+            }
+            
+            inline OverrideStatus GetLastStatus()
+            {
+                return  Statuses.empty() ? OverrideStatus::NO_OVERRIDE : Statuses.back();
+            }
+            
+            inline bool HasStatus(OverrideStatus status)
+            {
+                for(int i = 0; i < Statuses.size(); ++i)
+                {
+                    if(Statuses.at(i) == status)
+                        return true;
+                }
+                
+                return false;
+            }
     };
+    
+    inline std::shared_ptr<OverrideResult> CreateOverrideResult()
+    {
+        return std::make_shared<OverrideResult>();
+    }
 }
 
 #endif

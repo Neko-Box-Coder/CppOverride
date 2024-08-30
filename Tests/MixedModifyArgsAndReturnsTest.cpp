@@ -16,7 +16,7 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::OverrideResult result;
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             int testArg = 1;
             int testArg2 = 1;
             int calledCounter = 0;
@@ -31,7 +31,7 @@ int main()
                                         ++calledCounter;
                                     }
                                 )
-                                .AssignOverrideResult(result);
+                                .AssignResult(result);
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -42,7 +42,7 @@ int main()
         ssTEST_OUTPUT_ASSERT(testArg == 5);
         ssTEST_OUTPUT_ASSERT(executeResult == 32);
         ssTEST_OUTPUT_ASSERT(calledCounter == 1);
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
         
         ssTEST_OUTPUT_EXECUTION
         (
@@ -52,15 +52,15 @@ int main()
         ssTEST_OUTPUT_ASSERT(testArg2 == 5);
         ssTEST_OUTPUT_ASSERT(executeResult == 32);
         ssTEST_OUTPUT_ASSERT(calledCounter == 2);
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
     };
     
     ssTEST("Multiple Matching Overrides Should Apply The First One")
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::OverrideResult result;
-            CppOverride::OverrideResult result2;
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
+            std::shared_ptr<CppOverride::OverrideResult> result2 = CppOverride::CreateOverrideResult();
             int testArg = 1;
             int calledCounter = 0;
             
@@ -74,7 +74,7 @@ int main()
                                         ++calledCounter;
                                     }
                                 )
-                                .AssignOverrideResult(result);
+                                .AssignResult(result);
             
             CO_SETUP_OVERRIDE  (OverrideObj, AddNumFromNumPointerFunc)
                                 .SetArgs<int*, CO_ANY_TYPE>(10, CO_DONT_SET)
@@ -85,7 +85,7 @@ int main()
                                         ++calledCounter;
                                     }
                                 )
-                                .AssignOverrideResult(result2);
+                                .AssignResult(result2);
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -96,15 +96,15 @@ int main()
         ssTEST_OUTPUT_ASSERT(testArg == 5);
         ssTEST_OUTPUT_ASSERT(executeResult == 32);
         ssTEST_OUTPUT_ASSERT(calledCounter == 1);
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
-        ssTEST_OUTPUT_ASSERT(result2.Status == CppOverride::OverrideStatus::NO_OVERRIDE);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
+        ssTEST_OUTPUT_ASSERT(result2->GetStatusCount() == 0);
     };
     
     ssTEST("Modify None With Action Result Should Perform Action")
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::OverrideResult result;
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             int testArg = 1;
             int calledCounter = 0;
             
@@ -116,7 +116,7 @@ int main()
                                         ++calledCounter;
                                     }
                                 )
-                                .AssignOverrideResult(result);
+                                .AssignResult(result);
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -125,7 +125,7 @@ int main()
         );
         
         ssTEST_OUTPUT_ASSERT(calledCounter == 1);
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
     };
     
     ssTEST_END_TEST_GROUP();

@@ -16,7 +16,7 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::OverrideResult result;
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             CO_SETUP_OVERRIDE   (OverrideObj, ArgsFunc)
                                 .If
                                 (
@@ -33,18 +33,18 @@ int main()
                                     }
                                 )
                                 .Returns<int>(1)
-                                .AssignOverrideResult(result);
+                                .AssignResult(result);
         );
     
         ssTEST_OUTPUT_ASSERT(   "Meet If Condition", 
                                 CppOverrideTest::NonConst::ArgsFunc(1, true, 2.f) == 1);
         
-        ssTEST_OUTPUT_ASSERT(result.Status == CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
         
         ssTEST_OUTPUT_ASSERT(   "Fail If Condition", 
                                 CppOverrideTest::NonConst::ArgsFunc(2, false, 3.f) != 1);
         
-        ssTEST_OUTPUT_ASSERT(   result.Status == 
+        ssTEST_OUTPUT_ASSERT(   result->GetLastStatus() == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_ACTION_FAILED);
     };
     
@@ -52,7 +52,7 @@ int main()
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::OverrideResult result;
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             std::string testString = "";
             float testFloat = 1.f;
             
@@ -76,7 +76,7 @@ int main()
                                             std::string&>(  CO_DONT_SET, 
                                                             CO_DONT_SET, 
                                                             "Test String 2")
-                                .AssignOverrideResult(result);
+                                .AssignResult(result);
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -84,7 +84,7 @@ int main()
             CppOverrideTest::NonConst::ArgsToSetFunc(1, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT("Fail If Condition", testString.empty());
-        ssTEST_OUTPUT_ASSERT(   result.Status == 
+        ssTEST_OUTPUT_ASSERT(   result->GetLastStatus() == 
                                 CppOverride::OverrideStatus::MATCHING_CONDITION_ACTION_FAILED);
         
         ssTEST_OUTPUT_SETUP
@@ -97,8 +97,7 @@ int main()
             CppOverrideTest::NonConst::ArgsToSetFunc(1, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT("Meet If Condition", testString == "Test String 2");
-        ssTEST_OUTPUT_ASSERT(   result.Status == 
-                                CppOverride::OverrideStatus::OVERRIDE_SUCCESS);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
     };
     
     ssTEST_END_TEST_GROUP();
