@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <type_traits>
+#include <memory>
 
 namespace CppOverride
 {
@@ -142,13 +143,13 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            inline OverrideInfoSetter& AssignOverrideResult(OverrideInfoSetter& infoSetter, 
-                                                            OverrideResult& result)
+            inline OverrideInfoSetter& AssignResult(OverrideInfoSetter& infoSetter, 
+                                                    std::shared_ptr<OverrideResult> result)
             {
                 Internal_OverrideData& currentData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
-                currentData.Status = result.GetStatusRef();
+                currentData.Result = result;
                 return infoSetter;
             }
         

@@ -65,10 +65,10 @@ namespace CppOverride
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check parameter" << std::endl;
                     
-                    if(overrideDataToCheck.Status != nullptr)
+                    if(overrideDataToCheck.Result != nullptr)
                     {
-                        *overrideDataToCheck.Status = 
-                            OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
+                        overrideDataToCheck.Result->AddStatus
+                            (OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
                     }
                     
                     if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
@@ -88,10 +88,10 @@ namespace CppOverride
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check condition" << std::endl;
                     
-                    if(overrideDataToCheck.Status != nullptr)
+                    if(overrideDataToCheck.Result != nullptr)
                     {
-                        *overrideDataToCheck.Status = 
-                            OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
+                        overrideDataToCheck.Result->AddStatus
+                            (OverrideStatus::MATCHING_CONDITION_ACTION_FAILED);
                     }
                     
                     if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
@@ -112,10 +112,10 @@ namespace CppOverride
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check times" << std::endl;
                     
-                    if(overrideDataToCheck.Status != nullptr)
+                    if(overrideDataToCheck.Result != nullptr)
                     {
-                        *overrideDataToCheck.Status = 
-                            OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
+                        overrideDataToCheck.Result->AddStatus
+                            (OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
                     }
                     
                     if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)

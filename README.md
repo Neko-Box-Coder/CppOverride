@@ -56,6 +56,8 @@ int FreeFunction(int value1)
     return value1 * 2;
 }
 
+//Or CO_OVERRIDE_METHOD(OverrideInstance, int, FreeFunction, (int));
+
 int main()
 {
     CO_SETUP_OVERRIDE(OverrideInstance, FreeFunction)

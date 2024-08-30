@@ -2788,38 +2788,97 @@ namespace CppOverride
 
 
 
+#include <vector>
 #include <memory>
 
 namespace CppOverride
 {
-    struct OverrideResult
+    class OverrideResult
     {
         private:
-            std::shared_ptr<OverrideStatus> InnerStatus;
-        public:
-            OverrideStatus& Status;
+            std::vector<OverrideStatus> Statuses;
 
-        inline OverrideResult() : 
-            InnerStatus(std::make_shared<OverrideStatus>(OverrideStatus::NO_OVERRIDE)),
-            Status(std::ref(*InnerStatus))
-        {}
+        public:
+            inline void AddStatus(OverrideStatus status)
+            {
+                Statuses.push_back(status);
+            }
         
-        inline OverrideResult(const OverrideResult& other) : 
-            InnerStatus(other.InnerStatus),
-            Status(std::ref(*InnerStatus))
-        {}
-        
-        inline OverrideResult& operator=(const OverrideResult& other)
-        {
-            Status = other.Status;
-            return *this;
-        }
-        
-        inline std::shared_ptr<OverrideStatus> GetStatusRef()
-        {
-            return InnerStatus;
-        }
+            inline void ClearStatuses()
+            {
+                Statuses.clear();
+            }
+            
+            inline std::vector<OverrideStatus> GetAllStatuses()
+            {
+                return Statuses;
+            }
+            
+            //Helpers
+            inline int GetSucceedCount()
+            {
+                int succeedCounter = 0;
+                for(int i = 0; i < Statuses.size(); ++i)
+                {
+                    if(Statuses.at(i) == OverrideStatus::OVERRIDE_SUCCESS)
+                        ++succeedCounter;
+                }
+                
+                return succeedCounter;
+            }
+            
+            inline int GetFailedCount()
+            {
+                int failedCounter = 0;
+                for(int i = 0; i < Statuses.size(); ++i)
+                {
+                    if(Statuses.at(i) != OverrideStatus::OVERRIDE_SUCCESS)
+                        ++failedCounter;
+                }
+                
+                return failedCounter;
+            }
+            
+            inline int GetStatusCount()
+            {
+                return Statuses.size();
+            }
+            
+            inline bool LastStatusSucceed()
+            {
+                return  Statuses.empty() ? 
+                        false : 
+                        Statuses.back() == OverrideStatus::OVERRIDE_SUCCESS;
+            }
+            
+            inline bool LastStatusFailed()
+            {
+                return  Statuses.empty() ? 
+                        false : 
+                        Statuses.back() != OverrideStatus::OVERRIDE_SUCCESS;
+            }
+            
+            inline OverrideStatus GetLastStatus()
+            {
+                return  Statuses.empty() ? OverrideStatus::NO_OVERRIDE : Statuses.back();
+            }
+            
+            inline bool HasStatus(OverrideStatus status)
+            {
+                for(int i = 0; i < Statuses.size(); ++i)
+                {
+                    if(Statuses.at(i) == status)
+                        return true;
+                }
+                
+                return false;
+            }
     };
+    
+    inline std::shared_ptr<OverrideResult> CreateOverrideResult()
+    {
+        return std::make_shared<OverrideResult>();
+    }
 }
 
 #endif
@@ -2828,6 +2887,7 @@ namespace CppOverride
 #include <functional>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace CppOverride
 {
@@ -2867,7 +2927,7 @@ namespace CppOverride
             WhenCalledExpectedly_Do(std::function<void( void* instance,
                                                         const std::vector<void*>& args)> action);
             
-            OverrideInfoSetter& AssignOverrideResult(OverrideResult& result);
+            OverrideInfoSetter& AssignResult(std::shared_ptr<OverrideResult> result);
             
             OverrideInfoSetter& OverrideObject(const void* instance);
             
@@ -3084,7 +3144,7 @@ namespace CppOverride
         
         //Result of the override
         Internal_ResultActionInfo ResultActionInfo;
-        std::shared_ptr<OverrideStatus> Status = nullptr;
+        std::shared_ptr<OverrideResult> Result = nullptr;
     };
     
     using Internal_OverrideDataList = std::vector<Internal_OverrideData>;
@@ -3486,6 +3546,7 @@ namespace CppOverride
 #include <unordered_map>
 #include <iostream>
 #include <type_traits>
+#include <memory>
 
 namespace CppOverride
 {
@@ -3616,13 +3677,13 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            inline OverrideInfoSetter& AssignOverrideResult(OverrideInfoSetter& infoSetter, 
-                                                            OverrideResult& result)
+            inline OverrideInfoSetter& AssignResult(OverrideInfoSetter& infoSetter, 
+                                                    std::shared_ptr<OverrideResult> result)
             {
                 Internal_OverrideData& currentData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
-                currentData.Status = result.GetStatusRef();
+                currentData.Result = result;
                 return infoSetter;
             }
         
@@ -4641,10 +4702,10 @@ namespace CppOverride
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check parameter" << std::endl;
                     
-                    if(overrideDataToCheck.Status != nullptr)
+                    if(overrideDataToCheck.Result != nullptr)
                     {
-                        *overrideDataToCheck.Status = 
-                            OverrideStatus::MATCHING_CONDITION_VALUE_FAILED;
+                        overrideDataToCheck.Result->AddStatus
+                            (OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
                     }
                     
                     if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
@@ -4664,10 +4725,10 @@ namespace CppOverride
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check condition" << std::endl;
                     
-                    if(overrideDataToCheck.Status != nullptr)
+                    if(overrideDataToCheck.Result != nullptr)
                     {
-                        *overrideDataToCheck.Status = 
-                            OverrideStatus::MATCHING_CONDITION_ACTION_FAILED;
+                        overrideDataToCheck.Result->AddStatus
+                            (OverrideStatus::MATCHING_CONDITION_ACTION_FAILED);
                     }
                     
                     if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
@@ -4688,10 +4749,10 @@ namespace CppOverride
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check times" << std::endl;
                     
-                    if(overrideDataToCheck.Status != nullptr)
+                    if(overrideDataToCheck.Result != nullptr)
                     {
-                        *overrideDataToCheck.Status = 
-                            OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED;
+                        overrideDataToCheck.Result->AddStatus
+                            (OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
                     }
                     
                     if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
@@ -4909,8 +4970,8 @@ namespace CppOverride
                         {
                             for(int i = 0; i < currentDataList.size(); i++)
                             {
-                                if(currentDataList.at(i).Status != nullptr)
-                                    *currentDataList.at(i).Status = internalStatus;
+                                if(currentDataList.at(i).Result != nullptr)
+                                    currentDataList.at(i).Result->AddStatus(internalStatus);
                             }
                         }
                         
@@ -4952,8 +5013,8 @@ namespace CppOverride
                 }
                 
                 correctData.ConditionInfo.CalledTimes++;
-                if(correctData.Status != nullptr)
-                    *correctData.Status = OverrideStatus::OVERRIDE_SUCCESS;
+                if(correctData.Result != nullptr)
+                    correctData.Result->AddStatus(OverrideStatus::OVERRIDE_SUCCESS);
             }
 
             //------------------------------------------------------------------------------
@@ -5105,8 +5166,8 @@ namespace CppOverride
                                 args...);
                 }
                 
-                if(correctData.Status != nullptr)
-                    *correctData.Status = overrideStatus;
+                if(correctData.Result != nullptr)
+                    correctData.Result->AddStatus(overrideStatus);
                 
                 if( performResultAction && 
                     overrideStatus == OverrideStatus::OVERRIDE_SUCCESS)
@@ -5202,9 +5263,9 @@ namespace CppOverride
     }
 
     inline OverrideInfoSetter& 
-    OverrideInfoSetter::AssignOverrideResult(OverrideResult& result)
+    OverrideInfoSetter::AssignResult(std::shared_ptr<OverrideResult> result)
     {
-        return CppOverrideObj.AssignOverrideResult(*this, result);
+        return CppOverrideObj.AssignResult(*this, result);
     }
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverrideObject(const void* instance)

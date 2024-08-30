@@ -9,6 +9,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace CppOverride
 {
@@ -48,7 +49,7 @@ namespace CppOverride
             WhenCalledExpectedly_Do(std::function<void( void* instance,
                                                         const std::vector<void*>& args)> action);
             
-            OverrideInfoSetter& AssignOverrideResult(OverrideResult& result);
+            OverrideInfoSetter& AssignResult(std::shared_ptr<OverrideResult> result);
             
             OverrideInfoSetter& OverrideObject(const void* instance);
             
