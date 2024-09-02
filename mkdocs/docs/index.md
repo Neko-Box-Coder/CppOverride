@@ -229,18 +229,18 @@ CO_OVERRIDE_MEMBER_IMPL_CTOR_DTOR(Override Instance, (Arguments))
     #include "CppOverride.hpp"
     int SomeClass::MemberFunction(int value1, float value2)
     {
-        CO_OVERRIDE_IMPL_INSTANCE(MyOverrideInstance, int, (value1, value2));
+        CO_OVERRIDE_MEMBER_IMPL(MyOverrideInstance, int, (value1, value2));
         return value1 * value2;
     }
 
     SomeClass::SomeClass(int value1, float value2)
     {
-        CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(MyOverrideInstance, (value1, value2));
+        CO_OVERRIDE_MEMBER_IMPL_CTOR_DTOR(MyOverrideInstance, (value1, value2));
     }
 
     SomeClass::~SomeClass()
     {
-        CO_OVERRIDE_IMPL_INSTANCE_CTOR_DTOR(MyOverrideInstance, ());
+        CO_OVERRIDE_MEMBER_IMPL_CTOR_DTOR(MyOverrideInstance, ());
     }
     ```
 
