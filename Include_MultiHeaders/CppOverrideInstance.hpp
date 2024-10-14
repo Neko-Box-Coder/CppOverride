@@ -26,6 +26,19 @@
 
 namespace CppOverride
 {
+    inline std::string ProcessFunctionName(const std::string& functionName)
+    {
+        std::string processedName;
+        
+        for(int i = 0; i < functionName.size(); ++i)
+        {
+            if(functionName[i] != ' ')
+                processedName += functionName[i];
+        }
+        
+        return processedName;
+    }
+    
     class Overrider :   public Internal_ReturnDataSetter, 
                         public Internal_ArgsDataSetter,
                         public Internal_RequirementSetter,
@@ -97,6 +110,8 @@ namespace CppOverride
                                                 Args&... args)
             {
                 outOverrideIndex = -1;
+                
+                functionName = ProcessFunctionName(functionName);
                 
                 if(INTERNAL_CO_LOG_CheckOverride)
                 {
@@ -205,6 +220,8 @@ namespace CppOverride
                                                             void* instance,
                                                             Args&... args)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 Internal_OverrideData& correctData = 
                     OverrideDatas.at(functionName).at(overrideIndex);
                 
@@ -237,6 +254,8 @@ namespace CppOverride
                                                         void* instance,
                                                         Args&... args)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 Internal_CallReturnOverrideResultExpectedAction(functionName, 
                                                                 dataIndex, 
                                                                 instance, 
@@ -256,6 +275,8 @@ namespace CppOverride
                                                         void* instance, 
                                                         Args&... args)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
                 {
                     std::cout << std::endl << __func__ << " called" << std::endl;
@@ -300,6 +321,8 @@ namespace CppOverride
                                                         void* instance,
                                                         Args&... args)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
                 {
                     std::cout << std::endl << __func__ << " called" << std::endl;
@@ -346,6 +369,8 @@ namespace CppOverride
                                                 void* instance,
                                                 Args&... args)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 if(INTERNAL_CO_LOG_CheckOverrideAndSetArgs)
                 {
                     std::cout << std::endl << __func__ << " called" << std::endl;
@@ -390,6 +415,8 @@ namespace CppOverride
 
             inline OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 if(INTERNAL_CO_LOG_OverrideCreation)
                 {
                     std::cout << std::endl << __func__ << " called" << std::endl;
@@ -403,6 +430,8 @@ namespace CppOverride
             
             inline void Internal_RemoveOverrideInfo(std::string functionName)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 if(OverrideDatas.find(functionName) != OverrideDatas.end())
                     OverrideDatas.erase(functionName);
             }
