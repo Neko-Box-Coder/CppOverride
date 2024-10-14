@@ -20,7 +20,11 @@ namespace CppOverride
             Internal_ArgsValuesAppender& ArgsValuesAppender;
             Internal_ArgsTypeInfoAppender& ArgsTypeInfoAppender;
             
-            #define INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo 1
+            #else
+                #define INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo 0
+            #endif
 
             template<typename... Args>
             inline bool IsCorrectArgumentsDataInfo( Internal_OverrideData& overrideDataToCheck,

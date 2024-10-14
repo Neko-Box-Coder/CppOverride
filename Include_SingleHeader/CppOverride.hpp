@@ -2916,6 +2916,7 @@ namespace CppOverride
             template<typename... Args>
             OverrideInfoSetter& WhenCalledWith(Args... args);
             
+            //TODO: Enforce type for arguments
             OverrideInfoSetter& If(std::function<bool(  void* instance, 
                                                         const std::vector<void*>& args)> condition);
 
@@ -3348,7 +3349,11 @@ namespace CppOverride
         protected:
             OverrideDatas& CurrentOverrideDatas;
             
-            #define INTERNAL_CO_LOG_SetArgs 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_SetArgs 1
+            #else
+                #define INTERNAL_CO_LOG_SetArgs 0
+            #endif
             
             #ifndef PRINT_BYTES
                 #define PRINT_BYTES(val) \
@@ -3630,6 +3635,7 @@ namespace CppOverride
                 return WhenCalledWith(infoSetter, args...);
             }
             
+            //TODO: Enforce type for arguments
             inline OverrideInfoSetter& 
             If( OverrideInfoSetter& infoSetter, 
                 std::function<bool(void* instance, const std::vector<void*>& args)> condition)
@@ -3758,7 +3764,11 @@ namespace CppOverride
         friend class Internal_ArgsDataValidator;
         
         protected:
-            #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_AppendArgsTypeInfo 1
+            #else
+                #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
+            #endif
             
             inline void AppendArgsTypeInfo(std::vector<Internal_DataInfo>&) {}
             
@@ -3815,7 +3825,11 @@ namespace CppOverride
         protected:
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>&, int) { return true; };
 
-            #define INTERNAL_CO_LOG_CheckArguments 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckArguments 1
+            #else
+                #define INTERNAL_CO_LOG_CheckArguments 0
+            #endif
 
             //Check void*
             template<   typename T, 
@@ -4004,7 +4018,11 @@ namespace CppOverride
                                                 int,
                                                 OverrideStatus&) { return true; };
 
-            #define INTERNAL_CO_LOG_CheckArgumentsValues 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckArgumentsValues 1
+            #else
+                #define INTERNAL_CO_LOG_CheckArgumentsValues 0
+            #endif
 
             //Check type support inequal operator
             template<   typename T, 
@@ -4222,7 +4240,11 @@ namespace CppOverride
     class Internal_ArgsModifier
     {
         protected:
-            #define INTERNAL_CO_LOG_ModifyArgs 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_ModifyArgs 1
+            #else
+                #define INTERNAL_CO_LOG_ModifyArgs 0
+            #endif
         
             inline void ModifyArgs( std::vector<Internal_DataInfo>&, 
                                     int,
@@ -4406,7 +4428,11 @@ namespace CppOverride
         protected:
             Internal_ArgsValuesAppender& ArgsValuesAppender;
         
-            #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 1
+            #else
+                #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 0
+            #endif
 
             template<   typename ReturnType, 
                         typename... Args>
@@ -4515,7 +4541,11 @@ namespace CppOverride
             Internal_ArgsValuesAppender& ArgsValuesAppender;
             Internal_ArgsTypeInfoAppender& ArgsTypeInfoAppender;
             
-            #define INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo 1
+            #else
+                #define INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo 0
+            #endif
 
             template<typename... Args>
             inline bool IsCorrectArgumentsDataInfo( Internal_OverrideData& overrideDataToCheck,
@@ -4660,7 +4690,11 @@ namespace CppOverride
             Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
             Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
         
-            #define INTERNAL_CO_LOG_IsCorrectDataInfo 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_IsCorrectDataInfo 1
+            #else
+                #define INTERNAL_CO_LOG_IsCorrectDataInfo 0
+            #endif
 
             template<   typename ReturnType, 
                         typename... Args>
@@ -4717,6 +4751,7 @@ namespace CppOverride
                 }
                 
                 //Check condition lambda
+                //TODO: Enforce type for arguments
                 if( overrideDataToCheck.ConditionInfo.DataConditionSet && 
                     !overrideDataToCheck.ConditionInfo
                                         .LambdaCondition(   instance,
@@ -4823,6 +4858,19 @@ namespace CppOverride
 
 namespace CppOverride
 {
+    inline std::string ProcessFunctionName(const std::string& functionName)
+    {
+        std::string processedName;
+        
+        for(int i = 0; i < functionName.size(); ++i)
+        {
+            if(functionName[i] != ' ')
+                processedName += functionName[i];
+        }
+        
+        return processedName;
+    }
+    
     class Overrider :   public Internal_ReturnDataSetter, 
                         public Internal_ArgsDataSetter,
                         public Internal_RequirementSetter,
@@ -4882,7 +4930,11 @@ namespace CppOverride
             //------------------------------------------------------------------------------
             //Check overrides available
             //------------------------------------------------------------------------------
-            #define INTERNAL_CO_LOG_CheckOverride 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckOverride 1
+            #else
+                #define INTERNAL_CO_LOG_CheckOverride 0
+            #endif
             
             template<typename ReturnType, typename... Args>
             inline bool Internal_CheckOverride( std::string functionName, 
@@ -4894,6 +4946,8 @@ namespace CppOverride
                                                 Args&... args)
             {
                 outOverrideIndex = -1;
+                
+                functionName = ProcessFunctionName(functionName);
                 
                 if(INTERNAL_CO_LOG_CheckOverride)
                 {
@@ -5002,6 +5056,8 @@ namespace CppOverride
                                                             void* instance,
                                                             Args&... args)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 Internal_OverrideData& correctData = 
                     OverrideDatas.at(functionName).at(overrideIndex);
                 
@@ -5021,7 +5077,11 @@ namespace CppOverride
             //Overriding Returns
             //------------------------------------------------------------------------------
 
-            #define INTERNAL_CO_LOG_CheckOverrideAndReturn 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckOverrideAndReturn 1
+            #else
+                #define INTERNAL_CO_LOG_CheckOverrideAndReturn 0
+            #endif
 
             template
             <
@@ -5034,6 +5094,8 @@ namespace CppOverride
                                                         void* instance,
                                                         Args&... args)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 Internal_CallReturnOverrideResultExpectedAction(functionName, 
                                                                 dataIndex, 
                                                                 instance, 
@@ -5053,6 +5115,8 @@ namespace CppOverride
                                                         void* instance, 
                                                         Args&... args)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
                 {
                     std::cout << std::endl << __func__ << " called" << std::endl;
@@ -5097,6 +5161,8 @@ namespace CppOverride
                                                         void* instance,
                                                         Args&... args)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
                 {
                     std::cout << std::endl << __func__ << " called" << std::endl;
@@ -5134,7 +5200,11 @@ namespace CppOverride
             //------------------------------------------------------------------------------
             //Overriding Arguments
             //------------------------------------------------------------------------------
-            #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 1
+            #else
+                #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 0
+            #endif
 
             template<typename... Args>
             inline void Internal_OverrideArgs(  int dataIndex,
@@ -5143,6 +5213,8 @@ namespace CppOverride
                                                 void* instance,
                                                 Args&... args)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 if(INTERNAL_CO_LOG_CheckOverrideAndSetArgs)
                 {
                     std::cout << std::endl << __func__ << " called" << std::endl;
@@ -5183,10 +5255,16 @@ namespace CppOverride
             //Creating override info
             //------------------------------------------------------------------------------
             
-            #define INTERNAL_CO_LOG_OverrideCreation 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_OverrideCreation 1
+            #else
+                #define INTERNAL_CO_LOG_OverrideCreation 0
+            #endif
 
             inline OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 if(INTERNAL_CO_LOG_OverrideCreation)
                 {
                     std::cout << std::endl << __func__ << " called" << std::endl;
@@ -5200,6 +5278,8 @@ namespace CppOverride
             
             inline void Internal_RemoveOverrideInfo(std::string functionName)
             {
+                functionName = ProcessFunctionName(functionName);
+                
                 if(OverrideDatas.find(functionName) != OverrideDatas.end())
                     OverrideDatas.erase(functionName);
             }
@@ -5240,6 +5320,7 @@ namespace CppOverride
         return CppOverrideObj.WhenCalledWith(*this, args...);
     }
 
+    //TODO: Enforce type for arguments
     inline OverrideInfoSetter& 
     OverrideInfoSetter::If(std::function<bool(  void* instance, 
                                                 const std::vector<void*>& args)> condition)
@@ -5362,7 +5443,11 @@ namespace CppOverride
     #define INTERNAL_CO_ARGS_EMPTY()
     #define INTERNAL_CO_ARGS_NOT_EMPTY(...) , __VA_ARGS__
     
-    #define INTERNAL_CO_LOG_CO_OVERRIDE_IMPL 0
+    #if CO_SHOW_OVERRIDE_LOG
+        #define INTERNAL_CO_LOG_CO_OVERRIDE_IMPL 1
+    #else
+        #define INTERNAL_CO_LOG_CO_OVERRIDE_IMPL 0
+    #endif
     
     #define INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, returnType, instance, args) \
     do \

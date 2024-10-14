@@ -23,7 +23,11 @@ namespace CppOverride
             Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
             Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
         
-            #define INTERNAL_CO_LOG_IsCorrectDataInfo 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_IsCorrectDataInfo 1
+            #else
+                #define INTERNAL_CO_LOG_IsCorrectDataInfo 0
+            #endif
 
             template<   typename ReturnType, 
                         typename... Args>
@@ -80,6 +84,7 @@ namespace CppOverride
                 }
                 
                 //Check condition lambda
+                //TODO: Enforce type for arguments
                 if( overrideDataToCheck.ConditionInfo.DataConditionSet && 
                     !overrideDataToCheck.ConditionInfo
                                         .LambdaCondition(   instance,

@@ -31,7 +31,11 @@ namespace CppOverride
     #define INTERNAL_CO_ARGS_EMPTY()
     #define INTERNAL_CO_ARGS_NOT_EMPTY(...) , __VA_ARGS__
     
-    #define INTERNAL_CO_LOG_CO_OVERRIDE_IMPL 0
+    #if CO_SHOW_OVERRIDE_LOG
+        #define INTERNAL_CO_LOG_CO_OVERRIDE_IMPL 1
+    #else
+        #define INTERNAL_CO_LOG_CO_OVERRIDE_IMPL 0
+    #endif
     
     #define INTERNAL_CO_OVERRIDE_IMPL_COMMON_PART_1(overrideObjName, returnType, instance, args) \
     do \

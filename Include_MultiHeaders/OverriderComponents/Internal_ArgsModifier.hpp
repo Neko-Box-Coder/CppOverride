@@ -17,7 +17,11 @@ namespace CppOverride
     class Internal_ArgsModifier
     {
         protected:
-            #define INTERNAL_CO_LOG_ModifyArgs 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_ModifyArgs 1
+            #else
+                #define INTERNAL_CO_LOG_ModifyArgs 0
+            #endif
         
             inline void ModifyArgs( std::vector<Internal_DataInfo>&, 
                                     int,
