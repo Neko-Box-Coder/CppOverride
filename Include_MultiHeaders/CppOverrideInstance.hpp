@@ -98,7 +98,11 @@ namespace CppOverride
             //------------------------------------------------------------------------------
             //Check overrides available
             //------------------------------------------------------------------------------
-            #define INTERNAL_CO_LOG_CheckOverride 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckOverride 1
+            #else
+                #define INTERNAL_CO_LOG_CheckOverride 0
+            #endif
             
             template<typename ReturnType, typename... Args>
             inline bool Internal_CheckOverride( std::string functionName, 
@@ -241,7 +245,11 @@ namespace CppOverride
             //Overriding Returns
             //------------------------------------------------------------------------------
 
-            #define INTERNAL_CO_LOG_CheckOverrideAndReturn 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckOverrideAndReturn 1
+            #else
+                #define INTERNAL_CO_LOG_CheckOverrideAndReturn 0
+            #endif
 
             template
             <
@@ -360,7 +368,11 @@ namespace CppOverride
             //------------------------------------------------------------------------------
             //Overriding Arguments
             //------------------------------------------------------------------------------
-            #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 1
+            #else
+                #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 0
+            #endif
 
             template<typename... Args>
             inline void Internal_OverrideArgs(  int dataIndex,
@@ -411,7 +423,11 @@ namespace CppOverride
             //Creating override info
             //------------------------------------------------------------------------------
             
-            #define INTERNAL_CO_LOG_OverrideCreation 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_OverrideCreation 1
+            #else
+                #define INTERNAL_CO_LOG_OverrideCreation 0
+            #endif
 
             inline OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName)
             {

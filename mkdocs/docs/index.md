@@ -510,6 +510,17 @@ std::string OverrideStatusToString(Override Status)
 
 ---
 
+#### Debug Override
+
+If for any reason, it is unclear why the override did not get triggered and the override result
+did not give any useful information. You can force CppOverride to output verbose logs by
+defining `CO_SHOW_OVERRIDE_LOG 1` before `#include "CppOverride.hpp"`. 
+
+This will show all the debug logs on each stage of selecting override data and what conditions 
+are not met.
+
+---
+
 #### Disable Overrides
 
 By default, the override implementations won't do anything if nothing is setup, which 

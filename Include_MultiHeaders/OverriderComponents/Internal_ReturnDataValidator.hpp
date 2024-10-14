@@ -17,7 +17,11 @@ namespace CppOverride
         protected:
             Internal_ArgsValuesAppender& ArgsValuesAppender;
         
-            #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 1
+            #else
+                #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 0
+            #endif
 
             template<   typename ReturnType, 
                         typename... Args>

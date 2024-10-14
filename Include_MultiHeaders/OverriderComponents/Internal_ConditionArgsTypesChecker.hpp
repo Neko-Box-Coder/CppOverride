@@ -20,7 +20,11 @@ namespace CppOverride
         protected:
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>&, int) { return true; };
 
-            #define INTERNAL_CO_LOG_CheckArguments 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckArguments 1
+            #else
+                #define INTERNAL_CO_LOG_CheckArguments 0
+            #endif
 
             //Check void*
             template<   typename T, 

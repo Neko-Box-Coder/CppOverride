@@ -26,7 +26,11 @@ namespace CppOverride
                                                 int,
                                                 OverrideStatus&) { return true; };
 
-            #define INTERNAL_CO_LOG_CheckArgumentsValues 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckArgumentsValues 1
+            #else
+                #define INTERNAL_CO_LOG_CheckArgumentsValues 0
+            #endif
 
             //Check type support inequal operator
             template<   typename T, 

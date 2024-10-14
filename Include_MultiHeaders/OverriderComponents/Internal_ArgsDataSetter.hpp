@@ -28,7 +28,11 @@ namespace CppOverride
         protected:
             OverrideDatas& CurrentOverrideDatas;
             
-            #define INTERNAL_CO_LOG_SetArgs 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_SetArgs 1
+            #else
+                #define INTERNAL_CO_LOG_SetArgs 0
+            #endif
             
             #ifndef PRINT_BYTES
                 #define PRINT_BYTES(val) \

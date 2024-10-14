@@ -15,7 +15,11 @@ namespace CppOverride
         friend class Internal_ArgsDataValidator;
         
         protected:
-            #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_AppendArgsTypeInfo 1
+            #else
+                #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
+            #endif
             
             inline void AppendArgsTypeInfo(std::vector<Internal_DataInfo>&) {}
             

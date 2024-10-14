@@ -18,7 +18,11 @@ namespace CppOverride
             inline bool CheckArguments( std::vector<Internal_DataInfo>& validArgumentsList, 
                                         int argIndex) { return true; };
 
-            #define INTERNAL_CO_LOG_CheckArguments 0
+            #if CO_SHOW_OVERRIDE_LOG
+                #define INTERNAL_CO_LOG_CheckArguments 1
+            #else
+                #define INTERNAL_CO_LOG_CheckArguments 0
+            #endif
 
             template<typename T, typename... Args>
             inline bool CheckArguments( std::vector<Internal_DataInfo>& validArgumentsList, 
