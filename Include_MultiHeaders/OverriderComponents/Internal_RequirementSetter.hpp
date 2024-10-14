@@ -45,7 +45,7 @@ namespace CppOverride
                         typename... Args, 
                         typename = typename std::enable_if<std::is_same<INTERNAL_CO_PURE_TYPE(T), 
                                                                         void>::value>::type,
-                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T)>
+                        typename PureType = INTERNAL_CO_PURE_TYPE(T)>
             inline OverrideInfoSetter& WhenCalledWith(  OverrideInfoSetter& infoSetter,
                                                         T arg, 
                                                         Args... args)

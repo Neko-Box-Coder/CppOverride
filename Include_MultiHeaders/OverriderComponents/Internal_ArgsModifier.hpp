@@ -24,8 +24,8 @@ namespace CppOverride
                                     OverrideStatus*) {}
 
             template<   typename T, 
-                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T),
-                        typename = typename std::enable_if<!std::is_copy_assignable<RAW_T>::value>::type,
+                        typename RawType = INTERNAL_CO_RAW_TYPE(T),
+                        typename = typename std::enable_if<!std::is_copy_assignable<RawType>::value>::type,
                         typename... Args>
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
@@ -46,8 +46,8 @@ namespace CppOverride
             }
             
             template<   typename T, 
-                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T),
-                        typename = typename std::enable_if<std::is_copy_assignable<RAW_T>::value>::type,
+                        typename RawType = INTERNAL_CO_RAW_TYPE(T),
+                        typename = typename std::enable_if<std::is_copy_assignable<RawType>::value>::type,
                         typename... Args,
                         typename = void()>
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
@@ -58,8 +58,8 @@ namespace CppOverride
             {
                 if(argsData.at(index).DataSet)
                 {
-                    RAW_T& pureArg = (RAW_T&)(arg); 
-                    pureArg = *static_cast<RAW_T*>(argsData.at(index).Data.get());
+                    RawType& pureArg = (RawType&)(arg); 
+                    pureArg = *static_cast<RawType*>(argsData.at(index).Data.get());
                     if(INTERNAL_CO_LOG_ModifyArgs)
                     {
                         std::cout << std::endl << __func__ << " called" << std::endl;
@@ -78,9 +78,9 @@ namespace CppOverride
                         #endif
                         
                         std::cout << "modified index: " << index << std::endl;
-                        std::cout << "typeid(RAW_T).name(): " << typeid(RAW_T).name() << std::endl;
-                        std::cout <<    "typeid(RAW_T).hash_code(): " << 
-                                        typeid(RAW_T).hash_code() <<
+                        std::cout << "typeid(RawType).name(): " << typeid(RawType).name() << std::endl;
+                        std::cout <<    "typeid(RawType).hash_code(): " << 
+                                        typeid(RawType).hash_code() <<
                                         std::endl;
                         
                         std::cout <<    "argsData.at(index).DataType: " << 
@@ -95,7 +95,7 @@ namespace CppOverride
 
                         std::cout << "modified value bytes:" << std::endl;
                         
-                        PRINT_BYTES(*static_cast<RAW_T*>(argsData.at(index).Data.get()));
+                        PRINT_BYTES(*static_cast<RawType*>(argsData.at(index).Data.get()));
                         std::cout << std::endl;
                     }
                 }
@@ -106,8 +106,8 @@ namespace CppOverride
             //If the argument is a pointer type, we can just dereference that and 
             //pass it as reference to a value
             template<   typename T, 
-                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T),
-                        typename = typename std::enable_if<!std::is_same<RAW_T, void>::value>::type, 
+                        typename RawType = INTERNAL_CO_RAW_TYPE(T),
+                        typename = typename std::enable_if<!std::is_same<RawType, void>::value>::type, 
                         typename... Args,
                         typename = void(),
                         typename = void()>

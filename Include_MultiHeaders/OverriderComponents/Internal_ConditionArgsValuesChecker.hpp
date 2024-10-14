@@ -30,8 +30,8 @@ namespace CppOverride
 
             //Check type support inequal operator
             template<   typename T, 
-                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<!InequalExists<RAW_T>::value>::type,
+                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<!InequalExists<RawType>::value>::type,
                         typename... Args>
             inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
@@ -54,9 +54,9 @@ namespace CppOverride
                     const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
-                    if(typeid(RAW_T*).hash_code() == curArgInfo.DataType)
+                    if(typeid(RawType*).hash_code() == curArgInfo.DataType)
                     {
-                        if((RAW_T*)&arg != *static_cast<RAW_T**>(curArgInfo.Data.get()))
+                        if((RawType*)&arg != *static_cast<RawType**>(curArgInfo.Data.get()))
                             return false;
                     }
                     else
@@ -78,9 +78,9 @@ namespace CppOverride
             
             //Check value or reference
             template<   typename T, 
-                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<InequalExists<RAW_T>::value>::type,
-                        typename = typename std::enable_if<!std::is_pointer<RAW_T>::value>::type,
+                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<InequalExists<RawType>::value>::type,
+                        typename = typename std::enable_if<!std::is_pointer<RawType>::value>::type,
                         typename... Args>
             inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
@@ -103,13 +103,13 @@ namespace CppOverride
                     const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
-                    if(typeid(RAW_T*).hash_code() == curArgInfo.DataType)
+                    if(typeid(RawType*).hash_code() == curArgInfo.DataType)
                     {
-                        if((RAW_T*)&arg != *static_cast<RAW_T**>(curArgInfo.Data.get()))
+                        if((RawType*)&arg != *static_cast<RawType**>(curArgInfo.Data.get()))
                             return false;
                     }
                     //Check Value
-                    else if(*(RAW_T*)&arg != *static_cast<RAW_T*>(curArgInfo.Data.get()))
+                    else if(*(RawType*)&arg != *static_cast<RawType*>(curArgInfo.Data.get()))
                         return false;
                 }
                 
@@ -124,10 +124,10 @@ namespace CppOverride
             
             //Check pointer or value
             template<   typename T, 
-                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<std::is_pointer<RAW_T>::value>::type,
-                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(RAW_T), void>::value>::type, 
-                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T),
+                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<std::is_pointer<RawType>::value>::type,
+                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(RawType), void>::value>::type, 
+                        typename PureType = INTERNAL_CO_PURE_TYPE(T),
                         typename... Args>
             inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
@@ -150,9 +150,9 @@ namespace CppOverride
                     const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Pointer
-                    if(typeid(RAW_T).hash_code() == curArgInfo.DataType)
+                    if(typeid(RawType).hash_code() == curArgInfo.DataType)
                     {
-                        if((RAW_T)arg != *static_cast<RAW_T*>(curArgInfo.Data.get()))
+                        if((RawType)arg != *static_cast<RawType*>(curArgInfo.Data.get()))
                             return false;
                     }
                     //Check Value
@@ -161,7 +161,7 @@ namespace CppOverride
                         return CheckArgumentsValues(validArgumentsList, 
                                                     argIndex, 
                                                     status, 
-                                                    *(RAW_T)(arg), 
+                                                    *(RawType)(arg), 
                                                     args...);
                     }
                 }
@@ -177,8 +177,8 @@ namespace CppOverride
             
             //Check void*
             template<   typename T, 
-                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T),
-                        typename = typename std::enable_if<std::is_same<PURE_T, void>::value>::type, 
+                        typename PureType = INTERNAL_CO_PURE_TYPE(T),
+                        typename = typename std::enable_if<std::is_same<PureType, void>::value>::type, 
                         typename... Args,
                         typename = void(),
                         typename = void(),

@@ -24,8 +24,8 @@ namespace CppOverride
 
             //Check void*
             template<   typename T, 
-                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T),
-                        typename = typename std::enable_if<std::is_same<PURE_T, void>::value>::type, 
+                        typename PureType = INTERNAL_CO_PURE_TYPE(T),
+                        typename = typename std::enable_if<std::is_same<PureType, void>::value>::type, 
                         typename... Args,
                         typename = void()>
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
@@ -60,8 +60,8 @@ namespace CppOverride
             
             //Check Value or reference
             template<   typename T, 
-                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<!std::is_pointer<RAW_T>::value>::type,
+                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<!std::is_pointer<RawType>::value>::type,
                         typename... Args>
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
                                             int argIndex, 
@@ -80,12 +80,12 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    if( typeid(RAW_T).hash_code() != 
+                    if( typeid(RawType).hash_code() != 
                             validArgumentsList.at(argIndex).DataType &&
-                        typeid(RAW_T&).hash_code() != 
+                        typeid(RawType&).hash_code() != 
                             validArgumentsList.at(argIndex).DataType &&
                         //NOTE: Reference can be compared as pointer later down the line
-                        typeid(RAW_T*).hash_code() != 
+                        typeid(RawType*).hash_code() != 
                             validArgumentsList.at(argIndex).DataType)
                     {
                         return false;
@@ -103,10 +103,10 @@ namespace CppOverride
             
             //Check Pointer or value
             template<   typename T, 
-                        typename RAW_T = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<std::is_pointer<RAW_T>::value>::type,
-                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(RAW_T), void>::value>::type, 
-                        typename PURE_T = INTERNAL_CO_PURE_TYPE(T),
+                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                        typename = typename std::enable_if<std::is_pointer<RawType>::value>::type,
+                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(RawType), void>::value>::type, 
+                        typename PureType = INTERNAL_CO_PURE_TYPE(T),
                         typename... Args>
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
                                             int argIndex, 
@@ -126,17 +126,17 @@ namespace CppOverride
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
                         //Check pointer type
-                    if( typeid(RAW_T).hash_code() != validArgumentsList.at(argIndex).DataType &&
+                    if( typeid(RawType).hash_code() != validArgumentsList.at(argIndex).DataType &&
                         //Check value type
-                        typeid(PURE_T).hash_code() != validArgumentsList.at(argIndex).DataType)
+                        typeid(PureType).hash_code() != validArgumentsList.at(argIndex).DataType)
                     {
                         if(INTERNAL_CO_LOG_CheckArguments)
                         {
-                            std::cout <<    "typeid(RAW_T).hash_code(): " <<
-                                            typeid(RAW_T).hash_code() << 
+                            std::cout <<    "typeid(RawType).hash_code(): " <<
+                                            typeid(RawType).hash_code() << 
                                             std::endl;
-                            std::cout <<    "typeid(PURE_T).hash_code(): " <<
-                                            typeid(PURE_T).hash_code() << 
+                            std::cout <<    "typeid(PureType).hash_code(): " <<
+                                            typeid(PureType).hash_code() << 
                                             std::endl;
                             std::cout <<    "validArgumentsList[" << 
                                             argIndex << 

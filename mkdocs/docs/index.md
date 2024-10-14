@@ -870,7 +870,7 @@ This allows you to setup a function callback that gets called before an override
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
                  .WhenCalledExpectedly_Do
                  (
-                    void(void* instance, std::vector<void*>& args) Function
+                    void(void* instance, const std::vector<void*>& args) Function
                  );
 ```
 
@@ -924,7 +924,7 @@ because of failing to meet conditions or failing to match the correct argument v
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
                  .Otherwise_Do
                  (
-                    void(void* instance, std::vector<void*>& args) Function
+                    void(void* instance, const std::vector<void*>& args) Function
                  );
 ```
 

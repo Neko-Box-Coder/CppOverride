@@ -410,16 +410,18 @@ namespace CppOverride
     #define INTERNAL_CO_OVERRIDE_MEMBER_METHOD_DTOR_8(...) \
         static_assert(false, "CO_OVERRIDE_MEMBER_METHOD_DTOR must have 2 to 4 arguments, 8 given currently")
     
+    //NOTE: CO_SETUP_OVERRIDE needs to be defined as there are chained actions.
+    //      For CO_DECLARE_*, they need to be there such that things using them can be compiled
     #ifdef CO_NO_OVERRIDE
         #undef CO_OVERRIDE_IMPL
         #undef CO_OVERRIDE_MEMBER_IMPL_CTOR_DTOR
         #undef CO_OVERRIDE_MEMBER_IMPL
-        #undef CO_SETUP_OVERRIDE
+        //#undef CO_SETUP_OVERRIDE
         #undef CO_REMOVE_OVERRIDE_SETUP
         #undef CO_CLEAR_ALL_OVERRIDE_SETUP
-        #undef CO_DECLARE_MEMBER_INSTANCE
-        #undef CO_DECLARE_INSTANCE
-        #undef CO_DECLARE_OVERRIDE_METHODS
+        //#undef CO_DECLARE_MEMBER_INSTANCE
+        //#undef CO_DECLARE_INSTANCE
+        //#undef CO_DECLARE_OVERRIDE_METHODS
         #undef CO_OVERRIDE_METHOD
         #undef CO_OVERRIDE_MEMBER_METHOD
         #undef CO_OVERRIDE_MEMBER_METHOD_CTOR
@@ -428,12 +430,12 @@ namespace CppOverride
         #define CO_OVERRIDE_IMPL(...)
         #define CO_OVERRIDE_MEMBER_IMPL_CTOR_DTOR(...)
         #define CO_OVERRIDE_MEMBER_IMPL(...)
-        #define CO_SETUP_OVERRIDE(...)
+        //#define CO_SETUP_OVERRIDE(...)
         #define CO_REMOVE_OVERRIDE_SETUP(...)
         #define CO_CLEAR_ALL_OVERRIDE_SETUP(...)
-        #define CO_DECLARE_MEMBER_INSTANCE(...)
-        #define CO_DECLARE_INSTANCE(...)
-        #define CO_DECLARE_OVERRIDE_METHODS(...)
+        //#define CO_DECLARE_MEMBER_INSTANCE(...)
+        //#define CO_DECLARE_INSTANCE(...)
+        //#define CO_DECLARE_OVERRIDE_METHODS(...)
         #define CO_OVERRIDE_METHOD(...)
         #define CO_OVERRIDE_MEMBER_METHOD(...)
         #define CO_OVERRIDE_MEMBER_METHOD_CTOR(...)

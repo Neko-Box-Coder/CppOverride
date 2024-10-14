@@ -51,7 +51,7 @@ namespace CppOverride
             SetArgs(OverrideInfoSetter& infoSetter,
                     INTERNAL_CO_UNWRAPPED(T) arg)
             {
-                static_assert(  CO_ASSERT_FALSE<T>::value, 
+                static_assert(  CoAssertFalseType<T>::value, 
                                 "Cannot modify a non copy assignable object. "
                                 "Please use SetArgsByAction instead.");
 
