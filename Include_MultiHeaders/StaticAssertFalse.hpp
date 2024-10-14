@@ -1,12 +1,12 @@
-#ifndef CO_STATIC_ASSERT_FALSE
-#define CO_STATIC_ASSERT_FALSE
+#ifndef CO_STATIC_ASSERT_FALSE_HPP
+#define CO_STATIC_ASSERT_FALSE_HPP
 
 #include <type_traits>
 
 namespace CppOverride
 {
     template<typename T>
-    struct CO_ASSERT_FALSE : std::false_type { };
+    struct CoAssertFalseType : std::false_type { };
 }
 
 #endif
