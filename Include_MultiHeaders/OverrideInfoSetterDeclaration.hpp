@@ -38,6 +38,7 @@ namespace CppOverride
             template<typename... Args>
             OverrideInfoSetter& WhenCalledWith(Args... args);
             
+            //TODO: Enforce type for arguments
             OverrideInfoSetter& If(std::function<bool(  void* instance, 
                                                         const std::vector<void*>& args)> condition);
 

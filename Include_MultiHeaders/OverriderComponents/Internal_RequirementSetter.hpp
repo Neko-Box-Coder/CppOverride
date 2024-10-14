@@ -96,6 +96,7 @@ namespace CppOverride
                 return WhenCalledWith(infoSetter, args...);
             }
             
+            //TODO: Enforce type for arguments
             inline OverrideInfoSetter& 
             If( OverrideInfoSetter& infoSetter, 
                 std::function<bool(void* instance, const std::vector<void*>& args)> condition)

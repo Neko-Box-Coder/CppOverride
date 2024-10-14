@@ -2916,6 +2916,7 @@ namespace CppOverride
             template<typename... Args>
             OverrideInfoSetter& WhenCalledWith(Args... args);
             
+            //TODO: Enforce type for arguments
             OverrideInfoSetter& If(std::function<bool(  void* instance, 
                                                         const std::vector<void*>& args)> condition);
 
@@ -3634,6 +3635,7 @@ namespace CppOverride
                 return WhenCalledWith(infoSetter, args...);
             }
             
+            //TODO: Enforce type for arguments
             inline OverrideInfoSetter& 
             If( OverrideInfoSetter& infoSetter, 
                 std::function<bool(void* instance, const std::vector<void*>& args)> condition)
@@ -4749,6 +4751,7 @@ namespace CppOverride
                 }
                 
                 //Check condition lambda
+                //TODO: Enforce type for arguments
                 if( overrideDataToCheck.ConditionInfo.DataConditionSet && 
                     !overrideDataToCheck.ConditionInfo
                                         .LambdaCondition(   instance,
@@ -5317,6 +5320,7 @@ namespace CppOverride
         return CppOverrideObj.WhenCalledWith(*this, args...);
     }
 
+    //TODO: Enforce type for arguments
     inline OverrideInfoSetter& 
     OverrideInfoSetter::If(std::function<bool(  void* instance, 
                                                 const std::vector<void*>& args)> condition)

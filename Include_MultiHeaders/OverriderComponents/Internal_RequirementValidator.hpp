@@ -84,6 +84,7 @@ namespace CppOverride
                 }
                 
                 //Check condition lambda
+                //TODO: Enforce type for arguments
                 if( overrideDataToCheck.ConditionInfo.DataConditionSet && 
                     !overrideDataToCheck.ConditionInfo
                                         .LambdaCondition(   instance,
