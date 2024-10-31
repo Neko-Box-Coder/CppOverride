@@ -906,7 +906,6 @@ void ProcessOthers(const std::string& token, Parser& outParser)
 }
 
 void ParseToken(const std::string& token, 
-                const std::string& line,
                 int lineNumber,
                 Parser& outParser)
 {
@@ -977,7 +976,7 @@ void ParseHeaderFile(   const std::string& filename,
             {
                 if(!token.empty())
                 {
-                    ParseToken(token, currentLine, currentLineNumber, parser);
+                    ParseToken(token, currentLineNumber, parser);
                     token.clear();
                 }
                 continue;
@@ -987,12 +986,12 @@ void ParseHeaderFile(   const std::string& filename,
             {
                 if(!token.empty())
                 {
-                    ParseToken(token, currentLine, currentLineNumber, parser);
+                    ParseToken(token, currentLineNumber, parser);
                     token.clear();
                 }
                 
                 token += currentLine[i];
-                ParseToken(token, currentLine, currentLineNumber, parser);
+                ParseToken(token, currentLineNumber, parser);
                 token.clear();
                 continue;
             }
@@ -1000,7 +999,7 @@ void ParseHeaderFile(   const std::string& filename,
                 token += currentLine[i];
             
             if(i == currentLine.size() - 1)
-                ParseToken(token, currentLine, currentLineNumber, parser);
+                ParseToken(token, currentLineNumber, parser);
         }
         
         parser.LastLine = currentLine;
