@@ -22,9 +22,6 @@ set(CPP_OVERRIDE_USE_SINGLE_HEADER "ON" CACHE BOOL "Use single header version in
 
 add_library(CppOverride INTERFACE)
 
-add_executable(GenerateSingleHeader "${CMAKE_CURRENT_LIST_DIR}/Scripts/GenerateSingleHeader.cpp")
-add_executable(GenerateMockClass "${CMAKE_CURRENT_LIST_DIR}/Scripts/GenerateMockClass.cpp")
-
 if(CPP_OVERRIDE_USE_SINGLE_HEADER)
     target_include_directories(CppOverride INTERFACE "${CMAKE_CURRENT_LIST_DIR}/Include_SingleHeader")
 else()
@@ -50,6 +47,13 @@ else()
         set(STANDARD_LINK_FLAGS "${STANDARD_LINK_FLAGS};-fsanitize=address")
     endif()
 endif()
+
+
+add_executable(GenerateSingleHeader "${CMAKE_CURRENT_LIST_DIR}/Scripts/GenerateSingleHeader.cpp")
+target_compile_options(GenerateSingleHeader PRIVATE "${STANDARD_COMPILE_FLAGS}")
+
+add_executable(GenerateMockClass "${CMAKE_CURRENT_LIST_DIR}/Scripts/GenerateMockClass.cpp")
+target_compile_options(GenerateMockClass PRIVATE "${STANDARD_COMPILE_FLAGS}")
 
 if(CPP_OVERRIDE_BUILD_TEST)
     add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/External/ssTest" "${CMAKE_CURRENT_BINARY_DIR}/ssTest")
