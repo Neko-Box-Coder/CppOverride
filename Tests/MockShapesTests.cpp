@@ -2,19 +2,20 @@
 #include "ssTest.hpp"
 
 
-int main()
+int main(int argc, char** argv)
 {
-    // Testing pointer compatibility with mock macros
+    //Testing pointer compatibility with mock macros
     CppOverrideTest::MockSquare<char>* mockSquare;
     
     ssTEST_INIT_TEST_GROUP();
+    ssTEST_PARSE_ARGS(argc, argv);
     
-    ssTEST_COMMON_SET_UP
+    ssTEST_COMMON_SETUP
     {
         mockSquare = new CppOverrideTest::MockSquare<char>();
     };
     
-    ssTEST_COMMON_CLEAN_UP
+    ssTEST_COMMON_CLEANUP
     {
         delete mockSquare;
         mockSquare = nullptr;
@@ -66,9 +67,9 @@ int main()
         (
             std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             
-            std::tuple<float, uint8_t> overrideTuple = std::make_tuple(1.f, 5);
-            std::tuple<float, uint8_t> testTuple = std::make_tuple(3.f, 15);
-            std::tuple<float, uint8_t> test2Tuple = std::make_tuple(3.f, 16);
+            std::tuple<float, uint8_t> overrideTuple = std::make_tuple<float, uint8_t>(1.f, 5);
+            std::tuple<float, uint8_t> testTuple = std::make_tuple<float, uint8_t>(3.f, 15);
+            std::tuple<float, uint8_t> test2Tuple = std::make_tuple<float, uint8_t>(3.f, 16);
             
             CO_SETUP_OVERRIDE   ((*mockSquare), TestTemplateFunc)
                                 .WhenCalledWith(testTuple, 20.f)

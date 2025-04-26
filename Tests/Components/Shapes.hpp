@@ -49,7 +49,7 @@ namespace CppOverrideTest
             inline virtual void SetWidth(int width)
             {
                 CO_OVERRIDE_IMPL(Overrider, void, (width));
-                Width = width;
+                Width = (float)width;
             }
             
             inline virtual float GetWidth(float multiplier = 1.f) const
@@ -79,7 +79,7 @@ namespace CppOverrideTest
             inline virtual void SetHeight(int height)
             {
                 CO_OVERRIDE_IMPL(Overrider, void, (height));
-                Height = height;
+                Height = (float)height;
             }
             
             inline virtual float GetHeight(float multiplier = 1.f) const

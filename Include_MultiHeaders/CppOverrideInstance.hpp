@@ -137,7 +137,7 @@ namespace CppOverride
                 outOverrideArgs = false;
                 outOverrideReturn = false;
                 outDontReturn = false;
-                for(int i = 0; i < currentDataList.size(); ++i)
+                for(int i = 0; i < (int)currentDataList.size(); ++i)
                 {
                     //Match the correct instance if any
                     if( currentDataList.at(i).Instance != nullptr && 
@@ -190,10 +190,10 @@ namespace CppOverride
                         //If something is wrong internally, notify everything
                         if(internalStatus != OverrideStatus::NO_OVERRIDE)
                         {
-                            for(int i = 0; i < currentDataList.size(); i++)
+                            for(int j = 0; j < (int)currentDataList.size(); j++)
                             {
-                                if(currentDataList.at(i).Result != nullptr)
-                                    currentDataList.at(i).Result->AddStatus(internalStatus);
+                                if(currentDataList.at(j).Result != nullptr)
+                                    currentDataList.at(j).Result->AddStatus(internalStatus);
                             }
                         }
                         
