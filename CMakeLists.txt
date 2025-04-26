@@ -29,7 +29,8 @@ else()
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(STANDARD_COMPILE_FLAGS "/utf-8;/Wall")
+    # W4668: https://developercommunity.visualstudio.com/t/Including-limitsh-triggers-error-__STDC/10514743?sort=newest
+    set(STANDARD_COMPILE_FLAGS "/utf-8;/W4;/WX;/wd4172;/wd4464;/wd4626;/wd4668;/wd4702;/wd4820;/wd4840")
     set(STANDARD_LINK_FLAGS "")
 else()
     set(STANDARD_COMPILE_FLAGS  "-Wall"

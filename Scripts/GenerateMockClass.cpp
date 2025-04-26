@@ -247,7 +247,7 @@ inline std::string Trim(std::string line)
     }
     
     int lastCharIndex = -1;
-    for(int i = line.size() - 1; i >= 0; --i)
+    for(int i = (int)line.size() - 1; i >= 0; --i)
     {
         if(line[i] != ' ' && line[i] != '\t')
         {
@@ -398,7 +398,7 @@ bool ProcessEndOfFunctionDeclaration(const std::string& token, Parser& outParser
     if(token == ";" || token == "{")
     {
         //Handle function append attributes
-        for(int i = outParser.CurrentTokens.size() - 1; i >= 0; --i)
+        for(int i = (int)outParser.CurrentTokens.size() - 1; i >= 0; --i)
         {
             if(outParser.CurrentTokens[i] == ")")
             {
@@ -446,7 +446,7 @@ bool ProcessFunctionParameters(const std::string& token, Parser& outParser)
     if(token == "(")
     {
         outParser.CurrentParenthesis.push(ParenthesisDetails(   false, 
-                                                                outParser.CurrentTokens.size()));
+                                                                (int)outParser.CurrentTokens.size()));
         
         outParser.CurrentTokens.push_back(token);
         return true;
@@ -540,7 +540,7 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
         
         //Handle operator
         int operatorIndex = -1;
-        for(int i = outParser.CurrentTokens.size() - 1; i >= 0; --i)
+        for(int i = (int)outParser.CurrentTokens.size() - 1; i >= 0; --i)
         {
             const std::string operatorStr = "operator";
             
@@ -563,7 +563,7 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
         else
         {
             outParser.CurrentFunction.Name = outParser.CurrentTokens.back();
-            returnIndexInclusiveEnd = outParser.CurrentTokens.size() - 2;
+            returnIndexInclusiveEnd = (int)outParser.CurrentTokens.size() - 2;
         }
         
         //Handle constructor destructor
@@ -639,7 +639,7 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
                     const std::string& currentToken = 
                         outParser.CurrentTokens.at(returnIndexInclusiveEnd);
                     
-                    int currentTokenSize = currentToken.size();
+                    int currentTokenSize = (int)currentToken.size();
                     
                     if( currentTokenSize > i + 1 && currentToken.at(currentTokenSize - 1) == ':')
                         ++currentTokenColonCount;
@@ -669,7 +669,7 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
             prependIndexInclusiveEnd = returnIndexInclusiveEnd - 1;
         //Constructor or destructor, anything before the function name should be prepended
         else
-            prependIndexInclusiveEnd = outParser.CurrentTokens.size() - 2;
+            prependIndexInclusiveEnd = (int)outParser.CurrentTokens.size() - 2;
         
         if(prependIndexInclusiveEnd >= 0)
         {
@@ -678,7 +678,7 @@ bool ProcessBeforeFunctionParameters(const std::string& token, Parser& outParser
         }
         
         outParser.CurrentState |= ParseState::IN_FUNCTION_DECLARATION;
-        outParser.CurrentParenthesis.push(ParenthesisDetails(true, outParser.CurrentTokens.size()));
+        outParser.CurrentParenthesis.push(ParenthesisDetails(true, (int)outParser.CurrentTokens.size()));
         outParser.CurrentTokens.push_back(token);
         return true;
     }
@@ -837,7 +837,7 @@ bool ProcessNamespace(const std::string& token, Parser& outParser)
     
     if(outParser.CurrentState == ParseState::IN_NAMESPACE_DECLARATION && token == "{")
     {
-        for(int i = outParser.CurrentTokens.size() - 1; i >= 0; --i)
+        for(int i = (int)outParser.CurrentTokens.size() - 1; i >= 0; --i)
         {
             if(outParser.CurrentTokens[i] == "namespace" && i < outParser.CurrentTokens.size() - 1)
             {
@@ -1030,7 +1030,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         int extensionIndex = -1;
         int parentDirIndex = -1;
         
-        for(int i = originalFileName.size() - 1; i >= 0; --i)
+        for(int i = (int)originalFileName.size() - 1; i >= 0; --i)
         {
             if(originalFileName.at(i) == '.' && extensionIndex == -1)
                 extensionIndex = i;
@@ -1043,7 +1043,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         
         int substrStartIndex = parentDirIndex == -1 ? 0 : parentDirIndex + 1;
         int substrLength =  extensionIndex == -1 ? 
-                            originalFileName.size() - substrStartIndex :
+                            (int)originalFileName.size() - substrStartIndex :
                             extensionIndex - substrStartIndex - 1;
         
         headerGuardName = std::string("MOCK_") + originalFileName.substr(substrStartIndex, substrLength);
@@ -1057,7 +1057,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 continue;
             }
             
-            headerGuardName.at(i) = toupper(headerGuardName.at(i));
+            headerGuardName.at(i) = (char)toupper(headerGuardName.at(i));
         }
         
         headerGuardName += "_HPP";

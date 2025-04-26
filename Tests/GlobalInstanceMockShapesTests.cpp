@@ -11,7 +11,7 @@ int main(int argc, char** argv)
     ssTEST_COMMON_SETUP
     {};
     
-    ssTEST_COMMON_CLEAN_UP
+    ssTEST_COMMON_CLEANUP
     {
         CO_CLEAR_ALL_OVERRIDE_SETUP(OverrideObj);
     };

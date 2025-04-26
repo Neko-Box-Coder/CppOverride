@@ -33,7 +33,7 @@ namespace CppOverride
             inline int GetSucceedCount()
             {
                 int succeedCounter = 0;
-                for(int i = 0; i < Statuses.size(); ++i)
+                for(size_t i = 0; i < Statuses.size(); ++i)
                 {
                     if(Statuses.at(i) == OverrideStatus::OVERRIDE_SUCCESS)
                         ++succeedCounter;
@@ -45,7 +45,7 @@ namespace CppOverride
             inline int GetFailedCount()
             {
                 int failedCounter = 0;
-                for(int i = 0; i < Statuses.size(); ++i)
+                for(size_t i = 0; i < Statuses.size(); ++i)
                 {
                     if(Statuses.at(i) != OverrideStatus::OVERRIDE_SUCCESS)
                         ++failedCounter;
@@ -56,7 +56,7 @@ namespace CppOverride
             
             inline int GetStatusCount()
             {
-                return Statuses.size();
+                return (int)Statuses.size();
             }
             
             inline bool LastStatusSucceed()
@@ -80,7 +80,7 @@ namespace CppOverride
             
             inline bool HasStatus(OverrideStatus status)
             {
-                for(int i = 0; i < Statuses.size(); ++i)
+                for(size_t i = 0; i < Statuses.size(); ++i)
                 {
                     if(Statuses.at(i) == status)
                         return true;

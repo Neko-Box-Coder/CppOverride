@@ -2818,7 +2818,7 @@ namespace CppOverride
             inline int GetSucceedCount()
             {
                 int succeedCounter = 0;
-                for(int i = 0; i < Statuses.size(); ++i)
+                for(size_t i = 0; i < Statuses.size(); ++i)
                 {
                     if(Statuses.at(i) == OverrideStatus::OVERRIDE_SUCCESS)
                         ++succeedCounter;
@@ -2830,7 +2830,7 @@ namespace CppOverride
             inline int GetFailedCount()
             {
                 int failedCounter = 0;
-                for(int i = 0; i < Statuses.size(); ++i)
+                for(size_t i = 0; i < Statuses.size(); ++i)
                 {
                     if(Statuses.at(i) != OverrideStatus::OVERRIDE_SUCCESS)
                         ++failedCounter;
@@ -2841,7 +2841,7 @@ namespace CppOverride
             
             inline int GetStatusCount()
             {
-                return Statuses.size();
+                return (int)Statuses.size();
             }
             
             inline bool LastStatusSucceed()
@@ -2865,7 +2865,7 @@ namespace CppOverride
             
             inline bool HasStatus(OverrideStatus status)
             {
-                for(int i = 0; i < Statuses.size(); ++i)
+                for(size_t i = 0; i < Statuses.size(); ++i)
                 {
                     if(Statuses.at(i) == status)
                         return true;
@@ -4995,7 +4995,7 @@ namespace CppOverride
                 outOverrideArgs = false;
                 outOverrideReturn = false;
                 outDontReturn = false;
-                for(int i = 0; i < currentDataList.size(); ++i)
+                for(int i = 0; i < (int)currentDataList.size(); ++i)
                 {
                     //Match the correct instance if any
                     if( currentDataList.at(i).Instance != nullptr && 
@@ -5048,10 +5048,10 @@ namespace CppOverride
                         //If something is wrong internally, notify everything
                         if(internalStatus != OverrideStatus::NO_OVERRIDE)
                         {
-                            for(int i = 0; i < currentDataList.size(); i++)
+                            for(int j = 0; j < (int)currentDataList.size(); j++)
                             {
-                                if(currentDataList.at(i).Result != nullptr)
-                                    currentDataList.at(i).Result->AddStatus(internalStatus);
+                                if(currentDataList.at(j).Result != nullptr)
+                                    currentDataList.at(j).Result->AddStatus(internalStatus);
                             }
                         }
                         
