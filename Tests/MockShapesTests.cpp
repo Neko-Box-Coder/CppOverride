@@ -2,14 +2,15 @@
 #include "ssTest.hpp"
 
 
-int main()
+int main(int argc, char** argv)
 {
-    // Testing pointer compatibility with mock macros
+    //Testing pointer compatibility with mock macros
     CppOverrideTest::MockSquare<char>* mockSquare;
     
     ssTEST_INIT_TEST_GROUP();
+    ssTEST_PARSE_ARGS(argc, argv);
     
-    ssTEST_COMMON_SET_UP
+    ssTEST_COMMON_SETUP
     {
         mockSquare = new CppOverrideTest::MockSquare<char>();
     };

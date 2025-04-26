@@ -5,10 +5,12 @@
 
 CppOverride::Overrider OverrideObj;
 
-int main()
+int main(int argc, char** argv)
 {
     ssTEST_INIT_TEST_GROUP();
-    ssTEST_COMMON_SET_UP
+    ssTEST_PARSE_ARGS(argc, argv);
+    
+    ssTEST_COMMON_SETUP
     {
         OverrideObj = CppOverride::Overrider();
     };
