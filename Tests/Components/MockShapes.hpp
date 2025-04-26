@@ -41,6 +41,7 @@ public:
     CO_OVERRIDE_MEMBER_METHOD(*this, T, GetMetaData, (), virtual, const, ())
     CO_OVERRIDE_MEMBER_METHOD(*this, void, GetMetaData, (T&), virtual, const, (/* no default */))
     CO_OVERRIDE_MEMBER_METHOD(*this, void, GetMetaData, (T*), virtual, const, (/* no default */))
+    CO_OVERRIDE_MEMBER_METHOD(*this, MockSquare&, GetThis, (), virtual, /* no append */, (/* no default */))
 };
 
 }

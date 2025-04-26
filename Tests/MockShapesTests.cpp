@@ -40,6 +40,26 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
     };
     
+    ssTEST("Return Reference In Mock Class Should Be Overridable")
+    {
+        ssTEST_OUTPUT_SETUP
+        (
+            CppOverrideTest::MockSquare<char> mockSquare2 = {};
+            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
+            CO_SETUP_OVERRIDE   ((*mockSquare), GetThis)
+                                .Returns<CppOverrideTest::MockSquare<char>&>(mockSquare2)
+                                .AssignResult(result);
+        );
+
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::MockSquare<char>& thisRef = mockSquare->GetThis();
+        );
+
+        ssTEST_OUTPUT_ASSERT(&thisRef == &mockSquare2);
+        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
+    };
+    
     ssTEST("Argument Value In Mock Class Should Be Overridable")
     {
         ssTEST_OUTPUT_SETUP
