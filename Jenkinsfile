@@ -214,7 +214,7 @@ pipeline
                         unstash 'source'
                         bat 'dir'
                         bat 'mkdir Build'
-                        bat 'cd .\\Build && cmake .. -DCPP_OVERRIDE_BUILD_TEST=ON -DCPP_OVERRIDE_USE_SINGLE_HEADER=OFF && cmake --build . -j 16'
+                        bat 'cd .\\Build && cmake .. -DCPP_OVERRIDE_BUILD_TEST=ON && cmake --build . -j 16'
                         stash 'windows_build'
                     }
                     post { failure { script { FAILED_STAGE = env.STAGE_NAME } } }
@@ -235,6 +235,13 @@ pipeline
                         unstash 'linux_build'
                         bash "ls -lah"
                         bash "ls -lah ./Build"
+                        
+                        echo "Check single header is up to date"
+                        bash "mv ./Include_SingleHeader/CppOverride.hpp ./Include_SingleHeader/CppOverride.hpp.orig"
+                        bash "chmod +x ./GenerateCppOverrideSingleHeader.sh"
+                        bash "./GenerateCppOverrideSingleHeader.sh"
+                        bash "diff ./Include_SingleHeader/CppOverride.hpp ./Include_SingleHeader/CppOverride.hpp.orig"
+                        
                         bash "chmod +x ./Build/RunAllTests.sh"
                         bash "cd ./Build && ./RunAllTests.sh"
                         
