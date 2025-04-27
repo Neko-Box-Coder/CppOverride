@@ -20,10 +20,9 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, MockSquare)
-                                .WhenCalledWith<float, int>(1.f, 2)
-                                .AssignResult(result);
+            CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, MockSquare)
+                                                                .WhenCalledWith<float, int>(1.f, 2)
+                                                                .ReturnResult();
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -78,13 +77,12 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             CppOverrideTest::MockSquare<int> testSquare(1.f, 2);
-            CO_SETUP_OVERRIDE   (OverrideObj, GetArea)
-                                .Returns<float>(13.f)
-                                .WhenCalledWith(42.f)
-                                .OverrideObject(&testSquare)
-                                .AssignResult(result);
+            CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, GetArea)
+                                                                .Returns<float>(13.f)
+                                                                .WhenCalledWith(42.f)
+                                                                .OverrideObject(&testSquare)
+                                                                .ReturnResult();
         );
         ssTEST_OUTPUT_ASSERT(testSquare.GetArea(42.f) == 13.f);
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
@@ -102,13 +100,12 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             CppOverrideTest::MockSquare<int> testSquare(1.f, 2);
-            CO_SETUP_OVERRIDE   (OverrideObj, GetArea)
-                                .Returns<float>(13.f)
-                                .WhenCalledWith(42.f)
-                                .OverrideAny()
-                                .AssignResult(result);
+            CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, GetArea)
+                                                                .Returns<float>(13.f)
+                                                                .WhenCalledWith(42.f)
+                                                                .OverrideAny()
+                                                                .ReturnResult();
         );
         ssTEST_OUTPUT_ASSERT(testSquare.GetArea(42.f) == 13.f);
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());

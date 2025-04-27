@@ -46,9 +46,16 @@ namespace CppOverride
     }
 
     inline OverrideInfoSetter& 
-    OverrideInfoSetter::AssignResult(std::shared_ptr<OverrideResult> result)
+    OverrideInfoSetter::AssignResult(ResultPtr result)
     {
         return CppOverrideObj.AssignResult(*this, result);
+    }
+
+    inline ResultPtr OverrideInfoSetter::ReturnResult()
+    {
+        ResultPtr returnResult = CreateOverrideResult();
+        AssignResult(returnResult);
+        return returnResult;
     }
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverrideObject(const void* instance)

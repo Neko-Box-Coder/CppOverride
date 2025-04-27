@@ -90,7 +90,9 @@ namespace CppOverride
             }
     };
     
-    inline std::shared_ptr<OverrideResult> CreateOverrideResult()
+    using ResultPtr = std::shared_ptr<OverrideResult>;
+    
+    inline ResultPtr CreateOverrideResult()
     {
         return std::make_shared<OverrideResult>();
     }

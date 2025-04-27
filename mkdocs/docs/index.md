@@ -280,6 +280,8 @@ CO_SETUP_OVERRIDE(Override Instance, Function Name)
                  //etc...
 ```
 
+We will talk about all the actions that can be done later.
+
 ???+ example
     ```cpp
     #include "CppOverride.hpp"
@@ -386,12 +388,30 @@ Everytime where there's an attempt to override the function
 (assuming the function name and types match), the result of it can be recorded, 
 whether it was successful or not.
 
-To do so, we first need to create a result object that holds all the results.
+You can create and bind an override result object by calling `ReturnResult()` at the end of 
+`CO_SETUP_OVERRIDE()` chained actions.
 
 ```cpp
-auto result = CppOverride::CreateOverrideResult();
-//Or 
-std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
+CppOverride::ResultPtr result = CO_SETUP_OVERRIDE(YourOverrideInstance, YourFunction).ReturnResult();
+```
+
+`CppOverride::ResultPtr` is just a shared_ptr defined as this 
+
+```cpp
+using ResultPtr = std::shared_ptr<OverrideResult>;
+```
+
+If needed, You can create an override result object explicitly with `CreateOverrideResult()`
+
+```cpp
+CppOverride::ResultPtr result = CppOverride::CreateOverrideResult();
+```
+
+and explicitly bind the result object to an override action:
+
+```cpp
+CO_SETUP_OVERRIDE(Override Instance, Your Function)
+                 .AssignResult(Result Object)
 ```
 
 ??? info
@@ -400,12 +420,6 @@ std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrid
     If the result object goes out of scope, the program will crash when 
     the override instance is trying to dereference and modify this result object
 
-To bind the result object to an override action:
-
-```cpp
-CO_SETUP_OVERRIDE(Override Instance, Your Function)
-                 .AssignResult(Result Object)
-```
 
 Each time when there's an override attempt (whether successful or not), 
 it will add to the list of override status.
@@ -568,7 +582,7 @@ CO_CLEAR_ALL_OVERRIDE_SETUP(Override Instance)
 
 ---
 
-### ↩️ 5. Override Returns
+#### Override Returns
 
 You can override what a function returns by providing a value.
 
@@ -647,7 +661,7 @@ You must cast it to back to return type pointer in order to use it.
 
 ---
 
-### 📬️ 6. Override Arguments Values
+#### Override Arguments Values
 
 ```cpp
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
@@ -762,13 +776,6 @@ Again, you must cast the arguments pointers to their original type pointers in o
 
 Similar to `.SetArgs<...>(...)`, you can use `CO_ANY_TYPE` to match any type or to indicate 
 that it won't be set.
-
----
-
-### 📐 7. Override Rules And Actions
-
-Just like any mocking library, you can also control when and how the override functions will behave,
-as well as registering callbacks when the override is successful or not.
 
 ---
 
@@ -963,7 +970,7 @@ CO_SETUP_OVERRIDE(Override Instance, Your Function)
 
 ---
 
-### 📠 8. Mock Class Generator
+### 📠 5. Mock Class Generator
 
 Unlike other mocking frameworks, we ship with a mock class generator that is built along with
 the project that parses a given header and output the equivalent mock class header.
@@ -983,7 +990,7 @@ or in Windows Powershell
 ./GenerateMockClass <options...> <input header> | Set-Content -Encoding UTF8NoBOM ./MyMockClass.hpp
 ```
 
-### 🔌 9. Overriding External Functions and Objects
+### 🔌 6. Overriding External Functions and Objects
 
 It is very difficult to override external functions or objects since unlike other languages like C#,
 everything is compiled and there's no way to change the behavior of it.

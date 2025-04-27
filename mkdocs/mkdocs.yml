@@ -8,6 +8,7 @@ theme:
     # navigation_depth: 3
     
     name: material
+    custom_dir: overrides
     palette:
     -   scheme: slate
         primary: black
@@ -24,6 +25,11 @@ theme:
     -   toc.integrate
     -   content.code.copy
     -   content.code.select
+    icon: 
+        repo: fontawesome/brands/github
+
+repo_url: https://github.com/Neko-Box-Coder/CppOverride
+repo_name: Neko-Box-Coder/CppOverride
 
 
 extra_css: [extra.css]
@@ -38,4 +44,4 @@ markdown_extensions:
 - pymdownx.details
 - pymdownx.superfences
 -   toc:
-      toc_depth: 3
+      toc_depth: 4

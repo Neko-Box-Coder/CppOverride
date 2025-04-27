@@ -18,22 +18,22 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             int testArg = 1;
             int testArg2 = 1;
             int calledCounter = 0;
             
-            CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
-                                .SetArgs<int*, CO_ANY_TYPE>(5, CO_DONT_SET)
-                                .Returns<int>(32)
-                                .WhenCalledExpectedly_Do
-                                (
-                                    [&calledCounter](...)
-                                    {
-                                        ++calledCounter;
-                                    }
-                                )
-                                .AssignResult(result);
+            CppOverride::ResultPtr result = 
+                CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
+                                    .SetArgs<int*, CO_ANY_TYPE>(5, CO_DONT_SET)
+                                    .Returns<int>(32)
+                                    .WhenCalledExpectedly_Do
+                                    (
+                                        [&calledCounter](...)
+                                        {
+                                            ++calledCounter;
+                                        }
+                                    )
+                                    .ReturnResult();
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -61,33 +61,33 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            std::shared_ptr<CppOverride::OverrideResult> result2 = CppOverride::CreateOverrideResult();
             int testArg = 1;
             int calledCounter = 0;
             
-            CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
-                                .SetArgs<int*, CO_ANY_TYPE>(5, CO_DONT_SET)
-                                .Returns<int>(32)
-                                .WhenCalledExpectedly_Do
-                                (
-                                    [&calledCounter](...)
-                                    {
-                                        ++calledCounter;
-                                    }
-                                )
-                                .AssignResult(result);
+            CppOverride::ResultPtr result = 
+                CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
+                                    .SetArgs<int*, CO_ANY_TYPE>(5, CO_DONT_SET)
+                                    .Returns<int>(32)
+                                    .WhenCalledExpectedly_Do
+                                    (
+                                        [&calledCounter](...)
+                                        {
+                                            ++calledCounter;
+                                        }
+                                    )
+                                    .ReturnResult();
             
-            CO_SETUP_OVERRIDE  (OverrideObj, AddNumFromNumPointerFunc)
-                                .SetArgs<int*, CO_ANY_TYPE>(10, CO_DONT_SET)
-                                .WhenCalledExpectedly_Do
-                                (
-                                    [&calledCounter](...)
-                                    {
-                                        ++calledCounter;
-                                    }
-                                )
-                                .AssignResult(result2);
+            CppOverride::ResultPtr result2 = 
+                CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
+                                    .SetArgs<int*, CO_ANY_TYPE>(10, CO_DONT_SET)
+                                    .WhenCalledExpectedly_Do
+                                    (
+                                        [&calledCounter](...)
+                                        {
+                                            ++calledCounter;
+                                        }
+                                    )
+                                    .ReturnResult();
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -106,19 +106,19 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
             int testArg = 1;
             int calledCounter = 0;
             
-            CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
-                                .WhenCalledExpectedly_Do
-                                (
-                                    [&calledCounter](...)
-                                    {
-                                        ++calledCounter;
-                                    }
-                                )
-                                .AssignResult(result);
+            CppOverride::ResultPtr result = 
+                CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
+                                    .WhenCalledExpectedly_Do
+                                    (
+                                        [&calledCounter](...)
+                                        {
+                                            ++calledCounter;
+                                        }
+                                    )
+                                    .ReturnResult();
         );
         
         ssTEST_OUTPUT_EXECUTION

@@ -26,8 +26,7 @@ namespace CppOverrideTest
         
             inline bool operator ==(const Rectangle& other) const
             {
-                return GetWidth() == other.GetWidth() && 
-                        GetHeight() == other.GetHeight();
+                return GetWidth() == other.GetWidth() && GetHeight() == other.GetHeight();
             }
             
             inline bool operator !=(const Rectangle& other) const

@@ -18,10 +18,9 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             int nums[4] = {0, 1, 2, 3};
-            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, IntArrayParameterFunc)
-                                .Returns<int>(5)
-                                .AssignResult(result);
+            CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, IntArrayParameterFunc)
+                                                                .Returns<int>(5)
+                                                                .ReturnResult();
         );
 
         ssTEST_OUTPUT_EXECUTION
@@ -56,11 +55,10 @@ int main(int argc, char** argv)
         (
             int nums[4] = {0, 1, 2, 3};
             int nums2[4] = {0, 1, 2, 3};
-            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, IntArrayParameterFunc)
-                                .WhenCalledWith(nums)
-                                .Returns<int>(5)
-                                .AssignResult(result);
+            CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, IntArrayParameterFunc)
+                                                                .WhenCalledWith(nums)
+                                                                .Returns<int>(5)
+                                                                .ReturnResult();
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -113,11 +111,10 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             char chars[4] = "abc";
-            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, TemplateArgRefFunc)
-                                .WhenCalledWith(chars)
-                                .Returns<int>(5)
-                                .AssignResult(result);
+            CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, TemplateArgRefFunc)
+                                                                .WhenCalledWith(chars)
+                                                                .Returns<int>(5)
+                                                                .ReturnResult();
         );
         
         ssTEST_OUTPUT_EXECUTION

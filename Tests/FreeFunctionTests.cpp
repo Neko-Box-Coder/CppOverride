@@ -31,10 +31,9 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, MockFreeFunctionA)
-                                .Returns<int>(10)
-                                .AssignResult(result);
+            CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, MockFreeFunctionA)
+                                                                .Returns<int>(10)
+                                                                .ReturnResult();
             
             CO_SETUP_OVERRIDE   (OverrideObj, MockFreeFunctionB)
                                 .Returns<int>(10)
