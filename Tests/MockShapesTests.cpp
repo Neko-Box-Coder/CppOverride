@@ -27,7 +27,7 @@ int main(int argc, char** argv)
         (
             CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   ((*mockSquare), GetWidth)
                                                                 .Returns<float>(3.f)
-                                                                .ReturnResult();
+                                                                .ReturnsResult();
         );
 
         ssTEST_OUTPUT_EXECUTION
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
             CppOverride::ResultPtr result = 
                 CO_SETUP_OVERRIDE   ((*mockSquare), GetThis)
                                     .Returns<CppOverrideTest::MockSquare<char>&>(mockSquare2)
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
 
         ssTEST_OUTPUT_EXECUTION
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
             CppOverride::ResultPtr result = 
                 CO_SETUP_OVERRIDE   ((*mockSquare), GetWidth)
                                     .SetArgs<float&, CO_ANY_TYPE>(10.f, CO_ANY)
-                                    .ReturnResult();
+                                    .ReturnsResult();
             float width;
         );
 
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
                                     .WhenCalledWith(testTuple, 20.f)
                                     .Returns<std::tuple<float, uint8_t>>(overrideTuple)
                                     //.SetArgs<const std::tuple<float, uint8_t>&, float>(overrideTuple, 20)
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
         
         ssTEST_OUTPUT_EXECUTION

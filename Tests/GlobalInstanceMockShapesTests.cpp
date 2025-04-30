@@ -22,7 +22,7 @@ int main(int argc, char** argv)
         (
             CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, MockSquare)
                                                                 .WhenCalledWith<float, int>(1.f, 2)
-                                                                .ReturnResult();
+                                                                .ReturnsResult();
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -64,8 +64,8 @@ int main(int argc, char** argv)
                                             destructInstance = instance;
                                         }
                                     )
-                                    .OverrideObject(&testSquare)
-                                    .AssignResult(result);
+                                    .OverridesObject(&testSquare)
+                                    .AssignsResult(result);
             );
         }
         
@@ -81,8 +81,8 @@ int main(int argc, char** argv)
             CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, GetArea)
                                                                 .Returns<float>(13.f)
                                                                 .WhenCalledWith(42.f)
-                                                                .OverrideObject(&testSquare)
-                                                                .ReturnResult();
+                                                                .OverridesObject(&testSquare)
+                                                                .ReturnsResult();
         );
         ssTEST_OUTPUT_ASSERT(testSquare.GetArea(42.f) == 13.f);
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
                                                                 .Returns<float>(13.f)
                                                                 .WhenCalledWith(42.f)
                                                                 .OverrideAny()
-                                                                .ReturnResult();
+                                                                .ReturnsResult();
         );
         ssTEST_OUTPUT_ASSERT(testSquare.GetArea(42.f) == 13.f);
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());

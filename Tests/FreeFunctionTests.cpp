@@ -33,11 +33,11 @@ int main(int argc, char** argv)
         (
             CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, MockFreeFunctionA)
                                                                 .Returns<int>(10)
-                                                                .ReturnResult();
+                                                                .ReturnsResult();
             
             CO_SETUP_OVERRIDE   (OverrideObj, MockFreeFunctionB)
                                 .Returns<int>(10)
-                                .AssignResult(result);
+                                .AssignsResult(result);
         );
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionA(1) == 10);

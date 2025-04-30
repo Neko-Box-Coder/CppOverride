@@ -21,7 +21,7 @@ int main(int argc, char** argv)
         (
             CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
                                                                 .Returns<int>(32)
-                                                                .ReturnResult();
+                                                                .ReturnsResult();
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 32);
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
         (
             CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, ReturnStringFunc)
                                                                 .Returns<std::string>("test")
-                                                                .ReturnResult();
+                                                                .ReturnsResult();
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::ReturnStringFunc(1) == "test");
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
         (
             CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, AssignArgInternallyFunc)
                                                                 .ReturnsVoid()
-                                                                .ReturnResult();
+                                                                .ReturnsResult();
             std::string testString = "test";
             std::string testString2 = "test2";
         );
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
             CO_CLEAR_ALL_OVERRIDE_SETUP(OverrideObj);
             CO_SETUP_OVERRIDE   (OverrideObj, AssignArgInternallyFunc)
                                 .Returns<void>()
-                                .AssignResult(result);
+                                .AssignsResult(result);
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
             int testNum = 1;
             CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, ReturnReferenceFunc)
                                                                 .Returns<int&>(testNum)
-                                                                .ReturnResult();
+                                                                .ReturnsResult();
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
             int testNum = 1;
             CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, ReturnPointerFunc)
                                                                 .Returns<int*>(&testNum)
-                                                                .ReturnResult();
+                                                                .ReturnsResult();
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
             CppOverride::ResultPtr result = 
                 CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
                                     .Returns<CO_ANY_TYPE>(CO_DONT_OVERRIDE_RETURN)
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
@@ -126,7 +126,7 @@ int main(int argc, char** argv)
         (
             CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
                                                                 .Returns<float>(2.f)
-                                                                .ReturnResult();
+                                                                .ReturnsResult();
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
         ssTEST_OUTPUT_ASSERT(result->GetStatusCount() == 0);
@@ -140,7 +140,7 @@ int main(int argc, char** argv)
             CppOverride::ResultPtr result = 
                 CO_SETUP_OVERRIDE   (OverrideObj, ReturnObjectFunc)
                                     .Returns<CppOverrideTest::TestClass>(assertObject)
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
         using namespace CppOverrideTest::NonConst::Object;
         ssTEST_OUTPUT_ASSERT(ReturnObjectFunc(1, 3.0, "test 2") == assertObject);
@@ -156,7 +156,7 @@ int main(int argc, char** argv)
             CppOverride::ResultPtr result = 
                 CO_SETUP_OVERRIDE   (OverrideObj, TemplateReturnFunc)
                                     .Returns<CppOverrideTest::TestClass>(assertObject)
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
         using namespace CppOverrideTest::NonConst::Template;
         ssTEST_OUTPUT_ASSERT(TemplateReturnFunc<CppOverrideTest::TestClass>(testObject) == assertObject);
@@ -176,7 +176,7 @@ int main(int argc, char** argv)
                                             (*(int*)(out)) = 10;
                                         }
                                     )
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 10);
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());

@@ -2931,10 +2931,13 @@ namespace CppOverride
                                                         const std::vector<void*>& args)> action);
             
             OverrideInfoSetter& AssignResult(ResultPtr result);
+            OverrideInfoSetter& AssignsResult(ResultPtr result);
             
             ResultPtr ReturnResult();
+            ResultPtr ReturnsResult();
             
             OverrideInfoSetter& OverrideObject(const void* instance);
+            OverrideInfoSetter& OverridesObject(const void* instance);
             
             OverrideInfoSetter& OverrideAny();
             
@@ -5379,6 +5382,12 @@ namespace CppOverride
         return CppOverrideObj.AssignResult(*this, result);
     }
 
+    inline OverrideInfoSetter& 
+    OverrideInfoSetter::AssignsResult(ResultPtr result)
+    {
+        return AssignResult(result);
+    }
+
     inline ResultPtr OverrideInfoSetter::ReturnResult()
     {
         ResultPtr returnResult = CreateOverrideResult();
@@ -5386,9 +5395,19 @@ namespace CppOverride
         return returnResult;
     }
 
+    inline ResultPtr OverrideInfoSetter::ReturnsResult()
+    {
+        return ReturnResult();
+    }
+
     inline OverrideInfoSetter& OverrideInfoSetter::OverrideObject(const void* instance)
     {
         return CppOverrideObj.OverrideObject(*this, (void*)instance);
+    }
+
+    inline OverrideInfoSetter& OverrideInfoSetter::OverridesObject(const void* instance)
+    {
+        return OverrideObject(instance);
     }
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverrideAny()
@@ -5434,8 +5453,7 @@ namespace CppOverride
     
     template<typename... Args>
     inline OverrideInfoSetter&
-    OverrideInfoSetter::
-    SetArgsByAction(std::function<void( void* instance, 
+    OverrideInfoSetter::SetArgsByAction(std::function<void( void* instance, 
                                         std::vector<void*>& args)> setArgsAction)
     {
         return CppOverrideObj.SetArgsByAction<Args...>(*this, setArgsAction);

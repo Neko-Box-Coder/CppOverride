@@ -356,7 +356,7 @@ If you want to override a function for a specific object,
 you can specify with 
 ```cpp
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
-                 .OverrideObject(Your Object address)
+                 .OverridesObject(Your Object address)
 ```
 
 !!! note
@@ -372,7 +372,7 @@ CO_SETUP_OVERRIDE(Override Instance, Your Function)
         
         CO_SETUP_OVERRIDE(classObject, MemberFunction)
                          .WhenCalledWith(1, 2.f)
-                         .OverrideObject(&classObject2)
+                         .OverridesObject(&classObject2)
                          .Returns<int>(42);
         
         int result = classObject.MemberFunction(1, 2.f);    //Won't override
@@ -388,11 +388,11 @@ Everytime where there's an attempt to override the function
 (assuming the function name and types match), the result of it can be recorded, 
 whether it was successful or not.
 
-You can create and bind an override result object by calling `ReturnResult()` at the end of 
+You can create and bind an override result object by calling `ReturnsResult()` at the end of 
 `CO_SETUP_OVERRIDE()` chained actions.
 
 ```cpp
-CppOverride::ResultPtr result = CO_SETUP_OVERRIDE(YourOverrideInstance, YourFunction).ReturnResult();
+CppOverride::ResultPtr result = CO_SETUP_OVERRIDE(YourOverrideInstance, YourFunction).ReturnsResult();
 ```
 
 `CppOverride::ResultPtr` is just a shared_ptr defined as this 
@@ -411,7 +411,7 @@ and explicitly bind the result object to an override action:
 
 ```cpp
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
-                 .AssignResult(Result Object)
+                 .AssignsResult(Result Object)
 ```
 
 ??? info
@@ -508,7 +508,7 @@ class OverrideResult
     CO_SETUP_OVERRIDE(MyOverrideInstance, FreeFunction)
                      .WhenCalledWith(2, 3.f)
                      .Returns<int>(1)
-                     .AssignResult(result);
+                     .AssignsResult(result);
 
     int ret1 = FreeFunction(1, 2.f);
     assert(result->GetLastStatus() == OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);

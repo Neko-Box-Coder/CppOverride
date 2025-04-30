@@ -35,7 +35,7 @@ int main(int argc, char** argv)
                                         }
                                     )
                                     .Returns<int>(1)
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
     
         ssTEST_OUTPUT_ASSERT(   "Meet If Condition", 
@@ -79,7 +79,7 @@ int main(int argc, char** argv)
                                                 std::string&>(  CO_DONT_SET, 
                                                                 CO_DONT_SET, 
                                                                 "Test String 2")
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
         
         ssTEST_OUTPUT_EXECUTION

@@ -33,7 +33,7 @@ int main(int argc, char** argv)
                                             ++calledCounter;
                                         }
                                     )
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
                                             ++calledCounter;
                                         }
                                     )
-                                    .ReturnResult();
+                                    .ReturnsResult();
             
             CppOverride::ResultPtr result2 = 
                 CO_SETUP_OVERRIDE   (OverrideObj, AddNumFromNumPointerFunc)
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
                                             ++calledCounter;
                                         }
                                     )
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
                                             ++calledCounter;
                                         }
                                     )
-                                    .ReturnResult();
+                                    .ReturnsResult();
         );
         
         ssTEST_OUTPUT_EXECUTION

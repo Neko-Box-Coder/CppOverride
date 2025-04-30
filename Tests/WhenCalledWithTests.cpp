@@ -22,7 +22,7 @@ int main(int argc, char** argv)
         CO_SETUP_OVERRIDE   (OverrideObj, ArgsFunc)
                             .Returns<int>(1)
                             .WhenCalledWith(1, true, 2.f)
-                            .AssignResult(result);
+                            .AssignsResult(result);
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::ArgsFunc(1, true, 2.f) == 1);
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions",
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
                                                                                 true, 
                                                                                 "test")
                             .WhenCalledWith(5, CO_ANY, CO_ANY, CO_ANY)
-                            .AssignResult(result);
+                            .AssignsResult(result);
         
         ssTEST_OUTPUT_SETUP
         (
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
         CO_SETUP_OVERRIDE   (OverrideObj, ArgsFunc)
                             .WhenCalledWith(CO_ANY, CO_ANY, CO_ANY)
                             .Returns<int>(1)
-                            .AssignResult(result);
+                            .AssignsResult(result);
 
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::ArgsFunc(1, false, 2.f) == 1);
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
             (CO_SETUP_OVERRIDE  (OverrideObj, ConstVoidPointerFunc)
                                 .WhenCalledWith<const void*, int>(&testArg, 2)
                                 .Returns<int>(1))
-                                .AssignResult(result);
+                                .AssignsResult(result);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::Const::ConstVoidPointerFunc(&testArg, 2) == 1);
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
@@ -128,7 +128,7 @@ int main(int argc, char** argv)
                                         std::string&>(  CO_DONT_SET, 
                                                         CO_DONT_SET, 
                                                         "test")
-                            .AssignResult(result);
+                            .AssignsResult(result);
 
         ssTEST_OUTPUT_SETUP
         (
@@ -162,7 +162,7 @@ int main(int argc, char** argv)
                                         std::string&>(  CO_DONT_SET, 
                                                         CO_DONT_SET, 
                                                         "test")
-                            .AssignResult(result);
+                            .AssignsResult(result);
 
         ssTEST_OUTPUT_EXECUTION
         (
@@ -204,7 +204,7 @@ int main(int argc, char** argv)
                                         CO_ANY_TYPE>(   CO_DONT_SET, 
                                                         3.f, 
                                                         CO_DONT_SET)
-                            .AssignResult(result);
+                            .AssignsResult(result);
         
         ssTEST_OUTPUT_EXECUTION
         (
@@ -242,7 +242,7 @@ int main(int argc, char** argv)
         CO_SETUP_OVERRIDE   (OverrideObj, ConstStringRefArgFunc)
                             .WhenCalledWith<std::string>("test")
                             .Returns<int>(5)
-                            .AssignResult(result);
+                            .AssignsResult(result);
         
         ssTEST_OUTPUT_ASSERT(   "Meet WhenCalledWith Conditions", 
                                 CppOverrideTest::Const::ConstStringRefArgFunc(testString) == 5);
@@ -280,7 +280,7 @@ int main(int argc, char** argv)
                                                                             CO_DONT_SET, 
                                                                             overrideObject)
                                 .Returns<bool>(true)
-                                .AssignResult(result);
+                                .AssignsResult(result);
         );
 
         ssTEST_OUTPUT_EXECUTION
@@ -324,7 +324,7 @@ int main(int argc, char** argv)
             CO_SETUP_OVERRIDE   (OverrideObj, TemplateReturnFunc)
                                 .WhenCalledWith(conditionTemplate)
                                 .Returns<CppOverrideTest::TemplateTestClass<int>>(returnTemplate)
-                                .AssignResult(result);
+                                .AssignsResult(result);
         );
 
         namespace CppOverrideTemplateTest = CppOverrideTest::NonConst::Template;
@@ -360,7 +360,7 @@ int main(int argc, char** argv)
             CO_SETUP_OVERRIDE   (rect, GetWidth)
                                 .WhenCalledWith(2.f)
                                 .Returns<float>(5.f)
-                                .AssignResult(result);
+                                .AssignsResult(result);
         );
         
         ssTEST_OUTPUT_ASSERT("Meet WhenCalledWith Conditions", rect.GetWidth(2.f) == 5.f);
@@ -387,7 +387,7 @@ int main(int argc, char** argv)
             CO_SETUP_OVERRIDE   (OverrideObj, TemplateReturnFunc)
                                 .WhenCalledWith(testDummy)
                                 .Returns<CppOverrideTest::NonComparableTestClass>(returnDummy)
-                                .AssignResult(result);
+                                .AssignsResult(result);
         );
         
         namespace CppOverrideTemplateTest = CppOverrideTest::NonConst::Template;

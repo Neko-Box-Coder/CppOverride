@@ -51,10 +51,13 @@ namespace CppOverride
                                                         const std::vector<void*>& args)> action);
             
             OverrideInfoSetter& AssignResult(ResultPtr result);
+            OverrideInfoSetter& AssignsResult(ResultPtr result);
             
             ResultPtr ReturnResult();
+            ResultPtr ReturnsResult();
             
             OverrideInfoSetter& OverrideObject(const void* instance);
+            OverrideInfoSetter& OverridesObject(const void* instance);
             
             OverrideInfoSetter& OverrideAny();
             
