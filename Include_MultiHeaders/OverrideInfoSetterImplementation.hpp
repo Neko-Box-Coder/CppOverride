@@ -85,7 +85,7 @@ namespace CppOverride
     }
 
     template<typename ReturnType>
-    inline OverrideInfoSetter& 
+    inline OverrideInfoSetter&
     OverrideInfoSetter::ReturnsByAction(std::function<void( void* instance,
                                                             const std::vector<void*>& args, 
                                                             void* out)> returnAction)
@@ -114,7 +114,7 @@ namespace CppOverride
     }
     
     template<typename... Args>
-    inline OverrideInfoSetter& 
+    inline OverrideInfoSetter&
     OverrideInfoSetter::SetArgs(typename TypeUnwrapper<Args>::Type... args)
     {
         return CppOverrideObj.SetArgs<Args...>(*this, args...);

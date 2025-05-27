@@ -3,7 +3,6 @@
 
 #include "../OverrideInfoSetterDeclaration.hpp"
 #include "../Internal_OverrideData.hpp"
-#include "../StaticAssertFalse.hpp"
 #include "../Any.hpp"
 
 #include <iostream>
@@ -49,8 +48,8 @@ namespace CppOverride
             template
             <
                 typename ReturnType,
-                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type
+                typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
+                typename std::enable_if<!std::is_reference<ReturnType>::value, bool>::type = true
             >
             inline OverrideInfoSetter& Returns( OverrideInfoSetter& infoSetter, 
                                                 ReturnType returnData)
@@ -79,9 +78,8 @@ namespace CppOverride
             template
             <
                 typename ReturnType,
-                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
-                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type
+                typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
+                typename std::enable_if<std::is_reference<ReturnType>::value, bool>::type = true
             >
             inline OverrideInfoSetter& Returns( OverrideInfoSetter& infoSetter, 
                                                 ReturnType returnData)
@@ -119,9 +117,11 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            template<   typename ReturnType,
-                        typename = typename std::enable_if<std::is_same<ReturnType, 
-                                                                        void>::value>::type>
+            template
+            <
+                typename ReturnType,
+                typename std::enable_if<std::is_same<ReturnType, void>::value, bool>::type = true
+            >
             inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter)
             {
                 return ReturnsVoid(infoSetter);

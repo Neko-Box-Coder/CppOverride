@@ -2754,26 +2754,18 @@ namespace CppOverride
     template<typename T>
     struct TypeUnwrapper
     <
-        T, 
-        typename std::enable_if
-        <
-            !std::is_same<INTERNAL_CO_UNCONST(T), void*>::value
-        >::type
+        T, typename std::enable_if<!std::is_same<INTERNAL_CO_UNCONST(T), void*>::value>::type
     >
-    { 
+    {
         using Type = INTERNAL_CO_PURE_TYPE(T);
     };
     
     template<typename T>
     struct TypeUnwrapper
     <
-        T, 
-        typename std::enable_if
-        <
-            std::is_same<INTERNAL_CO_UNCONST(T), void*>::value
-        >::type
+        T, typename std::enable_if<std::is_same<INTERNAL_CO_UNCONST(T), void*>::value>::type
     >
-    { 
+    {
         using Type = INTERNAL_CO_UNCONST(T);
     };
 }
@@ -3160,22 +3152,6 @@ namespace CppOverride
 
 #endif
 
-//=================================================================
-//./Include_MultiHeaders/StaticAssertFalse.hpp
-//=================================================================
-#ifndef CO_STATIC_ASSERT_FALSE_HPP
-#define CO_STATIC_ASSERT_FALSE_HPP
-
-#include <type_traits>
-
-namespace CppOverride
-{
-    template<typename T>
-    struct CoAssertFalseType : std::false_type { };
-}
-
-#endif
-
 
 
 #include <iostream>
@@ -3221,8 +3197,8 @@ namespace CppOverride
             template
             <
                 typename ReturnType,
-                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type
+                typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
+                typename std::enable_if<!std::is_reference<ReturnType>::value, bool>::type = true
             >
             inline OverrideInfoSetter& Returns( OverrideInfoSetter& infoSetter, 
                                                 ReturnType returnData)
@@ -3251,9 +3227,8 @@ namespace CppOverride
             template
             <
                 typename ReturnType,
-                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
-                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type
+                typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
+                typename std::enable_if<std::is_reference<ReturnType>::value, bool>::type = true
             >
             inline OverrideInfoSetter& Returns( OverrideInfoSetter& infoSetter, 
                                                 ReturnType returnData)
@@ -3291,9 +3266,11 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            template<   typename ReturnType,
-                        typename = typename std::enable_if<std::is_same<ReturnType, 
-                                                                        void>::value>::type>
+            template
+            <
+                typename ReturnType,
+                typename std::enable_if<std::is_same<ReturnType, void>::value, bool>::type = true
+            >
             inline OverrideInfoSetter& Returns(OverrideInfoSetter& infoSetter)
             {
                 return ReturnsVoid(infoSetter);
@@ -3317,6 +3294,21 @@ namespace CppOverride
 
 
 
+//=================================================================
+//./Include_MultiHeaders/StaticAssertFalse.hpp
+//=================================================================
+#ifndef CO_STATIC_ASSERT_FALSE_HPP
+#define CO_STATIC_ASSERT_FALSE_HPP
+
+#include <type_traits>
+
+namespace CppOverride
+{
+    template<typename T>
+    struct CoAssertFalseType : std::false_type { };
+}
+
+#endif
 
 
 
@@ -3553,7 +3545,6 @@ namespace CppOverride
 
 
 
-
 #include <cassert>
 #include <unordered_map>
 #include <iostream>
@@ -3587,11 +3578,14 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            template<   typename T, 
-                        typename... Args, 
-                        typename = typename std::enable_if<std::is_same<INTERNAL_CO_PURE_TYPE(T), 
-                                                                        void>::value>::type,
-                        typename PureType = INTERNAL_CO_PURE_TYPE(T)>
+            template
+            <
+                typename T, 
+                typename... Args, 
+                typename std::enable_if<std::is_same<   INTERNAL_CO_PURE_TYPE(T), 
+                                                        void>::value, bool>::type = true,
+                typename PureType = INTERNAL_CO_PURE_TYPE(T)
+            >
             inline OverrideInfoSetter& WhenCalledWith(  OverrideInfoSetter& infoSetter,
                                                         T arg, 
                                                         Args... args)
@@ -3611,10 +3605,13 @@ namespace CppOverride
                 return WhenCalledWith(infoSetter, args...);
             }
             
-            template<   typename T, 
-                        typename... Args, 
-                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(T), 
-                                                                        void>::value>::type>
+            template
+            <
+                typename T, 
+                typename... Args, 
+                typename std::enable_if<!std::is_same<  INTERNAL_CO_PURE_TYPE(T), 
+                                                        void>::value, bool>::type = true
+            >
             inline OverrideInfoSetter& WhenCalledWith(  OverrideInfoSetter& infoSetter,
                                                         T arg, 
                                                         Args... args)
@@ -3779,8 +3776,7 @@ namespace CppOverride
             
             inline void AppendArgsTypeInfo(std::vector<Internal_DataInfo>&) {}
             
-            template<   typename T, 
-                        typename... Args>
+            template<typename T, typename... Args>
             inline void AppendArgsTypeInfo( std::vector<Internal_DataInfo>& argumentsList, 
                                             T&, 
                                             Args&... args)
@@ -3839,11 +3835,13 @@ namespace CppOverride
             #endif
 
             //Check void*
-            template<   typename T, 
-                        typename PureType = INTERNAL_CO_PURE_TYPE(T),
-                        typename = typename std::enable_if<std::is_same<PureType, void>::value>::type, 
-                        typename... Args,
-                        typename = void()>
+            template
+            <
+                typename T, 
+                typename PureType = INTERNAL_CO_PURE_TYPE(T),
+                typename std::enable_if<std::is_same<PureType, void>::value, bool>::type = true, 
+                typename... Args
+            >
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
@@ -3874,11 +3872,14 @@ namespace CppOverride
                 return CheckArgumentsTypes(validArgumentsList, ++argIndex, args...);
             }
             
-            //Check Value or reference
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<!std::is_pointer<RawType>::value>::type,
-                        typename... Args>
+            //Check reference
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                typename std::enable_if<!std::is_pointer<RawType>::value, bool>::type = true,
+                typename... Args
+            >
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
@@ -3918,12 +3919,16 @@ namespace CppOverride
             }
             
             //Check Pointer or value
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<std::is_pointer<RawType>::value>::type,
-                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(RawType), void>::value>::type, 
-                        typename PureType = INTERNAL_CO_PURE_TYPE(T),
-                        typename... Args>
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                typename std::enable_if<std::is_pointer<RawType>::value, bool>::type = true,
+                typename std::enable_if<!std::is_same<  INTERNAL_CO_PURE_TYPE(RawType), 
+                                                        void>::value, bool>::type = true, 
+                typename PureType = INTERNAL_CO_PURE_TYPE(T),
+                typename... Args
+            >
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
@@ -3998,7 +4003,10 @@ namespace CppOverride
     struct InequalExists : std::false_type {};
     
     template<typename T>
-    struct InequalExists<T, decltype(std::declval<T>() != std::declval<T>(), void())> : std::true_type {};
+    struct InequalExists
+    <
+        T, decltype(std::declval<T>() != std::declval<T>(), void())
+    > : std::true_type {};
 }
 
 #endif
@@ -4032,10 +4040,13 @@ namespace CppOverride
             #endif
 
             //Check type support inequal operator
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<!InequalExists<RawType>::value>::type,
-                        typename... Args>
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                typename std::enable_if<!InequalExists<RawType>::value, bool>::type = true,
+                typename... Args
+            >
             inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
@@ -4079,12 +4090,15 @@ namespace CppOverride
                 return CheckArgumentsValues(validArgumentsList, ++argIndex, status, args...);
             }
             
-            //Check value or reference
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<InequalExists<RawType>::value>::type,
-                        typename = typename std::enable_if<!std::is_pointer<RawType>::value>::type,
-                        typename... Args>
+            //Check reference
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                typename std::enable_if<InequalExists<RawType>::value, bool>::type = true,
+                typename std::enable_if<!std::is_pointer<RawType>::value, bool>::type = true,
+                typename... Args
+            >
             inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
@@ -4126,12 +4140,16 @@ namespace CppOverride
             }
             
             //Check pointer or value
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<std::is_pointer<RawType>::value>::type,
-                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(RawType), void>::value>::type, 
-                        typename PureType = INTERNAL_CO_PURE_TYPE(T),
-                        typename... Args>
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                typename std::enable_if<std::is_pointer<RawType>::value, bool>::type = true,
+                typename std::enable_if<!std::is_same<  INTERNAL_CO_PURE_TYPE(RawType), 
+                                                        void>::value, bool>::type = true, 
+                typename PureType = INTERNAL_CO_PURE_TYPE(T),
+                typename... Args
+            >
             inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
@@ -4179,13 +4197,13 @@ namespace CppOverride
             }
             
             //Check void*
-            template<   typename T, 
-                        typename PureType = INTERNAL_CO_PURE_TYPE(T),
-                        typename = typename std::enable_if<std::is_same<PureType, void>::value>::type, 
-                        typename... Args,
-                        typename = void(),
-                        typename = void(),
-                        typename = void()>
+            template
+            <
+                typename T, 
+                typename PureType = INTERNAL_CO_PURE_TYPE(T),
+                typename std::enable_if<std::is_same<PureType, void>::value, bool>::type = true, 
+                typename... Args
+            >
             inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
@@ -4257,10 +4275,13 @@ namespace CppOverride
                                     int,
                                     OverrideStatus*) {}
 
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T),
-                        typename = typename std::enable_if<!std::is_copy_assignable<RawType>::value>::type,
-                        typename... Args>
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T),
+                typename std::enable_if<!std::is_copy_assignable<RawType>::value, bool>::type = true,
+                typename... Args
+            >
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
@@ -4279,11 +4300,13 @@ namespace CppOverride
                 ModifyArgs(argsData, ++index, status, args...);
             }
             
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T),
-                        typename = typename std::enable_if<std::is_copy_assignable<RawType>::value>::type,
-                        typename... Args,
-                        typename = void()>
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T),
+                typename std::enable_if<std::is_copy_assignable<RawType>::value, bool>::type = true,
+                typename... Args
+            >
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
@@ -4339,12 +4362,13 @@ namespace CppOverride
             
             //If the argument is a pointer type, we can just dereference that and 
             //pass it as reference to a value
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T),
-                        typename = typename std::enable_if<!std::is_same<RawType, void>::value>::type, 
-                        typename... Args,
-                        typename = void(),
-                        typename = void()>
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T),
+                typename std::enable_if<!std::is_same<RawType, void>::value, bool>::type = true, 
+                typename... Args
+            >
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
@@ -4441,8 +4465,7 @@ namespace CppOverride
                 #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 0
             #endif
 
-            template<   typename ReturnType, 
-                        typename... Args>
+            template<typename ReturnType, typename... Args>
             inline bool IsCorrectReturnDataInfo(Internal_OverrideData& overrideDataToCheck,
                                                 Args&... args)
             {
@@ -4703,8 +4726,7 @@ namespace CppOverride
                 #define INTERNAL_CO_LOG_IsCorrectDataInfo 0
             #endif
 
-            template<   typename ReturnType, 
-                        typename... Args>
+            template<typename ReturnType, typename... Args>
             inline bool IsMeetingRequirementForDataInfo(Internal_OverrideData& overrideDataToCheck,
                                                         OverrideStatus& outInternalStatus,
                                                         void* instance,
@@ -5119,7 +5141,7 @@ namespace CppOverride
             template
             <
                 typename ReturnType, 
-                typename = typename std::enable_if<std::is_same<ReturnType, void>::value>::type,
+                typename std::enable_if<std::is_same<ReturnType, void>::value, bool>::type = true,
                 typename... Args
             >
             inline ReturnType Internal_OverrideReturn(  int dataIndex,
@@ -5139,8 +5161,8 @@ namespace CppOverride
             template
             <
                 typename ReturnType, 
-                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type,
+                typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
+                typename std::enable_if<!std::is_reference<ReturnType>::value, bool>::type = true,
                 typename... Args
             >
             inline ReturnType Internal_OverrideReturn(  int dataIndex,
@@ -5184,9 +5206,8 @@ namespace CppOverride
             template
             <
                 typename ReturnType, 
-                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
-                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
+                typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
+                typename std::enable_if<std::is_reference<ReturnType>::value, bool>::type = true,
                 typename... Args
             >
             inline ReturnType Internal_OverrideReturn(  int dataIndex,
@@ -5416,7 +5437,7 @@ namespace CppOverride
     }
 
     template<typename ReturnType>
-    inline OverrideInfoSetter& 
+    inline OverrideInfoSetter&
     OverrideInfoSetter::ReturnsByAction(std::function<void( void* instance,
                                                             const std::vector<void*>& args, 
                                                             void* out)> returnAction)
@@ -5445,7 +5466,7 @@ namespace CppOverride
     }
     
     template<typename... Args>
-    inline OverrideInfoSetter& 
+    inline OverrideInfoSetter&
     OverrideInfoSetter::SetArgs(typename TypeUnwrapper<Args>::Type... args)
     {
         return CppOverrideObj.SetArgs<Args...>(*this, args...);

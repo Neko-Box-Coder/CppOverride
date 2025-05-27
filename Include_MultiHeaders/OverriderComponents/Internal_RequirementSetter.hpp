@@ -4,7 +4,6 @@
 #include "../OverrideInfoSetterDeclaration.hpp"
 #include "../Internal_OverrideData.hpp"
 #include "../Internal_DataInfo.hpp"
-#include "../StaticAssertFalse.hpp"
 #include "../Any.hpp"
 #include "../PureType.hpp"
 
@@ -41,11 +40,14 @@ namespace CppOverride
                 return infoSetter;
             }
             
-            template<   typename T, 
-                        typename... Args, 
-                        typename = typename std::enable_if<std::is_same<INTERNAL_CO_PURE_TYPE(T), 
-                                                                        void>::value>::type,
-                        typename PureType = INTERNAL_CO_PURE_TYPE(T)>
+            template
+            <
+                typename T, 
+                typename... Args, 
+                typename std::enable_if<std::is_same<   INTERNAL_CO_PURE_TYPE(T), 
+                                                        void>::value, bool>::type = true,
+                typename PureType = INTERNAL_CO_PURE_TYPE(T)
+            >
             inline OverrideInfoSetter& WhenCalledWith(  OverrideInfoSetter& infoSetter,
                                                         T arg, 
                                                         Args... args)
@@ -65,10 +67,13 @@ namespace CppOverride
                 return WhenCalledWith(infoSetter, args...);
             }
             
-            template<   typename T, 
-                        typename... Args, 
-                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(T), 
-                                                                        void>::value>::type>
+            template
+            <
+                typename T, 
+                typename... Args, 
+                typename std::enable_if<!std::is_same<  INTERNAL_CO_PURE_TYPE(T), 
+                                                        void>::value, bool>::type = true
+            >
             inline OverrideInfoSetter& WhenCalledWith(  OverrideInfoSetter& infoSetter,
                                                         T arg, 
                                                         Args... args)

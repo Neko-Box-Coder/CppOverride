@@ -21,26 +21,18 @@ namespace CppOverride
     template<typename T>
     struct TypeUnwrapper
     <
-        T, 
-        typename std::enable_if
-        <
-            !std::is_same<INTERNAL_CO_UNCONST(T), void*>::value
-        >::type
+        T, typename std::enable_if<!std::is_same<INTERNAL_CO_UNCONST(T), void*>::value>::type
     >
-    { 
+    {
         using Type = INTERNAL_CO_PURE_TYPE(T);
     };
     
     template<typename T>
     struct TypeUnwrapper
     <
-        T, 
-        typename std::enable_if
-        <
-            std::is_same<INTERNAL_CO_UNCONST(T), void*>::value
-        >::type
+        T, typename std::enable_if<std::is_same<INTERNAL_CO_UNCONST(T), void*>::value>::type
     >
-    { 
+    {
         using Type = INTERNAL_CO_UNCONST(T);
     };
 }

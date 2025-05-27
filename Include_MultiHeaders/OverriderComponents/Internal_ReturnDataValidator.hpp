@@ -23,8 +23,7 @@ namespace CppOverride
                 #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 0
             #endif
 
-            template<   typename ReturnType, 
-                        typename... Args>
+            template<typename ReturnType, typename... Args>
             inline bool IsCorrectReturnDataInfo(Internal_OverrideData& overrideDataToCheck,
                                                 Args&... args)
             {

@@ -254,7 +254,7 @@ namespace CppOverride
             template
             <
                 typename ReturnType, 
-                typename = typename std::enable_if<std::is_same<ReturnType, void>::value>::type,
+                typename std::enable_if<std::is_same<ReturnType, void>::value, bool>::type = true,
                 typename... Args
             >
             inline ReturnType Internal_OverrideReturn(  int dataIndex,
@@ -274,8 +274,8 @@ namespace CppOverride
             template
             <
                 typename ReturnType, 
-                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                typename = typename std::enable_if<!std::is_reference<ReturnType>::value>::type,
+                typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
+                typename std::enable_if<!std::is_reference<ReturnType>::value, bool>::type = true,
                 typename... Args
             >
             inline ReturnType Internal_OverrideReturn(  int dataIndex,
@@ -319,9 +319,8 @@ namespace CppOverride
             template
             <
                 typename ReturnType, 
-                typename = typename std::enable_if<!std::is_same<ReturnType, void>::value>::type,
-                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
-                typename = typename std::enable_if<std::is_reference<ReturnType>::value>::type,
+                typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
+                typename std::enable_if<std::is_reference<ReturnType>::value, bool>::type = true,
                 typename... Args
             >
             inline ReturnType Internal_OverrideReturn(  int dataIndex,

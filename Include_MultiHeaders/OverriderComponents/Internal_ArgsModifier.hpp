@@ -27,10 +27,13 @@ namespace CppOverride
                                     int,
                                     OverrideStatus*) {}
 
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T),
-                        typename = typename std::enable_if<!std::is_copy_assignable<RawType>::value>::type,
-                        typename... Args>
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T),
+                typename std::enable_if<!std::is_copy_assignable<RawType>::value, bool>::type = true,
+                typename... Args
+            >
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
@@ -49,11 +52,13 @@ namespace CppOverride
                 ModifyArgs(argsData, ++index, status, args...);
             }
             
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T),
-                        typename = typename std::enable_if<std::is_copy_assignable<RawType>::value>::type,
-                        typename... Args,
-                        typename = void()>
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T),
+                typename std::enable_if<std::is_copy_assignable<RawType>::value, bool>::type = true,
+                typename... Args
+            >
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
@@ -109,12 +114,13 @@ namespace CppOverride
             
             //If the argument is a pointer type, we can just dereference that and 
             //pass it as reference to a value
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T),
-                        typename = typename std::enable_if<!std::is_same<RawType, void>::value>::type, 
-                        typename... Args,
-                        typename = void(),
-                        typename = void()>
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T),
+                typename std::enable_if<!std::is_same<RawType, void>::value, bool>::type = true, 
+                typename... Args
+            >
             inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,

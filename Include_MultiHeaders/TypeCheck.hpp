@@ -8,7 +8,10 @@ namespace CppOverride
     struct InequalExists : std::false_type {};
     
     template<typename T>
-    struct InequalExists<T, decltype(std::declval<T>() != std::declval<T>(), void())> : std::true_type {};
+    struct InequalExists
+    <
+        T, decltype(std::declval<T>() != std::declval<T>(), void())
+    > : std::true_type {};
 }
 
 #endif

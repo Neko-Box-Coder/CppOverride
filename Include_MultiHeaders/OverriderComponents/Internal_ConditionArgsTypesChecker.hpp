@@ -27,11 +27,13 @@ namespace CppOverride
             #endif
 
             //Check void*
-            template<   typename T, 
-                        typename PureType = INTERNAL_CO_PURE_TYPE(T),
-                        typename = typename std::enable_if<std::is_same<PureType, void>::value>::type, 
-                        typename... Args,
-                        typename = void()>
+            template
+            <
+                typename T, 
+                typename PureType = INTERNAL_CO_PURE_TYPE(T),
+                typename std::enable_if<std::is_same<PureType, void>::value, bool>::type = true, 
+                typename... Args
+            >
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
@@ -62,11 +64,14 @@ namespace CppOverride
                 return CheckArgumentsTypes(validArgumentsList, ++argIndex, args...);
             }
             
-            //Check Value or reference
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<!std::is_pointer<RawType>::value>::type,
-                        typename... Args>
+            //Check reference
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                typename std::enable_if<!std::is_pointer<RawType>::value, bool>::type = true,
+                typename... Args
+            >
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
@@ -106,12 +111,16 @@ namespace CppOverride
             }
             
             //Check Pointer or value
-            template<   typename T, 
-                        typename RawType = INTERNAL_CO_RAW_TYPE(T), 
-                        typename = typename std::enable_if<std::is_pointer<RawType>::value>::type,
-                        typename = typename std::enable_if<!std::is_same<INTERNAL_CO_PURE_TYPE(RawType), void>::value>::type, 
-                        typename PureType = INTERNAL_CO_PURE_TYPE(T),
-                        typename... Args>
+            template
+            <
+                typename T, 
+                typename RawType = INTERNAL_CO_RAW_TYPE(T), 
+                typename std::enable_if<std::is_pointer<RawType>::value, bool>::type = true,
+                typename std::enable_if<!std::is_same<  INTERNAL_CO_PURE_TYPE(RawType), 
+                                                        void>::value, bool>::type = true, 
+                typename PureType = INTERNAL_CO_PURE_TYPE(T),
+                typename... Args
+            >
             inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 

@@ -104,10 +104,13 @@ namespace CppOverride
                 return CheckArguments(validArgumentsList, ++argIndex, args...);
             }
             
-            template<   typename T, 
-                        typename = typename std::enable_if<!std::is_same<T, void>::value>::type, 
-                        typename = typename std::enable_if<!std::is_same<T, const void>::value>::type, 
-                        typename... Args>
+            template
+            <
+                typename T, 
+                typename std::enable_if<!std::is_same<T, void>::value, bool>::type = true, 
+                typename std::enable_if<!std::is_same<T, const void>::value, bool>::type = true, 
+                typename... Args
+            >
             inline bool CheckArguments( std::vector<Internal_DataInfo>& validArgumentsList, 
                                         int argIndex, 
                                         T*& arg, 

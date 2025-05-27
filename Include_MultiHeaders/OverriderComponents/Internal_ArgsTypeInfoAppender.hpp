@@ -23,8 +23,7 @@ namespace CppOverride
             
             inline void AppendArgsTypeInfo(std::vector<Internal_DataInfo>&) {}
             
-            template<   typename T, 
-                        typename... Args>
+            template<typename T, typename... Args>
             inline void AppendArgsTypeInfo( std::vector<Internal_DataInfo>& argumentsList, 
                                             T&, 
                                             Args&... args)

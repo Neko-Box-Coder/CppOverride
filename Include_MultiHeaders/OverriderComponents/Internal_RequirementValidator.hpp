@@ -29,8 +29,7 @@ namespace CppOverride
                 #define INTERNAL_CO_LOG_IsCorrectDataInfo 0
             #endif
 
-            template<   typename ReturnType, 
-                        typename... Args>
+            template<typename ReturnType, typename... Args>
             inline bool IsMeetingRequirementForDataInfo(Internal_OverrideData& overrideDataToCheck,
                                                         OverrideStatus& outInternalStatus,
                                                         void* instance,
