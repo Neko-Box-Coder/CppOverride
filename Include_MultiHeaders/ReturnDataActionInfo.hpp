@@ -1,11 +1,11 @@
-#ifndef CO_INTERNAL_RETURN_DATA_ACTION_INFO_HPP
-#define CO_INTERNAL_RETURN_DATA_ACTION_INFO_HPP
+#ifndef CO_RETURN_DATA_ACTION_INFO_HPP
+#define CO_RETURN_DATA_ACTION_INFO_HPP
 
-#include "./Internal_DataInfo.hpp"
+#include <functional>
 
 namespace CppOverride
 {
-    struct Internal_ReturnDataActionInfo
+    struct ReturnDataActionInfo
     {
         std::function<void(void* instance, const std::vector<void*>& args, void* out)> DataAction;
         std::size_t DataType = 0;

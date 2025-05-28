@@ -1,11 +1,11 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_DATA_VALIDATOR_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_DATA_VALIDATOR_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_ARGS_DATA_VALIDATOR_HPP
+#define CO_OVERRIDER_COMPONENTS_ARGS_DATA_VALIDATOR_HPP
 
-#include "./Internal_ArgsTypeInfoAppender.hpp"
-#include "./Internal_ArgsValuesAppender.hpp"
-#include "../Internal_OverrideData.hpp"
+#include "./ArgsTypeInfoAppender.hpp"
+#include "./ArgsValuesAppender.hpp"
+#include "../OverrideData.hpp"
 #include "../AliasTypes.hpp"
-#include "../Internal_DataInfo.hpp"
+#include "../DataInfo.hpp"
 
 #include <cassert>
 #include <string>
@@ -14,11 +14,11 @@
 
 namespace CppOverride
 {
-    class Internal_ArgsDataValidator
+    struct ArgsDataValidator
     {
-        protected:
-            Internal_ArgsValuesAppender& ArgsValuesAppender;
-            Internal_ArgsTypeInfoAppender& ArgsTypeInfoAppender;
+        public:
+            ArgsValuesAppender& CurrentArgsValuesAppender;
+            ArgsTypeInfoAppender& CurrentArgsTypeInfoAppender;
             
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo 1
@@ -27,7 +27,7 @@ namespace CppOverride
             #endif
 
             template<typename... Args>
-            inline bool IsCorrectArgumentsDataInfo( Internal_OverrideData& overrideDataToCheck,
+            inline bool IsCorrectArgumentsDataInfo( OverrideData& overrideDataToCheck,
                                                     Args&... args)
             {
                 
@@ -35,10 +35,10 @@ namespace CppOverride
                     std::cout << std::endl << __func__ << " called" << std::endl;
                 
                 std::vector<void*> argumentsList;
-                ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                std::vector<Internal_DataInfo> argumentsTypesList;
-                ArgsTypeInfoAppender.AppendArgsTypeInfo(argumentsTypesList, args...);
+                std::vector<DataInfo> argumentsTypesList;
+                CurrentArgsTypeInfoAppender.AppendArgsTypeInfo(argumentsTypesList, args...);
                 
                 if(INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo)
                     std::cout << "Checking arg data\n";
@@ -129,11 +129,10 @@ namespace CppOverride
                 return true;
             }
         
-        public:
-            Internal_ArgsDataValidator( Internal_ArgsValuesAppender& argsValuesAppender,
-                                        Internal_ArgsTypeInfoAppender& argsTypeInfoAppender) :
-                                                ArgsValuesAppender(argsValuesAppender),
-                                                ArgsTypeInfoAppender(argsTypeInfoAppender)
+            ArgsDataValidator(  ArgsValuesAppender& argsValuesAppender,
+                                ArgsTypeInfoAppender& argsTypeInfoAppender) :
+                CurrentArgsValuesAppender(argsValuesAppender),
+                CurrentArgsTypeInfoAppender(argsTypeInfoAppender)
             {}
     };
 

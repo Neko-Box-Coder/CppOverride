@@ -2884,15 +2884,14 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    class Overrider;
+    struct Overrider;
 
-    class OverrideInfoSetter
+    struct OverrideInfoSetter
     {
-        protected:
+        public:
             std::string FunctionSignatureName;
             Overrider& CppOverrideObj;
-        
-        public:
+            
             OverrideInfoSetter( std::string functionSignatureName, 
                                 Overrider& SimpleOverrideObj) : 
                 FunctionSignatureName(functionSignatureName),
@@ -2986,57 +2985,29 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ReturnDataSetter.hpp
+//./Include_MultiHeaders/OverriderComponents/ReturnDataSetter.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_SETTER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_SETTER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_RETURN_DATA_SETTER_HPP
+#define CO_OVERRIDER_COMPONENTS_RETURN_DATA_SETTER_HPP
 
 
 //=================================================================
-//./Include_MultiHeaders/Internal_OverrideData.hpp
+//./Include_MultiHeaders/OverrideData.hpp
 //=================================================================
-#ifndef CO_INTERNAL_OVERRIDE_DATA_HPP
-#define CO_INTERNAL_OVERRIDE_DATA_HPP
+#ifndef CO_OVERRIDE_DATA_HPP
+#define CO_OVERRIDE_DATA_HPP
 
 //=================================================================
-//./Include_MultiHeaders/Internal_ReturnDataActionInfo.hpp
+//./Include_MultiHeaders/ReturnDataActionInfo.hpp
 //=================================================================
-#ifndef CO_INTERNAL_RETURN_DATA_ACTION_INFO_HPP
-#define CO_INTERNAL_RETURN_DATA_ACTION_INFO_HPP
+#ifndef CO_RETURN_DATA_ACTION_INFO_HPP
+#define CO_RETURN_DATA_ACTION_INFO_HPP
 
-//=================================================================
-//./Include_MultiHeaders/Internal_DataInfo.hpp
-//=================================================================
-#ifndef CO_INTERNAL_DATA_INFO_HPP
-#define CO_INTERNAL_DATA_INFO_HPP
-
-#include <cstddef>
 #include <functional>
-#include <vector>
-#include <memory>
 
 namespace CppOverride
 {
-    struct Internal_DataInfo
-    {
-        std::size_t DataType = 0;
-        std::shared_ptr<void> Data = nullptr;
-        bool DataSet = false;
-    };
-    
-    struct Internal_ReturnDataInfo : public Internal_DataInfo
-    {
-        bool ReturnReference = false;
-        bool ReturnAny = false;
-    };
-}
-
-#endif
-
-
-namespace CppOverride
-{
-    struct Internal_ReturnDataActionInfo
+    struct ReturnDataActionInfo
     {
         std::function<void(void* instance, const std::vector<void*>& args, void* out)> DataAction;
         std::size_t DataType = 0;
@@ -3049,11 +3020,39 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/Internal_ConditionInfo.hpp
+//./Include_MultiHeaders/ConditionInfo.hpp
 //=================================================================
-#ifndef CO_INTERNAL_CONDITION_INFO_HPP
-#define CO_INTERNAL_CONDITION_INFO_HPP
+#ifndef CO_CONDITION_INFO_HPP
+#define CO_CONDITION_INFO_HPP
 
+//=================================================================
+//./Include_MultiHeaders/DataInfo.hpp
+//=================================================================
+#ifndef CO_DATA_INFO_HPP
+#define CO_DATA_INFO_HPP
+
+#include <cstddef>
+#include <functional>
+#include <vector>
+#include <memory>
+
+namespace CppOverride
+{
+    struct DataInfo
+    {
+        std::size_t DataType = 0;
+        std::shared_ptr<void> Data = nullptr;
+        bool DataSet = false;
+    };
+    
+    struct ReturnDataInfo : public DataInfo
+    {
+        bool ReturnReference = false;
+        bool ReturnAny = false;
+    };
+}
+
+#endif
 
 
 #include <functional>
@@ -3061,10 +3060,10 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    struct Internal_ConditionInfo
+    struct ConditionInfo
     {
         std::function<bool(void* instance, const std::vector<void*>& args)> LambdaCondition;
-        std::vector<Internal_DataInfo> ArgsCondition = {};
+        std::vector<DataInfo> ArgsCondition = {};
         int Times = -1;
         int CalledTimes = 0;
         bool DataConditionSet = false;
@@ -3074,17 +3073,17 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/Internal_ResultActionInfo.hpp
+//./Include_MultiHeaders/ResultActionInfo.hpp
 //=================================================================
-#ifndef CO_INTERNAL_RESULT_ACTION_INFO_HPP
-#define CO_INTERNAL_RESULT_ACTION_INFO_HPP
+#ifndef CO_RESULT_ACTION_INFO_HPP
+#define CO_RESULT_ACTION_INFO_HPP
 
 #include <functional>
 #include <vector>
 
 namespace CppOverride
 {
-    struct Internal_ResultActionInfo
+    struct ResultActionInfo
     {
         std::function<void(void* instance, const std::vector<void*>& args)> OtherwiseAction;
         std::function<void(void* instance, const std::vector<void*>& args)> CorrectAction;
@@ -3097,17 +3096,17 @@ namespace CppOverride
 
 
 //=================================================================
-//./Include_MultiHeaders/Internal_ArgsDataActionInfo.hpp
+//./Include_MultiHeaders/ArgsDataActionInfo.hpp
 //=================================================================
-#ifndef CO_INTERNAL_ARGS_DATA_ACTION_INFO_HPP
-#define CO_INTERNAL_ARGS_DATA_ACTION_INFO_HPP
+#ifndef CO_ARGS_DATA_ACTION_INFO_HPP
+#define CO_ARGS_DATA_ACTION_INFO_HPP
 
 #include <functional>
 #include <vector>
 
 namespace CppOverride
 {
-    struct Internal_ArgsDataActionInfo
+    struct ArgsDataActionInfo
     {
         std::function<void(void* instance, std::vector<void*>& args)> DataAction;
         std::vector<std::size_t> DataTypes;
@@ -3125,28 +3124,26 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    struct Internal_OverrideData
+    struct OverrideData
     {
         //The object instance we are overriding if specified, 
         //  nullptr for non specified or free function
         void* Instance = nullptr;
         
         //Condition for override
-        Internal_ConditionInfo ConditionInfo;
+        ConditionInfo CurrentConditionInfo;
         
         //Arguments and return data
-        std::vector<Internal_DataInfo> ArgumentsDataInfo;
-        Internal_ReturnDataInfo ReturnDataInfo;
+        std::vector<DataInfo> ArgumentsDataInfo;
+        ReturnDataInfo CurrentReturnDataInfo;
         
-        Internal_ReturnDataActionInfo ReturnDataActionInfo;
-        Internal_ArgsDataActionInfo  ArgumentsDataActionInfo;
+        ReturnDataActionInfo CurrentReturnDataActionInfo;
+        ArgsDataActionInfo ArgumentsDataActionInfo;
         
         //Result of the override
-        Internal_ResultActionInfo ResultActionInfo;
+        ResultActionInfo CurrentResultActionInfo;
         std::shared_ptr<OverrideResult> Result = nullptr;
     };
-    
-    using Internal_OverrideDataList = std::vector<Internal_OverrideData>;
 }
 
 #endif
@@ -3158,13 +3155,10 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    class Internal_ReturnDataSetter
+    struct ReturnDataSetter
     {
         public:
-            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
-            friend class OverrideInfoSetter;
-        
-        protected:
+            using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
             OverrideDatas& CurrentOverrideDatas;
             
             //------------------------------------------------------------------------------
@@ -3180,15 +3174,15 @@ namespace CppOverride
                 static_assert(  !std::is_same<ReturnType, Any>(), 
                                 "You can't return nothing in return action");
 
-                Internal_OverrideData& lastData = 
+                OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
 
-                lastData.ReturnDataActionInfo.DataAction = returnAction;
-                lastData.ReturnDataActionInfo.DataActionSet = true;
-                lastData.ReturnDataActionInfo.DataType = typeid(ReturnType).hash_code();
+                lastData.CurrentReturnDataActionInfo.DataAction = returnAction;
+                lastData.CurrentReturnDataActionInfo.DataActionSet = true;
+                lastData.CurrentReturnDataActionInfo.DataType = typeid(ReturnType).hash_code();
                 
                 if(std::is_reference<ReturnType>())
-                    lastData.ReturnDataActionInfo.ReturnReference = true;
+                    lastData.CurrentReturnDataActionInfo.ReturnReference = true;
                 
                 return infoSetter;
             }
@@ -3204,20 +3198,21 @@ namespace CppOverride
             {
                 if(!std::is_same<ReturnType, Any>())
                 {
-                    Internal_OverrideData& lastData = 
+                    OverrideData& lastData = 
                         CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                     
-                    lastData.ReturnDataInfo.Data = 
+                    lastData.CurrentReturnDataInfo.Data = 
                         std::shared_ptr<void>(  new ReturnType(returnData), 
                                                 [](void* p){ delete static_cast<ReturnType*>(p); });
-                    lastData.ReturnDataInfo.DataSet = true;
-                    lastData.ReturnDataInfo.DataType = typeid(ReturnType).hash_code();
+                    lastData.CurrentReturnDataInfo.DataSet = true;
+                    lastData.CurrentReturnDataInfo.DataType = typeid(ReturnType).hash_code();
                 }
                 else
                 {
-                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                                .ReturnDataInfo
-                                                                                .ReturnAny = true;
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
+                                        .back()
+                                        .CurrentReturnDataInfo
+                                        .ReturnAny = true;
                 }
                 
                 return infoSetter;
@@ -3234,20 +3229,21 @@ namespace CppOverride
             {
                 if(!std::is_same<ReturnType, Any&>())
                 {
-                    Internal_OverrideData& lastData = 
+                    OverrideData& lastData = 
                         CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                     
-                    lastData.ReturnDataInfo.Data = 
+                    lastData.CurrentReturnDataInfo.Data = 
                         std::shared_ptr<void>(&returnData, [](...){});
-                    lastData.ReturnDataInfo.DataSet = true;
-                    lastData.ReturnDataInfo.DataType = typeid(ReturnType).hash_code();
-                    lastData.ReturnDataInfo.ReturnReference = true;
+                    lastData.CurrentReturnDataInfo.DataSet = true;
+                    lastData.CurrentReturnDataInfo.DataType = typeid(ReturnType).hash_code();
+                    lastData.CurrentReturnDataInfo.ReturnReference = true;
                 }
                 else
                 {
-                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                                .ReturnDataInfo
-                                                                                .ReturnAny = true;
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
+                                        .back()
+                                        .CurrentReturnDataInfo
+                                        .ReturnAny = true;
                 }
                 
                 return infoSetter;
@@ -3255,12 +3251,12 @@ namespace CppOverride
             
             inline OverrideInfoSetter& ReturnsVoid(OverrideInfoSetter& infoSetter)
             {
-                Internal_OverrideData& lastData = 
+                OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
-                lastData.ReturnDataInfo.Data = nullptr;
-                lastData.ReturnDataInfo.DataSet = true;
-                lastData.ReturnDataInfo.DataType = typeid(void).hash_code();
+                lastData.CurrentReturnDataInfo.Data = nullptr;
+                lastData.CurrentReturnDataInfo.DataSet = true;
+                lastData.CurrentReturnDataInfo.DataType = typeid(void).hash_code();
                 
                 return infoSetter;
             }
@@ -3275,8 +3271,7 @@ namespace CppOverride
                 return ReturnsVoid(infoSetter);
             }
             
-        public:
-            inline Internal_ReturnDataSetter(OverrideDatas& overrideDatas) : 
+            inline ReturnDataSetter(OverrideDatas& overrideDatas) : 
                 CurrentOverrideDatas(overrideDatas)
             {}
     };
@@ -3286,10 +3281,10 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ArgsDataSetter.hpp
+//./Include_MultiHeaders/OverriderComponents/ArgsDataSetter.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGUMENT_DATA_SETTER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGUMENT_DATA_SETTER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_ARGUMENT_DATA_SETTER_HPP
+#define CO_OVERRIDER_COMPONENTS_ARGUMENT_DATA_SETTER_HPP
 
 
 
@@ -3335,16 +3330,12 @@ const CppOverride::Any CO_DONT_OVERRIDE_RETURN;
 
 namespace CppOverride
 {
-    class Internal_ArgsDataSetter
+    class ArgsDataSetter
     {
-        friend class OverrideInfoSetter;
-        
-        #define INTERNAL_CO_UNWRAPPED(arg) typename TypeUnwrapper<arg>::Type
-        
         public:
-            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
+            #define INTERNAL_CO_UNWRAPPED(arg) typename TypeUnwrapper<arg>::Type
+            using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
         
-        protected:
             OverrideDatas& CurrentOverrideDatas;
             
             #if CO_SHOW_OVERRIDE_LOG
@@ -3389,10 +3380,10 @@ namespace CppOverride
             >::type
             SetArgs(OverrideInfoSetter& infoSetter, INTERNAL_CO_UNWRAPPED(T) arg)
             {
-                Internal_OverrideData& lastData = 
+                OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
-                lastData.ArgumentsDataInfo.push_back(Internal_DataInfo());
+                lastData.ArgumentsDataInfo.push_back(DataInfo());
                 
                 if(!std::is_same<T, Any>())
                 {
@@ -3460,7 +3451,7 @@ namespace CppOverride
             
         private:
             template<typename T>
-            inline void InternalPushActionArgTypes(Internal_OverrideData& lastData)
+            inline void InternalPushActionArgTypes(OverrideData& lastData)
             {
                 lastData.ArgumentsDataActionInfo.DataTypes
                         .push_back(typeid(T).hash_code());
@@ -3479,7 +3470,7 @@ namespace CppOverride
             }
             
             template<typename T, typename... Args>
-            inline void PushActionArgTypes(Internal_OverrideData& lastData)
+            inline void PushActionArgTypes(OverrideData& lastData)
             {
                 InternalPushActionArgTypes<T>(lastData);
                 PushActionArgTypes<Args...>(lastData);
@@ -3487,16 +3478,16 @@ namespace CppOverride
             
             template<typename... Args>
             inline typename std::enable_if<sizeof...(Args) == 0>::type 
-            PushActionArgTypes(Internal_OverrideData&) {}
+            PushActionArgTypes(OverrideData&) {}
         
-        protected:
+        public:
             template<typename... Args>
             inline OverrideInfoSetter& 
             SetArgsByAction(OverrideInfoSetter& infoSetter,
                             std::function<void( void* instance, 
                                                 std::vector<void*>& args)> setArgsAction)
             {
-                Internal_OverrideData& lastData = 
+                OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 lastData.ArgumentsDataActionInfo.DataAction = setArgsAction;
@@ -3520,10 +3511,9 @@ namespace CppOverride
                 return infoSetter;
             }
             
-        #undef INTERNAL_CO_UNWRAPPED
+            #undef INTERNAL_CO_UNWRAPPED
         
-        public:
-            inline Internal_ArgsDataSetter(OverrideDatas& overrideArgumentsInfos) : 
+            inline ArgsDataSetter(OverrideDatas& overrideArgumentsInfos) : 
                 CurrentOverrideDatas(overrideArgumentsInfos)
             {}
     };
@@ -3533,10 +3523,10 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_RequirementSetter.hpp
+//./Include_MultiHeaders/OverriderComponents/RequirementSetter.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_REQUIREMENT_SETTER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_REQUIREMENT_SETTER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_REQUIREMENT_SETTER_HPP
+#define CO_OVERRIDER_COMPONENTS_REQUIREMENT_SETTER_HPP
 
 
 
@@ -3552,13 +3542,10 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    class Internal_RequirementSetter
+    struct RequirementSetter
     {
         public:
-            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
-            friend class OverrideInfoSetter;
-        
-        protected:
+            using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
             OverrideDatas& CurrentOverrideDatas;
         
             //------------------------------------------------------------------------------
@@ -3567,7 +3554,7 @@ namespace CppOverride
             inline OverrideInfoSetter& Times(OverrideInfoSetter& infoSetter, int times)
             {
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ConditionInfo
+                                                                            .CurrentConditionInfo
                                                                             .Times = times;
                 return infoSetter;
             }
@@ -3589,7 +3576,7 @@ namespace CppOverride
                                                         T arg, 
                                                         Args... args)
             {
-                Internal_DataInfo argData;
+                DataInfo argData;
                 //T is void*
                 argData.Data = std::shared_ptr<void>(   new void*((void*)arg), 
                                                         [](void* p){ delete static_cast<char*>(p); });
@@ -3597,7 +3584,7 @@ namespace CppOverride
                 argData.DataSet = true;
 
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ConditionInfo
+                                                                            .CurrentConditionInfo
                                                                             .ArgsCondition
                                                                             .push_back(argData);
 
@@ -3615,7 +3602,7 @@ namespace CppOverride
                                                         T arg, 
                                                         Args... args)
             {
-                Internal_DataInfo argData;
+                DataInfo argData;
                 //Other types that are not Any
                 if(!std::is_same<INTERNAL_CO_RAW_TYPE(T), Any>())
                 {
@@ -3631,7 +3618,7 @@ namespace CppOverride
                 }
 
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ConditionInfo
+                                                                            .CurrentConditionInfo
                                                                             .ArgsCondition
                                                                             .push_back(argData);
 
@@ -3645,11 +3632,11 @@ namespace CppOverride
             {
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ConditionInfo
+                                    .CurrentConditionInfo
                                     .LambdaCondition = condition;
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ConditionInfo
+                                    .CurrentConditionInfo
                                     .DataConditionSet = true;
                 return infoSetter;
             }
@@ -3661,11 +3648,11 @@ namespace CppOverride
             {
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ResultActionInfo
+                                    .CurrentResultActionInfo
                                     .OtherwiseAction = action;
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ResultActionInfo
+                                    .CurrentResultActionInfo
                                     .OtherwiseActionSet = true;
                 return infoSetter;
             }
@@ -3677,11 +3664,11 @@ namespace CppOverride
             {
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ResultActionInfo
+                                    .CurrentResultActionInfo
                                     .CorrectAction = action;
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ResultActionInfo
+                                    .CurrentResultActionInfo
                                     .CorrectActionSet = true;
                 return infoSetter;
             }
@@ -3689,7 +3676,7 @@ namespace CppOverride
             inline OverrideInfoSetter& AssignResult(OverrideInfoSetter& infoSetter, 
                                                     std::shared_ptr<OverrideResult> result)
             {
-                Internal_OverrideData& currentData = 
+                OverrideData& currentData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 currentData.Result = result;
@@ -3699,15 +3686,14 @@ namespace CppOverride
             inline OverrideInfoSetter& OverrideObject(  OverrideInfoSetter& infoSetter, 
                                                         void* instance)
             {
-                Internal_OverrideData& currentData = 
+                OverrideData& currentData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 currentData.Instance = instance;
                 return infoSetter;
             }
         
-        public:
-            Internal_RequirementSetter(OverrideDatas& overrideDataLists) :
+            RequirementSetter(OverrideDatas& overrideDataLists) :
                 CurrentOverrideDatas(overrideDataLists)
             {}
     };
@@ -3716,42 +3702,37 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ArgsValuesAppender.hpp
+//./Include_MultiHeaders/OverriderComponents/ArgsValuesAppender.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_VALUES_APPENDER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_VALUES_APPENDER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_ARGS_VALUES_APPENDER_HPP
+#define CO_OVERRIDER_COMPONENTS_ARGS_VALUES_APPENDER_HPP
 
 
 #include <vector>
 
 namespace CppOverride
 {
-    class Internal_ArgsValuesAppender
+    struct ArgsValuesAppender
     {
-        friend class Internal_ReturnDataValidator;
-        friend class Internal_ArgsDataValidator;
-        friend class Internal_RequirementValidator;
-        
-        protected:
-            //Appending arguments from function calls
-            inline void AppendArgsValues(std::vector<void*>&) {};
+        //Appending arguments from function calls
+        inline void AppendArgsValues(std::vector<void*>&) {};
 
-            template<typename T, typename RawType = INTERNAL_CO_RAW_TYPE(T), typename... Args>
-            inline void AppendArgsValues(std::vector<void*>& argumentsList, T& arg, Args&... args)
-            {
-                argumentsList.push_back((RawType*)&arg);
-                AppendArgsValues(argumentsList, args...);
-            }
+        template<typename T, typename RawType = INTERNAL_CO_RAW_TYPE(T), typename... Args>
+        inline void AppendArgsValues(std::vector<void*>& argumentsList, T& arg, Args&... args)
+        {
+            argumentsList.push_back((RawType*)&arg);
+            AppendArgsValues(argumentsList, args...);
+        }
     };
 }
 
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ArgsTypeInfoAppender.hpp
+//./Include_MultiHeaders/OverriderComponents/ArgsTypeInfoAppender.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_ARGS_TYPE_INFO_APPENDER_HPP
+#define CO_OVERRIDER_COMPONENTS_ARGS_TYPE_INFO_APPENDER_HPP
 
 
 
@@ -3762,25 +3743,23 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    class Internal_ArgsTypeInfoAppender
+    struct ArgsTypeInfoAppender
     {
-        friend class Internal_ArgsDataValidator;
-        
-        protected:
+        public:
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_AppendArgsTypeInfo 1
             #else
                 #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
             #endif
             
-            inline void AppendArgsTypeInfo(std::vector<Internal_DataInfo>&) {}
+            inline void AppendArgsTypeInfo(std::vector<DataInfo>&) {}
             
             template<typename T, typename... Args>
-            inline void AppendArgsTypeInfo( std::vector<Internal_DataInfo>& argumentsList, 
+            inline void AppendArgsTypeInfo( std::vector<DataInfo>& argumentsList, 
                                             T&, 
                                             Args&... args)
             {
-                Internal_DataInfo curArgInfo;
+                DataInfo curArgInfo;
                 if(!std::is_same<T, Any>())
                 {
                     curArgInfo.DataType = typeid(T).hash_code();
@@ -3803,10 +3782,10 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ConditionArgsTypesChecker.hpp
+//./Include_MultiHeaders/OverriderComponents/ConditionArgsTypesChecker.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_TYPES_CHECKER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_TYPES_CHECKER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_CONDITION_ARGS_TYPES_CHECKER_HPP
+#define CO_OVERRIDER_COMPONENTS_CONDITION_ARGS_TYPES_CHECKER_HPP
 
 
 
@@ -3818,14 +3797,10 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    class Internal_ConditionArgsTypesChecker
+    struct ConditionArgsTypesChecker
     {
-        friend class Internal_ReturnDataValidator;
-        friend class Internal_ArgsDataValidator;
-        friend class Internal_RequirementValidator;
-        
-        protected:
-            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>&, int) { return true; };
+        public:
+            inline bool CheckArgumentsTypes(std::vector<DataInfo>&, int) { return true; };
 
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_CheckArguments 1
@@ -3841,7 +3816,7 @@ namespace CppOverride
                 typename std::enable_if<std::is_same<PureType, void>::value, bool>::type = true, 
                 typename... Args
             >
-            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsTypes(std::vector<DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
                                             Args&... args)
@@ -3879,7 +3854,7 @@ namespace CppOverride
                 typename std::enable_if<!std::is_pointer<RawType>::value, bool>::type = true,
                 typename... Args
             >
-            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsTypes(std::vector<DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
                                             Args&... args)
@@ -3896,13 +3871,10 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    if( typeid(RawType).hash_code() != 
-                            validArgumentsList.at(argIndex).DataType &&
-                        typeid(RawType&).hash_code() != 
-                            validArgumentsList.at(argIndex).DataType &&
+                    if( typeid(RawType).hash_code() != validArgumentsList.at(argIndex).DataType &&
+                        typeid(RawType&).hash_code() != validArgumentsList.at(argIndex).DataType &&
                         //NOTE: Reference can be compared as pointer later down the line
-                        typeid(RawType*).hash_code() != 
-                            validArgumentsList.at(argIndex).DataType)
+                        typeid(RawType*).hash_code() != validArgumentsList.at(argIndex).DataType)
                     {
                         return false;
                     }
@@ -3928,7 +3900,7 @@ namespace CppOverride
                 typename PureType = INTERNAL_CO_PURE_TYPE(T),
                 typename... Args
             >
-            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsTypes(std::vector<DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
                                             Args&... args)
@@ -3982,10 +3954,10 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ConditionArgsValuesChecker.hpp
+//./Include_MultiHeaders/OverriderComponents/ConditionArgsValuesChecker.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_CONDITION_ARGS_VALUES_CHECKER_HPP
+#define CO_OVERRIDER_COMPONENTS_CONDITION_ARGS_VALUES_CHECKER_HPP
 
 
 
@@ -4040,14 +4012,10 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    class Internal_ConditionArgsValuesChecker
+    struct ConditionArgsValuesChecker
     {
-        friend class Internal_ReturnDataValidator;
-        friend class Internal_ArgsDataValidator;
-        friend class Internal_RequirementValidator;
-        
-        protected:
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>&, 
+        public:
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>&, 
                                                 int,
                                                 OverrideStatus&) { return true; };
 
@@ -4066,7 +4034,7 @@ namespace CppOverride
                 typename std::enable_if<!InequalExists<RawType>::value, bool>::type = true,
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -4084,7 +4052,7 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    const DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
                     if(typeid(RawType*).hash_code() == curArgInfo.DataType)
@@ -4119,7 +4087,7 @@ namespace CppOverride
                 typename std::enable_if<!std::is_pointer<RawType>::value, bool>::type = true,
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -4137,7 +4105,7 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    const DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
                     if(typeid(RawType*).hash_code() == curArgInfo.DataType)
@@ -4171,7 +4139,7 @@ namespace CppOverride
                 typename PureType = INTERNAL_CO_PURE_TYPE(T),
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -4189,7 +4157,7 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    const DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Pointer
                     if(typeid(RawType).hash_code() == curArgInfo.DataType)
@@ -4232,7 +4200,7 @@ namespace CppOverride
                 typename std::enable_if<!InequalExists<RawElementType>::value, bool>::type = true,
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -4250,7 +4218,7 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    const DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
                     if(typeid(RawType*).hash_code() == curArgInfo.DataType)
@@ -4287,7 +4255,7 @@ namespace CppOverride
                 typename std::enable_if<InequalExists<RawElementType>::value, bool>::type = true,
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -4305,7 +4273,7 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    const DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
                     if(typeid(RawType*).hash_code() == curArgInfo.DataType)
@@ -4335,7 +4303,7 @@ namespace CppOverride
                 typename std::enable_if<std::is_same<PureType, void>::value, bool>::type = true, 
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -4375,10 +4343,10 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ArgsModifier.hpp
+//./Include_MultiHeaders/OverriderComponents/ArgsModifier.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_MODIFIER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_MODIFIER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_ARGS_MODIFIER_HPP
+#define CO_OVERRIDER_COMPONENTS_ARGS_MODIFIER_HPP
 
 
 
@@ -4393,16 +4361,16 @@ namespace CppOverride
 
 namespace CppOverride 
 {
-    class Internal_ArgsModifier
+    struct ArgsModifier
     {
-        protected:
+        public:
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_ModifyArgs 1
             #else
                 #define INTERNAL_CO_LOG_ModifyArgs 0
             #endif
         
-            inline void ModifyArgs( std::vector<Internal_DataInfo>&, 
+            inline void ModifyArgs( std::vector<DataInfo>&, 
                                     int,
                                     OverrideStatus*) {}
 
@@ -4413,7 +4381,7 @@ namespace CppOverride
                 typename std::enable_if<!std::is_copy_assignable<RawType>::value, bool>::type = true,
                 typename... Args
             >
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
+            inline void ModifyArgs( std::vector<DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
                                     T&, 
@@ -4438,7 +4406,7 @@ namespace CppOverride
                 typename std::enable_if<std::is_copy_assignable<RawType>::value, bool>::type = true,
                 typename... Args
             >
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
+            inline void ModifyArgs( std::vector<DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
                                     T& arg, 
@@ -4500,7 +4468,7 @@ namespace CppOverride
                 typename std::enable_if<!std::is_same<RawType, void>::value, bool>::type = true, 
                 typename... Args
             >
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
+            inline void ModifyArgs( std::vector<DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
                                     T*& arg, 
@@ -4510,7 +4478,7 @@ namespace CppOverride
             }
             
             template<typename T, typename... Args>
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
+            inline void ModifyArgs( std::vector<DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
                                     const T& arg, 
@@ -4523,7 +4491,7 @@ namespace CppOverride
                     std::cout << "typeid(arg).name(): " << typeid(arg).name() <<std::endl;
                     std::cout << "typeid(arg).hash_code(): " << typeid(arg).hash_code() <<std::endl;
                     //std::cout << "arg value: "<< arg << std::endl;
-                    std::cout << "argsData.att(index).DataSet: " << argsData.at(index).DataSet << std::endl;
+                    std::cout << "argsData.at(index).DataSet: " << argsData.at(index).DataSet << std::endl;
                     std::cout << std::endl;
                 }
                 
@@ -4540,7 +4508,7 @@ namespace CppOverride
             }
 
             template<typename... Args>
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
+            inline void ModifyArgs( std::vector<DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
                                     const Any&, 
@@ -4557,7 +4525,7 @@ namespace CppOverride
             
             inline void ModifyArgs( void* instance,
                                     std::vector<void*>& argumentsList, 
-                                    Internal_ArgsDataActionInfo& argsDataAction)
+                                    ArgsDataActionInfo& argsDataAction)
             {
                 if(argsDataAction.DataActionSet)
                     argsDataAction.DataAction(instance, argumentsList);
@@ -4569,10 +4537,10 @@ namespace CppOverride
 
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ReturnDataValidator.hpp
+//./Include_MultiHeaders/OverriderComponents/ReturnDataValidator.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_VALIDATOR_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_VALIDATOR_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_RETURN_DATA_VALIDATOR_HPP
+#define CO_OVERRIDER_COMPONENTS_RETURN_DATA_VALIDATOR_HPP
 
 
 
@@ -4585,10 +4553,10 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    class Internal_ReturnDataValidator
+    struct ReturnDataValidator
     {
-        protected:
-            Internal_ArgsValuesAppender& ArgsValuesAppender;
+        public:
+            ArgsValuesAppender& CurrentArgsValuesAppender;
         
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 1
@@ -4597,45 +4565,23 @@ namespace CppOverride
             #endif
 
             template<typename ReturnType, typename... Args>
-            inline bool IsCorrectReturnDataInfo(Internal_OverrideData& overrideDataToCheck,
+            inline bool IsCorrectReturnDataInfo(OverrideData& overrideDataToCheck,
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
                     std::cout << std::endl << __func__ << " called" << std::endl;
 
                 std::vector<void*> argumentsList;
-                ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
                 if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
                     std::cout << "Checking return data" << std::endl;
 
                 //Check override return data exist
-                if(overrideDataToCheck.ReturnDataInfo.DataSet)
+                if(overrideDataToCheck.CurrentReturnDataInfo.DataSet)
                 {
                     //Check return type match
-                    if(overrideDataToCheck.ReturnDataInfo.DataType != typeid(ReturnType).hash_code())
-                    {
-                        if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
-                            std::cout << "Failed at return type" << std::endl;
-                        
-                        return false;
-                    }
-                    
-                    //If we need to return a reference, 
-                    //  we check for pointer type as we can't store references
-                    if( std::is_reference<ReturnType>() && 
-                        !overrideDataToCheck.ReturnDataInfo.ReturnReference)
-                    {
-                        if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
-                            std::cout << "Failed at return reference" << std::endl;
-                        
-                        return false;
-                    }
-                }
-                else if(overrideDataToCheck.ReturnDataActionInfo.DataActionSet)
-                {
-                    //Check return type match
-                    if( overrideDataToCheck.ReturnDataActionInfo.DataType != 
+                    if( overrideDataToCheck.CurrentReturnDataInfo.DataType != 
                         typeid(ReturnType).hash_code())
                     {
                         if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
@@ -4647,7 +4593,30 @@ namespace CppOverride
                     //If we need to return a reference, 
                     //  we check for pointer type as we can't store references
                     if( std::is_reference<ReturnType>() && 
-                        !overrideDataToCheck.ReturnDataActionInfo.ReturnReference)
+                        !overrideDataToCheck.CurrentReturnDataInfo.ReturnReference)
+                    {
+                        if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
+                            std::cout << "Failed at return reference" << std::endl;
+                        
+                        return false;
+                    }
+                }
+                else if(overrideDataToCheck.CurrentReturnDataActionInfo.DataActionSet)
+                {
+                    //Check return type match
+                    if( overrideDataToCheck.CurrentReturnDataActionInfo.DataType != 
+                        typeid(ReturnType).hash_code())
+                    {
+                        if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
+                            std::cout << "Failed at return type" << std::endl;
+                        
+                        return false;
+                    }
+                    
+                    //If we need to return a reference, 
+                    //  we check for pointer type as we can't store references
+                    if( std::is_reference<ReturnType>() && 
+                        !overrideDataToCheck.CurrentReturnDataActionInfo.ReturnReference)
                     {
                         if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
                             std::cout << "Failed at return action reference" << std::endl;
@@ -4655,7 +4624,7 @@ namespace CppOverride
                         return false;
                     }
                 }
-                else if(overrideDataToCheck.ReturnDataInfo.ReturnAny)
+                else if(overrideDataToCheck.CurrentReturnDataInfo.ReturnAny)
                 {
                     if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
                         std::cout << "Any return type entry encountered" << std::endl;
@@ -4668,9 +4637,9 @@ namespace CppOverride
                 
                 return true;
             }
-        public:
-            inline Internal_ReturnDataValidator(Internal_ArgsValuesAppender* argsValuesAppender) :
-                ArgsValuesAppender(*argsValuesAppender)
+            
+            inline ReturnDataValidator(ArgsValuesAppender& argsValuesAppender) :
+                CurrentArgsValuesAppender(argsValuesAppender)
             {}
     };
 }
@@ -4678,10 +4647,10 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_ArgsDataValidator.hpp
+//./Include_MultiHeaders/OverriderComponents/ArgsDataValidator.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_DATA_VALIDATOR_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_DATA_VALIDATOR_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_ARGS_DATA_VALIDATOR_HPP
+#define CO_OVERRIDER_COMPONENTS_ARGS_DATA_VALIDATOR_HPP
 
 
 
@@ -4696,11 +4665,11 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    class Internal_ArgsDataValidator
+    struct ArgsDataValidator
     {
-        protected:
-            Internal_ArgsValuesAppender& ArgsValuesAppender;
-            Internal_ArgsTypeInfoAppender& ArgsTypeInfoAppender;
+        public:
+            ArgsValuesAppender& CurrentArgsValuesAppender;
+            ArgsTypeInfoAppender& CurrentArgsTypeInfoAppender;
             
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo 1
@@ -4709,7 +4678,7 @@ namespace CppOverride
             #endif
 
             template<typename... Args>
-            inline bool IsCorrectArgumentsDataInfo( Internal_OverrideData& overrideDataToCheck,
+            inline bool IsCorrectArgumentsDataInfo( OverrideData& overrideDataToCheck,
                                                     Args&... args)
             {
                 
@@ -4717,10 +4686,10 @@ namespace CppOverride
                     std::cout << std::endl << __func__ << " called" << std::endl;
                 
                 std::vector<void*> argumentsList;
-                ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                std::vector<Internal_DataInfo> argumentsTypesList;
-                ArgsTypeInfoAppender.AppendArgsTypeInfo(argumentsTypesList, args...);
+                std::vector<DataInfo> argumentsTypesList;
+                CurrentArgsTypeInfoAppender.AppendArgsTypeInfo(argumentsTypesList, args...);
                 
                 if(INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo)
                     std::cout << "Checking arg data\n";
@@ -4811,11 +4780,10 @@ namespace CppOverride
                 return true;
             }
         
-        public:
-            Internal_ArgsDataValidator( Internal_ArgsValuesAppender& argsValuesAppender,
-                                        Internal_ArgsTypeInfoAppender& argsTypeInfoAppender) :
-                                                ArgsValuesAppender(argsValuesAppender),
-                                                ArgsTypeInfoAppender(argsTypeInfoAppender)
+            ArgsDataValidator(  ArgsValuesAppender& argsValuesAppender,
+                                ArgsTypeInfoAppender& argsTypeInfoAppender) :
+                CurrentArgsValuesAppender(argsValuesAppender),
+                CurrentArgsTypeInfoAppender(argsTypeInfoAppender)
             {}
     };
 
@@ -4824,10 +4792,10 @@ namespace CppOverride
 #endif
 
 //=================================================================
-//./Include_MultiHeaders/OverriderComponents/Internal_RequirementValidator.hpp
+//./Include_MultiHeaders/OverriderComponents/RequirementValidator.hpp
 //=================================================================
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_REQUIREMENT_VALIDATOR_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_REQUIREMENT_VALIDATOR_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_REQUIREMENT_VALIDATOR_HPP
+#define CO_OVERRIDER_COMPONENTS_REQUIREMENT_VALIDATOR_HPP
 
 
 
@@ -4844,12 +4812,12 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    class Internal_RequirementValidator
+    struct RequirementValidator
     {
-        protected:
-            Internal_ArgsValuesAppender& ArgsValuesAppender;
-            Internal_ConditionArgsTypesChecker& ArgsTypesChecker;
-            Internal_ConditionArgsValuesChecker& ArgsValuesChecker;
+        public:
+            ArgsValuesAppender& CurrentArgsValuesAppender;
+            ConditionArgsTypesChecker& CurrentArgsTypesChecker;
+            ConditionArgsValuesChecker& CurrentArgsValuesChecker;
         
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_IsCorrectDataInfo 1
@@ -4858,7 +4826,7 @@ namespace CppOverride
             #endif
 
             template<typename ReturnType, typename... Args>
-            inline bool IsMeetingRequirementForDataInfo(Internal_OverrideData& overrideDataToCheck,
+            inline bool IsMeetingRequirementForDataInfo(OverrideData& overrideDataToCheck,
                                                         OverrideStatus& outInternalStatus,
                                                         void* instance,
                                                         Args&... args)
@@ -4867,17 +4835,19 @@ namespace CppOverride
                     std::cout << std::endl << __func__ << " called" << std::endl;
 
                 std::vector<void*> argumentsList;
-                ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
                 if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                     std::cout << "Checking override data" << std::endl;
 
                 //Check parameter condition types/count match
-                if( !overrideDataToCheck.ConditionInfo.ArgsCondition.empty() && 
-                    !ArgsTypesChecker.CheckArgumentsTypes(  overrideDataToCheck .ConditionInfo
-                                                                                .ArgsCondition, 
-                                                            0, 
-                                                            args...))
+                if( !overrideDataToCheck.CurrentConditionInfo.ArgsCondition.empty() && 
+                    !CurrentArgsTypesChecker.CheckArgumentsTypes
+                    (
+                        overrideDataToCheck.CurrentConditionInfo.ArgsCondition, 
+                        0, 
+                        args...
+                    ))
                 {
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check parameter" << std::endl;
@@ -4886,12 +4856,14 @@ namespace CppOverride
                 }
                 
                 //Check parameter values
-                if( !overrideDataToCheck.ConditionInfo.ArgsCondition.empty() && 
-                    !ArgsValuesChecker.CheckArgumentsValues(overrideDataToCheck .ConditionInfo
-                                                                                .ArgsCondition, 
-                                                            0, 
-                                                            outInternalStatus,
-                                                            args...))
+                if( !overrideDataToCheck.CurrentConditionInfo.ArgsCondition.empty() && 
+                    !CurrentArgsValuesChecker.CheckArgumentsValues
+                    (
+                        overrideDataToCheck.CurrentConditionInfo.ArgsCondition, 
+                        0, 
+                        outInternalStatus,
+                        args...
+                    ))
                 {
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check parameter" << std::endl;
@@ -4902,9 +4874,9 @@ namespace CppOverride
                             (OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
                     }
                     
-                    if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
+                    if(overrideDataToCheck.CurrentResultActionInfo.OtherwiseActionSet)
                     {
-                        overrideDataToCheck .ResultActionInfo
+                        overrideDataToCheck .CurrentResultActionInfo
                                             .OtherwiseAction(instance, argumentsList);
                     }
                     return false;
@@ -4912,10 +4884,9 @@ namespace CppOverride
                 
                 //Check condition lambda
                 //TODO: Enforce type for arguments
-                if( overrideDataToCheck.ConditionInfo.DataConditionSet && 
-                    !overrideDataToCheck.ConditionInfo
-                                        .LambdaCondition(   instance,
-                                                            argumentsList))
+                if( overrideDataToCheck.CurrentConditionInfo.DataConditionSet && 
+                    !overrideDataToCheck.CurrentConditionInfo.LambdaCondition(  instance,
+                                                                                argumentsList))
                 {
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check condition" << std::endl;
@@ -4926,9 +4897,9 @@ namespace CppOverride
                             (OverrideStatus::MATCHING_CONDITION_ACTION_FAILED);
                     }
                     
-                    if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
+                    if(overrideDataToCheck.CurrentResultActionInfo.OtherwiseActionSet)
                     {
-                        overrideDataToCheck .ResultActionInfo
+                        overrideDataToCheck .CurrentResultActionInfo
                                             .OtherwiseAction(   instance, 
                                                                 argumentsList);
                     }
@@ -4937,9 +4908,9 @@ namespace CppOverride
                 }
                 
                 //Check times
-                if( overrideDataToCheck.ConditionInfo.Times >= 0 && 
-                    overrideDataToCheck.ConditionInfo.CalledTimes >= 
-                    overrideDataToCheck.ConditionInfo.Times)
+                if( overrideDataToCheck.CurrentConditionInfo.Times >= 0 && 
+                    overrideDataToCheck.CurrentConditionInfo.CalledTimes >= 
+                    overrideDataToCheck.CurrentConditionInfo.Times)
                 {
                     if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                         std::cout << "Failed at Check times" << std::endl;
@@ -4950,9 +4921,9 @@ namespace CppOverride
                             (OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
                     }
                     
-                    if(overrideDataToCheck.ResultActionInfo.OtherwiseActionSet)
+                    if(overrideDataToCheck.CurrentResultActionInfo.OtherwiseActionSet)
                     {
-                        overrideDataToCheck .ResultActionInfo
+                        overrideDataToCheck .CurrentResultActionInfo
                                             .OtherwiseAction(instance, argumentsList);
                     }
 
@@ -4964,14 +4935,13 @@ namespace CppOverride
                 
                 return true;
             }
-        public:
-            inline 
-            Internal_RequirementValidator(  Internal_ArgsValuesAppender& argsValuesAppender,
-                                            Internal_ConditionArgsTypesChecker& argsTypesChecker,
-                                            Internal_ConditionArgsValuesChecker& argsValuesChecker) : 
-                ArgsValuesAppender(argsValuesAppender),
-                ArgsTypesChecker(argsTypesChecker),
-                ArgsValuesChecker(argsValuesChecker)
+            
+            inline RequirementValidator(ArgsValuesAppender& argsValuesAppender,
+                                        ConditionArgsTypesChecker& argsTypesChecker,
+                                        ConditionArgsValuesChecker& argsValuesChecker) : 
+                CurrentArgsValuesAppender(argsValuesAppender),
+                CurrentArgsTypesChecker(argsTypesChecker),
+                CurrentArgsValuesChecker(argsValuesChecker)
             {}
     };
 }
@@ -5057,33 +5027,40 @@ namespace CppOverride
         return processedName;
     }
     
-    class Overrider :   public Internal_ReturnDataSetter, 
-                        public Internal_ArgsDataSetter,
-                        public Internal_RequirementSetter,
-                        public Internal_ArgsValuesAppender,
-                        public Internal_ArgsTypeInfoAppender,
-                        public Internal_ConditionArgsTypesChecker,
-                        public Internal_ConditionArgsValuesChecker,
-                        public Internal_ArgsModifier,
-                        public Internal_ReturnDataValidator,
-                        public Internal_ArgsDataValidator,
-                        public Internal_RequirementValidator
+    struct Overrider
     {
-        private:
-            std::unordered_map<std::string, Internal_OverrideDataList> OverrideDatas;
-
-
-        //==============================================================================
-        //Public facing methods for overriding returns or arguments
-        //==============================================================================
         public:
+            std::unordered_map<std::string, std::vector<OverrideData>> OverrideDatas;
+            ReturnDataSetter CurrentReturnDataSetter;
+            ArgsDataSetter CurrentArgsDataSetter;
+            RequirementSetter CurrentRequirementSetter;
+            ArgsValuesAppender CurrentArgsValuesAppender;
+            ArgsTypeInfoAppender CurrentArgsTypeInfoAppender;
+            ConditionArgsTypesChecker CurrentConditionArgsTypesChecker;
+            ConditionArgsValuesChecker CurrentConditionArgsValuesChecker;
+            ArgsModifier CurrentArgsModifier;
+            ReturnDataValidator CurrentReturnDataValidator;
+            ArgsDataValidator CurrentArgsDataValidator;
+            RequirementValidator CurrentRequirementValidator;
+
+            //==============================================================================
+            //Public facing methods for overriding returns or arguments
+            //==============================================================================
             inline Overrider(const Overrider& other) :
-                Internal_ReturnDataSetter(OverrideDatas),
-                Internal_ArgsDataSetter(OverrideDatas),
-                Internal_RequirementSetter(OverrideDatas),
-                Internal_ReturnDataValidator(static_cast<Internal_ArgsValuesAppender*>(this)),
-                Internal_ArgsDataValidator(*this, *this),
-                Internal_RequirementValidator(*this, *this, *this)
+                OverrideDatas(),
+                CurrentReturnDataSetter(OverrideDatas),
+                CurrentArgsDataSetter(OverrideDatas),
+                CurrentRequirementSetter(OverrideDatas),
+                CurrentArgsValuesAppender(),
+                CurrentArgsTypeInfoAppender(),
+                CurrentConditionArgsTypesChecker(),
+                CurrentConditionArgsValuesChecker(),
+                CurrentArgsModifier(),
+                CurrentReturnDataValidator(CurrentArgsValuesAppender),
+                CurrentArgsDataValidator(CurrentArgsValuesAppender, CurrentArgsTypeInfoAppender),
+                CurrentRequirementValidator(CurrentArgsValuesAppender, 
+                                            CurrentConditionArgsTypesChecker, 
+                                            CurrentConditionArgsValuesChecker)
             {
                 *this = other;
             }
@@ -5097,12 +5074,21 @@ namespace CppOverride
                 return *this;
             }
                 
-            inline Overrider() :    Internal_ReturnDataSetter(OverrideDatas),
-                                    Internal_ArgsDataSetter(OverrideDatas),
-                                    Internal_RequirementSetter(OverrideDatas),
-                                    Internal_ReturnDataValidator(*this),
-                                    Internal_ArgsDataValidator(*this, *this),
-                                    Internal_RequirementValidator(*this, *this, *this)
+            inline Overrider() :    OverrideDatas(),
+                                    CurrentReturnDataSetter(OverrideDatas),
+                                    CurrentArgsDataSetter(OverrideDatas),
+                                    CurrentRequirementSetter(OverrideDatas),
+                                    CurrentArgsValuesAppender(),
+                                    CurrentArgsTypeInfoAppender(),
+                                    CurrentConditionArgsTypesChecker(),
+                                    CurrentConditionArgsValuesChecker(),
+                                    CurrentArgsModifier(),
+                                    CurrentReturnDataValidator(CurrentArgsValuesAppender),
+                                    CurrentArgsDataValidator(   CurrentArgsValuesAppender, 
+                                                                CurrentArgsTypeInfoAppender),
+                                    CurrentRequirementValidator(CurrentArgsValuesAppender, 
+                                                                CurrentConditionArgsTypesChecker,
+                                                                CurrentConditionArgsValuesChecker)
             {}
             
             inline ~Overrider()
@@ -5150,7 +5136,7 @@ namespace CppOverride
                     return false;
                 }
             
-                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
                 
                 outOverrideArgs = false;
                 outOverrideReturn = false;
@@ -5167,8 +5153,8 @@ namespace CppOverride
                     if( !currentDataList.at(i).ArgumentsDataInfo.empty() ||
                         currentDataList.at(i).ArgumentsDataActionInfo.DataActionSet)
                     {
-                        if(!IsCorrectArgumentsDataInfo( currentDataList.at(i), 
-                                                        args...))
+                        if(!CurrentArgsDataValidator.IsCorrectArgumentsDataInfo(currentDataList.at(i), 
+                                                                                args...))
                         {
                             if(INTERNAL_CO_LOG_CheckOverride)
                                 std::cout << "Arguments not correct at index: " << i << std::endl;
@@ -5179,11 +5165,15 @@ namespace CppOverride
                         outOverrideArgs = true;
                     }
 
-                    if( currentDataList.at(i).ReturnDataInfo.DataSet ||
-                        currentDataList.at(i).ReturnDataInfo.ReturnAny ||
-                        currentDataList.at(i).ReturnDataActionInfo.DataActionSet)
+                    if( currentDataList.at(i).CurrentReturnDataInfo.DataSet ||
+                        currentDataList.at(i).CurrentReturnDataInfo.ReturnAny ||
+                        currentDataList.at(i).CurrentReturnDataActionInfo.DataActionSet)
                     {
-                        if(!IsCorrectReturnDataInfo<ReturnType>(currentDataList.at(i), args...))
+                        if( !CurrentReturnDataValidator.IsCorrectReturnDataInfo<ReturnType>
+                            (
+                                currentDataList.at(i), 
+                                args...
+                            ))
                         {
                             if(INTERNAL_CO_LOG_CheckOverride)
                                 std::cout << "Return not correct at index: " << i << std::endl;
@@ -5193,17 +5183,20 @@ namespace CppOverride
                         
                         outOverrideReturn = true;
                         
-                        if(currentDataList.at(i).ReturnDataInfo.ReturnAny)
+                        if(currentDataList.at(i).CurrentReturnDataInfo.ReturnAny)
                             outDontReturn = true;
                         else
                             outDontReturn = false;
                     }
 
                     OverrideStatus internalStatus = OverrideStatus::NO_OVERRIDE;
-                    if(!IsMeetingRequirementForDataInfo<ReturnType>(currentDataList.at(i), 
-                                                                    internalStatus, 
-                                                                    instance,
-                                                                    args...))
+                    if( !CurrentRequirementValidator.IsMeetingRequirementForDataInfo<ReturnType>
+                        (
+                            currentDataList.at(i), 
+                            internalStatus, 
+                            instance,
+                            args...
+                        ))
                     {
                         //If something is wrong internally, notify everything
                         if(internalStatus != OverrideStatus::NO_OVERRIDE)
@@ -5244,17 +5237,15 @@ namespace CppOverride
             {
                 functionName = ProcessFunctionName(functionName);
                 
-                Internal_OverrideData& correctData = 
-                    OverrideDatas.at(functionName).at(overrideIndex);
-                
-                if(correctData.ResultActionInfo.CorrectActionSet)
+                OverrideData& correctData = OverrideDatas.at(functionName).at(overrideIndex);
+                if(correctData.CurrentResultActionInfo.CorrectActionSet)
                 {
                     std::vector<void*> argumentsList;
-                    AppendArgsValues(argumentsList, args...);
-                    correctData.ResultActionInfo.CorrectAction(instance, argumentsList);
+                    CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
+                    correctData.CurrentResultActionInfo.CorrectAction(instance, argumentsList);
                 }
                 
-                correctData.ConditionInfo.CalledTimes++;
+                correctData.CurrentConditionInfo.CalledTimes++;
                 if(correctData.Result != nullptr)
                     correctData.Result->AddStatus(OverrideStatus::OVERRIDE_SUCCESS);
             }
@@ -5310,24 +5301,24 @@ namespace CppOverride
                     std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
                 
-                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
                 std::vector<void*> argumentsList;
-                AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
+                OverrideData& correctData = currentDataList.at(dataIndex);
                 Internal_CallReturnOverrideResultExpectedAction(functionName, 
                                                                 dataIndex, 
                                                                 instance, 
                                                                 args...);
                 
-                if(correctData.ReturnDataInfo.DataSet)
-                    return *static_cast<ReturnType*>(correctData.ReturnDataInfo.Data.get());
-                else if(correctData.ReturnDataActionInfo.DataActionSet)
+                if(correctData.CurrentReturnDataInfo.DataSet)
+                    return *static_cast<ReturnType*>(correctData.CurrentReturnDataInfo.Data.get());
+                else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
                 {
                     ReturnType returnRef;
-                    correctData.ReturnDataActionInfo.DataAction(instance, 
-                                                                argumentsList, 
-                                                                &returnRef);
+                    correctData.CurrentReturnDataActionInfo.DataAction( instance, 
+                                                                        argumentsList, 
+                                                                        &returnRef);
                     return returnRef;
                 }
                 
@@ -5355,27 +5346,29 @@ namespace CppOverride
                     std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
                 
-                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
                 std::vector<void*> argumentsList;
-                AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
+                OverrideData& correctData = currentDataList.at(dataIndex);
                 Internal_CallReturnOverrideResultExpectedAction(functionName, 
                                                                 dataIndex, 
                                                                 instance, 
                                                                 args...);
 
-                if(correctData.ReturnDataInfo.DataSet)
+                if(correctData.CurrentReturnDataInfo.DataSet)
                 {
                     return *reinterpret_cast<INTERNAL_CO_UNREF(ReturnType)*>
                     (
-                        correctData.ReturnDataInfo.Data.get()
+                        correctData.CurrentReturnDataInfo.Data.get()
                     );
                 }
-                else if(correctData.ReturnDataActionInfo.DataActionSet)
+                else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
                 {
                     INTERNAL_CO_UNREF(ReturnType)* returnRef;
-                    correctData.ReturnDataActionInfo.DataAction(instance, argumentsList, &returnRef);
+                    correctData.CurrentReturnDataActionInfo.DataAction( instance, 
+                                                                        argumentsList, 
+                                                                        &returnRef);
                     return *returnRef;
                 }
                 
@@ -5406,21 +5399,25 @@ namespace CppOverride
                     std::cout << "functionName: "<<functionName << std::endl;
                 }
                 
-                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
                 std::vector<void*> argumentsList;
-                AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
+                OverrideData& correctData = currentDataList.at(dataIndex);
                 OverrideStatus overrideStatus = OverrideStatus::OVERRIDE_SUCCESS;
                 
                 if(correctData.ArgumentsDataActionInfo.DataActionSet)
-                    ModifyArgs(instance, argumentsList, correctData.ArgumentsDataActionInfo);
+                {
+                    CurrentArgsModifier.ModifyArgs( instance, 
+                                                    argumentsList, 
+                                                    correctData.ArgumentsDataActionInfo);
+                }
                 else
                 {
-                    ModifyArgs( correctData.ArgumentsDataInfo, 
-                                0, 
-                                &overrideStatus, 
-                                args...);
+                    CurrentArgsModifier.ModifyArgs( correctData.ArgumentsDataInfo, 
+                                                    0, 
+                                                    &overrideStatus, 
+                                                    args...);
                 }
                 
                 if(correctData.Result != nullptr)
@@ -5457,7 +5454,7 @@ namespace CppOverride
                     std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
 
-                OverrideDatas[functionName].push_back(Internal_OverrideData());
+                OverrideDatas[functionName].push_back(OverrideData());
                 return OverrideInfoSetter(functionName, *this);
             }
             
@@ -5496,13 +5493,13 @@ namespace CppOverride
 
     inline OverrideInfoSetter& OverrideInfoSetter::Times(int times)
     {
-        return CppOverrideObj.Times(*this, times);
+        return CppOverrideObj.CurrentRequirementSetter.Times(*this, times);
     }
 
     template<typename... Args>
     inline OverrideInfoSetter& OverrideInfoSetter::WhenCalledWith(Args... args)
     {
-        return CppOverrideObj.WhenCalledWith(*this, args...);
+        return CppOverrideObj.CurrentRequirementSetter.WhenCalledWith(*this, args...);
     }
 
     //TODO: Enforce type for arguments
@@ -5510,14 +5507,14 @@ namespace CppOverride
     OverrideInfoSetter::If(std::function<bool(  void* instance, 
                                                 const std::vector<void*>& args)> condition)
     {
-        return CppOverrideObj.If(*this, condition);
+        return CppOverrideObj.CurrentRequirementSetter.If(*this, condition);
     }
 
     inline OverrideInfoSetter& 
     OverrideInfoSetter::Otherwise_Do(std::function<void(void* instance,
                                                         const std::vector<void*>& args)> action)
     {
-        return CppOverrideObj.Otherwise_Do(*this, action);
+        return CppOverrideObj.CurrentRequirementSetter.Otherwise_Do(*this, action);
     }
 
     inline OverrideInfoSetter& 
@@ -5525,13 +5522,13 @@ namespace CppOverride
     WhenCalledExpectedly_Do(std::function<void( void* instance,
                                                 const std::vector<void*>& args)> action)
     {
-        return CppOverrideObj.WhenCalledExpectedly_Do(*this, action);
+        return CppOverrideObj.CurrentRequirementSetter.WhenCalledExpectedly_Do(*this, action);
     }
 
     inline OverrideInfoSetter& 
     OverrideInfoSetter::AssignResult(ResultPtr result)
     {
-        return CppOverrideObj.AssignResult(*this, result);
+        return CppOverrideObj.CurrentRequirementSetter.AssignResult(*this, result);
     }
 
     inline OverrideInfoSetter& 
@@ -5554,7 +5551,7 @@ namespace CppOverride
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverrideObject(const void* instance)
     {
-        return CppOverrideObj.OverrideObject(*this, (void*)instance);
+        return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, (void*)instance);
     }
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverridesObject(const void* instance)
@@ -5564,7 +5561,7 @@ namespace CppOverride
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverrideAny()
     {
-        return CppOverrideObj.OverrideObject(*this, nullptr);
+        return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, nullptr);
     }
 
     template<typename ReturnType>
@@ -5573,7 +5570,8 @@ namespace CppOverride
                                                             const std::vector<void*>& args, 
                                                             void* out)> returnAction)
     {
-        return CppOverrideObj.ReturnsByAction<ReturnType>(*this, returnAction);
+        return CppOverrideObj.CurrentReturnDataSetter.ReturnsByAction<ReturnType>(  *this, 
+                                                                                    returnAction);
     }
 
     template<typename ReturnType>
@@ -5581,26 +5579,26 @@ namespace CppOverride
     OverrideInfoSetter::Returns(typename TypeSpecifier<ReturnType>::Type returnData)
     {
         static_assert(std::is_same<ReturnType, decltype(returnData)>::value, "");
-        return CppOverrideObj.Returns<ReturnType>(*this, returnData);
+        return CppOverrideObj.CurrentReturnDataSetter.Returns<ReturnType>(*this, returnData);
     }
     
     template<>
     inline OverrideInfoSetter&
     OverrideInfoSetter::Returns<void>()
     {
-        return CppOverrideObj.ReturnsVoid(*this);
+        return CppOverrideObj.CurrentReturnDataSetter.ReturnsVoid(*this);
     }
     
     inline OverrideInfoSetter& OverrideInfoSetter::ReturnsVoid()
     {
-        return CppOverrideObj.ReturnsVoid(*this);
+        return CppOverrideObj.CurrentReturnDataSetter.ReturnsVoid(*this);
     }
     
     template<typename... Args>
     inline OverrideInfoSetter&
     OverrideInfoSetter::SetArgs(typename TypeUnwrapper<Args>::Type... args)
     {
-        return CppOverrideObj.SetArgs<Args...>(*this, args...);
+        return CppOverrideObj.CurrentArgsDataSetter.SetArgs<Args...>(*this, args...);
     }
     
     template<typename... Args>
@@ -5608,7 +5606,7 @@ namespace CppOverride
     OverrideInfoSetter::SetArgsByAction(std::function<void( void* instance, 
                                         std::vector<void*>& args)> setArgsAction)
     {
-        return CppOverrideObj.SetArgsByAction<Args...>(*this, setArgsAction);
+        return CppOverrideObj.CurrentArgsDataSetter.SetArgsByAction<Args...>(*this, setArgsAction);
     }
 }
 
@@ -6072,13 +6070,10 @@ namespace CppOverride
 
 namespace CppOverride
 {
-    class Overridable
+    struct Overridable
     {
-        protected:
-            CO_DECLARE_MEMBER_INSTANCE(CurrentOverrideInstance);
-        
-        public:
-            CO_DECLARE_OVERRIDE_METHODS(CurrentOverrideInstance);
+        CO_DECLARE_MEMBER_INSTANCE(CurrentOverrideInstance);
+        CO_DECLARE_OVERRIDE_METHODS(CurrentOverrideInstance);
     };
 }
 

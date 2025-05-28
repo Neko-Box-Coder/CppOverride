@@ -1,9 +1,9 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_MODIFIER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_MODIFIER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_ARGS_MODIFIER_HPP
+#define CO_OVERRIDER_COMPONENTS_ARGS_MODIFIER_HPP
 
-#include "../Internal_DataInfo.hpp"
+#include "../DataInfo.hpp"
 #include "../Any.hpp"
-#include "../Internal_ArgsDataActionInfo.hpp"
+#include "../ArgsDataActionInfo.hpp"
 #include "../OverrideStatus.hpp"
 #include "../PureType.hpp"
 
@@ -14,16 +14,16 @@
 
 namespace CppOverride 
 {
-    class Internal_ArgsModifier
+    struct ArgsModifier
     {
-        protected:
+        public:
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_ModifyArgs 1
             #else
                 #define INTERNAL_CO_LOG_ModifyArgs 0
             #endif
         
-            inline void ModifyArgs( std::vector<Internal_DataInfo>&, 
+            inline void ModifyArgs( std::vector<DataInfo>&, 
                                     int,
                                     OverrideStatus*) {}
 
@@ -34,7 +34,7 @@ namespace CppOverride
                 typename std::enable_if<!std::is_copy_assignable<RawType>::value, bool>::type = true,
                 typename... Args
             >
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
+            inline void ModifyArgs( std::vector<DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
                                     T&, 
@@ -59,7 +59,7 @@ namespace CppOverride
                 typename std::enable_if<std::is_copy_assignable<RawType>::value, bool>::type = true,
                 typename... Args
             >
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
+            inline void ModifyArgs( std::vector<DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
                                     T& arg, 
@@ -121,7 +121,7 @@ namespace CppOverride
                 typename std::enable_if<!std::is_same<RawType, void>::value, bool>::type = true, 
                 typename... Args
             >
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
+            inline void ModifyArgs( std::vector<DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
                                     T*& arg, 
@@ -131,7 +131,7 @@ namespace CppOverride
             }
             
             template<typename T, typename... Args>
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
+            inline void ModifyArgs( std::vector<DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
                                     const T& arg, 
@@ -144,7 +144,7 @@ namespace CppOverride
                     std::cout << "typeid(arg).name(): " << typeid(arg).name() <<std::endl;
                     std::cout << "typeid(arg).hash_code(): " << typeid(arg).hash_code() <<std::endl;
                     //std::cout << "arg value: "<< arg << std::endl;
-                    std::cout << "argsData.att(index).DataSet: " << argsData.at(index).DataSet << std::endl;
+                    std::cout << "argsData.at(index).DataSet: " << argsData.at(index).DataSet << std::endl;
                     std::cout << std::endl;
                 }
                 
@@ -161,7 +161,7 @@ namespace CppOverride
             }
 
             template<typename... Args>
-            inline void ModifyArgs( std::vector<Internal_DataInfo>& argsData, 
+            inline void ModifyArgs( std::vector<DataInfo>& argsData, 
                                     int index, 
                                     OverrideStatus* status,
                                     const Any&, 
@@ -178,7 +178,7 @@ namespace CppOverride
             
             inline void ModifyArgs( void* instance,
                                     std::vector<void*>& argumentsList, 
-                                    Internal_ArgsDataActionInfo& argsDataAction)
+                                    ArgsDataActionInfo& argsDataAction)
             {
                 if(argsDataAction.DataActionSet)
                     argsDataAction.DataAction(instance, argumentsList);

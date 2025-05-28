@@ -1,8 +1,8 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_SETTER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_SETTER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_RETURN_DATA_SETTER_HPP
+#define CO_OVERRIDER_COMPONENTS_RETURN_DATA_SETTER_HPP
 
 #include "../OverrideInfoSetterDeclaration.hpp"
-#include "../Internal_OverrideData.hpp"
+#include "../OverrideData.hpp"
 #include "../Any.hpp"
 
 #include <iostream>
@@ -10,13 +10,10 @@
 
 namespace CppOverride
 {
-    class Internal_ReturnDataSetter
+    struct ReturnDataSetter
     {
         public:
-            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
-            friend class OverrideInfoSetter;
-        
-        protected:
+            using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
             OverrideDatas& CurrentOverrideDatas;
             
             //------------------------------------------------------------------------------
@@ -32,15 +29,15 @@ namespace CppOverride
                 static_assert(  !std::is_same<ReturnType, Any>(), 
                                 "You can't return nothing in return action");
 
-                Internal_OverrideData& lastData = 
+                OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
 
-                lastData.ReturnDataActionInfo.DataAction = returnAction;
-                lastData.ReturnDataActionInfo.DataActionSet = true;
-                lastData.ReturnDataActionInfo.DataType = typeid(ReturnType).hash_code();
+                lastData.CurrentReturnDataActionInfo.DataAction = returnAction;
+                lastData.CurrentReturnDataActionInfo.DataActionSet = true;
+                lastData.CurrentReturnDataActionInfo.DataType = typeid(ReturnType).hash_code();
                 
                 if(std::is_reference<ReturnType>())
-                    lastData.ReturnDataActionInfo.ReturnReference = true;
+                    lastData.CurrentReturnDataActionInfo.ReturnReference = true;
                 
                 return infoSetter;
             }
@@ -56,20 +53,21 @@ namespace CppOverride
             {
                 if(!std::is_same<ReturnType, Any>())
                 {
-                    Internal_OverrideData& lastData = 
+                    OverrideData& lastData = 
                         CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                     
-                    lastData.ReturnDataInfo.Data = 
+                    lastData.CurrentReturnDataInfo.Data = 
                         std::shared_ptr<void>(  new ReturnType(returnData), 
                                                 [](void* p){ delete static_cast<ReturnType*>(p); });
-                    lastData.ReturnDataInfo.DataSet = true;
-                    lastData.ReturnDataInfo.DataType = typeid(ReturnType).hash_code();
+                    lastData.CurrentReturnDataInfo.DataSet = true;
+                    lastData.CurrentReturnDataInfo.DataType = typeid(ReturnType).hash_code();
                 }
                 else
                 {
-                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                                .ReturnDataInfo
-                                                                                .ReturnAny = true;
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
+                                        .back()
+                                        .CurrentReturnDataInfo
+                                        .ReturnAny = true;
                 }
                 
                 return infoSetter;
@@ -86,20 +84,21 @@ namespace CppOverride
             {
                 if(!std::is_same<ReturnType, Any&>())
                 {
-                    Internal_OverrideData& lastData = 
+                    OverrideData& lastData = 
                         CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                     
-                    lastData.ReturnDataInfo.Data = 
+                    lastData.CurrentReturnDataInfo.Data = 
                         std::shared_ptr<void>(&returnData, [](...){});
-                    lastData.ReturnDataInfo.DataSet = true;
-                    lastData.ReturnDataInfo.DataType = typeid(ReturnType).hash_code();
-                    lastData.ReturnDataInfo.ReturnReference = true;
+                    lastData.CurrentReturnDataInfo.DataSet = true;
+                    lastData.CurrentReturnDataInfo.DataType = typeid(ReturnType).hash_code();
+                    lastData.CurrentReturnDataInfo.ReturnReference = true;
                 }
                 else
                 {
-                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                                .ReturnDataInfo
-                                                                                .ReturnAny = true;
+                    CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
+                                        .back()
+                                        .CurrentReturnDataInfo
+                                        .ReturnAny = true;
                 }
                 
                 return infoSetter;
@@ -107,12 +106,12 @@ namespace CppOverride
             
             inline OverrideInfoSetter& ReturnsVoid(OverrideInfoSetter& infoSetter)
             {
-                Internal_OverrideData& lastData = 
+                OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
-                lastData.ReturnDataInfo.Data = nullptr;
-                lastData.ReturnDataInfo.DataSet = true;
-                lastData.ReturnDataInfo.DataType = typeid(void).hash_code();
+                lastData.CurrentReturnDataInfo.Data = nullptr;
+                lastData.CurrentReturnDataInfo.DataSet = true;
+                lastData.CurrentReturnDataInfo.DataType = typeid(void).hash_code();
                 
                 return infoSetter;
             }
@@ -127,8 +126,7 @@ namespace CppOverride
                 return ReturnsVoid(infoSetter);
             }
             
-        public:
-            inline Internal_ReturnDataSetter(OverrideDatas& overrideDatas) : 
+            inline ReturnDataSetter(OverrideDatas& overrideDatas) : 
                 CurrentOverrideDatas(overrideDatas)
             {}
     };

@@ -1,8 +1,8 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_VALIDATOR_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_RETURN_DATA_VALIDATOR_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_RETURN_DATA_VALIDATOR_HPP
+#define CO_OVERRIDER_COMPONENTS_RETURN_DATA_VALIDATOR_HPP
 
-#include "./Internal_ArgsValuesAppender.hpp"
-#include "../Internal_OverrideData.hpp"
+#include "./ArgsValuesAppender.hpp"
+#include "../OverrideData.hpp"
 
 #include <cassert>
 #include <string>
@@ -12,10 +12,10 @@
 
 namespace CppOverride
 {
-    class Internal_ReturnDataValidator
+    struct ReturnDataValidator
     {
-        protected:
-            Internal_ArgsValuesAppender& ArgsValuesAppender;
+        public:
+            ArgsValuesAppender& CurrentArgsValuesAppender;
         
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_IsCorrectReturnDataInfo 1
@@ -24,45 +24,23 @@ namespace CppOverride
             #endif
 
             template<typename ReturnType, typename... Args>
-            inline bool IsCorrectReturnDataInfo(Internal_OverrideData& overrideDataToCheck,
+            inline bool IsCorrectReturnDataInfo(OverrideData& overrideDataToCheck,
                                                 Args&... args)
             {
                 if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
                     std::cout << std::endl << __func__ << " called" << std::endl;
 
                 std::vector<void*> argumentsList;
-                ArgsValuesAppender.AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
                 if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
                     std::cout << "Checking return data" << std::endl;
 
                 //Check override return data exist
-                if(overrideDataToCheck.ReturnDataInfo.DataSet)
+                if(overrideDataToCheck.CurrentReturnDataInfo.DataSet)
                 {
                     //Check return type match
-                    if(overrideDataToCheck.ReturnDataInfo.DataType != typeid(ReturnType).hash_code())
-                    {
-                        if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
-                            std::cout << "Failed at return type" << std::endl;
-                        
-                        return false;
-                    }
-                    
-                    //If we need to return a reference, 
-                    //  we check for pointer type as we can't store references
-                    if( std::is_reference<ReturnType>() && 
-                        !overrideDataToCheck.ReturnDataInfo.ReturnReference)
-                    {
-                        if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
-                            std::cout << "Failed at return reference" << std::endl;
-                        
-                        return false;
-                    }
-                }
-                else if(overrideDataToCheck.ReturnDataActionInfo.DataActionSet)
-                {
-                    //Check return type match
-                    if( overrideDataToCheck.ReturnDataActionInfo.DataType != 
+                    if( overrideDataToCheck.CurrentReturnDataInfo.DataType != 
                         typeid(ReturnType).hash_code())
                     {
                         if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
@@ -74,7 +52,30 @@ namespace CppOverride
                     //If we need to return a reference, 
                     //  we check for pointer type as we can't store references
                     if( std::is_reference<ReturnType>() && 
-                        !overrideDataToCheck.ReturnDataActionInfo.ReturnReference)
+                        !overrideDataToCheck.CurrentReturnDataInfo.ReturnReference)
+                    {
+                        if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
+                            std::cout << "Failed at return reference" << std::endl;
+                        
+                        return false;
+                    }
+                }
+                else if(overrideDataToCheck.CurrentReturnDataActionInfo.DataActionSet)
+                {
+                    //Check return type match
+                    if( overrideDataToCheck.CurrentReturnDataActionInfo.DataType != 
+                        typeid(ReturnType).hash_code())
+                    {
+                        if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
+                            std::cout << "Failed at return type" << std::endl;
+                        
+                        return false;
+                    }
+                    
+                    //If we need to return a reference, 
+                    //  we check for pointer type as we can't store references
+                    if( std::is_reference<ReturnType>() && 
+                        !overrideDataToCheck.CurrentReturnDataActionInfo.ReturnReference)
                     {
                         if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
                             std::cout << "Failed at return action reference" << std::endl;
@@ -82,7 +83,7 @@ namespace CppOverride
                         return false;
                     }
                 }
-                else if(overrideDataToCheck.ReturnDataInfo.ReturnAny)
+                else if(overrideDataToCheck.CurrentReturnDataInfo.ReturnAny)
                 {
                     if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
                         std::cout << "Any return type entry encountered" << std::endl;
@@ -95,9 +96,9 @@ namespace CppOverride
                 
                 return true;
             }
-        public:
-            inline Internal_ReturnDataValidator(Internal_ArgsValuesAppender* argsValuesAppender) :
-                ArgsValuesAppender(*argsValuesAppender)
+            
+            inline ReturnDataValidator(ArgsValuesAppender& argsValuesAppender) :
+                CurrentArgsValuesAppender(argsValuesAppender)
             {}
     };
 }

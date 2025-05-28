@@ -1,11 +1,11 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGUMENT_DATA_SETTER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGUMENT_DATA_SETTER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_ARGUMENT_DATA_SETTER_HPP
+#define CO_OVERRIDER_COMPONENTS_ARGUMENT_DATA_SETTER_HPP
 
 #include "../OverrideInfoSetterDeclaration.hpp"
 #include "../Any.hpp"
 #include "../StaticAssertFalse.hpp"
 #include "../PureType.hpp"
-#include "../Internal_OverrideData.hpp"
+#include "../OverrideData.hpp"
 #include "../../External/MacroPowerToys/MacroPowerToys.h"
 #include "../AliasTypes.hpp"
 
@@ -16,16 +16,12 @@
 
 namespace CppOverride
 {
-    class Internal_ArgsDataSetter
+    class ArgsDataSetter
     {
-        friend class OverrideInfoSetter;
-        
-        #define INTERNAL_CO_UNWRAPPED(arg) typename TypeUnwrapper<arg>::Type
-        
         public:
-            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
+            #define INTERNAL_CO_UNWRAPPED(arg) typename TypeUnwrapper<arg>::Type
+            using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
         
-        protected:
             OverrideDatas& CurrentOverrideDatas;
             
             #if CO_SHOW_OVERRIDE_LOG
@@ -70,10 +66,10 @@ namespace CppOverride
             >::type
             SetArgs(OverrideInfoSetter& infoSetter, INTERNAL_CO_UNWRAPPED(T) arg)
             {
-                Internal_OverrideData& lastData = 
+                OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
-                lastData.ArgumentsDataInfo.push_back(Internal_DataInfo());
+                lastData.ArgumentsDataInfo.push_back(DataInfo());
                 
                 if(!std::is_same<T, Any>())
                 {
@@ -141,7 +137,7 @@ namespace CppOverride
             
         private:
             template<typename T>
-            inline void InternalPushActionArgTypes(Internal_OverrideData& lastData)
+            inline void InternalPushActionArgTypes(OverrideData& lastData)
             {
                 lastData.ArgumentsDataActionInfo.DataTypes
                         .push_back(typeid(T).hash_code());
@@ -160,7 +156,7 @@ namespace CppOverride
             }
             
             template<typename T, typename... Args>
-            inline void PushActionArgTypes(Internal_OverrideData& lastData)
+            inline void PushActionArgTypes(OverrideData& lastData)
             {
                 InternalPushActionArgTypes<T>(lastData);
                 PushActionArgTypes<Args...>(lastData);
@@ -168,16 +164,16 @@ namespace CppOverride
             
             template<typename... Args>
             inline typename std::enable_if<sizeof...(Args) == 0>::type 
-            PushActionArgTypes(Internal_OverrideData&) {}
+            PushActionArgTypes(OverrideData&) {}
         
-        protected:
+        public:
             template<typename... Args>
             inline OverrideInfoSetter& 
             SetArgsByAction(OverrideInfoSetter& infoSetter,
                             std::function<void( void* instance, 
                                                 std::vector<void*>& args)> setArgsAction)
             {
-                Internal_OverrideData& lastData = 
+                OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 lastData.ArgumentsDataActionInfo.DataAction = setArgsAction;
@@ -201,10 +197,9 @@ namespace CppOverride
                 return infoSetter;
             }
             
-        #undef INTERNAL_CO_UNWRAPPED
+            #undef INTERNAL_CO_UNWRAPPED
         
-        public:
-            inline Internal_ArgsDataSetter(OverrideDatas& overrideArgumentsInfos) : 
+            inline ArgsDataSetter(OverrideDatas& overrideArgumentsInfos) : 
                 CurrentOverrideDatas(overrideArgumentsInfos)
             {}
     };
