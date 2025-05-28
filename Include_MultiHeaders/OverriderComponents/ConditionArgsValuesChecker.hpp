@@ -1,8 +1,8 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_VALUES_CHECKER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_CONDITION_ARGS_VALUES_CHECKER_HPP
+#define CO_OVERRIDER_COMPONENTS_CONDITION_ARGS_VALUES_CHECKER_HPP
 
 #include "../Any.hpp"
-#include "../Internal_DataInfo.hpp"
+#include "../DataInfo.hpp"
 #include "../TypeCheck.hpp"
 #include "../OverrideStatus.hpp"
 #include "../PureType.hpp"
@@ -16,14 +16,10 @@
 
 namespace CppOverride
 {
-    class Internal_ConditionArgsValuesChecker
+    struct ConditionArgsValuesChecker
     {
-        friend class Internal_ReturnDataValidator;
-        friend class Internal_ArgsDataValidator;
-        friend class Internal_RequirementValidator;
-        
-        protected:
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>&, 
+        public:
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>&, 
                                                 int,
                                                 OverrideStatus&) { return true; };
 
@@ -42,7 +38,7 @@ namespace CppOverride
                 typename std::enable_if<!InequalExists<RawType>::value, bool>::type = true,
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -60,7 +56,7 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    const DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
                     if(typeid(RawType*).hash_code() == curArgInfo.DataType)
@@ -95,7 +91,7 @@ namespace CppOverride
                 typename std::enable_if<!std::is_pointer<RawType>::value, bool>::type = true,
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -113,7 +109,7 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    const DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
                     if(typeid(RawType*).hash_code() == curArgInfo.DataType)
@@ -147,7 +143,7 @@ namespace CppOverride
                 typename PureType = INTERNAL_CO_PURE_TYPE(T),
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -165,7 +161,7 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    const DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Pointer
                     if(typeid(RawType).hash_code() == curArgInfo.DataType)
@@ -208,7 +204,7 @@ namespace CppOverride
                 typename std::enable_if<!InequalExists<RawElementType>::value, bool>::type = true,
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -226,7 +222,7 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    const DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
                     if(typeid(RawType*).hash_code() == curArgInfo.DataType)
@@ -263,7 +259,7 @@ namespace CppOverride
                 typename std::enable_if<InequalExists<RawElementType>::value, bool>::type = true,
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 
@@ -281,7 +277,7 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    const Internal_DataInfo& curArgInfo = validArgumentsList.at(argIndex);
+                    const DataInfo& curArgInfo = validArgumentsList.at(argIndex);
                     
                     //Check Reference (Which is converted to pointer when checking)
                     if(typeid(RawType*).hash_code() == curArgInfo.DataType)
@@ -311,7 +307,7 @@ namespace CppOverride
                 typename std::enable_if<std::is_same<PureType, void>::value, bool>::type = true, 
                 typename... Args
             >
-            inline bool CheckArgumentsValues(   std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsValues(   std::vector<DataInfo>& validArgumentsList, 
                                                 int argIndex, 
                                                 OverrideStatus& status,
                                                 T& arg, 

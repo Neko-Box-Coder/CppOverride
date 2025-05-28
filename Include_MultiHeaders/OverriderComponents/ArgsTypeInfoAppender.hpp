@@ -1,8 +1,8 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_ARGS_TYPE_INFO_APPENDER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_ARGS_TYPE_INFO_APPENDER_HPP
+#define CO_OVERRIDER_COMPONENTS_ARGS_TYPE_INFO_APPENDER_HPP
 
 #include "../Any.hpp"
-#include "../Internal_DataInfo.hpp"
+#include "../DataInfo.hpp"
 
 #include <iostream>
 #include <vector>
@@ -10,25 +10,23 @@
 
 namespace CppOverride
 {
-    class Internal_ArgsTypeInfoAppender
+    struct ArgsTypeInfoAppender
     {
-        friend class Internal_ArgsDataValidator;
-        
-        protected:
+        public:
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_AppendArgsTypeInfo 1
             #else
                 #define INTERNAL_CO_LOG_AppendArgsTypeInfo 0
             #endif
             
-            inline void AppendArgsTypeInfo(std::vector<Internal_DataInfo>&) {}
+            inline void AppendArgsTypeInfo(std::vector<DataInfo>&) {}
             
             template<typename T, typename... Args>
-            inline void AppendArgsTypeInfo( std::vector<Internal_DataInfo>& argumentsList, 
+            inline void AppendArgsTypeInfo( std::vector<DataInfo>& argumentsList, 
                                             T&, 
                                             Args&... args)
             {
-                Internal_DataInfo curArgInfo;
+                DataInfo curArgInfo;
                 if(!std::is_same<T, Any>())
                 {
                     curArgInfo.DataType = typeid(T).hash_code();

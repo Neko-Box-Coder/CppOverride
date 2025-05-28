@@ -1,8 +1,8 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_TYPES_CHECKER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_CONDITION_ARGS_TYPES_CHECKER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_CONDITION_ARGS_TYPES_CHECKER_HPP
+#define CO_OVERRIDER_COMPONENTS_CONDITION_ARGS_TYPES_CHECKER_HPP
 
 #include "../Any.hpp"
-#include "../Internal_DataInfo.hpp"
+#include "../DataInfo.hpp"
 #include "../PureType.hpp"
 
 #include <vector>
@@ -11,14 +11,10 @@
 
 namespace CppOverride
 {
-    class Internal_ConditionArgsTypesChecker
+    struct ConditionArgsTypesChecker
     {
-        friend class Internal_ReturnDataValidator;
-        friend class Internal_ArgsDataValidator;
-        friend class Internal_RequirementValidator;
-        
-        protected:
-            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>&, int) { return true; };
+        public:
+            inline bool CheckArgumentsTypes(std::vector<DataInfo>&, int) { return true; };
 
             #if CO_SHOW_OVERRIDE_LOG
                 #define INTERNAL_CO_LOG_CheckArguments 1
@@ -34,7 +30,7 @@ namespace CppOverride
                 typename std::enable_if<std::is_same<PureType, void>::value, bool>::type = true, 
                 typename... Args
             >
-            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsTypes(std::vector<DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
                                             Args&... args)
@@ -72,7 +68,7 @@ namespace CppOverride
                 typename std::enable_if<!std::is_pointer<RawType>::value, bool>::type = true,
                 typename... Args
             >
-            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsTypes(std::vector<DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
                                             Args&... args)
@@ -89,13 +85,10 @@ namespace CppOverride
 
                 if(validArgumentsList.at(argIndex).DataSet)
                 {
-                    if( typeid(RawType).hash_code() != 
-                            validArgumentsList.at(argIndex).DataType &&
-                        typeid(RawType&).hash_code() != 
-                            validArgumentsList.at(argIndex).DataType &&
+                    if( typeid(RawType).hash_code() != validArgumentsList.at(argIndex).DataType &&
+                        typeid(RawType&).hash_code() != validArgumentsList.at(argIndex).DataType &&
                         //NOTE: Reference can be compared as pointer later down the line
-                        typeid(RawType*).hash_code() != 
-                            validArgumentsList.at(argIndex).DataType)
+                        typeid(RawType*).hash_code() != validArgumentsList.at(argIndex).DataType)
                     {
                         return false;
                     }
@@ -121,7 +114,7 @@ namespace CppOverride
                 typename PureType = INTERNAL_CO_PURE_TYPE(T),
                 typename... Args
             >
-            inline bool CheckArgumentsTypes(std::vector<Internal_DataInfo>& validArgumentsList, 
+            inline bool CheckArgumentsTypes(std::vector<DataInfo>& validArgumentsList, 
                                             int argIndex, 
                                             T&, 
                                             Args&... args)

@@ -13,15 +13,14 @@
 
 namespace CppOverride
 {
-    class Overrider;
+    struct Overrider;
 
-    class OverrideInfoSetter
+    struct OverrideInfoSetter
     {
-        protected:
+        public:
             std::string FunctionSignatureName;
             Overrider& CppOverrideObj;
-        
-        public:
+            
             OverrideInfoSetter( std::string functionSignatureName, 
                                 Overrider& SimpleOverrideObj) : 
                 FunctionSignatureName(functionSignatureName),

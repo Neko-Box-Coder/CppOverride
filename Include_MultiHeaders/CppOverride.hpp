@@ -9,13 +9,10 @@
 
 namespace CppOverride
 {
-    class Overridable
+    struct Overridable
     {
-        protected:
-            CO_DECLARE_MEMBER_INSTANCE(CurrentOverrideInstance);
-        
-        public:
-            CO_DECLARE_OVERRIDE_METHODS(CurrentOverrideInstance);
+        CO_DECLARE_MEMBER_INSTANCE(CurrentOverrideInstance);
+        CO_DECLARE_OVERRIDE_METHODS(CurrentOverrideInstance);
     };
 }
 

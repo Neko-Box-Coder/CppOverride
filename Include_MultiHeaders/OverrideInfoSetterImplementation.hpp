@@ -13,13 +13,13 @@ namespace CppOverride
 
     inline OverrideInfoSetter& OverrideInfoSetter::Times(int times)
     {
-        return CppOverrideObj.Times(*this, times);
+        return CppOverrideObj.CurrentRequirementSetter.Times(*this, times);
     }
 
     template<typename... Args>
     inline OverrideInfoSetter& OverrideInfoSetter::WhenCalledWith(Args... args)
     {
-        return CppOverrideObj.WhenCalledWith(*this, args...);
+        return CppOverrideObj.CurrentRequirementSetter.WhenCalledWith(*this, args...);
     }
 
     //TODO: Enforce type for arguments
@@ -27,14 +27,14 @@ namespace CppOverride
     OverrideInfoSetter::If(std::function<bool(  void* instance, 
                                                 const std::vector<void*>& args)> condition)
     {
-        return CppOverrideObj.If(*this, condition);
+        return CppOverrideObj.CurrentRequirementSetter.If(*this, condition);
     }
 
     inline OverrideInfoSetter& 
     OverrideInfoSetter::Otherwise_Do(std::function<void(void* instance,
                                                         const std::vector<void*>& args)> action)
     {
-        return CppOverrideObj.Otherwise_Do(*this, action);
+        return CppOverrideObj.CurrentRequirementSetter.Otherwise_Do(*this, action);
     }
 
     inline OverrideInfoSetter& 
@@ -42,13 +42,13 @@ namespace CppOverride
     WhenCalledExpectedly_Do(std::function<void( void* instance,
                                                 const std::vector<void*>& args)> action)
     {
-        return CppOverrideObj.WhenCalledExpectedly_Do(*this, action);
+        return CppOverrideObj.CurrentRequirementSetter.WhenCalledExpectedly_Do(*this, action);
     }
 
     inline OverrideInfoSetter& 
     OverrideInfoSetter::AssignResult(ResultPtr result)
     {
-        return CppOverrideObj.AssignResult(*this, result);
+        return CppOverrideObj.CurrentRequirementSetter.AssignResult(*this, result);
     }
 
     inline OverrideInfoSetter& 
@@ -71,7 +71,7 @@ namespace CppOverride
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverrideObject(const void* instance)
     {
-        return CppOverrideObj.OverrideObject(*this, (void*)instance);
+        return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, (void*)instance);
     }
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverridesObject(const void* instance)
@@ -81,7 +81,7 @@ namespace CppOverride
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverrideAny()
     {
-        return CppOverrideObj.OverrideObject(*this, nullptr);
+        return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, nullptr);
     }
 
     template<typename ReturnType>
@@ -90,7 +90,8 @@ namespace CppOverride
                                                             const std::vector<void*>& args, 
                                                             void* out)> returnAction)
     {
-        return CppOverrideObj.ReturnsByAction<ReturnType>(*this, returnAction);
+        return CppOverrideObj.CurrentReturnDataSetter.ReturnsByAction<ReturnType>(  *this, 
+                                                                                    returnAction);
     }
 
     template<typename ReturnType>
@@ -98,26 +99,26 @@ namespace CppOverride
     OverrideInfoSetter::Returns(typename TypeSpecifier<ReturnType>::Type returnData)
     {
         static_assert(std::is_same<ReturnType, decltype(returnData)>::value, "");
-        return CppOverrideObj.Returns<ReturnType>(*this, returnData);
+        return CppOverrideObj.CurrentReturnDataSetter.Returns<ReturnType>(*this, returnData);
     }
     
     template<>
     inline OverrideInfoSetter&
     OverrideInfoSetter::Returns<void>()
     {
-        return CppOverrideObj.ReturnsVoid(*this);
+        return CppOverrideObj.CurrentReturnDataSetter.ReturnsVoid(*this);
     }
     
     inline OverrideInfoSetter& OverrideInfoSetter::ReturnsVoid()
     {
-        return CppOverrideObj.ReturnsVoid(*this);
+        return CppOverrideObj.CurrentReturnDataSetter.ReturnsVoid(*this);
     }
     
     template<typename... Args>
     inline OverrideInfoSetter&
     OverrideInfoSetter::SetArgs(typename TypeUnwrapper<Args>::Type... args)
     {
-        return CppOverrideObj.SetArgs<Args...>(*this, args...);
+        return CppOverrideObj.CurrentArgsDataSetter.SetArgs<Args...>(*this, args...);
     }
     
     template<typename... Args>
@@ -125,7 +126,7 @@ namespace CppOverride
     OverrideInfoSetter::SetArgsByAction(std::function<void( void* instance, 
                                         std::vector<void*>& args)> setArgsAction)
     {
-        return CppOverrideObj.SetArgsByAction<Args...>(*this, setArgsAction);
+        return CppOverrideObj.CurrentArgsDataSetter.SetArgsByAction<Args...>(*this, setArgsAction);
     }
 }
 

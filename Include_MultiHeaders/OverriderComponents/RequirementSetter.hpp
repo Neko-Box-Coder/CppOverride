@@ -1,9 +1,9 @@
-#ifndef CO_OVERRIDER_COMPONENTS_INTERNAL_REQUIREMENT_SETTER_HPP
-#define CO_OVERRIDER_COMPONENTS_INTERNAL_REQUIREMENT_SETTER_HPP
+#ifndef CO_OVERRIDER_COMPONENTS_REQUIREMENT_SETTER_HPP
+#define CO_OVERRIDER_COMPONENTS_REQUIREMENT_SETTER_HPP
 
 #include "../OverrideInfoSetterDeclaration.hpp"
-#include "../Internal_OverrideData.hpp"
-#include "../Internal_DataInfo.hpp"
+#include "../OverrideData.hpp"
+#include "../DataInfo.hpp"
 #include "../Any.hpp"
 #include "../PureType.hpp"
 
@@ -15,13 +15,10 @@
 
 namespace CppOverride
 {
-    class Internal_RequirementSetter
+    struct RequirementSetter
     {
         public:
-            using OverrideDatas = std::unordered_map<std::string, Internal_OverrideDataList>;
-            friend class OverrideInfoSetter;
-        
-        protected:
+            using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
             OverrideDatas& CurrentOverrideDatas;
         
             //------------------------------------------------------------------------------
@@ -30,7 +27,7 @@ namespace CppOverride
             inline OverrideInfoSetter& Times(OverrideInfoSetter& infoSetter, int times)
             {
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ConditionInfo
+                                                                            .CurrentConditionInfo
                                                                             .Times = times;
                 return infoSetter;
             }
@@ -52,7 +49,7 @@ namespace CppOverride
                                                         T arg, 
                                                         Args... args)
             {
-                Internal_DataInfo argData;
+                DataInfo argData;
                 //T is void*
                 argData.Data = std::shared_ptr<void>(   new void*((void*)arg), 
                                                         [](void* p){ delete static_cast<char*>(p); });
@@ -60,7 +57,7 @@ namespace CppOverride
                 argData.DataSet = true;
 
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ConditionInfo
+                                                                            .CurrentConditionInfo
                                                                             .ArgsCondition
                                                                             .push_back(argData);
 
@@ -78,7 +75,7 @@ namespace CppOverride
                                                         T arg, 
                                                         Args... args)
             {
-                Internal_DataInfo argData;
+                DataInfo argData;
                 //Other types that are not Any
                 if(!std::is_same<INTERNAL_CO_RAW_TYPE(T), Any>())
                 {
@@ -94,7 +91,7 @@ namespace CppOverride
                 }
 
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] .back()
-                                                                            .ConditionInfo
+                                                                            .CurrentConditionInfo
                                                                             .ArgsCondition
                                                                             .push_back(argData);
 
@@ -108,11 +105,11 @@ namespace CppOverride
             {
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ConditionInfo
+                                    .CurrentConditionInfo
                                     .LambdaCondition = condition;
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ConditionInfo
+                                    .CurrentConditionInfo
                                     .DataConditionSet = true;
                 return infoSetter;
             }
@@ -124,11 +121,11 @@ namespace CppOverride
             {
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ResultActionInfo
+                                    .CurrentResultActionInfo
                                     .OtherwiseAction = action;
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ResultActionInfo
+                                    .CurrentResultActionInfo
                                     .OtherwiseActionSet = true;
                 return infoSetter;
             }
@@ -140,11 +137,11 @@ namespace CppOverride
             {
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ResultActionInfo
+                                    .CurrentResultActionInfo
                                     .CorrectAction = action;
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                     .back()
-                                    .ResultActionInfo
+                                    .CurrentResultActionInfo
                                     .CorrectActionSet = true;
                 return infoSetter;
             }
@@ -152,7 +149,7 @@ namespace CppOverride
             inline OverrideInfoSetter& AssignResult(OverrideInfoSetter& infoSetter, 
                                                     std::shared_ptr<OverrideResult> result)
             {
-                Internal_OverrideData& currentData = 
+                OverrideData& currentData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 currentData.Result = result;
@@ -162,15 +159,14 @@ namespace CppOverride
             inline OverrideInfoSetter& OverrideObject(  OverrideInfoSetter& infoSetter, 
                                                         void* instance)
             {
-                Internal_OverrideData& currentData = 
+                OverrideData& currentData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
                 
                 currentData.Instance = instance;
                 return infoSetter;
             }
         
-        public:
-            Internal_RequirementSetter(OverrideDatas& overrideDataLists) :
+            RequirementSetter(OverrideDatas& overrideDataLists) :
                 CurrentOverrideDatas(overrideDataLists)
             {}
     };

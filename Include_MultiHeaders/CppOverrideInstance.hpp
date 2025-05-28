@@ -3,23 +3,23 @@
 
 #include "./OverrideInfoSetterDeclaration.hpp"
 #include "./Any.hpp"
-#include "./OverriderComponents/Internal_ReturnDataSetter.hpp"
-#include "./OverriderComponents/Internal_ArgsDataSetter.hpp"
-#include "./OverriderComponents/Internal_RequirementSetter.hpp"
-#include "./OverriderComponents/Internal_ArgsValuesAppender.hpp"
-#include "./OverriderComponents/Internal_ArgsTypeInfoAppender.hpp"
-#include "./OverriderComponents/Internal_ConditionArgsTypesChecker.hpp"
-#include "./OverriderComponents/Internal_ConditionArgsValuesChecker.hpp"
-#include "./OverriderComponents/Internal_ArgsModifier.hpp"
+#include "./OverriderComponents/ReturnDataSetter.hpp"
+#include "./OverriderComponents/ArgsDataSetter.hpp"
+#include "./OverriderComponents/RequirementSetter.hpp"
+#include "./OverriderComponents/ArgsValuesAppender.hpp"
+#include "./OverriderComponents/ArgsTypeInfoAppender.hpp"
+#include "./OverriderComponents/ConditionArgsTypesChecker.hpp"
+#include "./OverriderComponents/ConditionArgsValuesChecker.hpp"
+#include "./OverriderComponents/ArgsModifier.hpp"
 
-#include "./OverriderComponents/Internal_ReturnDataValidator.hpp"
-#include "./OverriderComponents/Internal_ArgsDataValidator.hpp"
-#include "./OverriderComponents/Internal_RequirementValidator.hpp"
+#include "./OverriderComponents/ReturnDataValidator.hpp"
+#include "./OverriderComponents/ArgsDataValidator.hpp"
+#include "./OverriderComponents/RequirementValidator.hpp"
 
-#include "./Internal_OverrideData.hpp"
+#include "./OverrideData.hpp"
 #include "./OverrideStatus.hpp"
 #include "./EarlyReturn.hpp"
-#include "./Internal_DataInfo.hpp"
+#include "./DataInfo.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -39,33 +39,40 @@ namespace CppOverride
         return processedName;
     }
     
-    class Overrider :   public Internal_ReturnDataSetter, 
-                        public Internal_ArgsDataSetter,
-                        public Internal_RequirementSetter,
-                        public Internal_ArgsValuesAppender,
-                        public Internal_ArgsTypeInfoAppender,
-                        public Internal_ConditionArgsTypesChecker,
-                        public Internal_ConditionArgsValuesChecker,
-                        public Internal_ArgsModifier,
-                        public Internal_ReturnDataValidator,
-                        public Internal_ArgsDataValidator,
-                        public Internal_RequirementValidator
+    struct Overrider
     {
-        private:
-            std::unordered_map<std::string, Internal_OverrideDataList> OverrideDatas;
-
-
-        //==============================================================================
-        //Public facing methods for overriding returns or arguments
-        //==============================================================================
         public:
+            std::unordered_map<std::string, std::vector<OverrideData>> OverrideDatas;
+            ReturnDataSetter CurrentReturnDataSetter;
+            ArgsDataSetter CurrentArgsDataSetter;
+            RequirementSetter CurrentRequirementSetter;
+            ArgsValuesAppender CurrentArgsValuesAppender;
+            ArgsTypeInfoAppender CurrentArgsTypeInfoAppender;
+            ConditionArgsTypesChecker CurrentConditionArgsTypesChecker;
+            ConditionArgsValuesChecker CurrentConditionArgsValuesChecker;
+            ArgsModifier CurrentArgsModifier;
+            ReturnDataValidator CurrentReturnDataValidator;
+            ArgsDataValidator CurrentArgsDataValidator;
+            RequirementValidator CurrentRequirementValidator;
+
+            //==============================================================================
+            //Public facing methods for overriding returns or arguments
+            //==============================================================================
             inline Overrider(const Overrider& other) :
-                Internal_ReturnDataSetter(OverrideDatas),
-                Internal_ArgsDataSetter(OverrideDatas),
-                Internal_RequirementSetter(OverrideDatas),
-                Internal_ReturnDataValidator(static_cast<Internal_ArgsValuesAppender*>(this)),
-                Internal_ArgsDataValidator(*this, *this),
-                Internal_RequirementValidator(*this, *this, *this)
+                OverrideDatas(),
+                CurrentReturnDataSetter(OverrideDatas),
+                CurrentArgsDataSetter(OverrideDatas),
+                CurrentRequirementSetter(OverrideDatas),
+                CurrentArgsValuesAppender(),
+                CurrentArgsTypeInfoAppender(),
+                CurrentConditionArgsTypesChecker(),
+                CurrentConditionArgsValuesChecker(),
+                CurrentArgsModifier(),
+                CurrentReturnDataValidator(CurrentArgsValuesAppender),
+                CurrentArgsDataValidator(CurrentArgsValuesAppender, CurrentArgsTypeInfoAppender),
+                CurrentRequirementValidator(CurrentArgsValuesAppender, 
+                                            CurrentConditionArgsTypesChecker, 
+                                            CurrentConditionArgsValuesChecker)
             {
                 *this = other;
             }
@@ -79,12 +86,21 @@ namespace CppOverride
                 return *this;
             }
                 
-            inline Overrider() :    Internal_ReturnDataSetter(OverrideDatas),
-                                    Internal_ArgsDataSetter(OverrideDatas),
-                                    Internal_RequirementSetter(OverrideDatas),
-                                    Internal_ReturnDataValidator(*this),
-                                    Internal_ArgsDataValidator(*this, *this),
-                                    Internal_RequirementValidator(*this, *this, *this)
+            inline Overrider() :    OverrideDatas(),
+                                    CurrentReturnDataSetter(OverrideDatas),
+                                    CurrentArgsDataSetter(OverrideDatas),
+                                    CurrentRequirementSetter(OverrideDatas),
+                                    CurrentArgsValuesAppender(),
+                                    CurrentArgsTypeInfoAppender(),
+                                    CurrentConditionArgsTypesChecker(),
+                                    CurrentConditionArgsValuesChecker(),
+                                    CurrentArgsModifier(),
+                                    CurrentReturnDataValidator(CurrentArgsValuesAppender),
+                                    CurrentArgsDataValidator(   CurrentArgsValuesAppender, 
+                                                                CurrentArgsTypeInfoAppender),
+                                    CurrentRequirementValidator(CurrentArgsValuesAppender, 
+                                                                CurrentConditionArgsTypesChecker,
+                                                                CurrentConditionArgsValuesChecker)
             {}
             
             inline ~Overrider()
@@ -132,7 +148,7 @@ namespace CppOverride
                     return false;
                 }
             
-                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
                 
                 outOverrideArgs = false;
                 outOverrideReturn = false;
@@ -149,8 +165,8 @@ namespace CppOverride
                     if( !currentDataList.at(i).ArgumentsDataInfo.empty() ||
                         currentDataList.at(i).ArgumentsDataActionInfo.DataActionSet)
                     {
-                        if(!IsCorrectArgumentsDataInfo( currentDataList.at(i), 
-                                                        args...))
+                        if(!CurrentArgsDataValidator.IsCorrectArgumentsDataInfo(currentDataList.at(i), 
+                                                                                args...))
                         {
                             if(INTERNAL_CO_LOG_CheckOverride)
                                 std::cout << "Arguments not correct at index: " << i << std::endl;
@@ -161,11 +177,15 @@ namespace CppOverride
                         outOverrideArgs = true;
                     }
 
-                    if( currentDataList.at(i).ReturnDataInfo.DataSet ||
-                        currentDataList.at(i).ReturnDataInfo.ReturnAny ||
-                        currentDataList.at(i).ReturnDataActionInfo.DataActionSet)
+                    if( currentDataList.at(i).CurrentReturnDataInfo.DataSet ||
+                        currentDataList.at(i).CurrentReturnDataInfo.ReturnAny ||
+                        currentDataList.at(i).CurrentReturnDataActionInfo.DataActionSet)
                     {
-                        if(!IsCorrectReturnDataInfo<ReturnType>(currentDataList.at(i), args...))
+                        if( !CurrentReturnDataValidator.IsCorrectReturnDataInfo<ReturnType>
+                            (
+                                currentDataList.at(i), 
+                                args...
+                            ))
                         {
                             if(INTERNAL_CO_LOG_CheckOverride)
                                 std::cout << "Return not correct at index: " << i << std::endl;
@@ -175,17 +195,20 @@ namespace CppOverride
                         
                         outOverrideReturn = true;
                         
-                        if(currentDataList.at(i).ReturnDataInfo.ReturnAny)
+                        if(currentDataList.at(i).CurrentReturnDataInfo.ReturnAny)
                             outDontReturn = true;
                         else
                             outDontReturn = false;
                     }
 
                     OverrideStatus internalStatus = OverrideStatus::NO_OVERRIDE;
-                    if(!IsMeetingRequirementForDataInfo<ReturnType>(currentDataList.at(i), 
-                                                                    internalStatus, 
-                                                                    instance,
-                                                                    args...))
+                    if( !CurrentRequirementValidator.IsMeetingRequirementForDataInfo<ReturnType>
+                        (
+                            currentDataList.at(i), 
+                            internalStatus, 
+                            instance,
+                            args...
+                        ))
                     {
                         //If something is wrong internally, notify everything
                         if(internalStatus != OverrideStatus::NO_OVERRIDE)
@@ -226,17 +249,15 @@ namespace CppOverride
             {
                 functionName = ProcessFunctionName(functionName);
                 
-                Internal_OverrideData& correctData = 
-                    OverrideDatas.at(functionName).at(overrideIndex);
-                
-                if(correctData.ResultActionInfo.CorrectActionSet)
+                OverrideData& correctData = OverrideDatas.at(functionName).at(overrideIndex);
+                if(correctData.CurrentResultActionInfo.CorrectActionSet)
                 {
                     std::vector<void*> argumentsList;
-                    AppendArgsValues(argumentsList, args...);
-                    correctData.ResultActionInfo.CorrectAction(instance, argumentsList);
+                    CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
+                    correctData.CurrentResultActionInfo.CorrectAction(instance, argumentsList);
                 }
                 
-                correctData.ConditionInfo.CalledTimes++;
+                correctData.CurrentConditionInfo.CalledTimes++;
                 if(correctData.Result != nullptr)
                     correctData.Result->AddStatus(OverrideStatus::OVERRIDE_SUCCESS);
             }
@@ -292,24 +313,24 @@ namespace CppOverride
                     std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
                 
-                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
                 std::vector<void*> argumentsList;
-                AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
+                OverrideData& correctData = currentDataList.at(dataIndex);
                 Internal_CallReturnOverrideResultExpectedAction(functionName, 
                                                                 dataIndex, 
                                                                 instance, 
                                                                 args...);
                 
-                if(correctData.ReturnDataInfo.DataSet)
-                    return *static_cast<ReturnType*>(correctData.ReturnDataInfo.Data.get());
-                else if(correctData.ReturnDataActionInfo.DataActionSet)
+                if(correctData.CurrentReturnDataInfo.DataSet)
+                    return *static_cast<ReturnType*>(correctData.CurrentReturnDataInfo.Data.get());
+                else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
                 {
                     ReturnType returnRef;
-                    correctData.ReturnDataActionInfo.DataAction(instance, 
-                                                                argumentsList, 
-                                                                &returnRef);
+                    correctData.CurrentReturnDataActionInfo.DataAction( instance, 
+                                                                        argumentsList, 
+                                                                        &returnRef);
                     return returnRef;
                 }
                 
@@ -337,27 +358,29 @@ namespace CppOverride
                     std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
                 
-                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
                 std::vector<void*> argumentsList;
-                AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
+                OverrideData& correctData = currentDataList.at(dataIndex);
                 Internal_CallReturnOverrideResultExpectedAction(functionName, 
                                                                 dataIndex, 
                                                                 instance, 
                                                                 args...);
 
-                if(correctData.ReturnDataInfo.DataSet)
+                if(correctData.CurrentReturnDataInfo.DataSet)
                 {
                     return *reinterpret_cast<INTERNAL_CO_UNREF(ReturnType)*>
                     (
-                        correctData.ReturnDataInfo.Data.get()
+                        correctData.CurrentReturnDataInfo.Data.get()
                     );
                 }
-                else if(correctData.ReturnDataActionInfo.DataActionSet)
+                else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
                 {
                     INTERNAL_CO_UNREF(ReturnType)* returnRef;
-                    correctData.ReturnDataActionInfo.DataAction(instance, argumentsList, &returnRef);
+                    correctData.CurrentReturnDataActionInfo.DataAction( instance, 
+                                                                        argumentsList, 
+                                                                        &returnRef);
                     return *returnRef;
                 }
                 
@@ -388,21 +411,25 @@ namespace CppOverride
                     std::cout << "functionName: "<<functionName << std::endl;
                 }
                 
-                Internal_OverrideDataList& currentDataList = OverrideDatas.at(functionName);
+                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
                 std::vector<void*> argumentsList;
-                AppendArgsValues(argumentsList, args...);
+                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 
-                Internal_OverrideData& correctData = currentDataList.at(dataIndex);
+                OverrideData& correctData = currentDataList.at(dataIndex);
                 OverrideStatus overrideStatus = OverrideStatus::OVERRIDE_SUCCESS;
                 
                 if(correctData.ArgumentsDataActionInfo.DataActionSet)
-                    ModifyArgs(instance, argumentsList, correctData.ArgumentsDataActionInfo);
+                {
+                    CurrentArgsModifier.ModifyArgs( instance, 
+                                                    argumentsList, 
+                                                    correctData.ArgumentsDataActionInfo);
+                }
                 else
                 {
-                    ModifyArgs( correctData.ArgumentsDataInfo, 
-                                0, 
-                                &overrideStatus, 
-                                args...);
+                    CurrentArgsModifier.ModifyArgs( correctData.ArgumentsDataInfo, 
+                                                    0, 
+                                                    &overrideStatus, 
+                                                    args...);
                 }
                 
                 if(correctData.Result != nullptr)
@@ -439,7 +466,7 @@ namespace CppOverride
                     std::cout << "functionName.size(): " << functionName.size() << std::endl;
                 }
 
-                OverrideDatas[functionName].push_back(Internal_OverrideData());
+                OverrideDatas[functionName].push_back(OverrideData());
                 return OverrideInfoSetter(functionName, *this);
             }
             
