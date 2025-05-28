@@ -41,447 +41,446 @@ namespace CppOverride
     
     struct Overrider
     {
-        public:
-            std::unordered_map<std::string, std::vector<OverrideData>> OverrideDatas;
-            ReturnDataSetter CurrentReturnDataSetter;
-            ArgsDataSetter CurrentArgsDataSetter;
-            RequirementSetter CurrentRequirementSetter;
-            ArgsValuesAppender CurrentArgsValuesAppender;
-            ArgsTypeInfoAppender CurrentArgsTypeInfoAppender;
-            ConditionArgsTypesChecker CurrentConditionArgsTypesChecker;
-            ConditionArgsValuesChecker CurrentConditionArgsValuesChecker;
-            ArgsModifier CurrentArgsModifier;
-            ReturnDataValidator CurrentReturnDataValidator;
-            ArgsDataValidator CurrentArgsDataValidator;
-            RequirementValidator CurrentRequirementValidator;
+        std::unordered_map<std::string, std::vector<OverrideData>> OverrideDatas;
+        ReturnDataSetter CurrentReturnDataSetter;
+        ArgsDataSetter CurrentArgsDataSetter;
+        RequirementSetter CurrentRequirementSetter;
+        ArgsValuesAppender CurrentArgsValuesAppender;
+        ArgsTypeInfoAppender CurrentArgsTypeInfoAppender;
+        ConditionArgsTypesChecker CurrentConditionArgsTypesChecker;
+        ConditionArgsValuesChecker CurrentConditionArgsValuesChecker;
+        ArgsModifier CurrentArgsModifier;
+        ReturnDataValidator CurrentReturnDataValidator;
+        ArgsDataValidator CurrentArgsDataValidator;
+        RequirementValidator CurrentRequirementValidator;
 
-            //==============================================================================
-            //Public facing methods for overriding returns or arguments
-            //==============================================================================
-            inline Overrider(const Overrider& other) :
-                OverrideDatas(),
-                CurrentReturnDataSetter(OverrideDatas),
-                CurrentArgsDataSetter(OverrideDatas),
-                CurrentRequirementSetter(OverrideDatas),
-                CurrentArgsValuesAppender(),
-                CurrentArgsTypeInfoAppender(),
-                CurrentConditionArgsTypesChecker(),
-                CurrentConditionArgsValuesChecker(),
-                CurrentArgsModifier(),
-                CurrentReturnDataValidator(CurrentArgsValuesAppender),
-                CurrentArgsDataValidator(CurrentArgsValuesAppender, CurrentArgsTypeInfoAppender),
-                CurrentRequirementValidator(CurrentArgsValuesAppender, 
-                                            CurrentConditionArgsTypesChecker, 
-                                            CurrentConditionArgsValuesChecker)
-            {
-                *this = other;
-            }
-            
-            inline Overrider& operator=(const Overrider& other)
-            {
-                if(this == &other)
-                    return *this;
-            
-                OverrideDatas = other.OverrideDatas;
+        //==============================================================================
+        //Public facing methods for overriding returns or arguments
+        //==============================================================================
+        inline Overrider(const Overrider& other) :
+            OverrideDatas(),
+            CurrentReturnDataSetter(OverrideDatas),
+            CurrentArgsDataSetter(OverrideDatas),
+            CurrentRequirementSetter(OverrideDatas),
+            CurrentArgsValuesAppender(),
+            CurrentArgsTypeInfoAppender(),
+            CurrentConditionArgsTypesChecker(),
+            CurrentConditionArgsValuesChecker(),
+            CurrentArgsModifier(),
+            CurrentReturnDataValidator(CurrentArgsValuesAppender),
+            CurrentArgsDataValidator(CurrentArgsValuesAppender, CurrentArgsTypeInfoAppender),
+            CurrentRequirementValidator(CurrentArgsValuesAppender, 
+                                        CurrentConditionArgsTypesChecker, 
+                                        CurrentConditionArgsValuesChecker)
+        {
+            *this = other;
+        }
+        
+        inline Overrider& operator=(const Overrider& other)
+        {
+            if(this == &other)
                 return *this;
-            }
-                
-            inline Overrider() :    OverrideDatas(),
-                                    CurrentReturnDataSetter(OverrideDatas),
-                                    CurrentArgsDataSetter(OverrideDatas),
-                                    CurrentRequirementSetter(OverrideDatas),
-                                    CurrentArgsValuesAppender(),
-                                    CurrentArgsTypeInfoAppender(),
-                                    CurrentConditionArgsTypesChecker(),
-                                    CurrentConditionArgsValuesChecker(),
-                                    CurrentArgsModifier(),
-                                    CurrentReturnDataValidator(CurrentArgsValuesAppender),
-                                    CurrentArgsDataValidator(   CurrentArgsValuesAppender, 
-                                                                CurrentArgsTypeInfoAppender),
-                                    CurrentRequirementValidator(CurrentArgsValuesAppender, 
-                                                                CurrentConditionArgsTypesChecker,
-                                                                CurrentConditionArgsValuesChecker)
-            {}
+        
+            OverrideDatas = other.OverrideDatas;
+            return *this;
+        }
             
-            inline ~Overrider()
-            {}
+        inline Overrider() :    OverrideDatas(),
+                                CurrentReturnDataSetter(OverrideDatas),
+                                CurrentArgsDataSetter(OverrideDatas),
+                                CurrentRequirementSetter(OverrideDatas),
+                                CurrentArgsValuesAppender(),
+                                CurrentArgsTypeInfoAppender(),
+                                CurrentConditionArgsTypesChecker(),
+                                CurrentConditionArgsValuesChecker(),
+                                CurrentArgsModifier(),
+                                CurrentReturnDataValidator(CurrentArgsValuesAppender),
+                                CurrentArgsDataValidator(   CurrentArgsValuesAppender, 
+                                                            CurrentArgsTypeInfoAppender),
+                                CurrentRequirementValidator(CurrentArgsValuesAppender, 
+                                                            CurrentConditionArgsTypesChecker,
+                                                            CurrentConditionArgsValuesChecker)
+        {}
+        
+        inline ~Overrider()
+        {}
 
-            inline Overrider& GetOverrideObject()
+        inline Overrider& GetOverrideObject()
+        {
+            return *this;
+        }
+        
+        //------------------------------------------------------------------------------
+        //Check overrides available
+        //------------------------------------------------------------------------------
+        #if CO_SHOW_OVERRIDE_LOG
+            #define INTERNAL_CO_LOG_CheckOverride 1
+        #else
+            #define INTERNAL_CO_LOG_CheckOverride 0
+        #endif
+        
+        template<typename ReturnType, typename... Args>
+        inline bool Internal_CheckOverride( std::string functionName, 
+                                            int& outOverrideIndex,
+                                            bool& outOverrideReturn,
+                                            bool& outOverrideArgs,
+                                            bool& outDontReturn,
+                                            void* instance,
+                                            Args&... args)
+        {
+            outOverrideIndex = -1;
+            
+            functionName = ProcessFunctionName(functionName);
+            
+            if(INTERNAL_CO_LOG_CheckOverride)
             {
-                return *this;
+                std::cout << std::endl << __func__ << " called" << std::endl;
+                std::cout << "functionName: "<< functionName << std::endl;
+                std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
             
-            //------------------------------------------------------------------------------
-            //Check overrides available
-            //------------------------------------------------------------------------------
-            #if CO_SHOW_OVERRIDE_LOG
-                #define INTERNAL_CO_LOG_CheckOverride 1
-            #else
-                #define INTERNAL_CO_LOG_CheckOverride 0
-            #endif
-            
-            template<typename ReturnType, typename... Args>
-            inline bool Internal_CheckOverride( std::string functionName, 
-                                                int& outOverrideIndex,
-                                                bool& outOverrideReturn,
-                                                bool& outOverrideArgs,
-                                                bool& outDontReturn,
-                                                void* instance,
-                                                Args&... args)
+            if(OverrideDatas.find(functionName) == OverrideDatas.end())
             {
-                outOverrideIndex = -1;
-                
-                functionName = ProcessFunctionName(functionName);
-                
                 if(INTERNAL_CO_LOG_CheckOverride)
-                {
-                    std::cout << std::endl << __func__ << " called" << std::endl;
-                    std::cout << "functionName: "<< functionName << std::endl;
-                    std::cout << "functionName.size(): " << functionName.size() << std::endl;
-                }
+                    std::cout << functionName << " not found\n";
                 
-                if(OverrideDatas.find(functionName) == OverrideDatas.end())
-                {
-                    if(INTERNAL_CO_LOG_CheckOverride)
-                        std::cout << functionName << " not found\n";
-                    
-                    return false;
-                }
+                return false;
+            }
+        
+            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
             
-                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
-                
-                outOverrideArgs = false;
-                outOverrideReturn = false;
-                outDontReturn = false;
-                for(int i = 0; i < (int)currentDataList.size(); ++i)
+            outOverrideArgs = false;
+            outOverrideReturn = false;
+            outDontReturn = false;
+            for(int i = 0; i < (int)currentDataList.size(); ++i)
+            {
+                //Match the correct instance if any
+                if( currentDataList.at(i).Instance != nullptr && 
+                    currentDataList.at(i).Instance != instance)
                 {
-                    //Match the correct instance if any
-                    if( currentDataList.at(i).Instance != nullptr && 
-                        currentDataList.at(i).Instance != instance)
+                    continue;
+                }
+                
+                if( !currentDataList.at(i).ArgumentsDataInfo.empty() ||
+                    currentDataList.at(i).ArgumentsDataActionInfo.DataActionSet)
+                {
+                    if(!CurrentArgsDataValidator.IsCorrectArgumentsDataInfo(currentDataList.at(i), 
+                                                                            args...))
                     {
+                        if(INTERNAL_CO_LOG_CheckOverride)
+                            std::cout << "Arguments not correct at index: " << i << std::endl;
+                        
                         continue;
                     }
                     
-                    if( !currentDataList.at(i).ArgumentsDataInfo.empty() ||
-                        currentDataList.at(i).ArgumentsDataActionInfo.DataActionSet)
-                    {
-                        if(!CurrentArgsDataValidator.IsCorrectArgumentsDataInfo(currentDataList.at(i), 
-                                                                                args...))
-                        {
-                            if(INTERNAL_CO_LOG_CheckOverride)
-                                std::cout << "Arguments not correct at index: " << i << std::endl;
-                            
-                            continue;
-                        }
-                        
-                        outOverrideArgs = true;
-                    }
+                    outOverrideArgs = true;
+                }
 
-                    if( currentDataList.at(i).CurrentReturnDataInfo.DataSet ||
-                        currentDataList.at(i).CurrentReturnDataInfo.ReturnAny ||
-                        currentDataList.at(i).CurrentReturnDataActionInfo.DataActionSet)
-                    {
-                        if( !CurrentReturnDataValidator.IsCorrectReturnDataInfo<ReturnType>
-                            (
-                                currentDataList.at(i), 
-                                args...
-                            ))
-                        {
-                            if(INTERNAL_CO_LOG_CheckOverride)
-                                std::cout << "Return not correct at index: " << i << std::endl;
-                            
-                            continue;
-                        }
-                        
-                        outOverrideReturn = true;
-                        
-                        if(currentDataList.at(i).CurrentReturnDataInfo.ReturnAny)
-                            outDontReturn = true;
-                        else
-                            outDontReturn = false;
-                    }
-
-                    OverrideStatus internalStatus = OverrideStatus::NO_OVERRIDE;
-                    if( !CurrentRequirementValidator.IsMeetingRequirementForDataInfo<ReturnType>
+                if( currentDataList.at(i).CurrentReturnDataInfo.DataSet ||
+                    currentDataList.at(i).CurrentReturnDataInfo.ReturnAny ||
+                    currentDataList.at(i).CurrentReturnDataActionInfo.DataActionSet)
+                {
+                    if( !CurrentReturnDataValidator.IsCorrectReturnDataInfo<ReturnType>
                         (
                             currentDataList.at(i), 
-                            internalStatus, 
-                            instance,
                             args...
                         ))
                     {
-                        //If something is wrong internally, notify everything
-                        if(internalStatus != OverrideStatus::NO_OVERRIDE)
-                        {
-                            for(int j = 0; j < (int)currentDataList.size(); j++)
-                            {
-                                if(currentDataList.at(j).Result != nullptr)
-                                    currentDataList.at(j).Result->AddStatus(internalStatus);
-                            }
-                        }
-                        
                         if(INTERNAL_CO_LOG_CheckOverride)
-                            std::cout << "Requirement not correct at index: " << i << std::endl;
+                            std::cout << "Return not correct at index: " << i << std::endl;
                         
-                        outOverrideArgs = false;
-                        outOverrideReturn = false;
-                        outDontReturn = false;
                         continue;
                     }
-
-                    outOverrideIndex = i;
-                    break;
+                    
+                    outOverrideReturn = true;
+                    
+                    if(currentDataList.at(i).CurrentReturnDataInfo.ReturnAny)
+                        outDontReturn = true;
+                    else
+                        outDontReturn = false;
                 }
-                
-                
-                if(INTERNAL_CO_LOG_CheckOverride)
-                    std::cout << "outOverrideIndex: " << outOverrideIndex << std::endl;
-                
-                return outOverrideIndex != -1;
-            }
 
-            template<typename... Args>
-            inline void 
-            Internal_CallReturnOverrideResultExpectedAction(std::string functionName,
-                                                            int overrideIndex,
-                                                            void* instance,
-                                                            Args&... args)
-            {
-                functionName = ProcessFunctionName(functionName);
-                
-                OverrideData& correctData = OverrideDatas.at(functionName).at(overrideIndex);
-                if(correctData.CurrentResultActionInfo.CorrectActionSet)
-                {
-                    std::vector<void*> argumentsList;
-                    CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
-                    correctData.CurrentResultActionInfo.CorrectAction(instance, argumentsList);
-                }
-                
-                correctData.CurrentConditionInfo.CalledTimes++;
-                if(correctData.Result != nullptr)
-                    correctData.Result->AddStatus(OverrideStatus::OVERRIDE_SUCCESS);
-            }
-
-            //------------------------------------------------------------------------------
-            //Overriding Returns
-            //------------------------------------------------------------------------------
-
-            #if CO_SHOW_OVERRIDE_LOG
-                #define INTERNAL_CO_LOG_CheckOverrideAndReturn 1
-            #else
-                #define INTERNAL_CO_LOG_CheckOverrideAndReturn 0
-            #endif
-
-            template
-            <
-                typename ReturnType, 
-                typename std::enable_if<std::is_same<ReturnType, void>::value, bool>::type = true,
-                typename... Args
-            >
-            inline ReturnType Internal_OverrideReturn(  int dataIndex,
-                                                        std::string functionName, 
-                                                        void* instance,
-                                                        Args&... args)
-            {
-                functionName = ProcessFunctionName(functionName);
-                
-                Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                                dataIndex, 
-                                                                instance, 
-                                                                args...);
-                return ReturnType();
-            }
-
-            template
-            <
-                typename ReturnType, 
-                typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
-                typename std::enable_if<!std::is_reference<ReturnType>::value, bool>::type = true,
-                typename... Args
-            >
-            inline ReturnType Internal_OverrideReturn(  int dataIndex,
-                                                        std::string functionName, 
-                                                        void* instance, 
-                                                        Args&... args)
-            {
-                functionName = ProcessFunctionName(functionName);
-                
-                if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
-                {
-                    std::cout << std::endl << __func__ << " called" << std::endl;
-                    std::cout << "functionName: " << functionName << std::endl;
-                    std::cout << "functionName.size(): " << functionName.size() << std::endl;
-                }
-                
-                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
-                std::vector<void*> argumentsList;
-                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
-                
-                OverrideData& correctData = currentDataList.at(dataIndex);
-                Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                                dataIndex, 
-                                                                instance, 
-                                                                args...);
-                
-                if(correctData.CurrentReturnDataInfo.DataSet)
-                    return *static_cast<ReturnType*>(correctData.CurrentReturnDataInfo.Data.get());
-                else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
-                {
-                    ReturnType returnRef;
-                    correctData.CurrentReturnDataActionInfo.DataAction( instance, 
-                                                                        argumentsList, 
-                                                                        &returnRef);
-                    return returnRef;
-                }
-                
-                return ReturnType();
-            }
-            
-            template
-            <
-                typename ReturnType, 
-                typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
-                typename std::enable_if<std::is_reference<ReturnType>::value, bool>::type = true,
-                typename... Args
-            >
-            inline ReturnType Internal_OverrideReturn(  int dataIndex,
-                                                        std::string functionName, 
-                                                        void* instance,
-                                                        Args&... args)
-            {
-                functionName = ProcessFunctionName(functionName);
-                
-                if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
-                {
-                    std::cout << std::endl << __func__ << " called" << std::endl;
-                    std::cout << "functionName: " << functionName << std::endl;
-                    std::cout << "functionName.size(): " << functionName.size() << std::endl;
-                }
-                
-                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
-                std::vector<void*> argumentsList;
-                CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
-                
-                OverrideData& correctData = currentDataList.at(dataIndex);
-                Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                                dataIndex, 
-                                                                instance, 
-                                                                args...);
-
-                if(correctData.CurrentReturnDataInfo.DataSet)
-                {
-                    return *reinterpret_cast<INTERNAL_CO_UNREF(ReturnType)*>
+                OverrideStatus internalStatus = OverrideStatus::NO_OVERRIDE;
+                if( !CurrentRequirementValidator.IsMeetingRequirementForDataInfo<ReturnType>
                     (
-                        correctData.CurrentReturnDataInfo.Data.get()
-                    );
-                }
-                else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
+                        currentDataList.at(i), 
+                        internalStatus, 
+                        instance,
+                        args...
+                    ))
                 {
-                    INTERNAL_CO_UNREF(ReturnType)* returnRef;
-                    correctData.CurrentReturnDataActionInfo.DataAction( instance, 
-                                                                        argumentsList, 
-                                                                        &returnRef);
-                    return *returnRef;
+                    //If something is wrong internally, notify everything
+                    if(internalStatus != OverrideStatus::NO_OVERRIDE)
+                    {
+                        for(int j = 0; j < (int)currentDataList.size(); j++)
+                        {
+                            if(currentDataList.at(j).Result != nullptr)
+                                currentDataList.at(j).Result->AddStatus(internalStatus);
+                        }
+                    }
+                    
+                    if(INTERNAL_CO_LOG_CheckOverride)
+                        std::cout << "Requirement not correct at index: " << i << std::endl;
+                    
+                    outOverrideArgs = false;
+                    outOverrideReturn = false;
+                    outDontReturn = false;
+                    continue;
                 }
-                
-                return EarlyReturn<ReturnType>();
+
+                outOverrideIndex = i;
+                break;
             }
+            
+            
+            if(INTERNAL_CO_LOG_CheckOverride)
+                std::cout << "outOverrideIndex: " << outOverrideIndex << std::endl;
+            
+            return outOverrideIndex != -1;
+        }
 
-            //------------------------------------------------------------------------------
-            //Overriding Arguments
-            //------------------------------------------------------------------------------
-            #if CO_SHOW_OVERRIDE_LOG
-                #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 1
-            #else
-                #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 0
-            #endif
-
-            template<typename... Args>
-            inline void Internal_OverrideArgs(  int dataIndex,
-                                                std::string functionName, 
-                                                bool performResultAction,
-                                                void* instance,
-                                                Args&... args)
+        template<typename... Args>
+        inline void 
+        Internal_CallReturnOverrideResultExpectedAction(std::string functionName,
+                                                        int overrideIndex,
+                                                        void* instance,
+                                                        Args&... args)
+        {
+            functionName = ProcessFunctionName(functionName);
+            
+            OverrideData& correctData = OverrideDatas.at(functionName).at(overrideIndex);
+            if(correctData.CurrentResultActionInfo.CorrectActionSet)
             {
-                functionName = ProcessFunctionName(functionName);
-                
-                if(INTERNAL_CO_LOG_CheckOverrideAndSetArgs)
-                {
-                    std::cout << std::endl << __func__ << " called" << std::endl;
-                    std::cout << "functionName: "<<functionName << std::endl;
-                }
-                
-                std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
                 std::vector<void*> argumentsList;
                 CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
-                
-                OverrideData& correctData = currentDataList.at(dataIndex);
-                OverrideStatus overrideStatus = OverrideStatus::OVERRIDE_SUCCESS;
-                
-                if(correctData.ArgumentsDataActionInfo.DataActionSet)
-                {
-                    CurrentArgsModifier.ModifyArgs( instance, 
-                                                    argumentsList, 
-                                                    correctData.ArgumentsDataActionInfo);
-                }
-                else
-                {
-                    CurrentArgsModifier.ModifyArgs( correctData.ArgumentsDataInfo, 
-                                                    0, 
-                                                    &overrideStatus, 
-                                                    args...);
-                }
-                
-                if(correctData.Result != nullptr)
-                    correctData.Result->AddStatus(overrideStatus);
-                
-                if( performResultAction && 
-                    overrideStatus == OverrideStatus::OVERRIDE_SUCCESS)
-                {
-                    Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                                    dataIndex, 
-                                                                    instance, 
-                                                                    args...);
-                }
+                correctData.CurrentResultActionInfo.CorrectAction(instance, argumentsList);
             }
             
-            //------------------------------------------------------------------------------
-            //Creating override info
-            //------------------------------------------------------------------------------
-            
-            #if CO_SHOW_OVERRIDE_LOG
-                #define INTERNAL_CO_LOG_OverrideCreation 1
-            #else
-                #define INTERNAL_CO_LOG_OverrideCreation 0
-            #endif
+            correctData.CurrentConditionInfo.CalledTimes++;
+            if(correctData.Result != nullptr)
+                correctData.Result->AddStatus(OverrideStatus::OVERRIDE_SUCCESS);
+        }
 
-            inline OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName)
-            {
-                functionName = ProcessFunctionName(functionName);
-                
-                if(INTERNAL_CO_LOG_OverrideCreation)
-                {
-                    std::cout << std::endl << __func__ << " called" << std::endl;
-                    std::cout << "functionName: " << functionName << std::endl;
-                    std::cout << "functionName.size(): " << functionName.size() << std::endl;
-                }
+        //------------------------------------------------------------------------------
+        //Overriding Returns
+        //------------------------------------------------------------------------------
 
-                OverrideDatas[functionName].push_back(OverrideData());
-                return OverrideInfoSetter(functionName, *this);
+        #if CO_SHOW_OVERRIDE_LOG
+            #define INTERNAL_CO_LOG_CheckOverrideAndReturn 1
+        #else
+            #define INTERNAL_CO_LOG_CheckOverrideAndReturn 0
+        #endif
+
+        template
+        <
+            typename ReturnType, 
+            typename std::enable_if<std::is_same<ReturnType, void>::value, bool>::type = true,
+            typename... Args
+        >
+        inline ReturnType Internal_OverrideReturn(  int dataIndex,
+                                                    std::string functionName, 
+                                                    void* instance,
+                                                    Args&... args)
+        {
+            functionName = ProcessFunctionName(functionName);
+            
+            Internal_CallReturnOverrideResultExpectedAction(functionName, 
+                                                            dataIndex, 
+                                                            instance, 
+                                                            args...);
+            return ReturnType();
+        }
+
+        template
+        <
+            typename ReturnType, 
+            typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
+            typename std::enable_if<!std::is_reference<ReturnType>::value, bool>::type = true,
+            typename... Args
+        >
+        inline ReturnType Internal_OverrideReturn(  int dataIndex,
+                                                    std::string functionName, 
+                                                    void* instance, 
+                                                    Args&... args)
+        {
+            functionName = ProcessFunctionName(functionName);
+            
+            if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
+            {
+                std::cout << std::endl << __func__ << " called" << std::endl;
+                std::cout << "functionName: " << functionName << std::endl;
+                std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
             
-            inline void Internal_RemoveOverrideInfo(std::string functionName)
+            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<void*> argumentsList;
+            CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
+            
+            OverrideData& correctData = currentDataList.at(dataIndex);
+            Internal_CallReturnOverrideResultExpectedAction(functionName, 
+                                                            dataIndex, 
+                                                            instance, 
+                                                            args...);
+            
+            if(correctData.CurrentReturnDataInfo.DataSet)
+                return *static_cast<ReturnType*>(correctData.CurrentReturnDataInfo.Data.get());
+            else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
             {
-                functionName = ProcessFunctionName(functionName);
-                
-                if(OverrideDatas.find(functionName) != OverrideDatas.end())
-                    OverrideDatas.erase(functionName);
+                ReturnType returnRef;
+                correctData.CurrentReturnDataActionInfo.DataAction( instance, 
+                                                                    argumentsList, 
+                                                                    &returnRef);
+                return returnRef;
             }
             
-            inline void ClearAllOverrideInfo()
+            return ReturnType();
+        }
+        
+        template
+        <
+            typename ReturnType, 
+            typename std::enable_if<!std::is_same<ReturnType, void>::value, bool>::type = true,
+            typename std::enable_if<std::is_reference<ReturnType>::value, bool>::type = true,
+            typename... Args
+        >
+        inline ReturnType Internal_OverrideReturn(  int dataIndex,
+                                                    std::string functionName, 
+                                                    void* instance,
+                                                    Args&... args)
+        {
+            functionName = ProcessFunctionName(functionName);
+            
+            if(INTERNAL_CO_LOG_CheckOverrideAndReturn)
             {
-                OverrideDatas.clear();
+                std::cout << std::endl << __func__ << " called" << std::endl;
+                std::cout << "functionName: " << functionName << std::endl;
+                std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
+            
+            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<void*> argumentsList;
+            CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
+            
+            OverrideData& correctData = currentDataList.at(dataIndex);
+            Internal_CallReturnOverrideResultExpectedAction(functionName, 
+                                                            dataIndex, 
+                                                            instance, 
+                                                            args...);
+
+            if(correctData.CurrentReturnDataInfo.DataSet)
+            {
+                return *reinterpret_cast<INTERNAL_CO_UNREF(ReturnType)*>
+                (
+                    correctData.CurrentReturnDataInfo.Data.get()
+                );
+            }
+            else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
+            {
+                INTERNAL_CO_UNREF(ReturnType)* returnRef;
+                correctData.CurrentReturnDataActionInfo.DataAction( instance, 
+                                                                    argumentsList, 
+                                                                    &returnRef);
+                return *returnRef;
+            }
+            
+            return EarlyReturn<ReturnType>();
+        }
+
+        //------------------------------------------------------------------------------
+        //Overriding Arguments
+        //------------------------------------------------------------------------------
+        #if CO_SHOW_OVERRIDE_LOG
+            #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 1
+        #else
+            #define INTERNAL_CO_LOG_CheckOverrideAndSetArgs 0
+        #endif
+
+        template<typename... Args>
+        inline void Internal_OverrideArgs(  int dataIndex,
+                                            std::string functionName, 
+                                            bool performResultAction,
+                                            void* instance,
+                                            Args&... args)
+        {
+            functionName = ProcessFunctionName(functionName);
+            
+            if(INTERNAL_CO_LOG_CheckOverrideAndSetArgs)
+            {
+                std::cout << std::endl << __func__ << " called" << std::endl;
+                std::cout << "functionName: "<<functionName << std::endl;
+            }
+            
+            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<void*> argumentsList;
+            CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
+            
+            OverrideData& correctData = currentDataList.at(dataIndex);
+            OverrideStatus overrideStatus = OverrideStatus::OVERRIDE_SUCCESS;
+            
+            if(correctData.ArgumentsDataActionInfo.DataActionSet)
+            {
+                CurrentArgsModifier.ModifyArgs( instance, 
+                                                argumentsList, 
+                                                correctData.ArgumentsDataActionInfo);
+            }
+            else
+            {
+                CurrentArgsModifier.ModifyArgs( correctData.ArgumentsDataInfo, 
+                                                0, 
+                                                &overrideStatus, 
+                                                args...);
+            }
+            
+            if(correctData.Result != nullptr)
+                correctData.Result->AddStatus(overrideStatus);
+            
+            if( performResultAction && 
+                overrideStatus == OverrideStatus::OVERRIDE_SUCCESS)
+            {
+                Internal_CallReturnOverrideResultExpectedAction(functionName, 
+                                                                dataIndex, 
+                                                                instance, 
+                                                                args...);
+            }
+        }
+        
+        //------------------------------------------------------------------------------
+        //Creating override info
+        //------------------------------------------------------------------------------
+        
+        #if CO_SHOW_OVERRIDE_LOG
+            #define INTERNAL_CO_LOG_OverrideCreation 1
+        #else
+            #define INTERNAL_CO_LOG_OverrideCreation 0
+        #endif
+
+        inline OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName)
+        {
+            functionName = ProcessFunctionName(functionName);
+            
+            if(INTERNAL_CO_LOG_OverrideCreation)
+            {
+                std::cout << std::endl << __func__ << " called" << std::endl;
+                std::cout << "functionName: " << functionName << std::endl;
+                std::cout << "functionName.size(): " << functionName.size() << std::endl;
+            }
+
+            OverrideDatas[functionName].push_back(OverrideData());
+            return OverrideInfoSetter(functionName, *this);
+        }
+        
+        inline void Internal_RemoveOverrideInfo(std::string functionName)
+        {
+            functionName = ProcessFunctionName(functionName);
+            
+            if(OverrideDatas.find(functionName) != OverrideDatas.end())
+                OverrideDatas.erase(functionName);
+        }
+        
+        inline void ClearAllOverrideInfo()
+        {
+            OverrideDatas.clear();
+        }
     };
 }
 
