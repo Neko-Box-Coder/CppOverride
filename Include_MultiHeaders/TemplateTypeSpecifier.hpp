@@ -10,8 +10,7 @@ namespace CppOverride
     template<typename T>
     struct TypeSpecifier { using Type = T; };
     
-    template<   typename T,
-                typename VoidType = void>
+    template<typename T, typename VoidType = void>
     struct TypeUnwrapper
     { 
         static_assert(std::is_same<VoidType, void>::value, "");

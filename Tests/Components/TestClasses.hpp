@@ -5,7 +5,8 @@
 
 namespace CppOverrideTest
 {
-    class TestClass {
+    class TestClass 
+    {
         private:
             int TestData;
             double TestData2;
