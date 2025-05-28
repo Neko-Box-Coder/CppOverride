@@ -120,6 +120,12 @@ namespace CppOverrideTest
             return (int)(chars[0]);
         }
         
+        inline bool CompoundedNonComparableParameterFunc(std::vector<NonComparableTestClass>& outArg)
+        {
+            CO_OVERRIDE_IMPL(OverrideObj, bool, (outArg));
+            return true;
+        }
+        
         namespace Object
         {
             //Used In:
