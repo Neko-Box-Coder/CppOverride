@@ -9,6 +9,8 @@
 #include "./OverrideStatus.hpp"
 
 #include <memory>
+#include <vector>
+#include <unordered_map>
 
 namespace CppOverride
 {
@@ -32,6 +34,9 @@ namespace CppOverride
         ResultActionInfo CurrentResultActionInfo;
         std::shared_ptr<OverrideResult> Result = nullptr;
     };
+    
+    using FunctionName = std::string;
+    using OverrideDatas = std::unordered_map<FunctionName, std::vector<OverrideData>>;
 }
 
 #endif

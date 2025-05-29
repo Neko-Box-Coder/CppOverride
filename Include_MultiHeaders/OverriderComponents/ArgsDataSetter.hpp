@@ -20,8 +20,6 @@ namespace CppOverride
     {
         public:
             #define INTERNAL_CO_UNWRAPPED(arg) typename TypeUnwrapper<arg>::Type
-            using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
-        
             OverrideDatas& CurrentOverrideDatas;
             
             #if CO_SHOW_OVERRIDE_LOG

@@ -12,7 +12,6 @@ namespace CppOverride
 {
     struct ReturnDataSetter
     {
-        using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
         OverrideDatas& CurrentOverrideDatas;
         
         //------------------------------------------------------------------------------

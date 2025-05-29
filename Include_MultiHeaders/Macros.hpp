@@ -127,7 +127,7 @@ namespace CppOverride
                 } \
                 if(!overrideArgs && !overrideReturn) \
                 { \
-                    /* If we are overriding anything, we still need to call result actions */ \
+                    /* If we are not overriding anything, we still need to call result actions */ \
                     (overrideObjName)   .GetOverrideObject() \
                                         .Internal_CallReturnOverrideResultExpectedAction \
                                         ( \

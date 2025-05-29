@@ -41,7 +41,7 @@ namespace CppOverride
     
     struct Overrider
     {
-        std::unordered_map<std::string, std::vector<OverrideData>> OverrideDatas;
+        OverrideDatas CurrentOverrideDatas;
         ReturnDataSetter CurrentReturnDataSetter;
         ArgsDataSetter CurrentArgsDataSetter;
         RequirementSetter CurrentRequirementSetter;
@@ -58,10 +58,10 @@ namespace CppOverride
         //Public facing methods for overriding returns or arguments
         //==============================================================================
         inline Overrider(const Overrider& other) :
-            OverrideDatas(),
-            CurrentReturnDataSetter(OverrideDatas),
-            CurrentArgsDataSetter(OverrideDatas),
-            CurrentRequirementSetter(OverrideDatas),
+            CurrentOverrideDatas(),
+            CurrentReturnDataSetter(CurrentOverrideDatas),
+            CurrentArgsDataSetter(CurrentOverrideDatas),
+            CurrentRequirementSetter(CurrentOverrideDatas),
             CurrentArgsValuesAppender(),
             CurrentArgsTypeInfoAppender(),
             CurrentConditionArgsTypesChecker(),
@@ -81,14 +81,14 @@ namespace CppOverride
             if(this == &other)
                 return *this;
         
-            OverrideDatas = other.OverrideDatas;
+            CurrentOverrideDatas = other.CurrentOverrideDatas;
             return *this;
         }
             
-        inline Overrider() :    OverrideDatas(),
-                                CurrentReturnDataSetter(OverrideDatas),
-                                CurrentArgsDataSetter(OverrideDatas),
-                                CurrentRequirementSetter(OverrideDatas),
+        inline Overrider() :    CurrentOverrideDatas(),
+                                CurrentReturnDataSetter(CurrentOverrideDatas),
+                                CurrentArgsDataSetter(CurrentOverrideDatas),
+                                CurrentRequirementSetter(CurrentOverrideDatas),
                                 CurrentArgsValuesAppender(),
                                 CurrentArgsTypeInfoAppender(),
                                 CurrentConditionArgsTypesChecker(),
@@ -139,7 +139,7 @@ namespace CppOverride
                 std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
             
-            if(OverrideDatas.find(functionName) == OverrideDatas.end())
+            if(CurrentOverrideDatas.find(functionName) == CurrentOverrideDatas.end())
             {
                 if(INTERNAL_CO_LOG_CheckOverride)
                     std::cout << functionName << " not found\n";
@@ -147,7 +147,7 @@ namespace CppOverride
                 return false;
             }
         
-            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
             
             outOverrideArgs = false;
             outOverrideReturn = false;
@@ -248,7 +248,7 @@ namespace CppOverride
         {
             functionName = ProcessFunctionName(functionName);
             
-            OverrideData& correctData = OverrideDatas.at(functionName).at(overrideIndex);
+            OverrideData& correctData = CurrentOverrideDatas.at(functionName).at(overrideIndex);
             if(correctData.CurrentResultActionInfo.CorrectActionSet)
             {
                 std::vector<void*> argumentsList;
@@ -312,7 +312,7 @@ namespace CppOverride
                 std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
             
-            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
             std::vector<void*> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
@@ -357,7 +357,7 @@ namespace CppOverride
                 std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
             
-            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
             std::vector<void*> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
@@ -410,7 +410,7 @@ namespace CppOverride
                 std::cout << "functionName: "<<functionName << std::endl;
             }
             
-            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
             std::vector<void*> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
@@ -465,7 +465,7 @@ namespace CppOverride
                 std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
 
-            OverrideDatas[functionName].push_back(OverrideData());
+            CurrentOverrideDatas[functionName].push_back(OverrideData());
             return OverrideInfoSetter(functionName, *this);
         }
         
@@ -473,13 +473,13 @@ namespace CppOverride
         {
             functionName = ProcessFunctionName(functionName);
             
-            if(OverrideDatas.find(functionName) != OverrideDatas.end())
-                OverrideDatas.erase(functionName);
+            if(CurrentOverrideDatas.find(functionName) != CurrentOverrideDatas.end())
+                CurrentOverrideDatas.erase(functionName);
         }
         
         inline void ClearAllOverrideInfo()
         {
-            OverrideDatas.clear();
+            CurrentOverrideDatas.clear();
         }
     };
 }
