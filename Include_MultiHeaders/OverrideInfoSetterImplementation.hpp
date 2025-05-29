@@ -78,8 +78,18 @@ namespace CppOverride
     {
         return OverrideObject(instance);
     }
+    
+    inline OverrideInfoSetter& OverrideInfoSetter::MatchesObject(const void* instance)
+    {
+        return OverrideObject(instance);
+    }
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverrideAny()
+    {
+        return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, nullptr);
+    }
+    
+    inline OverrideInfoSetter& OverrideInfoSetter::MatchesAny()
     {
         return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, nullptr);
     }

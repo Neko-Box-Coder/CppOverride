@@ -779,6 +779,28 @@ that it won't be set.
 
 ---
 
+#### Match Object
+
+```cpp
+CO_SETUP_OVERRIDE(Override Instance, Your Function)
+                 .MatchesObject(const void* instance)
+```
+
+This triggers the override only when the object pointer matches.
+
+This requires the `CO_OVERRIDE_MEMBER_IMPL` or `CO_OVERRIDE_MEMBER_METHOD` macros to be inserted.
+
+```cpp
+CO_SETUP_OVERRIDE(Override Instance, Your Function)
+                 .MatchesAny()
+```
+
+This explicitly set the override to ignore the object pointer. 
+
+This is the default behavior even without calling this method.
+
+---
+
 #### When Called With
 
 This triggers the override only when the value matches. 
@@ -787,7 +809,7 @@ if not it will then try to match pointer instead.
 
 ```cpp
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
-                 .WhenCalledWith<Condition Types>(Condition Values)
+                 .WhenCalledWith<typename... Args>(Args... args)
 ```
 
 ???+ example
@@ -826,7 +848,7 @@ This allows override to be triggered for the set amount of times.
 
 ```cpp
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
-                 .Times(Override Amount)
+                 .Times(int times)
 ```
 
 ??? example
@@ -852,7 +874,7 @@ This sets the condition to decide to run the override action or not
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
                  .If
                  (
-                    bool(void* instance, const std::vector<void*>& args) Function
+                    bool(void* instance, const std::vector<void*>& args) function
                  )
 ```
 
@@ -888,7 +910,7 @@ This allows you to setup a function callback that gets called before an override
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
                  .WhenCalledExpectedly_Do
                  (
-                    void(void* instance, const std::vector<void*>& args) Function
+                    void(void* instance, const std::vector<void*>& args) function
                  );
 ```
 
@@ -942,7 +964,7 @@ because of failing to meet conditions or failing to match the correct argument v
 CO_SETUP_OVERRIDE(Override Instance, Your Function)
                  .Otherwise_Do
                  (
-                    void(void* instance, const std::vector<void*>& args) Function
+                    void(void* instance, const std::vector<void*>& args) function
                  );
 ```
 

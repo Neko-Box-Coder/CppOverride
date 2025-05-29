@@ -56,8 +56,10 @@ namespace CppOverride
         
         OverrideInfoSetter& OverrideObject(const void* instance);
         OverrideInfoSetter& OverridesObject(const void* instance);
+        OverrideInfoSetter& MatchesObject(const void* instance);
         
         OverrideInfoSetter& OverrideAny();
+        OverrideInfoSetter& MatchesAny();
         
         template<typename ReturnType>
         OverrideInfoSetter& ReturnsByAction(std::function<void( void* instance,

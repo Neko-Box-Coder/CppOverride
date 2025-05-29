@@ -2927,8 +2927,10 @@ namespace CppOverride
         
         OverrideInfoSetter& OverrideObject(const void* instance);
         OverrideInfoSetter& OverridesObject(const void* instance);
+        OverrideInfoSetter& MatchesObject(const void* instance);
         
         OverrideInfoSetter& OverrideAny();
+        OverrideInfoSetter& MatchesAny();
         
         template<typename ReturnType>
         OverrideInfoSetter& ReturnsByAction(std::function<void( void* instance,
@@ -3120,6 +3122,8 @@ namespace CppOverride
 
 
 #include <memory>
+#include <vector>
+#include <unordered_map>
 
 namespace CppOverride
 {
@@ -3143,6 +3147,9 @@ namespace CppOverride
         ResultActionInfo CurrentResultActionInfo;
         std::shared_ptr<OverrideResult> Result = nullptr;
     };
+    
+    using FunctionName = std::string;
+    using OverrideDatas = std::unordered_map<FunctionName, std::vector<OverrideData>>;
 }
 
 #endif
@@ -3156,7 +3163,6 @@ namespace CppOverride
 {
     struct ReturnDataSetter
     {
-        using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
         OverrideDatas& CurrentOverrideDatas;
         
         //------------------------------------------------------------------------------
@@ -3332,8 +3338,6 @@ namespace CppOverride
     {
         public:
             #define INTERNAL_CO_UNWRAPPED(arg) typename TypeUnwrapper<arg>::Type
-            using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
-        
             OverrideDatas& CurrentOverrideDatas;
             
             #if CO_SHOW_OVERRIDE_LOG
@@ -3542,7 +3546,6 @@ namespace CppOverride
 {
     struct RequirementSetter
     {
-        using OverrideDatas = std::unordered_map<std::string, std::vector<OverrideData>>;
         OverrideDatas& CurrentOverrideDatas;
     
         //------------------------------------------------------------------------------
@@ -5020,7 +5023,7 @@ namespace CppOverride
     
     struct Overrider
     {
-        std::unordered_map<std::string, std::vector<OverrideData>> OverrideDatas;
+        OverrideDatas CurrentOverrideDatas;
         ReturnDataSetter CurrentReturnDataSetter;
         ArgsDataSetter CurrentArgsDataSetter;
         RequirementSetter CurrentRequirementSetter;
@@ -5037,10 +5040,10 @@ namespace CppOverride
         //Public facing methods for overriding returns or arguments
         //==============================================================================
         inline Overrider(const Overrider& other) :
-            OverrideDatas(),
-            CurrentReturnDataSetter(OverrideDatas),
-            CurrentArgsDataSetter(OverrideDatas),
-            CurrentRequirementSetter(OverrideDatas),
+            CurrentOverrideDatas(),
+            CurrentReturnDataSetter(CurrentOverrideDatas),
+            CurrentArgsDataSetter(CurrentOverrideDatas),
+            CurrentRequirementSetter(CurrentOverrideDatas),
             CurrentArgsValuesAppender(),
             CurrentArgsTypeInfoAppender(),
             CurrentConditionArgsTypesChecker(),
@@ -5060,14 +5063,14 @@ namespace CppOverride
             if(this == &other)
                 return *this;
         
-            OverrideDatas = other.OverrideDatas;
+            CurrentOverrideDatas = other.CurrentOverrideDatas;
             return *this;
         }
             
-        inline Overrider() :    OverrideDatas(),
-                                CurrentReturnDataSetter(OverrideDatas),
-                                CurrentArgsDataSetter(OverrideDatas),
-                                CurrentRequirementSetter(OverrideDatas),
+        inline Overrider() :    CurrentOverrideDatas(),
+                                CurrentReturnDataSetter(CurrentOverrideDatas),
+                                CurrentArgsDataSetter(CurrentOverrideDatas),
+                                CurrentRequirementSetter(CurrentOverrideDatas),
                                 CurrentArgsValuesAppender(),
                                 CurrentArgsTypeInfoAppender(),
                                 CurrentConditionArgsTypesChecker(),
@@ -5118,7 +5121,7 @@ namespace CppOverride
                 std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
             
-            if(OverrideDatas.find(functionName) == OverrideDatas.end())
+            if(CurrentOverrideDatas.find(functionName) == CurrentOverrideDatas.end())
             {
                 if(INTERNAL_CO_LOG_CheckOverride)
                     std::cout << functionName << " not found\n";
@@ -5126,7 +5129,7 @@ namespace CppOverride
                 return false;
             }
         
-            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
             
             outOverrideArgs = false;
             outOverrideReturn = false;
@@ -5227,7 +5230,7 @@ namespace CppOverride
         {
             functionName = ProcessFunctionName(functionName);
             
-            OverrideData& correctData = OverrideDatas.at(functionName).at(overrideIndex);
+            OverrideData& correctData = CurrentOverrideDatas.at(functionName).at(overrideIndex);
             if(correctData.CurrentResultActionInfo.CorrectActionSet)
             {
                 std::vector<void*> argumentsList;
@@ -5291,7 +5294,7 @@ namespace CppOverride
                 std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
             
-            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
             std::vector<void*> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
@@ -5336,7 +5339,7 @@ namespace CppOverride
                 std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
             
-            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
             std::vector<void*> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
@@ -5389,7 +5392,7 @@ namespace CppOverride
                 std::cout << "functionName: "<<functionName << std::endl;
             }
             
-            std::vector<OverrideData>& currentDataList = OverrideDatas.at(functionName);
+            std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
             std::vector<void*> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
@@ -5444,7 +5447,7 @@ namespace CppOverride
                 std::cout << "functionName.size(): " << functionName.size() << std::endl;
             }
 
-            OverrideDatas[functionName].push_back(OverrideData());
+            CurrentOverrideDatas[functionName].push_back(OverrideData());
             return OverrideInfoSetter(functionName, *this);
         }
         
@@ -5452,13 +5455,13 @@ namespace CppOverride
         {
             functionName = ProcessFunctionName(functionName);
             
-            if(OverrideDatas.find(functionName) != OverrideDatas.end())
-                OverrideDatas.erase(functionName);
+            if(CurrentOverrideDatas.find(functionName) != CurrentOverrideDatas.end())
+                CurrentOverrideDatas.erase(functionName);
         }
         
         inline void ClearAllOverrideInfo()
         {
-            OverrideDatas.clear();
+            CurrentOverrideDatas.clear();
         }
     };
 }
@@ -5548,8 +5551,18 @@ namespace CppOverride
     {
         return OverrideObject(instance);
     }
+    
+    inline OverrideInfoSetter& OverrideInfoSetter::MatchesObject(const void* instance)
+    {
+        return OverrideObject(instance);
+    }
 
     inline OverrideInfoSetter& OverrideInfoSetter::OverrideAny()
+    {
+        return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, nullptr);
+    }
+    
+    inline OverrideInfoSetter& OverrideInfoSetter::MatchesAny()
     {
         return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, nullptr);
     }
@@ -5734,7 +5747,7 @@ namespace CppOverride
                 } \
                 if(!overrideArgs && !overrideReturn) \
                 { \
-                    /* If we are overriding anything, we still need to call result actions */ \
+                    /* If we are not overriding anything, we still need to call result actions */ \
                     (overrideObjName)   .GetOverrideObject() \
                                         .Internal_CallReturnOverrideResultExpectedAction \
                                         ( \
