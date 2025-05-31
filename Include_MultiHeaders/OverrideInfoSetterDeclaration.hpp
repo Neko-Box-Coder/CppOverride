@@ -48,17 +48,12 @@ namespace CppOverride
         WhenCalledExpectedly_Do(std::function<void( void* instance,
                                                     const std::vector<void*>& args)> action);
         
-        OverrideInfoSetter& AssignResult(ResultPtr result);
         OverrideInfoSetter& AssignsResult(ResultPtr result);
         
-        ResultPtr ReturnResult();
         ResultPtr ReturnsResult();
         
-        OverrideInfoSetter& OverrideObject(const void* instance);
-        OverrideInfoSetter& OverridesObject(const void* instance);
         OverrideInfoSetter& MatchesObject(const void* instance);
         
-        OverrideInfoSetter& OverrideAny();
         OverrideInfoSetter& MatchesAny();
         
         template<typename ReturnType>

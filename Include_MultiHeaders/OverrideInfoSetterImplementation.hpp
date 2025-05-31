@@ -45,53 +45,26 @@ namespace CppOverride
         return CppOverrideObj.CurrentRequirementSetter.WhenCalledExpectedly_Do(*this, action);
     }
 
-    inline OverrideInfoSetter& 
-    OverrideInfoSetter::AssignResult(ResultPtr result)
+    inline OverrideInfoSetter& OverrideInfoSetter::AssignsResult(ResultPtr result)
     {
-        return CppOverrideObj.CurrentRequirementSetter.AssignResult(*this, result);
-    }
-
-    inline OverrideInfoSetter& 
-    OverrideInfoSetter::AssignsResult(ResultPtr result)
-    {
-        return AssignResult(result);
-    }
-
-    inline ResultPtr OverrideInfoSetter::ReturnResult()
-    {
-        ResultPtr returnResult = CreateOverrideResult();
-        AssignResult(returnResult);
-        return returnResult;
+        return CppOverrideObj.CurrentRequirementSetter.AssignsResult(*this, result);
     }
 
     inline ResultPtr OverrideInfoSetter::ReturnsResult()
     {
-        return ReturnResult();
+        ResultPtr returnResult = CreateOverrideResult();
+        AssignsResult(returnResult);
+        return returnResult;
     }
 
-    inline OverrideInfoSetter& OverrideInfoSetter::OverrideObject(const void* instance)
-    {
-        return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, (void*)instance);
-    }
-
-    inline OverrideInfoSetter& OverrideInfoSetter::OverridesObject(const void* instance)
-    {
-        return OverrideObject(instance);
-    }
-    
     inline OverrideInfoSetter& OverrideInfoSetter::MatchesObject(const void* instance)
     {
-        return OverrideObject(instance);
-    }
-
-    inline OverrideInfoSetter& OverrideInfoSetter::OverrideAny()
-    {
-        return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, nullptr);
+        return CppOverrideObj.CurrentRequirementSetter.MatchesObject(*this, (void*)instance);
     }
     
     inline OverrideInfoSetter& OverrideInfoSetter::MatchesAny()
     {
-        return CppOverrideObj.CurrentRequirementSetter.OverrideObject(*this, nullptr);
+        return CppOverrideObj.CurrentRequirementSetter.MatchesObject(*this, nullptr);
     }
 
     template<typename ReturnType>
