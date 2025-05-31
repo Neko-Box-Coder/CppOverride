@@ -22,16 +22,16 @@ int main(int argc, char** argv)
             CppOverrideTest::Rectangle rect(1.5, 1.5);
             bool calledExpectedly = false;
             
-            CO_SETUP_OVERRIDE   (rect, GetWidth)
-                                .WhenCalledWith(2.f)
-                                .Returns<float>(6.f)
-                                .WhenCalledExpectedly_Do
-                                (
-                                    [&calledExpectedly](...)
-                                    {
-                                        calledExpectedly = true;
-                                    }
-                                );
+            CO_INSTRUCT (rect, GetWidth)
+                        .WhenCalledWith(2.f)
+                        .Returns<float>(6.f)
+                        .WhenCalledExpectedly_Do
+                        (
+                            [&calledExpectedly](...)
+                            {
+                                calledExpectedly = true;
+                            }
+                        );
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -52,20 +52,20 @@ int main(int argc, char** argv)
         (
             bool calledExpectedly = false;
             
-            CO_SETUP_OVERRIDE   (OverrideObj, ConstArgsAndArgsToSetFunc)
-                                .WhenCalledWith(1, 2.f, CO_ANY)
-                                .SetArgs<   CO_ANY_TYPE, 
-                                            CO_ANY_TYPE, 
-                                            std::string&>(  CO_DONT_SET, 
-                                                            CO_DONT_SET, 
-                                                            "test")
-                                .WhenCalledExpectedly_Do
-                                (
-                                    [&calledExpectedly](...)
-                                    {
-                                        calledExpectedly = true;
-                                    }
-                                );
+            CO_INSTRUCT (OverrideObj, ConstArgsAndArgsToSetFunc)
+                        .WhenCalledWith(1, 2.f, CO_ANY)
+                        .SetArgs<   CO_ANY_TYPE, 
+                                    CO_ANY_TYPE, 
+                                    std::string&>(  CO_DONT_SET, 
+                                                    CO_DONT_SET, 
+                                                    "test")
+                        .WhenCalledExpectedly_Do
+                        (
+                            [&calledExpectedly](...)
+                            {
+                                calledExpectedly = true;
+                            }
+                        );
 
             std::string testString;
         );

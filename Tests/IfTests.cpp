@@ -19,23 +19,23 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::ResultPtr result = 
-                CO_SETUP_OVERRIDE   (OverrideObj, ArgsFunc)
-                                    .If
-                                    (
-                                        [] (void*, const std::vector<void *>& args) -> bool
-                                        {
-                                            if( *static_cast<const int*>(args.at(0)) == 1 &&
-                                                *static_cast<const bool*>(args.at(1)) == true &&
-                                                *static_cast<float*>(args.at(2)) == 2.f)
-                                            {
-                                                return true;
-                                            }
-                                            
-                                            return false;
-                                        }
-                                    )
-                                    .Returns<int>(1)
-                                    .ReturnsResult();
+                CO_INSTRUCT (OverrideObj, ArgsFunc)
+                            .If
+                            (
+                                [] (void*, const std::vector<void *>& args) -> bool
+                                {
+                                    if( *static_cast<const int*>(args.at(0)) == 1 &&
+                                        *static_cast<const bool*>(args.at(1)) == true &&
+                                        *static_cast<float*>(args.at(2)) == 2.f)
+                                    {
+                                        return true;
+                                    }
+                                    
+                                    return false;
+                                }
+                            )
+                            .Returns<int>(1)
+                            .ReturnsResult();
         );
     
         ssTEST_OUTPUT_ASSERT(   "Meet If Condition", 
@@ -58,28 +58,28 @@ int main(int argc, char** argv)
             float testFloat = 1.f;
             
             CppOverride::ResultPtr result = 
-                CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
-                                    .If
-                                    (
-                                        [] (void*, const std::vector<void *>& args) -> bool
-                                        {
-                                            if( *static_cast<int*>(args.at(0)) == 1 &&
-                                                **static_cast<float**>(args.at(1)) == 2.f &&
-                                                *static_cast<std::string*>(args.at(2)) == 
-                                                "Test String")
-                                            {
-                                                return true;
-                                            }
-                                            
-                                            return false;
-                                        }
-                                    )
-                                    .SetArgs<   CO_ANY_TYPE, 
-                                                CO_ANY_TYPE, 
-                                                std::string&>(  CO_DONT_SET, 
-                                                                CO_DONT_SET, 
-                                                                "Test String 2")
-                                    .ReturnsResult();
+                CO_INSTRUCT (OverrideObj, ArgsToSetFunc)
+                            .If
+                            (
+                                [](void*, const std::vector<void *>& args) -> bool
+                                {
+                                    if( *static_cast<int*>(args.at(0)) == 1 &&
+                                        **static_cast<float**>(args.at(1)) == 2.f &&
+                                        *static_cast<std::string*>(args.at(2)) == 
+                                        "Test String")
+                                    {
+                                        return true;
+                                    }
+                                    
+                                    return false;
+                                }
+                            )
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string&>(  CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "Test String 2")
+                            .ReturnsResult();
         );
         
         ssTEST_OUTPUT_EXECUTION

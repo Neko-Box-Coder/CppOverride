@@ -18,9 +18,7 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
-                                .Times(0)
-                                .Returns<int>(1);
+            CO_INSTRUCT(OverrideObj, NoArgsFunc).Times(0).Returns<int>(1);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
     };
@@ -30,7 +28,7 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
+            CO_INSTRUCT (OverrideObj, NoArgsFunc)
                                 .Times(1)
                                 .Returns<int>(1)
                                 .AssignsResult(result);
@@ -46,10 +44,7 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
-                                .Times(2)
-                                .Returns<int>(1)
-                                .AssignsResult(result);
+            CO_INSTRUCT(OverrideObj, NoArgsFunc).Times(2).Returns<int>(1).AssignsResult(result);
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
         ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
@@ -65,9 +60,7 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
-                                .Returns<int>(1)
-                                .AssignsResult(result);
+            CO_INSTRUCT(OverrideObj, NoArgsFunc).Returns<int>(1).AssignsResult(result);
         );
         
         for(int i = 0; i < 10; i++)
@@ -85,10 +78,7 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, NoArgsFunc)
-                                .Times(2)
-                                .Returns<int>(1)
-                                .AssignsResult(result);
+            CO_INSTRUCT(OverrideObj, NoArgsFunc).Times(2).Returns<int>(1).AssignsResult(result);
         );
 
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
@@ -106,9 +96,9 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
-                                .Times(0)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test");
+            CO_INSTRUCT (OverrideObj, ArgsToSetFunc)
+                        .Times(0)
+                        .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test");
             
             float testFloat = 0.f;
             std::string testString = "";
@@ -127,10 +117,10 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
-                                .Times(1)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .AssignsResult(result);
+            CO_INSTRUCT (OverrideObj, ArgsToSetFunc)
+                        .Times(1)
+                        .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                        .AssignsResult(result);
             
             float testFloat = 0.f;
             std::string testString = "";
@@ -159,10 +149,10 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
-                                .Times(2)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .AssignsResult(result);
+            CO_INSTRUCT (OverrideObj, ArgsToSetFunc)
+                        .Times(2)
+                        .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                        .AssignsResult(result);
             
             float testFloat = 0.f;
             std::string testString = "";
@@ -205,9 +195,9 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .AssignsResult(result);
+            CO_INSTRUCT (OverrideObj, ArgsToSetFunc)
+                        .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                        .AssignsResult(result);
             
             float testFloat = 0.f;
             std::string testString = "";
@@ -234,10 +224,10 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             std::shared_ptr<CppOverride::OverrideResult> result = CppOverride::CreateOverrideResult();
-            CO_SETUP_OVERRIDE   (OverrideObj, ArgsToSetFunc)
-                                .Times(2)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .AssignsResult(result);
+            CO_INSTRUCT (OverrideObj, ArgsToSetFunc)
+                        .Times(2)
+                        .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                        .AssignsResult(result);
             
             float testFloat = 0.f;
             std::string testString = "";

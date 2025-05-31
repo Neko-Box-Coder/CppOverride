@@ -31,13 +31,10 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   (OverrideObj, MockFreeFunctionA)
-                                                                .Returns<int>(10)
-                                                                .ReturnsResult();
+            CppOverride::ResultPtr result = 
+                CO_INSTRUCT(OverrideObj, MockFreeFunctionA).Returns<int>(10).ReturnsResult();
             
-            CO_SETUP_OVERRIDE   (OverrideObj, MockFreeFunctionB)
-                                .Returns<int>(10)
-                                .AssignsResult(result);
+            CO_INSTRUCT(OverrideObj, MockFreeFunctionB).Returns<int>(10).AssignsResult(result);
         );
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionA(1) == 10);

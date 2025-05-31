@@ -25,9 +25,8 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::ResultPtr result = CO_SETUP_OVERRIDE   ((*mockSquare), GetWidth)
-                                                                .Returns<float>(3.f)
-                                                                .ReturnsResult();
+            CppOverride::ResultPtr result = 
+                CO_INSTRUCT(*mockSquare, GetWidth).Returns<float>(3.f).ReturnsResult();
         );
 
         ssTEST_OUTPUT_EXECUTION
@@ -45,9 +44,9 @@ int main(int argc, char** argv)
         (
             CppOverrideTest::MockSquare<char> mockSquare2 = {};
             CppOverride::ResultPtr result = 
-                CO_SETUP_OVERRIDE   ((*mockSquare), GetThis)
-                                    .Returns<CppOverrideTest::MockSquare<char>&>(mockSquare2)
-                                    .ReturnsResult();
+                CO_INSTRUCT (*mockSquare, GetThis)
+                            .Returns<CppOverrideTest::MockSquare<char>&>(mockSquare2)
+                            .ReturnsResult();
         );
 
         ssTEST_OUTPUT_EXECUTION
@@ -64,9 +63,9 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_SETUP
         (
             CppOverride::ResultPtr result = 
-                CO_SETUP_OVERRIDE   ((*mockSquare), GetWidth)
-                                    .SetArgs<float&, CO_ANY_TYPE>(10.f, CO_ANY)
-                                    .ReturnsResult();
+                CO_INSTRUCT (*mockSquare, GetWidth)
+                            .SetArgs<float&, CO_ANY_TYPE>(10.f, CO_ANY)
+                            .ReturnsResult();
             float width;
         );
 
@@ -88,11 +87,11 @@ int main(int argc, char** argv)
             std::tuple<float, uint8_t> test2Tuple = std::make_tuple<float, uint8_t>(3.f, 16);
             
             CppOverride::ResultPtr result = 
-                CO_SETUP_OVERRIDE   ((*mockSquare), TestTemplateFunc)
-                                    .WhenCalledWith(testTuple, 20.f)
-                                    .Returns<std::tuple<float, uint8_t>>(overrideTuple)
-                                    //.SetArgs<const std::tuple<float, uint8_t>&, float>(overrideTuple, 20)
-                                    .ReturnsResult();
+                CO_INSTRUCT (*mockSquare, TestTemplateFunc)
+                            .WhenCalledWith(testTuple, 20.f)
+                            .Returns<std::tuple<float, uint8_t>>(overrideTuple)
+                            //.SetArgs<const std::tuple<float, uint8_t>&, float>(overrideTuple, 20)
+                            .ReturnsResult();
         );
         
         ssTEST_OUTPUT_EXECUTION

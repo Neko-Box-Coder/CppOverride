@@ -15,7 +15,7 @@ namespace CppOverrideTest
         //  TimesTests
         inline int NoArgsFunc()
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int, ());
+            CO_INSERT_IMPL(OverrideObj, int, ());
             return -1;
         }
 
@@ -24,7 +24,7 @@ namespace CppOverrideTest
         //  WhenCalledWithTests
         inline int ArgsFunc(int testArg, bool testArg2, float testArg3)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2, testArg3));
+            CO_INSERT_IMPL(OverrideObj, int, (testArg, testArg2, testArg3));
             return -1;
         }
 
@@ -35,14 +35,14 @@ namespace CppOverrideTest
         //  WhenCalledWithTests
         inline void ArgsToSetFunc(int testArg, float* testArg2, std::string& testArg3)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
+            CO_INSERT_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
         }
         
         //Used In:
         //  ModifyArgsTests
         inline void ArgsToSetFunc(int testArg, float& testArg2, float* testArg3)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
+            CO_INSERT_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
         }
         
         //Used In:
@@ -50,14 +50,14 @@ namespace CppOverrideTest
         //  WhenCalledWithTests
         inline void MoreArgsToSetFunc(int testArg, float* testArg2, bool* testArg3, std::string& testArg4)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3, testArg4));
+            CO_INSERT_IMPL(OverrideObj, void, (testArg, testArg2, testArg3, testArg4));
         }
         
         //Used In:
         //  ModifyReturnsTests
         inline std::string ReturnStringFunc(int value)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, std::string, (value));
+            CO_INSERT_IMPL(OverrideObj, std::string, (value));
             return "";
         }
         
@@ -65,7 +65,7 @@ namespace CppOverrideTest
         //  ModifyArgsTests
         inline int AddNumFromVoidPointerFunc(void* testArg, int testArg2)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2));
+            CO_INSERT_IMPL(OverrideObj, int, (testArg, testArg2));
             return (*(int*)testArg) + testArg2;
         }
         
@@ -73,7 +73,7 @@ namespace CppOverrideTest
         //  MixedModifyArgsAndReturnsTest
         inline int AddNumFromNumPointerFunc(int* testArg, int testArg2)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2));
+            CO_INSERT_IMPL(OverrideObj, int, (testArg, testArg2));
             return *testArg + testArg2;
         }
         
@@ -82,7 +82,7 @@ namespace CppOverrideTest
         //  ModifyReturnsTests
         inline void AssignArgInternallyFunc(std::string testArg, std::string& testArg2)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2));
+            CO_INSERT_IMPL(OverrideObj, void, (testArg, testArg2));
             testArg2 = testArg;
         }
 
@@ -92,7 +92,7 @@ namespace CppOverrideTest
         //  ModifyReturnsTests
         inline int& ReturnReferenceFunc(int a)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int&, (a));
+            CO_INSERT_IMPL(OverrideObj, int&, (a));
             return ReferenceInt;
         }
 
@@ -100,7 +100,7 @@ namespace CppOverrideTest
         //  ModifyReturnsTests
         inline int* ReturnPointerFunc(int a)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int*, (a));
+            CO_INSERT_IMPL(OverrideObj, int*, (a));
             return nullptr;
         }
         
@@ -108,7 +108,7 @@ namespace CppOverrideTest
         //  ArrayParamTests
         inline int IntArrayParameterFunc(int nums[4])
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int, (nums));
+            CO_INSERT_IMPL(OverrideObj, int, (nums));
             return nums[0];
         }
         
@@ -116,13 +116,13 @@ namespace CppOverrideTest
         //  ArrayParamTests
         inline int CharArrayParameterFunc(char chars[4])
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int, (chars));
+            CO_INSERT_IMPL(OverrideObj, int, (chars));
             return (int)(chars[0]);
         }
         
         inline bool CompoundedNonComparableParameterFunc(std::vector<NonComparableTestClass>& outArg)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, bool, (outArg));
+            CO_INSERT_IMPL(OverrideObj, bool, (outArg));
             return true;
         }
         
@@ -132,7 +132,7 @@ namespace CppOverrideTest
             //  ModifyReturnsTests
             inline TestClass ReturnObjectFunc(int data, double value, std::string name)
             {
-                CO_OVERRIDE_IMPL(OverrideObj, TestClass, (data, value, name));
+                CO_INSERT_IMPL(OverrideObj, TestClass, (data, value, name));
                 return TestClass();
             }
             
@@ -141,7 +141,7 @@ namespace CppOverrideTest
             //  WhenCalledWithTests
             inline bool SetObjectFunc(int data, double value, std::string name, TestClass& testClass)
             {
-                CO_OVERRIDE_IMPL(OverrideObj, bool, (data, value, name, testClass));
+                CO_INSERT_IMPL(OverrideObj, bool, (data, value, name, testClass));
                 return false;
             }
             
@@ -149,7 +149,7 @@ namespace CppOverrideTest
             //  ModifyArgsTests
             inline void SetNonCopyableArgFunc(NonCopyableTestClass* testClass)
             {
-                CO_OVERRIDE_IMPL(OverrideObj, void, (testClass));
+                CO_INSERT_IMPL(OverrideObj, void, (testClass));
             }
         }
         
@@ -161,7 +161,7 @@ namespace CppOverrideTest
             template<typename T>
             inline T TemplateReturnFunc(T testArg)
             {
-                CO_OVERRIDE_IMPL(OverrideObj, T, (testArg));
+                CO_INSERT_IMPL(OverrideObj, T, (testArg));
                 return testArg;
             }
 
@@ -170,7 +170,7 @@ namespace CppOverrideTest
             template<typename T>
             inline void TemplateSetArgFunc(T& testArg, T* testArg2)
             {
-                CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2));
+                CO_INSERT_IMPL(OverrideObj, void, (testArg, testArg2));
             }
             
             //Used In:
@@ -178,7 +178,7 @@ namespace CppOverrideTest
             template<typename T>
             inline int TemplateArgRefFunc(T& testArg)
             {
-                CO_OVERRIDE_IMPL(OverrideObj, int, (testArg));
+                CO_INSERT_IMPL(OverrideObj, int, (testArg));
                 return 0;
             }
         }
@@ -189,7 +189,7 @@ namespace CppOverrideTest
         //Used In:
         inline int ConstArgsFunc(const int testArg, const bool testArg2, float testArg3)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2, testArg3));
+            CO_INSERT_IMPL(OverrideObj, int, (testArg, testArg2, testArg3));
             return -1;
         }
 
@@ -200,14 +200,14 @@ namespace CppOverrideTest
                                                 const float testArg2, 
                                                 std::string& testArg3)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
+            CO_INSERT_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
         }
 
         //Used In:
         //  WhenCalledWithTests
         inline int ConstStringRefArgFunc(const std::string& test)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int, (test));
+            CO_INSERT_IMPL(OverrideObj, int, (test));
             return -1;
         }
         
@@ -215,21 +215,21 @@ namespace CppOverrideTest
         //  ModifyArgsTests
         inline void SetEndConstArgFunc(int* testArg, bool* testArg2, const float* testArg3)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
+            CO_INSERT_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
         }
         
         //Used In:
         //  ModifyArgsTests
         inline void SetBeginConstArgFunc(const int* testArg, bool* testArg2, float* testArg3)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
+            CO_INSERT_IMPL(OverrideObj, void, (testArg, testArg2, testArg3));
         }
 
         //Used In:
         //  WhenCalledWithTests
         inline int ConstVoidPointerFunc(const void* testArg, int testArg2)
         {
-            CO_OVERRIDE_IMPL(OverrideObj, int, (testArg, testArg2));
+            CO_INSERT_IMPL(OverrideObj, int, (testArg, testArg2));
             return -1;
         }
     }
