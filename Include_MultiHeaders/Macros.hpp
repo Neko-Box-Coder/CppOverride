@@ -180,19 +180,19 @@ namespace CppOverride
     #define CO_DECLARE_OVERRIDE_METHODS(OverrideObjName) \
     inline CppOverride::OverrideInfoSetter Internal_CreateOverrideInfo(std::string functionName) const \
     { \
-        return OverrideObjName.Internal_CreateOverrideInfo(functionName); \
+        return (OverrideObjName).Internal_CreateOverrideInfo(functionName); \
     } \
     inline void Internal_RemoveOverrideInfo(std::string functionName) const \
     { \
-        OverrideObjName.Internal_RemoveOverrideInfo(functionName); \
+        (OverrideObjName).Internal_RemoveOverrideInfo(functionName); \
     } \
     inline void ClearAllOverrideInfo() const \
     { \
-        OverrideObjName.ClearAllOverrideInfo(); \
+        (OverrideObjName).ClearAllOverrideInfo(); \
     } \
     inline CppOverride::Overrider& GetOverrideObject() const \
     { \
-        return OverrideObjName; \
+        return (OverrideObjName); \
     }
     
     #define INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes) \
