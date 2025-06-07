@@ -145,12 +145,15 @@ namespace CppOverride
         }
         
         inline OverrideInfoSetter& AssignsResult(   OverrideInfoSetter& infoSetter, 
-                                                    std::shared_ptr<OverrideResult> result)
+                                                    ResultPtr& outResult)
         {
             OverrideData& currentData = 
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
             
-            currentData.Result = result;
+            if(!currentData.Result)
+                currentData.Result = CreateOverrideResult();
+            
+            outResult = currentData.Result;
             return infoSetter;
         }
     

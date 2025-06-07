@@ -32,7 +32,7 @@ namespace CppOverride
         
         //Result of the override
         ResultActionInfo CurrentResultActionInfo;
-        std::shared_ptr<OverrideResult> Result = nullptr;
+        ResultPtr Result = nullptr;
     };
     
     using FunctionName = std::string;

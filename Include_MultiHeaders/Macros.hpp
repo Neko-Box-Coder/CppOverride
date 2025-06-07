@@ -23,11 +23,11 @@ namespace CppOverride
     { \
         (OverrideObjName).Internal_RemoveOverrideInfo(functionName); \
     } \
-    inline void ClearAllOverrideInfo() const \
+    inline void Internal_ClearAllOverrideInfo() const \
     { \
-        (OverrideObjName).ClearAllOverrideInfo(); \
+        (OverrideObjName).Internal_ClearAllOverrideInfo(); \
     } \
-    inline CppOverride::Overrider& GetOverrideObject() const \
+    inline CppOverride::Overrider& Internal_GetOverrideObject() const \
     { \
         return (OverrideObjName); \
     }
@@ -149,7 +149,7 @@ namespace CppOverride
         bool overrideReturn = false; \
         bool dontReturn = false; \
         bool found = \
-            (overrideObjName)   .GetOverrideObject() \
+            (overrideObjName)   .Internal_GetOverrideObject() \
                                 .Internal_CheckOverride<MPT_REMOVE_PARENTHESIS(returnType)> \
                                 ( \
                                     __func__, \
@@ -175,7 +175,7 @@ namespace CppOverride
             { \
                 if(overrideArgs) \
                 { \
-                    (overrideObjName)   .GetOverrideObject() \
+                    (overrideObjName)   .Internal_GetOverrideObject() \
                                         .Internal_OverrideArgs( foundIndex, \
                                                                 __func__, \
                                                                 !overrideReturn, \
@@ -191,7 +191,7 @@ namespace CppOverride
                     /* If we are not returning, we will need to call the result actions */ \
                     if(dontReturn) \
                     { \
-                        (overrideObjName)   .GetOverrideObject() \
+                        (overrideObjName)   .Internal_GetOverrideObject() \
                                             .Internal_CallReturnOverrideResultExpectedAction \
                                             ( \
                                                 __func__, \
@@ -205,7 +205,7 @@ namespace CppOverride
     
     #define INTERNAL_CO_IMPL_NORMAL_PART_2(overrideObjName, returnType, instance, args) \
                         /* If we are returning, the result action is called inside */ \
-                        return (overrideObjName).GetOverrideObject() \
+                        return (overrideObjName).Internal_GetOverrideObject() \
                                                 .Internal_OverrideReturn<MPT_REMOVE_PARENTHESIS(returnType)> \
                                                 ( \
                                                     foundIndex, \
@@ -216,7 +216,7 @@ namespace CppOverride
     
     #define INTERNAL_CO_IMPL_NO_RETURN_TYPE_PART_2(overrideObjName, instance, args) \
                         /* If we are returning, the result action is called inside */ \
-                        (overrideObjName)   .GetOverrideObject() \
+                        (overrideObjName)   .Internal_GetOverrideObject() \
                                             .Internal_OverrideReturn<MPT_REMOVE_PARENTHESIS(void)> \
                                             ( \
                                                 foundIndex, \
@@ -232,7 +232,7 @@ namespace CppOverride
                 if(!overrideArgs && !overrideReturn) \
                 { \
                     /* If we are not overriding anything, we still need to call result actions */ \
-                    (overrideObjName)   .GetOverrideObject() \
+                    (overrideObjName)   .Internal_GetOverrideObject() \
                                         .Internal_CallReturnOverrideResultExpectedAction \
                                         ( \
                                             __func__, \

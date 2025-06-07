@@ -48,7 +48,7 @@ namespace CppOverride
         WhenCalledExpectedly_Do(std::function<void( void* instance,
                                                     const std::vector<void*>& args)> action);
         
-        OverrideInfoSetter& AssignsResult(ResultPtr result);
+        OverrideInfoSetter& AssignsResult(ResultPtr& outResult);
         
         ResultPtr ReturnsResult();
         

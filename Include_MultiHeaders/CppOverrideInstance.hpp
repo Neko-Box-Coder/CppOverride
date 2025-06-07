@@ -42,6 +42,7 @@ namespace CppOverride
     struct Overrider
     {
         OverrideDatas CurrentOverrideDatas;
+        
         ReturnDataSetter CurrentReturnDataSetter;
         ArgsDataSetter CurrentArgsDataSetter;
         RequirementSetter CurrentRequirementSetter;
@@ -105,7 +106,7 @@ namespace CppOverride
         inline ~Overrider()
         {}
 
-        inline Overrider& GetOverrideObject()
+        inline Overrider& Internal_GetOverrideObject()
         {
             return *this;
         }
@@ -445,7 +446,7 @@ namespace CppOverride
         }
         
         //------------------------------------------------------------------------------
-        //Creating override info
+        //Modify override info
         //------------------------------------------------------------------------------
         
         #if CO_SHOW_OVERRIDE_LOG
@@ -472,12 +473,11 @@ namespace CppOverride
         inline void Internal_RemoveOverrideInfo(std::string functionName)
         {
             functionName = ProcessFunctionName(functionName);
-            
             if(CurrentOverrideDatas.find(functionName) != CurrentOverrideDatas.end())
                 CurrentOverrideDatas.erase(functionName);
         }
         
-        inline void ClearAllOverrideInfo()
+        inline void Internal_ClearAllOverrideInfo()
         {
             CurrentOverrideDatas.clear();
         }

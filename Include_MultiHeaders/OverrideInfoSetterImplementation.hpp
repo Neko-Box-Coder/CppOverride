@@ -45,14 +45,14 @@ namespace CppOverride
         return CppOverrideObj.CurrentRequirementSetter.WhenCalledExpectedly_Do(*this, action);
     }
 
-    inline OverrideInfoSetter& OverrideInfoSetter::AssignsResult(ResultPtr result)
+    inline OverrideInfoSetter& OverrideInfoSetter::AssignsResult(ResultPtr& outResult)
     {
-        return CppOverrideObj.CurrentRequirementSetter.AssignsResult(*this, result);
+        return CppOverrideObj.CurrentRequirementSetter.AssignsResult(*this, outResult);
     }
 
     inline ResultPtr OverrideInfoSetter::ReturnsResult()
     {
-        ResultPtr returnResult = CreateOverrideResult();
+        ResultPtr returnResult = nullptr;
         AssignsResult(returnResult);
         return returnResult;
     }
