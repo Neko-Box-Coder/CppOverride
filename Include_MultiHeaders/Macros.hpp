@@ -396,7 +396,7 @@ namespace CppOverride
         (overrideObjName).Internal_CreateOverrideInfo(#functionName)
 
     #define CO_REMOVE_INSTRUCT(overrideObjName, functionName)\
-        (overrideObjName).Internal_RemoveOverrideInfo(functionName)
+        (overrideObjName).Internal_RemoveOverrideInfo(#functionName)
 
     #define CO_CLEAR_ALL_INSTRUCTS(overrideObjName) \
         (overrideObjName).ClearAllOverrideInfo()
