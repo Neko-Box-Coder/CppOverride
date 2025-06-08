@@ -84,7 +84,7 @@ int main(int argc, char** argv)
                                     ++calledCounter;
                                 }
                             )
-                            .ExpectedNotTriggered();
+                            .ExpectedNotSatisfy();
         );
         
         ssTEST_OUTPUT_EXECUTION

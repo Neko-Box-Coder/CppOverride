@@ -183,7 +183,7 @@ namespace CppOverride
             return infoSetter;
         }
         
-        inline OverrideInfoSetter& ExpectedNotTriggered(OverrideInfoSetter& infoSetter)
+        inline OverrideInfoSetter& ExpectedNotSatisfy(OverrideInfoSetter& infoSetter)
         {
             OverrideData& currentData = 
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();

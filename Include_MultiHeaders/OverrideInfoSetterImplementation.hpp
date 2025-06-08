@@ -110,9 +110,9 @@ namespace CppOverride
         return CppOverrideObj.CurrentRequirementSetter.Expected(*this);
     }
     
-    inline OverrideInfoSetter& OverrideInfoSetter::ExpectedNotTriggered()
+    inline OverrideInfoSetter& OverrideInfoSetter::ExpectedNotSatisfy()
     {
-        return CppOverrideObj.CurrentRequirementSetter.ExpectedNotTriggered(*this);
+        return CppOverrideObj.CurrentRequirementSetter.ExpectedNotSatisfy(*this);
     }
 }
 

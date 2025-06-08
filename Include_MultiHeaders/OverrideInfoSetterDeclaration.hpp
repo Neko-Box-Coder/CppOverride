@@ -78,7 +78,7 @@ namespace CppOverride
     
         OverrideInfoSetter& Expected();
         
-        OverrideInfoSetter& ExpectedNotTriggered();
+        OverrideInfoSetter& ExpectedNotSatisfy();
     };
 
 

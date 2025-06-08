@@ -276,7 +276,7 @@ void ExpectedExample()
     CO_INSTRUCT_REF (OverrideInstanceName, CO_GLOBAL, OverrideMyReturnValue)
                     .WhenCalledWith(3, 4.f)
                     .Returns<int>(1)
-                    .ExpectedNotTriggered();
+                    .ExpectedNotSatisfy();
     
     std::vector<CppOverride::FunctionName> failedFunctions;
     

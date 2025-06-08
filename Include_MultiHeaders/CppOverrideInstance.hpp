@@ -512,7 +512,16 @@ namespace CppOverride
                     else if(it->second[i].Expected == OverrideData::ExpectedType::NOT_TRIGGERED && 
                             it->second[i].Result)
                     {
-                        if(it->second[i].CurrentConditionInfo.CalledTimes > 0)
+                        if( it->second[i].CurrentConditionInfo.Times >= 0 && 
+                            it->second[i].CurrentConditionInfo.CalledTimes == 
+                            it->second[i].CurrentConditionInfo.Times)
+                        {
+                            failedFunctions.push_back(it->first);
+                            break;
+                        }
+                        
+                        if( it->second[i].CurrentConditionInfo.Times == -1 && 
+                            it->second[i].CurrentConditionInfo.CalledTimes > 0)
                         {
                             failedFunctions.push_back(it->first);
                             break;
