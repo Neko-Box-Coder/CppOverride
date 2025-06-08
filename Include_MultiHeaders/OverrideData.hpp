@@ -30,8 +30,15 @@ namespace CppOverride
         ReturnDataActionInfo CurrentReturnDataActionInfo;
         ArgsDataActionInfo ArgumentsDataActionInfo;
         
+        enum class ExpectedType
+        {
+            NONE,
+            TRIGGERED,
+            NOT_TRIGGERED
+        };
+        
         //Result of the override
-        bool Expected = false;
+        ExpectedType Expected = ExpectedType::NONE;
         ResultActionInfo CurrentResultActionInfo;
         ResultPtr Result = nullptr;
     };

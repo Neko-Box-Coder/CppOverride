@@ -269,21 +269,35 @@ void ExpectedExample()
 {
     CO_INSTRUCT_REF (OverrideInstanceName, CO_GLOBAL, OverrideMyReturnValue)
                     .WhenCalledWith(2, 3.f)
+                    .Times(1)
                     .Returns<int>(1)
                     .Expected();
     
-    int ret1 = OverrideMyReturnValue(1, 2.f);
+    CO_INSTRUCT_REF (OverrideInstanceName, CO_GLOBAL, OverrideMyReturnValue)
+                    .WhenCalledWith(3, 4.f)
+                    .Returns<int>(1)
+                    .ExpectedNotTriggered();
     
     std::vector<CppOverride::FunctionName> failedFunctions;
+    
+    //Not triggering any instructed overrides when we expected to do so, 
+    //therefore failed expectations.
+    int ret1 = OverrideMyReturnValue(1, 2.f);
     failedFunctions = CO_GET_FAILED_EXPECTS(OverrideInstanceName);
     CO_QUICK_ASSERT(ret1 != 1);
     CO_QUICK_ASSERT(failedFunctions.size() == 1);
     
+    //Triggered the first instructed override, filled all expectations.
     ret1 = OverrideMyReturnValue(2, 3.f);
     failedFunctions = CO_GET_FAILED_EXPECTS(OverrideInstanceName);
-    
     CO_QUICK_ASSERT(ret1 == 1);
     CO_QUICK_ASSERT(failedFunctions.empty());
+    
+    //Triggered the second instructed override when we expect to not be triggered, 
+    //therefore failing expectation
+    OverrideMyReturnValue(3, 4.f);
+    failedFunctions = CO_GET_FAILED_EXPECTS(OverrideInstanceName);
+    CO_QUICK_ASSERT(failedFunctions.size() == 1);
 
     ResetAll();
 }

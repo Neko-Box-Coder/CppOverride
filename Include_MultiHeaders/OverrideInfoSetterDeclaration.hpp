@@ -77,6 +77,8 @@ namespace CppOverride
                                             std::vector<void*>& args)> setArgsAction);
     
         OverrideInfoSetter& Expected();
+        
+        OverrideInfoSetter& ExpectedNotTriggered();
     };
 
 

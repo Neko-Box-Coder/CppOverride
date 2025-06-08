@@ -491,7 +491,8 @@ namespace CppOverride
             {
                 for(int i = 0; i < it->second.size(); ++i)
                 {
-                    if(it->second[i].Expected && it->second[i].Result)
+                    if( it->second[i].Expected == OverrideData::ExpectedType::TRIGGERED && 
+                        it->second[i].Result)
                     {
                         if( it->second[i].CurrentConditionInfo.Times >= 0 && 
                             it->second[i].CurrentConditionInfo.CalledTimes != 
@@ -503,6 +504,15 @@ namespace CppOverride
                         
                         if( it->second[i].CurrentConditionInfo.Times == -1 && 
                             it->second[i].CurrentConditionInfo.CalledTimes == 0)
+                        {
+                            failedFunctions.push_back(it->first);
+                            break;
+                        }
+                    }
+                    else if(it->second[i].Expected == OverrideData::ExpectedType::NOT_TRIGGERED && 
+                            it->second[i].Result)
+                    {
+                        if(it->second[i].CurrentConditionInfo.CalledTimes > 0)
                         {
                             failedFunctions.push_back(it->first);
                             break;

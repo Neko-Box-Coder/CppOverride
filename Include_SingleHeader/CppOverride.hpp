@@ -2971,6 +2971,8 @@ namespace CppOverride
                                             std::vector<void*>& args)> setArgsAction);
     
         OverrideInfoSetter& Expected();
+        
+        OverrideInfoSetter& ExpectedNotTriggered();
     };
 
 
@@ -3161,8 +3163,15 @@ namespace CppOverride
         ReturnDataActionInfo CurrentReturnDataActionInfo;
         ArgsDataActionInfo ArgumentsDataActionInfo;
         
+        enum class ExpectedType
+        {
+            NONE,
+            TRIGGERED,
+            NOT_TRIGGERED
+        };
+        
         //Result of the override
-        bool Expected = false;
+        ExpectedType Expected = ExpectedType::NONE;
         ResultActionInfo CurrentResultActionInfo;
         ResultPtr Result = nullptr;
     };
@@ -3724,7 +3733,19 @@ namespace CppOverride
             OverrideData& currentData = 
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
             
-            currentData.Expected = true;
+            currentData.Expected = OverrideData::ExpectedType::TRIGGERED;
+            if(!currentData.Result)
+                currentData.Result = CreateOverrideResult();
+            
+            return infoSetter;
+        }
+        
+        inline OverrideInfoSetter& ExpectedNotTriggered(OverrideInfoSetter& infoSetter)
+        {
+            OverrideData& currentData = 
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
+            
+            currentData.Expected = OverrideData::ExpectedType::NOT_TRIGGERED;
             if(!currentData.Result)
                 currentData.Result = CreateOverrideResult();
             
@@ -5507,7 +5528,8 @@ namespace CppOverride
             {
                 for(int i = 0; i < it->second.size(); ++i)
                 {
-                    if(it->second[i].Expected && it->second[i].Result)
+                    if( it->second[i].Expected == OverrideData::ExpectedType::TRIGGERED && 
+                        it->second[i].Result)
                     {
                         if( it->second[i].CurrentConditionInfo.Times >= 0 && 
                             it->second[i].CurrentConditionInfo.CalledTimes != 
@@ -5519,6 +5541,15 @@ namespace CppOverride
                         
                         if( it->second[i].CurrentConditionInfo.Times == -1 && 
                             it->second[i].CurrentConditionInfo.CalledTimes == 0)
+                        {
+                            failedFunctions.push_back(it->first);
+                            break;
+                        }
+                    }
+                    else if(it->second[i].Expected == OverrideData::ExpectedType::NOT_TRIGGERED && 
+                            it->second[i].Result)
+                    {
+                        if(it->second[i].CurrentConditionInfo.CalledTimes > 0)
                         {
                             failedFunctions.push_back(it->first);
                             break;
@@ -5661,6 +5692,11 @@ namespace CppOverride
     inline OverrideInfoSetter& OverrideInfoSetter::Expected()
     {
         return CppOverrideObj.CurrentRequirementSetter.Expected(*this);
+    }
+    
+    inline OverrideInfoSetter& OverrideInfoSetter::ExpectedNotTriggered()
+    {
+        return CppOverrideObj.CurrentRequirementSetter.ExpectedNotTriggered(*this);
     }
 }
 

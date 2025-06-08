@@ -176,7 +176,19 @@ namespace CppOverride
             OverrideData& currentData = 
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
             
-            currentData.Expected = true;
+            currentData.Expected = OverrideData::ExpectedType::TRIGGERED;
+            if(!currentData.Result)
+                currentData.Result = CreateOverrideResult();
+            
+            return infoSetter;
+        }
+        
+        inline OverrideInfoSetter& ExpectedNotTriggered(OverrideInfoSetter& infoSetter)
+        {
+            OverrideData& currentData = 
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
+            
+            currentData.Expected = OverrideData::ExpectedType::NOT_TRIGGERED;
             if(!currentData.Result)
                 currentData.Result = CreateOverrideResult();
             

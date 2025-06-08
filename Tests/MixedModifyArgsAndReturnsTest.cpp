@@ -75,7 +75,6 @@ int main(int argc, char** argv)
                             )
                             .Expected();
             
-            //TODO(NOW): Come back to this when adding not called required?
             CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, AddNumFromNumPointerFunc)
                             .SetArgs<int*, CO_ANY_TYPE>(10, CO_DONT_SET)
                             .WhenCalledExpectedly_Do
@@ -84,7 +83,8 @@ int main(int argc, char** argv)
                                 {
                                     ++calledCounter;
                                 }
-                            );
+                            )
+                            .ExpectedNotTriggered();
         );
         
         ssTEST_OUTPUT_EXECUTION
@@ -96,10 +96,6 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_ASSERT(executeResult == 32);
         ssTEST_OUTPUT_ASSERT(calledCounter == 1);
         ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
-        
-        //TODO(NOW): Come back to this later
-        //ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
-        //ssTEST_OUTPUT_ASSERT(result2->GetStatusCount() == 0);
     };
     
     ssTEST("Modify None With Action Result Should Perform Action")
