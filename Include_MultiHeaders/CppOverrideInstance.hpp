@@ -56,6 +56,9 @@ namespace CppOverride
         ReturnDataValidator CurrentReturnDataValidator;
         ArgsDataValidator CurrentArgsDataValidator;
         RequirementValidator CurrentRequirementValidator;
+        
+        OverrideData PassthroughData;
+        std::vector<std::string> UnexpectedPassthroughFunctions;
 
         //==============================================================================
         //Public facing methods for overriding returns or arguments
@@ -74,7 +77,9 @@ namespace CppOverride
             CurrentArgsDataValidator(CurrentArgsValuesAppender, CurrentArgsTypeInfoAppender),
             CurrentRequirementValidator(CurrentArgsValuesAppender, 
                                         CurrentConditionArgsTypesChecker, 
-                                        CurrentConditionArgsValuesChecker)
+                                        CurrentConditionArgsValuesChecker),
+            PassthroughData(other.PassthroughData),
+            UnexpectedPassthroughFunctions(other.UnexpectedPassthroughFunctions)
         {
             *this = other;
         }
@@ -102,7 +107,9 @@ namespace CppOverride
                                                             CurrentArgsTypeInfoAppender),
                                 CurrentRequirementValidator(CurrentArgsValuesAppender, 
                                                             CurrentConditionArgsTypesChecker,
-                                                            CurrentConditionArgsValuesChecker)
+                                                            CurrentConditionArgsValuesChecker),
+                                PassthroughData(OverrideData()),
+                                UnexpectedPassthroughFunctions()
         {}
         
         inline ~Overrider()
@@ -261,6 +268,28 @@ namespace CppOverride
             correctData.CurrentConditionInfo.CalledTimes++;
             if(correctData.Result != nullptr)
                 correctData.Result->AddStatus(OverrideStatus::OVERRIDE_SUCCESS);
+        }
+        
+        inline void Internal_CallOverridePassthroughExpectedAction(const std::string& functionName)
+        {
+            PassthroughData.CurrentConditionInfo.CalledTimes++;
+            if(PassthroughData.Expected == OverrideData::ExpectedType::TRIGGERED)
+            {
+                if( PassthroughData.CurrentConditionInfo.Times >= 0 && 
+                    PassthroughData.CurrentConditionInfo.CalledTimes >
+                    PassthroughData.CurrentConditionInfo.Times)
+                {
+                    UnexpectedPassthroughFunctions.emplace_back(functionName);
+                }
+            }
+            else if(PassthroughData.Expected == OverrideData::ExpectedType::NOT_TRIGGERED)
+            {
+                if( PassthroughData.CurrentConditionInfo.Times == -1 && 
+                    PassthroughData.CurrentConditionInfo.CalledTimes > 0)
+                {
+                    UnexpectedPassthroughFunctions.emplace_back(functionName);
+                }
+            }
         }
 
         //------------------------------------------------------------------------------
@@ -462,9 +491,21 @@ namespace CppOverride
                 CurrentOverrideDatas.erase(functionName);
         }
         
+        inline OverridePassthroughInfoSetter Internal_CreateOverridePassthroughInfo()
+        {
+            return OverridePassthroughInfoSetter(*this);
+        }
+        
+        inline void Internal_ResetPassthroughOverrideData()
+        {
+            PassthroughData = OverrideData();
+            UnexpectedPassthroughFunctions.clear();
+        }
+        
         inline void Internal_ClearAllOverrideInfo()
         {
             CurrentOverrideDatas.clear();
+            Internal_ResetPassthroughOverrideData();
         }
         
         inline std::vector<FunctionName> Internal_GetFailedExpects()
@@ -512,6 +553,51 @@ namespace CppOverride
                     }
                 }
             }
+            
+            if(PassthroughData.Expected == OverrideData::ExpectedType::TRIGGERED)
+            {
+                if( PassthroughData.CurrentConditionInfo.Times >= 0 && 
+                    PassthroughData.CurrentConditionInfo.CalledTimes != 
+                    PassthroughData.CurrentConditionInfo.Times)
+                {
+                    const std::string msg = 
+                        std::string("Passthrough failed to reach times as instructed, ") +
+                        "Instructed Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
+                                                                                .Times) + ", " +
+                        "Called Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
+                                                                            .CalledTimes);
+                    failedFunctions.emplace_back(msg);
+                }
+                else if(PassthroughData.CurrentConditionInfo.Times == -1 && 
+                        PassthroughData.CurrentConditionInfo.CalledTimes == 0)
+                {
+                    failedFunctions.emplace_back(   "Passthrough function expected to be called at "
+                                                    "least once");
+                }
+            }
+            else if(PassthroughData.Expected == OverrideData::ExpectedType::NOT_TRIGGERED)
+            {
+                if( PassthroughData.CurrentConditionInfo.Times >= 0 && 
+                    PassthroughData.CurrentConditionInfo.CalledTimes == 
+                    PassthroughData.CurrentConditionInfo.Times)
+                {
+                    const std::string msg = 
+                        std::string("Passthrough failed to not reach times as instructed, ") +
+                        "Instructed Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
+                                                                                .Times) + ", " +
+                        "Called Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
+                                                                            .CalledTimes);
+                    failedFunctions.emplace_back(msg);
+                }
+                else if(PassthroughData.CurrentConditionInfo.Times == -1 && 
+                        PassthroughData.CurrentConditionInfo.CalledTimes > 0)
+                {
+                    failedFunctions.emplace_back("Passthrough function expected not to be called");
+                }
+            }
+            
+            for(int i = 0; i < UnexpectedPassthroughFunctions.size(); ++i)
+                failedFunctions.emplace_back(UnexpectedPassthroughFunctions[i] + " (Passthrough)");
             
             return failedFunctions;
         }

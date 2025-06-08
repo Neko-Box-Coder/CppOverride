@@ -23,6 +23,14 @@ namespace CppOverride
     { \
         (OverrideObjName).Internal_RemoveOverrideInfo(functionName); \
     } \
+    inline CppOverride::OverridePassthroughInfoSetter Internal_CreateOverridePassthroughInfo() const \
+    { \
+        return (OverrideObjName).Internal_CreateOverridePassthroughInfo(); \
+    } \
+    inline void Internal_ResetPassthroughOverrideData() const \
+    { \
+        (OverrideObjName).Internal_ResetPassthroughOverrideData(); \
+    } \
     inline void Internal_ClearAllOverrideInfo() const \
     { \
         (OverrideObjName).Internal_ClearAllOverrideInfo(); \
@@ -252,6 +260,11 @@ namespace CppOverride
                 } \
             } \
         } \
+        else \
+        { \
+            (overrideObjName)   .Internal_GetOverrideObject() \
+                                .Internal_CallOverridePassthroughExpectedAction(__func__); \
+        } \
     } while(0)
 
     #define INTERNAL_CO_INSERT_IMPL(overrideObjName, returnType, instance, args) \
@@ -419,6 +432,12 @@ namespace CppOverride
         INTERNAL_CO_REF_FUNCTION(scope, functionName); \
         (overrideObjName).Internal_RemoveOverrideInfo(#functionName)
 
+    #define CO_INSTRUCT_PASSTHROUGH(overrideObjName) \
+        ;(overrideObjName).Internal_CreateOverridePassthroughInfo()
+    
+    #define CO_REMOVE_INSTRUCT_PASSTHROUGH(overrideObjName) \
+        ;(overrideObjName).Internal_ResetPassthroughOverrideData()
+    
     #define CO_CLEAR_ALL_INSTRUCTS(overrideObjName) \
         ;(overrideObjName).Internal_ClearAllOverrideInfo()
     
@@ -429,7 +448,6 @@ namespace CppOverride
         static_cast<decltype(overrideObjName)>(overrideObjName).Internal_GetFailedExpects()
     #define CO_GET_OVERRIDE_RESULTS(overrideObjName, functionName) \
         static_cast<decltype(overrideObjName)>(overrideObjName).Internal_GetOverrideResults(functionName)
-    
     
     //NOTE: CO_INSTRUCT_* needs to be defined as there are chained actions.
     //      For CO_DECLARE_*, they need to be there such that things using them can be compiled
@@ -453,6 +471,8 @@ namespace CppOverride
         //#undef CO_GLOBAL
         //#undef CO_INSTRUCT_REF
         #undef CO_REMOVE_INSTRUCT_REF
+        //#undef CO_INSTRUCT_PASSTHROUGH
+        #undef CO_REMOVE_INSTRUCT_PASSTHROUGH
         #undef CO_CLEAR_ALL_INSTRUCTS
         
         #undef CO_GET_FAILED_EXPECTS
@@ -477,6 +497,8 @@ namespace CppOverride
         //#define CO_GLOBAL
         //#define CO_INSTRUCT_REF(...)
         #define CO_REMOVE_INSTRUCT_REF(...)
+        //#define CO_INSTRUCT_PASSTHROUGH(...)
+        #define CO_REMOVE_INSTRUCT_PASSTHROUGH(...)
         #define CO_CLEAR_ALL_INSTRUCTS(...)
         
         #define CO_GET_FAILED_EXPECTS(...) {}

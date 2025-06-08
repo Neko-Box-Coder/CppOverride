@@ -81,7 +81,20 @@ namespace CppOverride
         OverrideInfoSetter& ExpectedNotSatisfy();
     };
 
-
+    //NOTE: Subset of OverrideInfoSetter
+    struct OverridePassthroughInfoSetter
+    {
+        Overrider& CppOverrideObj;
+        
+        OverridePassthroughInfoSetter(Overrider& SimpleOverrideObj) : CppOverrideObj(SimpleOverrideObj)
+        {}
+        
+        OverridePassthroughInfoSetter& Times(int times);
+    
+        OverridePassthroughInfoSetter& Expected();
+        
+        OverridePassthroughInfoSetter& ExpectedNotSatisfy();
+    };
 }
 
 #endif
