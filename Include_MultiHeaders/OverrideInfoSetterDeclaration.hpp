@@ -75,6 +75,8 @@ namespace CppOverride
         OverrideInfoSetter& 
         SetArgsByAction(std::function<void( void* instance, 
                                             std::vector<void*>& args)> setArgsAction);
+    
+        OverrideInfoSetter& Expected();
     };
 
 

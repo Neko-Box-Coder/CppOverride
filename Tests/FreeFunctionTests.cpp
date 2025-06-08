@@ -31,22 +31,17 @@ int main(int argc, char** argv)
     {
         ssTEST_OUTPUT_SETUP
         (
-            CppOverride::ResultPtr result = 
-                CO_INSTRUCT(OverrideObj, MockFreeFunctionA).Returns<int>(10).ReturnsResult();
-            
-            CO_INSTRUCT(OverrideObj, MockFreeFunctionB).Returns<int>(10).AssignsResult(result);
+            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest, MockFreeFunctionA)
+                            .Returns<int>(10)
+                            .Expected();
+            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest, MockFreeFunctionB)
+                            .Returns<int>(10)
+                            .Expected();
         );
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionA(1) == 10);
-        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
-        
-        ssTEST_OUTPUT_SETUP
-        (
-            result->ClearStatuses();
-        );
-        
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionB(1, 2) == 10);
-        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
     };
     
     #ifdef FreeFunctionA

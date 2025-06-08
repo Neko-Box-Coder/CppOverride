@@ -30,6 +30,15 @@ namespace CppOverride
     inline CppOverride::Overrider& Internal_GetOverrideObject() const \
     { \
         return (OverrideObjName); \
+    } \
+    inline std::vector<CppOverride::FunctionName> Internal_GetFailedExpects() const \
+    { \
+        return (OverrideObjName).Internal_GetFailedExpects(); \
+    } \
+    inline std::vector<CppOverride::ResultPtr> \
+    Internal_GetOverrideResults(const std::string& functionName) const \
+    { \
+        return (OverrideObjName).Internal_GetOverrideResults(functionName); \
     }
     
     #define INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes) \
@@ -392,45 +401,86 @@ namespace CppOverride
     //-------------------------------------------------------
     //Instruct overrides
     //-------------------------------------------------------
-    #define CO_INSTRUCT(overrideObjName, functionName) \
-        (overrideObjName).Internal_CreateOverrideInfo(#functionName)
+    #define INTERNAL_CO_REF_FUNCTION(scope, functionName) \
+        ;(void) (& scope :: functionName) //NOTE: If you get an error here, common reasons are you are passing an overloaded function, missing template arguments, constructor/destructor or unable to reference function name
+    
+    #define CO_INSTRUCT_NO_REF(overrideObjName, functionName) \
+        ;(overrideObjName).Internal_CreateOverrideInfo(#functionName)
 
-    #define CO_REMOVE_INSTRUCT(overrideObjName, functionName)\
+    #define CO_REMOVE_INSTRUCT_NO_REF(overrideObjName, functionName)\
+        ;(overrideObjName).Internal_RemoveOverrideInfo(#functionName)
+
+    #define CO_GLOBAL /* Empty */
+    #define CO_INSTRUCT_REF(overrideObjName, scope, functionName) \
+        INTERNAL_CO_REF_FUNCTION(scope, functionName); \
+        ;(overrideObjName).Internal_CreateOverrideInfo(#functionName)
+
+    #define CO_REMOVE_INSTRUCT_REF(overrideObjName, scope, functionName) \
+        INTERNAL_CO_REF_FUNCTION(scope, functionName); \
         (overrideObjName).Internal_RemoveOverrideInfo(#functionName)
 
     #define CO_CLEAR_ALL_INSTRUCTS(overrideObjName) \
-        (overrideObjName).ClearAllOverrideInfo()
+        ;(overrideObjName).Internal_ClearAllOverrideInfo()
     
-    //NOTE: CO_INSTRUCT needs to be defined as there are chained actions.
+    //-------------------------------------------------------
+    //Validate overrides results
+    //-------------------------------------------------------
+    #define CO_GET_FAILED_EXPECTS(overrideObjName) \
+        static_cast<decltype(overrideObjName)>(overrideObjName).Internal_GetFailedExpects()
+    #define CO_GET_OVERRIDE_RESULTS(overrideObjName, functionName) \
+        static_cast<decltype(overrideObjName)>(overrideObjName).Internal_GetOverrideResults(functionName)
+    
+    
+    //NOTE: CO_INSTRUCT_* needs to be defined as there are chained actions.
     //      For CO_DECLARE_*, they need to be there such that things using them can be compiled
     #ifdef CO_NO_OVERRIDE
-        #undef CO_INSERT_IMPL
-        #undef CO_INSERT_MEMBER_IMPL_CTOR_DTOR
-        #undef CO_INSERT_MEMBER_IMPL
-        //#undef CO_INSTRUCT
-        #undef CO_REMOVE_INSTRUCT
-        #undef CO_CLEAR_ALL_INSTRUCTS
+        //Undefine marcos first
+        
         //#undef CO_DECLARE_MEMBER_INSTANCE
         //#undef CO_DECLARE_INSTANCE
         //#undef CO_DECLARE_OVERRIDE_METHODS
+        
+        #undef CO_INSERT_IMPL
+        #undef CO_INSERT_MEMBER_IMPL_CTOR_DTOR
+        #undef CO_INSERT_MEMBER_IMPL
         #undef CO_INSERT_METHOD
         #undef CO_INSERT_MEMBER_METHOD
         #undef CO_INSERT_MEMBER_METHOD_CTOR
         #undef CO_INSERT_MEMBER_METHOD_DTOR
-    
-        #define CO_INSERT_IMPL(...)
-        #define CO_INSERT_MEMBER_IMPL_CTOR_DTOR(...)
-        #define CO_INSERT_MEMBER_IMPL(...)
-        //#define CO_INSTRUCT(...)
-        #define CO_REMOVE_INSTRUCT(...)
-        #define CO_CLEAR_ALL_INSTRUCTS(...)
+        
+        //#undef CO_INSTRUCT_NO_REF
+        #undef CO_REMOVE_INSTRUCT_NO_REF
+        //#undef CO_GLOBAL
+        //#undef CO_INSTRUCT_REF
+        #undef CO_REMOVE_INSTRUCT_REF
+        #undef CO_CLEAR_ALL_INSTRUCTS
+        
+        #undef CO_GET_FAILED_EXPECTS
+        #undef CO_GET_OVERRIDE_RESULTS
+
+        //Redefine the macros to noop
+        
         //#define CO_DECLARE_MEMBER_INSTANCE(...)
         //#define CO_DECLARE_INSTANCE(...)
         //#define CO_DECLARE_OVERRIDE_METHODS(...)
+        
+        #define CO_INSERT_IMPL(...)
+        #define CO_INSERT_MEMBER_IMPL_CTOR_DTOR(...)
+        #define CO_INSERT_MEMBER_IMPL(...)
         #define CO_INSERT_METHOD(...)
         #define CO_INSERT_MEMBER_METHOD(...)
         #define CO_INSERT_MEMBER_METHOD_CTOR(...)
         #define CO_INSERT_MEMBER_METHOD_DTOR(...)
+        
+        //#define CO_INSTRUCT_NO_REF(...)
+        #define CO_REMOVE_INSTRUCT(...)
+        //#define CO_GLOBAL
+        //#define CO_INSTRUCT_REF(...)
+        #define CO_REMOVE_INSTRUCT_REF(...)
+        #define CO_CLEAR_ALL_INSTRUCTS(...)
+        
+        #define CO_GET_FAILED_EXPECTS(...) {}
+        #define CO_GET_OVERRIDE_RESULTS(...) {}
     #endif
 }
 

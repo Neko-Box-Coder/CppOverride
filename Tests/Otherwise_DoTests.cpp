@@ -21,16 +21,16 @@ int main(int argc, char** argv)
         (
             CppOverrideTest::Rectangle rect(1.5, 1.5);
             bool otherwiseDoCalled = false;
-            CO_INSTRUCT (rect, GetWidth)
-                        .WhenCalledWith(2.f)
-                        .Returns<float>(6.f)
-                        .Otherwise_Do
-                        (
-                            [&otherwiseDoCalled](...)
-                            {
-                                otherwiseDoCalled = true;
-                            }
-                        );
+            CO_INSTRUCT_NO_REF  (rect, GetWidth)
+                                .WhenCalledWith(2.f)
+                                .Returns<float>(6.f)
+                                .Otherwise_Do
+                                (
+                                    [&otherwiseDoCalled](...)
+                                    {
+                                        otherwiseDoCalled = true;
+                                    }
+                                );
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -51,22 +51,22 @@ int main(int argc, char** argv)
         (
             CppOverrideTest::Rectangle rect(1.5, 1.5);
             bool otherwiseDoCalled = false;
-            CO_INSTRUCT (rect, GetWidth)
-                        .If
-                        (
-                            [](void*, const std::vector<void *>& args)
-                            {
-                                return (*(float*)args[0] == 2.f);
-                            }
-                        )
-                        .Returns<float>(6.f)
-                        .Otherwise_Do
-                        (
-                            [&otherwiseDoCalled](...)
-                            {
-                                otherwiseDoCalled = true;
-                            }
-                        );
+            CO_INSTRUCT_NO_REF  (rect, GetWidth)
+                                .If
+                                (
+                                    [](void*, const std::vector<void *>& args)
+                                    {
+                                        return (*(float*)args[0] == 2.f);
+                                    }
+                                )
+                                .Returns<float>(6.f)
+                                .Otherwise_Do
+                                (
+                                    [&otherwiseDoCalled](...)
+                                    {
+                                        otherwiseDoCalled = true;
+                                    }
+                                );
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -87,20 +87,20 @@ int main(int argc, char** argv)
         (
             bool otherwiseDoCalled = false;
             std::string testString;
-            CO_INSTRUCT (OverrideObj, ConstArgsAndArgsToSetFunc)
-                        .WhenCalledWith(1, 2.f, CO_ANY)
-                        .SetArgs<   CO_ANY_TYPE, 
-                                    CO_ANY_TYPE, 
-                                    std::string&>(  CO_DONT_SET, 
-                                                    CO_DONT_SET, 
-                                                    "test")
-                        .Otherwise_Do
-                        (
-                            [&otherwiseDoCalled](...)
-                            {
-                                otherwiseDoCalled = true;
-                            }
-                        );
+            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::Const, ConstArgsAndArgsToSetFunc)
+                            .WhenCalledWith(1, 2.f, CO_ANY)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string&>(  CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "test")
+                            .Otherwise_Do
+                            (
+                                [&otherwiseDoCalled](...)
+                                {
+                                    otherwiseDoCalled = true;
+                                }
+                            );
         );
         ssTEST_OUTPUT_EXECUTION
         (
@@ -121,26 +121,26 @@ int main(int argc, char** argv)
         (
             bool otherwiseDoCalled = false;
             std::string testString;
-            CO_INSTRUCT (OverrideObj, ConstArgsAndArgsToSetFunc)
-                        .If
-                        (
-                            [](void*, const std::vector<void *>& args)
-                            {
-                                return (*(int*)args[0] == 1) && (*(float*)args[1] == 2.f);
-                            }
-                        )
-                        .SetArgs<   CO_ANY_TYPE, 
-                                    CO_ANY_TYPE, 
-                                    std::string&>(  CO_DONT_SET, 
-                                                    CO_DONT_SET, 
-                                                    "test")
-                        .Otherwise_Do
-                        (
-                            [&otherwiseDoCalled](...)
-                            {
-                                otherwiseDoCalled = true;
-                            }
-                        );
+            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::Const, ConstArgsAndArgsToSetFunc)
+                            .If
+                            (
+                                [](void*, const std::vector<void *>& args)
+                                {
+                                    return (*(int*)args[0] == 1) && (*(float*)args[1] == 2.f);
+                                }
+                            )
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string&>(  CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "test")
+                            .Otherwise_Do
+                            (
+                                [&otherwiseDoCalled](...)
+                                {
+                                    otherwiseDoCalled = true;
+                                }
+                            );
         );
         ssTEST_OUTPUT_EXECUTION
         (

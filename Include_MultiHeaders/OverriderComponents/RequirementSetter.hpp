@@ -170,6 +170,18 @@ namespace CppOverride
         RequirementSetter(OverrideDatas& overrideDataLists) :
             CurrentOverrideDatas(overrideDataLists)
         {}
+        
+        inline OverrideInfoSetter& Expected(OverrideInfoSetter& infoSetter)
+        {
+            OverrideData& currentData = 
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
+            
+            currentData.Expected = true;
+            if(!currentData.Result)
+                currentData.Result = CreateOverrideResult();
+            
+            return infoSetter;
+        }
     };
 }
 

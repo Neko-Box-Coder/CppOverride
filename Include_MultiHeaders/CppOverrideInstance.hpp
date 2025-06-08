@@ -32,7 +32,9 @@ namespace CppOverride
         
         for(int i = 0; i < functionName.size(); ++i)
         {
-            if(functionName[i] != ' ')
+            if(functionName[i] == '<')
+                break;
+            else if(functionName[i] != ' ')
                 processedName += functionName[i];
         }
         
@@ -480,6 +482,50 @@ namespace CppOverride
         inline void Internal_ClearAllOverrideInfo()
         {
             CurrentOverrideDatas.clear();
+        }
+        
+        inline std::vector<FunctionName> Internal_GetFailedExpects()
+        {
+            std::vector<FunctionName> failedFunctions;
+            for(auto it = CurrentOverrideDatas.begin(); it != CurrentOverrideDatas.end(); ++it)
+            {
+                for(int i = 0; i < it->second.size(); ++i)
+                {
+                    if(it->second[i].Expected && it->second[i].Result)
+                    {
+                        if( it->second[i].CurrentConditionInfo.Times >= 0 && 
+                            it->second[i].CurrentConditionInfo.CalledTimes != 
+                            it->second[i].CurrentConditionInfo.Times)
+                        {
+                            failedFunctions.push_back(it->first);
+                            break;
+                        }
+                        
+                        if( it->second[i].CurrentConditionInfo.Times == -1 && 
+                            it->second[i].CurrentConditionInfo.CalledTimes == 0)
+                        {
+                            failedFunctions.push_back(it->first);
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            return failedFunctions;
+        }
+        
+        inline std::vector<ResultPtr> 
+        Internal_GetOverrideResults(const std::string& functionName)
+        {
+            std::vector<ResultPtr> results;
+            if(CurrentOverrideDatas.find(functionName) != CurrentOverrideDatas.end())
+            {
+                const std::vector<OverrideData>& overrideData = CurrentOverrideDatas.at(functionName);
+                for(int i = 0; i < overrideData.size(); ++i)
+                    results.push_back(overrideData[i].Result);
+            }
+            
+            return results;
         }
     };
 }

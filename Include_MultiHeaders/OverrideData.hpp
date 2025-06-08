@@ -31,6 +31,7 @@ namespace CppOverride
         ArgsDataActionInfo ArgumentsDataActionInfo;
         
         //Result of the override
+        bool Expected = false;
         ResultActionInfo CurrentResultActionInfo;
         ResultPtr Result = nullptr;
     };

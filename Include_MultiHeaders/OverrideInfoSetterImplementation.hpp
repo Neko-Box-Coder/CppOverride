@@ -104,6 +104,11 @@ namespace CppOverride
     {
         return CppOverrideObj.CurrentArgsDataSetter.SetArgsByAction<Args...>(*this, setArgsAction);
     }
+
+    inline OverrideInfoSetter& OverrideInfoSetter::Expected()
+    {
+        return CppOverrideObj.CurrentRequirementSetter.Expected(*this);
+    }
 }
 
 #endif
