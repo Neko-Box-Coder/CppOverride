@@ -243,8 +243,7 @@ namespace CppOverride
         }
 
         template<typename... Args>
-        inline void 
-        Internal_CallReturnOverrideResultExpectedAction(std::string functionName,
+        inline void Internal_CallOverrideExpectedAction(std::string functionName,
                                                         int overrideIndex,
                                                         void* instance,
                                                         Args&... args)
@@ -286,11 +285,7 @@ namespace CppOverride
                                                     Args&... args)
         {
             functionName = ProcessFunctionName(functionName);
-            
-            Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                            dataIndex, 
-                                                            instance, 
-                                                            args...);
+            Internal_CallOverrideExpectedAction(functionName, dataIndex, instance, args...);
             return ReturnType();
         }
 
@@ -320,10 +315,7 @@ namespace CppOverride
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
-            Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                            dataIndex, 
-                                                            instance, 
-                                                            args...);
+            Internal_CallOverrideExpectedAction(functionName, dataIndex, instance, args...);
             
             if(correctData.CurrentReturnDataInfo.DataSet)
                 return *static_cast<ReturnType*>(correctData.CurrentReturnDataInfo.Data.get());
@@ -365,10 +357,7 @@ namespace CppOverride
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
-            Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                            dataIndex, 
-                                                            instance, 
-                                                            args...);
+            Internal_CallOverrideExpectedAction(functionName, dataIndex, instance, args...);
 
             if(correctData.CurrentReturnDataInfo.DataSet)
             {
@@ -437,14 +426,8 @@ namespace CppOverride
             if(correctData.Result != nullptr)
                 correctData.Result->AddStatus(overrideStatus);
             
-            if( performResultAction && 
-                overrideStatus == OverrideStatus::OVERRIDE_SUCCESS)
-            {
-                Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                                dataIndex, 
-                                                                instance, 
-                                                                args...);
-            }
+            if(performResultAction && overrideStatus == OverrideStatus::OVERRIDE_SUCCESS)
+                Internal_CallOverrideExpectedAction(functionName, dataIndex, instance, args...);
         }
         
         //------------------------------------------------------------------------------

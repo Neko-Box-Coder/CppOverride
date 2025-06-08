@@ -201,7 +201,7 @@ namespace CppOverride
                     if(dontReturn) \
                     { \
                         (overrideObjName)   .Internal_GetOverrideObject() \
-                                            .Internal_CallReturnOverrideResultExpectedAction \
+                                            .Internal_CallOverrideExpectedAction \
                                             ( \
                                                 __func__, \
                                                 foundIndex, \
@@ -242,7 +242,7 @@ namespace CppOverride
                 { \
                     /* If we are not overriding anything, we still need to call result actions */ \
                     (overrideObjName)   .Internal_GetOverrideObject() \
-                                        .Internal_CallReturnOverrideResultExpectedAction \
+                                        .Internal_CallOverrideExpectedAction \
                                         ( \
                                             __func__, \
                                             foundIndex, \
