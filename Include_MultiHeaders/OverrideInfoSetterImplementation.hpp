@@ -50,13 +50,6 @@ namespace CppOverride
         return CppOverrideObj.CurrentRequirementSetter.AssignsResult(*this, outResult);
     }
 
-    inline ResultPtr OverrideInfoSetter::ReturnsResult()
-    {
-        ResultPtr returnResult = nullptr;
-        AssignsResult(returnResult);
-        return returnResult;
-    }
-
     inline OverrideInfoSetter& OverrideInfoSetter::MatchesObject(const void* instance)
     {
         return CppOverrideObj.CurrentRequirementSetter.MatchesObject(*this, (void*)instance);

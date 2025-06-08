@@ -50,8 +50,6 @@ namespace CppOverride
         
         OverrideInfoSetter& AssignsResult(ResultPtr& outResult);
         
-        ResultPtr ReturnsResult();
-        
         OverrideInfoSetter& MatchesObject(const void* instance);
         
         OverrideInfoSetter& MatchesAny();
