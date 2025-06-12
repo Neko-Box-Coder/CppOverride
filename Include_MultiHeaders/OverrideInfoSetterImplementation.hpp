@@ -25,14 +25,14 @@ namespace CppOverride
     //TODO: Enforce type for arguments
     inline OverrideInfoSetter& 
     OverrideInfoSetter::If(std::function<bool(  void* instance, 
-                                                const std::vector<void*>& args)> condition)
+                                                const std::vector<TypedDataInfo>& args)> condition)
     {
         return CppOverrideObj.CurrentRequirementSetter.If(*this, condition);
     }
 
     inline OverrideInfoSetter& 
     OverrideInfoSetter::Otherwise_Do(std::function<void(void* instance,
-                                                        const std::vector<void*>& args)> action)
+                                                        const std::vector<TypedDataInfo>& args)> action)
     {
         return CppOverrideObj.CurrentRequirementSetter.Otherwise_Do(*this, action);
     }
@@ -40,7 +40,7 @@ namespace CppOverride
     inline OverrideInfoSetter& 
     OverrideInfoSetter::
     WhenCalledExpectedly_Do(std::function<void( void* instance,
-                                                const std::vector<void*>& args)> action)
+                                                const std::vector<TypedDataInfo>& args)> action)
     {
         return CppOverrideObj.CurrentRequirementSetter.WhenCalledExpectedly_Do(*this, action);
     }
@@ -63,8 +63,8 @@ namespace CppOverride
     template<typename ReturnType>
     inline OverrideInfoSetter&
     OverrideInfoSetter::ReturnsByAction(std::function<void( void* instance,
-                                                            const std::vector<void*>& args, 
-                                                            void* out)> returnAction)
+                                                            const std::vector<TypedDataInfo>& args, 
+                                                            TypedDataInfo& out)> returnAction)
     {
         return CppOverrideObj.CurrentReturnDataSetter.ReturnsByAction<ReturnType>(  *this, 
                                                                                     returnAction);
@@ -100,7 +100,7 @@ namespace CppOverride
     template<typename... Args>
     inline OverrideInfoSetter&
     OverrideInfoSetter::SetArgsByAction(std::function<void( void* instance, 
-                                        std::vector<void*>& args)> setArgsAction)
+                                        std::vector<TypedDataInfo>& args)> setArgsAction)
     {
         return CppOverrideObj.CurrentArgsDataSetter.SetArgsByAction<Args...>(*this, setArgsAction);
     }

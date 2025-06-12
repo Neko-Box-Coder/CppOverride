@@ -316,10 +316,12 @@ int main(int argc, char** argv)
             CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
                                 .SetArgsByAction<int, float*, std::string&>
                                 (
-                                    [](void*, std::vector<void*>& args)
+                                    [](void*, std::vector<CppOverride::TypedDataInfo>& args)
                                     {
-                                        **((float**)args.at(1)) = 2.f;
-                                        *((std::string*)args.at(2)) = "test";
+                                        if(args.at(1).IsType<float*>())
+                                            **args.at(1).GetTypedDataPtr<float*>() = 2.f;
+                                        if(args.at(2).IsType<std::string>())
+                                            *args.at(2).GetTypedDataPtr<std::string>() = "test";
                                     }
                                 )
                                 .Expected();
@@ -346,10 +348,13 @@ int main(int argc, char** argv)
                                                 CO_ANY_TYPE, 
                                                 CppOverrideTest::TestClass&>
                             (
-                                [](void*, std::vector<void*>& args)
+                                [](void*, std::vector<CppOverride::TypedDataInfo>& args)
                                 {
-                                    *((CppOverrideTest::TestClass*)args.at(3)) = 
+                                    if(args.at(3).IsType<CppOverrideTest::TestClass>())
+                                    {
+                                        *args.at(3).GetTypedDataPtr<CppOverrideTest::TestClass>() = 
                                         CppOverrideTest::TestClass(1, 2.0, "test");
+                                    }
                                 }
                             )
                             .Returns<bool>(true)
@@ -372,10 +377,12 @@ int main(int argc, char** argv)
             CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
                                 .SetArgsByAction<CO_ANY_TYPE, float*, std::string&>
                                 (
-                                    [](void*, std::vector<void*>& args)
+                                    [](void*, std::vector<CppOverride::TypedDataInfo>& args)
                                     {
-                                        **((float**)args.at(1)) = 4.f;
-                                        *((std::string*)args.at(2)) = "Test";
+                                        if(args.at(1).IsType<float*>())
+                                            **args.at(1).GetTypedDataPtr<float*>() = 4.f;
+                                        if(args.at(2).IsType<std::string>())
+                                            *args.at(2).GetTypedDataPtr<std::string>() = "Test";
                                     }
                                 )
                                 .AssignsResult(result);
@@ -383,10 +390,12 @@ int main(int argc, char** argv)
             CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
                                 .SetArgsByAction<CO_ANY_TYPE, float&, float*>
                                 (
-                                    [](void*, std::vector<void*>& args)
+                                    [](void*, std::vector<CppOverride::TypedDataInfo>& args)
                                     {
-                                        *((float*)args.at(1)) = 5.f;
-                                        **((float**)args.at(2)) = 3.f;
+                                        if(args.at(1).IsType<float>())
+                                            *args.at(1).GetTypedDataPtr<float>() = 5.f;
+                                        if(args.at(2).IsType<float*>())
+                                            **args.at(2).GetTypedDataPtr<float*>() = 3.f;
                                     }
                                 )
                                 .AssignsResult(result2);

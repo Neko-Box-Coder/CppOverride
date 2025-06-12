@@ -99,7 +99,7 @@ namespace CppOverride
         //TODO: Enforce type for arguments
         inline OverrideInfoSetter& 
         If( OverrideInfoSetter& infoSetter, 
-            std::function<bool(void* instance, const std::vector<void*>& args)> condition)
+            std::function<bool(void* instance, const std::vector<TypedDataInfo>& args)> condition)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()
@@ -115,7 +115,7 @@ namespace CppOverride
         inline OverrideInfoSetter& 
         Otherwise_Do(   OverrideInfoSetter& infoSetter, 
                         std::function<void( void* instance, 
-                                            const std::vector<void*>& args)> action)
+                                            const std::vector<TypedDataInfo>& args)> action)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()
@@ -131,7 +131,7 @@ namespace CppOverride
         inline OverrideInfoSetter& 
         WhenCalledExpectedly_Do(OverrideInfoSetter& infoSetter, 
                                 std::function<void( void* instance, 
-                                                    const std::vector<void*>& args)> action)
+                                                    const std::vector<TypedDataInfo>& args)> action)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()

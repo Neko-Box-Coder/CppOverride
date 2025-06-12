@@ -111,9 +111,15 @@ void OverrideReturnsWithActionLambda()
     CO_INSTRUCT_REF (OverrideInstanceName, CO_GLOBAL, OverrideMyReturnValue)
                     .ReturnsByAction<int>
                     ( 
-                        [](void*, const std::vector<void*>&, void* out)
+                        []( void*, 
+                            const std::vector<CppOverride::TypedDataInfo>& args, 
+                            CppOverride::TypedDataInfo& out)
                         { 
-                            *static_cast<int*>(out) = 5;
+                            (void)args;
+                            //Can access args with type safety if needed
+                            //e.g., if(args.at(0).IsType<int>()) { ... }
+                            if(out.IsType<int>())
+                                *out.GetTypedDataPtr<int>() = 5;
                         }
                     );
     
@@ -127,10 +133,12 @@ void OverrideArgumentsWithActionLambda()
     CO_INSTRUCT_REF (OverrideInstanceName, CO_GLOBAL, OverrideMyArgs)
                     .SetArgsByAction<float&, int*>
                     (
-                        [](void*, std::vector<void*>& args)
+                        [](void*, std::vector<CppOverride::TypedDataInfo>& args)
                         {
-                            *static_cast<float*>(args.at(0)) = 1.f;
-                            **static_cast<int**>(args.at(1)) = 2;
+                            if(args.at(0).IsType<float>())
+                                *args.at(0).GetTypedDataPtr<float>() = 1.f;
+                            if(args.at(1).IsType<int*>())
+                                **args.at(1).GetTypedDataPtr<int*>() = 2;
                         }
                     );
 
@@ -186,9 +194,9 @@ void IfConditionLambdaExample()
     CO_INSTRUCT_REF (OverrideInstanceName, CO_GLOBAL, OverrideMyReturnValue)
                     .If
                     (
-                        [](void*, const std::vector<void*>& args)
+                        [](void*, const std::vector<CppOverride::TypedDataInfo>& args)
                         {
-                            if(*static_cast<int*>(args.at(0)) == 1)
+                            if(args.at(0).IsType<int>() && *args.at(0).GetTypedDataPtr<int>() == 1)
                                 return true;
                             else
                                 return false;
@@ -213,8 +221,14 @@ void WhenCalledExpectedlyDoLambdaExample()
                     .Returns<int>(1)
                     .WhenCalledExpectedly_Do
                     (
-                        [&called](...)
+                        [&called](  void* instance, 
+                                    const std::vector<CppOverride::TypedDataInfo>& args)
                         {
+                            (void)instance;
+                            (void)args;
+                            //Can access args with type safety if needed
+                            //e.g., if(args.at(0).IsType<int>()) { ... }
+                            
                             called = true;
                         }
                     );
@@ -234,8 +248,14 @@ void OtherwiseDoLambdaExample()
                     .Returns<int>(1)
                     .Otherwise_Do
                     (
-                        [&called](...)
+                        [&called](  void* instance, 
+                                    const std::vector<CppOverride::TypedDataInfo>& args)
                         {
+                            (void)instance;
+                            (void)args;
+                            //Can access args with type safety if needed
+                            //e.g., if(args.at(0).IsType<int>()) { ... }
+                            
                             called = true;
                         }
                     );

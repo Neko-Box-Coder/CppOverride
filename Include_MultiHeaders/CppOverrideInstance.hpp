@@ -20,6 +20,7 @@
 #include "./OverrideStatus.hpp"
 #include "./EarlyReturn.hpp"
 #include "./DataInfo.hpp"
+#include "./TypedDataInfo.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -260,7 +261,7 @@ namespace CppOverride
             OverrideData& correctData = CurrentOverrideDatas.at(functionName).at(overrideIndex);
             if(correctData.CurrentResultActionInfo.CorrectActionSet)
             {
-                std::vector<void*> argumentsList;
+                std::vector<TypedDataInfo> argumentsList;
                 CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 correctData.CurrentResultActionInfo.CorrectAction(instance, argumentsList);
             }
@@ -340,7 +341,7 @@ namespace CppOverride
             }
             
             std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
@@ -351,9 +352,13 @@ namespace CppOverride
             else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
             {
                 ReturnType returnRef;
+                TypedDataInfo returnDataInfo;
+                returnDataInfo.Data = &returnRef;
+                returnDataInfo.TypeHash = typeid(ReturnType).hash_code();
+                returnDataInfo.IsSet = true;
                 correctData.CurrentReturnDataActionInfo.DataAction( instance, 
                                                                     argumentsList, 
-                                                                    &returnRef);
+                                                                    returnDataInfo);
                 return returnRef;
             }
             
@@ -382,7 +387,7 @@ namespace CppOverride
             }
             
             std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
@@ -398,9 +403,13 @@ namespace CppOverride
             else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
             {
                 INTERNAL_CO_UNREF(ReturnType)* returnRef;
+                TypedDataInfo returnDataInfo;
+                returnDataInfo.Data = &returnRef;
+                returnDataInfo.TypeHash = typeid(INTERNAL_CO_UNREF(ReturnType)*).hash_code();
+                returnDataInfo.IsSet = true;
                 correctData.CurrentReturnDataActionInfo.DataAction( instance, 
                                                                     argumentsList, 
-                                                                    &returnRef);
+                                                                    returnDataInfo);
                 return *returnRef;
             }
             
@@ -432,7 +441,7 @@ namespace CppOverride
             }
             
             std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
@@ -560,6 +569,7 @@ namespace CppOverride
                     PassthroughData.CurrentConditionInfo.CalledTimes != 
                     PassthroughData.CurrentConditionInfo.Times)
                 {
+                    #if 0
                     const std::string msg = 
                         std::string("Passthrough failed to reach times as instructed, ") +
                         "Instructed Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
@@ -567,12 +577,17 @@ namespace CppOverride
                         "Called Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
                                                                             .CalledTimes);
                     failedFunctions.emplace_back(msg);
+                    #endif
+                    failedFunctions.emplace_back("Passthrough");
                 }
                 else if(PassthroughData.CurrentConditionInfo.Times == -1 && 
                         PassthroughData.CurrentConditionInfo.CalledTimes == 0)
                 {
+                    #if 0
                     failedFunctions.emplace_back(   "Passthrough function expected to be called at "
                                                     "least once");
+                    #endif
+                    failedFunctions.emplace_back("Passthrough");
                 }
             }
             else if(PassthroughData.Expected == OverrideData::ExpectedType::NOT_TRIGGERED)
@@ -581,6 +596,7 @@ namespace CppOverride
                     PassthroughData.CurrentConditionInfo.CalledTimes == 
                     PassthroughData.CurrentConditionInfo.Times)
                 {
+                    #if 0
                     const std::string msg = 
                         std::string("Passthrough failed to not reach times as instructed, ") +
                         "Instructed Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
@@ -588,11 +604,15 @@ namespace CppOverride
                         "Called Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
                                                                             .CalledTimes);
                     failedFunctions.emplace_back(msg);
+                    #endif
+                    failedFunctions.emplace_back("Passthrough");
                 }
                 else if(PassthroughData.CurrentConditionInfo.Times == -1 && 
                         PassthroughData.CurrentConditionInfo.CalledTimes > 0)
                 {
+                    #if 0
                     failedFunctions.emplace_back("Passthrough function expected not to be called");
+                    #endif
                 }
             }
             

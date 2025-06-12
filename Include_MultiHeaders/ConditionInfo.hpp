@@ -2,6 +2,7 @@
 #define CO_CONDITION_INFO_HPP
 
 #include "./DataInfo.hpp"
+#include "./TypedDataInfo.hpp"
 
 #include <functional>
 #include <vector>
@@ -10,7 +11,7 @@ namespace CppOverride
 {
     struct ConditionInfo
     {
-        std::function<bool(void* instance, const std::vector<void*>& args)> LambdaCondition;
+        std::function<bool(void* instance, const std::vector<TypedDataInfo>& args)> LambdaCondition;
         std::vector<DataInfo> ArgsCondition = {};
         int Times = -1;
         int CalledTimes = 0;

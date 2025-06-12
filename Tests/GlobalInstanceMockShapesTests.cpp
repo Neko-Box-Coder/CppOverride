@@ -52,7 +52,11 @@ int main(int argc, char** argv)
                 CO_INSTRUCT_NO_REF  (OverrideObj, ~MockSquare)
                                     .WhenCalledExpectedly_Do
                                     (
-                                        [&destructInstance](void* instance, const std::vector<void*>&)
+                                        [&destructInstance]
+                                        (
+                                            void* instance, 
+                                            const std::vector<CppOverride::TypedDataInfo>&
+                                        )
                                         {
                                             destructInstance = instance;
                                         }

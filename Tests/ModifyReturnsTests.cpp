@@ -83,10 +83,37 @@ int main(int argc, char** argv)
         );
         ssTEST_OUTPUT_EXECUTION
         (
-            int& testNum2 = CppOverrideTest::NonConst::ReturnReferenceFunc(1);
+            int& testNum2 = CppOverrideTest::NonConst::ReturnReferenceFunc(10);
         );
-        ssTEST_OUTPUT_ASSERT(testNum == testNum2);
         ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        CO_CLEAR_ALL_INSTRUCTS(OverrideObj);
+        ssTEST_OUTPUT_ASSERT(&testNum == &testNum2);
+        
+        ssTEST_OUTPUT_SETUP
+        (
+            CO_CLEAR_ALL_INSTRUCTS(OverrideObj);
+            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, ReturnReferenceFunc)
+                            .ReturnsByAction<int&>
+                            (
+                                [&](void*, 
+                                    const std::vector<CppOverride::TypedDataInfo>&, 
+                                    CppOverride::TypedDataInfo& out)
+                                {
+                                    //NOTE: Special case, reference is converted to pointer for return
+                                    if(out.IsType<int*>())
+                                        *out.GetTypedDataPtr<int*>() = &testNum;
+                                }
+                            )
+                            .Expected();
+        );
+        
+        ssTEST_OUTPUT_EXECUTION
+        (
+            int& testNum3 = CppOverrideTest::NonConst::ReturnReferenceFunc(10);
+        );
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        CO_CLEAR_ALL_INSTRUCTS(OverrideObj);
+        ssTEST_OUTPUT_ASSERT(&testNum == &testNum3);
     };
     
     ssTEST("Return Pointer Should Override")
@@ -160,7 +187,8 @@ int main(int argc, char** argv)
             .Expected();
         );
         using namespace CppOverrideTest::NonConst::Template;
-        ssTEST_OUTPUT_ASSERT(TemplateReturnFunc<CppOverrideTest::TestClass>(testObject) == assertObject);
+        ssTEST_OUTPUT_ASSERT(   TemplateReturnFunc<CppOverrideTest::TestClass>(testObject) == 
+                                assertObject);
         ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
     };
     
@@ -171,9 +199,12 @@ int main(int argc, char** argv)
             CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
                             .ReturnsByAction<int>
                             (
-                                [](void*, const std::vector<void *>&, void* out)
+                                []( void*, 
+                                    const std::vector<CppOverride::TypedDataInfo>&, 
+                                    CppOverride::TypedDataInfo& out)
                                 {
-                                    (*(int*)(out)) = 10;
+                                    if(out.IsType<int>())
+                                        *out.GetTypedDataPtr<int>() = 10;
                                 }
                             )
                             .Expected();

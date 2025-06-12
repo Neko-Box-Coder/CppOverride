@@ -22,11 +22,15 @@ int main(int argc, char** argv)
             CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, ArgsFunc)
                             .If
                             (
-                                [] (void*, const std::vector<void *>& args) -> bool
+                                [] (void*, 
+                                    const std::vector<CppOverride::TypedDataInfo>& args) -> bool
                                 {
-                                    if( *static_cast<const int*>(args.at(0)) == 1 &&
-                                        *static_cast<const bool*>(args.at(1)) == true &&
-                                        *static_cast<float*>(args.at(2)) == 2.f)
+                                    if( args.at(0).IsType<int>() && 
+                                        *args.at(0).GetTypedDataPtr<int>() == 1 &&
+                                        args.at(1).IsType<bool>() && 
+                                        *args.at(1).GetTypedDataPtr<bool>() == true &&
+                                        args.at(2).IsType<float>() && 
+                                        *args.at(2).GetTypedDataPtr<float>() == 2.f)
                                     {
                                         return true;
                                     }
@@ -59,11 +63,15 @@ int main(int argc, char** argv)
             CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
                                 .If
                                 (
-                                    [](void*, const std::vector<void *>& args) -> bool
+                                    []( void*, 
+                                        const std::vector<CppOverride::TypedDataInfo>& args) -> bool
                                     {
-                                        if( *static_cast<int*>(args.at(0)) == 1 &&
-                                            **static_cast<float**>(args.at(1)) == 2.f &&
-                                            *static_cast<std::string*>(args.at(2)) == 
+                                        if( args.at(0).IsType<int>() && 
+                                            *args.at(0).GetTypedDataPtr<int>() == 1 &&
+                                            args.at(1).IsType<float*>() && 
+                                            **args.at(1).GetTypedDataPtr<float*>() == 2.f &&
+                                            args.at(2).IsType<std::string>() && 
+                                            *args.at(2).GetTypedDataPtr<std::string>() == 
                                             "Test String")
                                         {
                                             return true;

@@ -2899,6 +2899,47 @@ namespace CppOverride
 
 #endif
 
+//=================================================================
+//./Include_MultiHeaders/TypedDataInfo.hpp
+//=================================================================
+#ifndef CO_TYPED_DATA_INFO_HPP
+#define CO_TYPED_DATA_INFO_HPP
+
+#include <typeinfo>
+#include <cstddef>
+
+namespace CppOverride
+{
+    struct TypedDataInfo
+    {
+        void* Data = nullptr;
+        std::size_t TypeHash = 0;
+        bool IsSet = false;
+        
+        TypedDataInfo() = default;
+        
+        template<typename T>
+        TypedDataInfo(T* dataPtr) : Data(dataPtr), 
+                                    TypeHash(typeid(T).hash_code()), 
+                                    IsSet(dataPtr != nullptr)
+        {}
+        
+        template<typename T>
+        T* GetTypedDataPtr() const
+        {
+            return static_cast<T*>(Data);
+        }
+        
+        template<typename T>
+        bool IsType() const
+        {
+            return IsSet && (TypeHash == typeid(T).hash_code());
+        }
+    };
+}
+
+#endif 
+
 
 #include <functional>
 #include <string>
@@ -2932,15 +2973,15 @@ namespace CppOverride
         
         //TODO: Enforce type for arguments
         OverrideInfoSetter& If(std::function<bool(  void* instance, 
-                                                    const std::vector<void*>& args)> condition);
+                                                    const std::vector<TypedDataInfo>& args)> condition);
 
         OverrideInfoSetter& 
         Otherwise_Do(std::function<void(void* instance,
-                                        const std::vector<void*>& args)> action);
+                                        const std::vector<TypedDataInfo>& args)> action);
 
         OverrideInfoSetter& 
         WhenCalledExpectedly_Do(std::function<void( void* instance,
-                                                    const std::vector<void*>& args)> action);
+                                                    const std::vector<TypedDataInfo>& args)> action);
         
         OverrideInfoSetter& AssignsResult(ResultPtr& outResult);
         
@@ -2950,8 +2991,8 @@ namespace CppOverride
         
         template<typename ReturnType>
         OverrideInfoSetter& ReturnsByAction(std::function<void( void* instance,
-                                                                const std::vector<void*>& args, 
-                                                                void* out)> returnAction);
+                                                                const std::vector<TypedDataInfo>& args, 
+                                                                TypedDataInfo& out)> returnAction);
 
         template<typename ReturnType>
         OverrideInfoSetter& Returns(typename TypeSpecifier<ReturnType>::Type returnData);
@@ -2968,7 +3009,7 @@ namespace CppOverride
         template<typename... Args>
         OverrideInfoSetter& 
         SetArgsByAction(std::function<void( void* instance, 
-                                            std::vector<void*>& args)> setArgsAction);
+                                            std::vector<TypedDataInfo>& args)> setArgsAction);
     
         OverrideInfoSetter& Expected();
         
@@ -3037,13 +3078,17 @@ namespace CppOverride
 #ifndef CO_RETURN_DATA_ACTION_INFO_HPP
 #define CO_RETURN_DATA_ACTION_INFO_HPP
 
+
 #include <functional>
+#include <vector>
 
 namespace CppOverride
 {
     struct ReturnDataActionInfo
     {
-        std::function<void(void* instance, const std::vector<void*>& args, void* out)> DataAction;
+        std::function<void( void* instance, 
+                            const std::vector<TypedDataInfo>& args, 
+                            TypedDataInfo& out)> DataAction;
         std::size_t DataType = 0;
         bool DataActionSet = false;
         bool ReturnReference = false;
@@ -3089,6 +3134,7 @@ namespace CppOverride
 #endif
 
 
+
 #include <functional>
 #include <vector>
 
@@ -3096,7 +3142,7 @@ namespace CppOverride
 {
     struct ConditionInfo
     {
-        std::function<bool(void* instance, const std::vector<void*>& args)> LambdaCondition;
+        std::function<bool(void* instance, const std::vector<TypedDataInfo>& args)> LambdaCondition;
         std::vector<DataInfo> ArgsCondition = {};
         int Times = -1;
         int CalledTimes = 0;
@@ -3112,6 +3158,7 @@ namespace CppOverride
 #ifndef CO_RESULT_ACTION_INFO_HPP
 #define CO_RESULT_ACTION_INFO_HPP
 
+
 #include <functional>
 #include <vector>
 
@@ -3119,8 +3166,8 @@ namespace CppOverride
 {
     struct ResultActionInfo
     {
-        std::function<void(void* instance, const std::vector<void*>& args)> OtherwiseAction;
-        std::function<void(void* instance, const std::vector<void*>& args)> CorrectAction;
+        std::function<void(void* instance, const std::vector<TypedDataInfo>& args)> OtherwiseAction;
+        std::function<void(void* instance, const std::vector<TypedDataInfo>& args)> CorrectAction;
         bool OtherwiseActionSet = false;
         bool CorrectActionSet = false;
     };
@@ -3135,6 +3182,7 @@ namespace CppOverride
 #ifndef CO_ARGS_DATA_ACTION_INFO_HPP
 #define CO_ARGS_DATA_ACTION_INFO_HPP
 
+
 #include <functional>
 #include <vector>
 
@@ -3142,7 +3190,7 @@ namespace CppOverride
 {
     struct ArgsDataActionInfo
     {
-        std::function<void(void* instance, std::vector<void*>& args)> DataAction;
+        std::function<void(void* instance, std::vector<TypedDataInfo>& args)> DataAction;
         std::vector<std::size_t> DataTypes;
         std::vector<bool> DataTypesSet;
         bool DataActionSet = false;
@@ -3213,8 +3261,8 @@ namespace CppOverride
         inline OverrideInfoSetter& 
         ReturnsByAction(OverrideInfoSetter& infoSetter, 
                         std::function<void( void* instance,
-                                            const std::vector<void*>& args, 
-                                            void* out)> returnAction)
+                                            const std::vector<TypedDataInfo>& args, 
+                                            TypedDataInfo& out)> returnAction)
         {
             static_assert(  !std::is_same<ReturnType, Any>(), 
                             "You can't return nothing in return action");
@@ -3348,6 +3396,7 @@ namespace CppOverride
 }
 
 #endif
+
 
 
 
@@ -3528,7 +3577,7 @@ namespace CppOverride
             inline OverrideInfoSetter& 
             SetArgsByAction(OverrideInfoSetter& infoSetter,
                             std::function<void( void* instance, 
-                                                std::vector<void*>& args)> setArgsAction)
+                                                std::vector<TypedDataInfo>& args)> setArgsAction)
             {
                 OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
@@ -3669,7 +3718,7 @@ namespace CppOverride
         //TODO: Enforce type for arguments
         inline OverrideInfoSetter& 
         If( OverrideInfoSetter& infoSetter, 
-            std::function<bool(void* instance, const std::vector<void*>& args)> condition)
+            std::function<bool(void* instance, const std::vector<TypedDataInfo>& args)> condition)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()
@@ -3685,7 +3734,7 @@ namespace CppOverride
         inline OverrideInfoSetter& 
         Otherwise_Do(   OverrideInfoSetter& infoSetter, 
                         std::function<void( void* instance, 
-                                            const std::vector<void*>& args)> action)
+                                            const std::vector<TypedDataInfo>& args)> action)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()
@@ -3701,7 +3750,7 @@ namespace CppOverride
         inline OverrideInfoSetter& 
         WhenCalledExpectedly_Do(OverrideInfoSetter& infoSetter, 
                                 std::function<void( void* instance, 
-                                                    const std::vector<void*>& args)> action)
+                                                    const std::vector<TypedDataInfo>& args)> action)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()
@@ -3776,19 +3825,24 @@ namespace CppOverride
 #define CO_OVERRIDER_COMPONENTS_ARGS_VALUES_APPENDER_HPP
 
 
+
 #include <vector>
 
 namespace CppOverride
 {
     struct ArgsValuesAppender
     {
-        //Appending arguments from function calls
-        inline void AppendArgsValues(std::vector<void*>&) {};
+        //Appending arguments as TypedDataInfo from function calls
+        inline void AppendArgsValues(std::vector<TypedDataInfo>&) {};
 
         template<typename T, typename RawType = INTERNAL_CO_RAW_TYPE(T), typename... Args>
-        inline void AppendArgsValues(std::vector<void*>& argumentsList, T& arg, Args&... args)
+        inline void AppendArgsValues(std::vector<TypedDataInfo>& argumentsList, T& arg, Args&... args)
         {
-            argumentsList.push_back((RawType*)&arg);
+            TypedDataInfo info;
+            info.Data = (RawType*)&arg;
+            info.TypeHash = typeid(RawType).hash_code();
+            info.IsSet = true;
+            argumentsList.push_back(info);
             AppendArgsValues(argumentsList, args...);
         }
     };
@@ -4420,6 +4474,7 @@ namespace CppOverride
 
 
 
+
 #include <cassert>
 #include <cstdint>
 #include <vector>
@@ -4589,11 +4644,11 @@ namespace CppOverride
         }
         
         inline void ModifyArgs( void* instance,
-                                std::vector<void*>& argumentsList, 
+                                std::vector<TypedDataInfo>& typedArgs, 
                                 ArgsDataActionInfo& argsDataAction)
         {
             if(argsDataAction.DataActionSet)
-                argsDataAction.DataAction(instance, argumentsList);
+                argsDataAction.DataAction(instance, typedArgs);
         }
     };
 }
@@ -4635,7 +4690,7 @@ namespace CppOverride
             if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
                 std::cout << std::endl << __func__ << " called" << std::endl;
 
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             if(INTERNAL_CO_LOG_IsCorrectReturnDataInfo)
@@ -4748,7 +4803,7 @@ namespace CppOverride
             if(INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo)
                 std::cout << std::endl << __func__ << " called" << std::endl;
             
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             std::vector<DataInfo> argumentsTypesList;
@@ -4896,7 +4951,7 @@ namespace CppOverride
             if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                 std::cout << std::endl << __func__ << " called" << std::endl;
 
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             if(INTERNAL_CO_LOG_IsCorrectDataInfo)
@@ -4962,8 +5017,7 @@ namespace CppOverride
                 if(overrideDataToCheck.CurrentResultActionInfo.OtherwiseActionSet)
                 {
                     overrideDataToCheck .CurrentResultActionInfo
-                                        .OtherwiseAction(   instance, 
-                                                            argumentsList);
+                                        .OtherwiseAction(instance, argumentsList);
                 }
                 
                 return false;
@@ -5068,6 +5122,7 @@ namespace CppOverride
 }
 
 #endif
+
 
 
 
@@ -5310,7 +5365,7 @@ namespace CppOverride
             OverrideData& correctData = CurrentOverrideDatas.at(functionName).at(overrideIndex);
             if(correctData.CurrentResultActionInfo.CorrectActionSet)
             {
-                std::vector<void*> argumentsList;
+                std::vector<TypedDataInfo> argumentsList;
                 CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 correctData.CurrentResultActionInfo.CorrectAction(instance, argumentsList);
             }
@@ -5390,7 +5445,7 @@ namespace CppOverride
             }
             
             std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
@@ -5401,9 +5456,13 @@ namespace CppOverride
             else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
             {
                 ReturnType returnRef;
+                TypedDataInfo returnDataInfo;
+                returnDataInfo.Data = &returnRef;
+                returnDataInfo.TypeHash = typeid(ReturnType).hash_code();
+                returnDataInfo.IsSet = true;
                 correctData.CurrentReturnDataActionInfo.DataAction( instance, 
                                                                     argumentsList, 
-                                                                    &returnRef);
+                                                                    returnDataInfo);
                 return returnRef;
             }
             
@@ -5432,7 +5491,7 @@ namespace CppOverride
             }
             
             std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
@@ -5448,9 +5507,13 @@ namespace CppOverride
             else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
             {
                 INTERNAL_CO_UNREF(ReturnType)* returnRef;
+                TypedDataInfo returnDataInfo;
+                returnDataInfo.Data = &returnRef;
+                returnDataInfo.TypeHash = typeid(INTERNAL_CO_UNREF(ReturnType)*).hash_code();
+                returnDataInfo.IsSet = true;
                 correctData.CurrentReturnDataActionInfo.DataAction( instance, 
                                                                     argumentsList, 
-                                                                    &returnRef);
+                                                                    returnDataInfo);
                 return *returnRef;
             }
             
@@ -5482,7 +5545,7 @@ namespace CppOverride
             }
             
             std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
@@ -5610,6 +5673,7 @@ namespace CppOverride
                     PassthroughData.CurrentConditionInfo.CalledTimes != 
                     PassthroughData.CurrentConditionInfo.Times)
                 {
+                    #if 0
                     const std::string msg = 
                         std::string("Passthrough failed to reach times as instructed, ") +
                         "Instructed Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
@@ -5617,12 +5681,17 @@ namespace CppOverride
                         "Called Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
                                                                             .CalledTimes);
                     failedFunctions.emplace_back(msg);
+                    #endif
+                    failedFunctions.emplace_back("Passthrough");
                 }
                 else if(PassthroughData.CurrentConditionInfo.Times == -1 && 
                         PassthroughData.CurrentConditionInfo.CalledTimes == 0)
                 {
+                    #if 0
                     failedFunctions.emplace_back(   "Passthrough function expected to be called at "
                                                     "least once");
+                    #endif
+                    failedFunctions.emplace_back("Passthrough");
                 }
             }
             else if(PassthroughData.Expected == OverrideData::ExpectedType::NOT_TRIGGERED)
@@ -5631,6 +5700,7 @@ namespace CppOverride
                     PassthroughData.CurrentConditionInfo.CalledTimes == 
                     PassthroughData.CurrentConditionInfo.Times)
                 {
+                    #if 0
                     const std::string msg = 
                         std::string("Passthrough failed to not reach times as instructed, ") +
                         "Instructed Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
@@ -5638,11 +5708,15 @@ namespace CppOverride
                         "Called Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
                                                                             .CalledTimes);
                     failedFunctions.emplace_back(msg);
+                    #endif
+                    failedFunctions.emplace_back("Passthrough");
                 }
                 else if(PassthroughData.CurrentConditionInfo.Times == -1 && 
                         PassthroughData.CurrentConditionInfo.CalledTimes > 0)
                 {
+                    #if 0
                     failedFunctions.emplace_back("Passthrough function expected not to be called");
+                    #endif
                 }
             }
             
@@ -5700,14 +5774,14 @@ namespace CppOverride
     //TODO: Enforce type for arguments
     inline OverrideInfoSetter& 
     OverrideInfoSetter::If(std::function<bool(  void* instance, 
-                                                const std::vector<void*>& args)> condition)
+                                                const std::vector<TypedDataInfo>& args)> condition)
     {
         return CppOverrideObj.CurrentRequirementSetter.If(*this, condition);
     }
 
     inline OverrideInfoSetter& 
     OverrideInfoSetter::Otherwise_Do(std::function<void(void* instance,
-                                                        const std::vector<void*>& args)> action)
+                                                        const std::vector<TypedDataInfo>& args)> action)
     {
         return CppOverrideObj.CurrentRequirementSetter.Otherwise_Do(*this, action);
     }
@@ -5715,7 +5789,7 @@ namespace CppOverride
     inline OverrideInfoSetter& 
     OverrideInfoSetter::
     WhenCalledExpectedly_Do(std::function<void( void* instance,
-                                                const std::vector<void*>& args)> action)
+                                                const std::vector<TypedDataInfo>& args)> action)
     {
         return CppOverrideObj.CurrentRequirementSetter.WhenCalledExpectedly_Do(*this, action);
     }
@@ -5738,8 +5812,8 @@ namespace CppOverride
     template<typename ReturnType>
     inline OverrideInfoSetter&
     OverrideInfoSetter::ReturnsByAction(std::function<void( void* instance,
-                                                            const std::vector<void*>& args, 
-                                                            void* out)> returnAction)
+                                                            const std::vector<TypedDataInfo>& args, 
+                                                            TypedDataInfo& out)> returnAction)
     {
         return CppOverrideObj.CurrentReturnDataSetter.ReturnsByAction<ReturnType>(  *this, 
                                                                                     returnAction);
@@ -5775,7 +5849,7 @@ namespace CppOverride
     template<typename... Args>
     inline OverrideInfoSetter&
     OverrideInfoSetter::SetArgsByAction(std::function<void( void* instance, 
-                                        std::vector<void*>& args)> setArgsAction)
+                                        std::vector<TypedDataInfo>& args)> setArgsAction)
     {
         return CppOverrideObj.CurrentArgsDataSetter.SetArgsByAction<Args...>(*this, setArgsAction);
     }
