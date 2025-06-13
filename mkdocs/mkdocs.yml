@@ -23,10 +23,25 @@ theme:
     features:
     -   toc.follow
     -   toc.integrate
+    -   navigation.sections
     -   content.code.copy
     -   content.code.select
+    -   navigation.sections
+    -   navigation.expand
+    # -   navigation.tabs
+    # -   navigation.tabs.sticky
+    
     icon: 
         repo: fontawesome/brands/github
+
+nav:
+    -   index.md
+    -   getting_started.md
+    -   insert_overrides.md
+    -   instruct_overrides.md
+    -   inspect_overrides.md
+    -   mock_class_generator.md
+    -   override_external.md
 
 repo_url: https://github.com/Neko-Box-Coder/CppOverride
 repo_name: Neko-Box-Coder/CppOverride
@@ -44,8 +59,9 @@ markdown_extensions:
 - pymdownx.details
 - pymdownx.superfences
 -   toc:
-      toc_depth: 4
+      toc_depth: 2
 
 extra:
     version:
         provider: mike
+        default: latest
