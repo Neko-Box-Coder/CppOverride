@@ -6,6 +6,7 @@
 #include "../StaticAssertFalse.hpp"
 #include "../PureType.hpp"
 #include "../OverrideData.hpp"
+#include "../TypedDataInfo.hpp"
 #include "../../External/MacroPowerToys/MacroPowerToys.h"
 #include "../AliasTypes.hpp"
 
@@ -169,7 +170,7 @@ namespace CppOverride
             inline OverrideInfoSetter& 
             SetArgsByAction(OverrideInfoSetter& infoSetter,
                             std::function<void( void* instance, 
-                                                std::vector<void*>& args)> setArgsAction)
+                                                std::vector<TypedDataInfo>& args)> setArgsAction)
             {
                 OverrideData& lastData = 
                     CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();

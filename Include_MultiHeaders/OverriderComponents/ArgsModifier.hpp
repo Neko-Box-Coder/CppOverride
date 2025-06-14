@@ -4,6 +4,7 @@
 #include "../DataInfo.hpp"
 #include "../Any.hpp"
 #include "../ArgsDataActionInfo.hpp"
+#include "../TypedDataInfo.hpp"
 #include "../OverrideStatus.hpp"
 #include "../PureType.hpp"
 
@@ -176,11 +177,11 @@ namespace CppOverride
         }
         
         inline void ModifyArgs( void* instance,
-                                std::vector<void*>& argumentsList, 
+                                std::vector<TypedDataInfo>& typedArgs, 
                                 ArgsDataActionInfo& argsDataAction)
         {
             if(argsDataAction.DataActionSet)
-                argsDataAction.DataAction(instance, argumentsList);
+                argsDataAction.DataAction(instance, typedArgs);
         }
     };
 }

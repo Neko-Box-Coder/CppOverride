@@ -99,7 +99,7 @@ namespace CppOverride
         //TODO: Enforce type for arguments
         inline OverrideInfoSetter& 
         If( OverrideInfoSetter& infoSetter, 
-            std::function<bool(void* instance, const std::vector<void*>& args)> condition)
+            std::function<bool(void* instance, const std::vector<TypedDataInfo>& args)> condition)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()
@@ -115,7 +115,7 @@ namespace CppOverride
         inline OverrideInfoSetter& 
         Otherwise_Do(   OverrideInfoSetter& infoSetter, 
                         std::function<void( void* instance, 
-                                            const std::vector<void*>& args)> action)
+                                            const std::vector<TypedDataInfo>& args)> action)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()
@@ -131,7 +131,7 @@ namespace CppOverride
         inline OverrideInfoSetter& 
         WhenCalledExpectedly_Do(OverrideInfoSetter& infoSetter, 
                                 std::function<void( void* instance, 
-                                                    const std::vector<void*>& args)> action)
+                                                    const std::vector<TypedDataInfo>& args)> action)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()
@@ -144,17 +144,20 @@ namespace CppOverride
             return infoSetter;
         }
         
-        inline OverrideInfoSetter& AssignResult(OverrideInfoSetter& infoSetter, 
-                                                std::shared_ptr<OverrideResult> result)
+        inline OverrideInfoSetter& AssignsResult(   OverrideInfoSetter& infoSetter, 
+                                                    ResultPtr& outResult)
         {
             OverrideData& currentData = 
                 CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
             
-            currentData.Result = result;
+            if(!currentData.Result)
+                currentData.Result = CreateOverrideResult();
+            
+            outResult = currentData.Result;
             return infoSetter;
         }
     
-        inline OverrideInfoSetter& OverrideObject(  OverrideInfoSetter& infoSetter, 
+        inline OverrideInfoSetter& MatchesObject(   OverrideInfoSetter& infoSetter, 
                                                     void* instance)
         {
             OverrideData& currentData = 
@@ -167,6 +170,30 @@ namespace CppOverride
         RequirementSetter(OverrideDatas& overrideDataLists) :
             CurrentOverrideDatas(overrideDataLists)
         {}
+        
+        inline OverrideInfoSetter& Expected(OverrideInfoSetter& infoSetter)
+        {
+            OverrideData& currentData = 
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
+            
+            currentData.Expected = OverrideData::ExpectedType::TRIGGERED;
+            if(!currentData.Result)
+                currentData.Result = CreateOverrideResult();
+            
+            return infoSetter;
+        }
+        
+        inline OverrideInfoSetter& ExpectedNotSatisfy(OverrideInfoSetter& infoSetter)
+        {
+            OverrideData& currentData = 
+                CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()].back();
+            
+            currentData.Expected = OverrideData::ExpectedType::NOT_TRIGGERED;
+            if(!currentData.Result)
+                currentData.Result = CreateOverrideResult();
+            
+            return infoSetter;
+        }
     };
 }
 

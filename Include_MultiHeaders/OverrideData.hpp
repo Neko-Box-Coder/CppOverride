@@ -30,9 +30,17 @@ namespace CppOverride
         ReturnDataActionInfo CurrentReturnDataActionInfo;
         ArgsDataActionInfo ArgumentsDataActionInfo;
         
+        enum class ExpectedType
+        {
+            NONE,
+            TRIGGERED,
+            NOT_TRIGGERED
+        };
+        
         //Result of the override
+        ExpectedType Expected = ExpectedType::NONE;
         ResultActionInfo CurrentResultActionInfo;
-        std::shared_ptr<OverrideResult> Result = nullptr;
+        ResultPtr Result = nullptr;
     };
     
     using FunctionName = std::string;

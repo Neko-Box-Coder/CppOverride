@@ -33,7 +33,7 @@ namespace CppOverride
             if(INTERNAL_CO_LOG_IsCorrectArgumentsDataInfo)
                 std::cout << std::endl << __func__ << " called" << std::endl;
             
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             std::vector<DataInfo> argumentsTypesList;

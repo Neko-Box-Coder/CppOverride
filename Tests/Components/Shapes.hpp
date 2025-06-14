@@ -41,97 +41,97 @@ namespace CppOverrideTest
             
             inline virtual void SetWidth(float width)
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (width));
+                CO_INSERT_IMPL(Overrider, void, (width));
                 Width = width;
             }
             
             inline virtual void SetWidth(int width)
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (width));
+                CO_INSERT_IMPL(Overrider, void, (width));
                 Width = (float)width;
             }
             
             inline virtual float GetWidth(float multiplier = 1.f) const
             {
-                CO_OVERRIDE_IMPL(Overrider, float, (multiplier));
+                CO_INSERT_IMPL(Overrider, float, (multiplier));
                 return Width * multiplier;
             }
             
             inline virtual void GetWidth(float& outWidth, float multiplier = 1.f)
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (outWidth, multiplier));
+                CO_INSERT_IMPL(Overrider, void, (outWidth, multiplier));
                 outWidth = Width * multiplier;
             }
             
             inline virtual void GetWidth(float* outWidth, float multiplier = 1.f) const
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (outWidth, multiplier));
+                CO_INSERT_IMPL(Overrider, void, (outWidth, multiplier));
                 *outWidth = Width * multiplier;
             }
             
             inline virtual void SetHeight(float height)
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (height));
+                CO_INSERT_IMPL(Overrider, void, (height));
                 Height = height;
             }
             
             inline virtual void SetHeight(int height)
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (height));
+                CO_INSERT_IMPL(Overrider, void, (height));
                 Height = (float)height;
             }
             
             inline virtual float GetHeight(float multiplier = 1.f) const
             {
-                CO_OVERRIDE_IMPL(Overrider, float, (multiplier));
+                CO_INSERT_IMPL(Overrider, float, (multiplier));
                 return Height * multiplier;
             }
             
             inline virtual void GetHeight(float& outHeight, float multiplier = 1.f)
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (outHeight, multiplier));
+                CO_INSERT_IMPL(Overrider, void, (outHeight, multiplier));
                 outHeight = Height * multiplier;
             }
             
             inline virtual void GetHeight(float* outHeight, float multiplier = 1.f) const
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (outHeight, multiplier));
+                CO_INSERT_IMPL(Overrider, void, (outHeight, multiplier));
                 *outHeight = Height * multiplier;
             }
             
             inline virtual float GetArea(float multiplier = 1.f) const override
             {
-                CO_OVERRIDE_IMPL(Overrider, float, (multiplier));
+                CO_INSERT_IMPL(Overrider, float, (multiplier));
                 return Width * Height;
             }
             
             inline virtual void GetArea(float& outArea, float multiplier = 1.f)
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (outArea, multiplier));
+                CO_INSERT_IMPL(Overrider, void, (outArea, multiplier));
                 outArea = Width * Height;
             }
             
             inline virtual void GetArea(float* outArea, float multiplier = 1.f) const
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (outArea, multiplier));
+                CO_INSERT_IMPL(Overrider, void, (outArea, multiplier));
                 *outArea = Width * Height;
             }
             
             inline virtual float GetPerimeter(float multiplier = 1.f) const override
             {
-                CO_OVERRIDE_IMPL(Overrider, float, (multiplier));
+                CO_INSERT_IMPL(Overrider, float, (multiplier));
                 return 2.f * (Width + Height);
             }
             
             inline virtual void GetPerimeter(float& outPerimeter, float multiplier = 1.f)
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (outPerimeter, multiplier));
+                CO_INSERT_IMPL(Overrider, void, (outPerimeter, multiplier));
                 outPerimeter = 2.f * (Width + Height);
             }
             
             inline virtual void GetPerimeter(float* outPerimeter, float multiplier = 1.f) const
             {
-                CO_OVERRIDE_IMPL(Overrider, void, (outPerimeter, multiplier));
+                CO_INSERT_IMPL(Overrider, void, (outPerimeter, multiplier));
                 *outPerimeter = 2.f * (Width + Height);
             }
     };

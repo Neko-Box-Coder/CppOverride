@@ -20,6 +20,7 @@
 #include "./OverrideStatus.hpp"
 #include "./EarlyReturn.hpp"
 #include "./DataInfo.hpp"
+#include "./TypedDataInfo.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -32,7 +33,9 @@ namespace CppOverride
         
         for(int i = 0; i < functionName.size(); ++i)
         {
-            if(functionName[i] != ' ')
+            if(functionName[i] == '<')
+                break;
+            else if(functionName[i] != ' ')
                 processedName += functionName[i];
         }
         
@@ -42,6 +45,7 @@ namespace CppOverride
     struct Overrider
     {
         OverrideDatas CurrentOverrideDatas;
+        
         ReturnDataSetter CurrentReturnDataSetter;
         ArgsDataSetter CurrentArgsDataSetter;
         RequirementSetter CurrentRequirementSetter;
@@ -53,6 +57,9 @@ namespace CppOverride
         ReturnDataValidator CurrentReturnDataValidator;
         ArgsDataValidator CurrentArgsDataValidator;
         RequirementValidator CurrentRequirementValidator;
+        
+        OverrideData PassthroughData;
+        std::vector<std::string> UnexpectedPassthroughFunctions;
 
         //==============================================================================
         //Public facing methods for overriding returns or arguments
@@ -71,7 +78,9 @@ namespace CppOverride
             CurrentArgsDataValidator(CurrentArgsValuesAppender, CurrentArgsTypeInfoAppender),
             CurrentRequirementValidator(CurrentArgsValuesAppender, 
                                         CurrentConditionArgsTypesChecker, 
-                                        CurrentConditionArgsValuesChecker)
+                                        CurrentConditionArgsValuesChecker),
+            PassthroughData(other.PassthroughData),
+            UnexpectedPassthroughFunctions(other.UnexpectedPassthroughFunctions)
         {
             *this = other;
         }
@@ -99,13 +108,15 @@ namespace CppOverride
                                                             CurrentArgsTypeInfoAppender),
                                 CurrentRequirementValidator(CurrentArgsValuesAppender, 
                                                             CurrentConditionArgsTypesChecker,
-                                                            CurrentConditionArgsValuesChecker)
+                                                            CurrentConditionArgsValuesChecker),
+                                PassthroughData(OverrideData()),
+                                UnexpectedPassthroughFunctions()
         {}
         
         inline ~Overrider()
         {}
 
-        inline Overrider& GetOverrideObject()
+        inline Overrider& Internal_GetOverrideObject()
         {
             return *this;
         }
@@ -240,8 +251,7 @@ namespace CppOverride
         }
 
         template<typename... Args>
-        inline void 
-        Internal_CallReturnOverrideResultExpectedAction(std::string functionName,
+        inline void Internal_CallOverrideExpectedAction(std::string functionName,
                                                         int overrideIndex,
                                                         void* instance,
                                                         Args&... args)
@@ -251,7 +261,7 @@ namespace CppOverride
             OverrideData& correctData = CurrentOverrideDatas.at(functionName).at(overrideIndex);
             if(correctData.CurrentResultActionInfo.CorrectActionSet)
             {
-                std::vector<void*> argumentsList;
+                std::vector<TypedDataInfo> argumentsList;
                 CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
                 correctData.CurrentResultActionInfo.CorrectAction(instance, argumentsList);
             }
@@ -259,6 +269,28 @@ namespace CppOverride
             correctData.CurrentConditionInfo.CalledTimes++;
             if(correctData.Result != nullptr)
                 correctData.Result->AddStatus(OverrideStatus::OVERRIDE_SUCCESS);
+        }
+        
+        inline void Internal_CallOverridePassthroughExpectedAction(const std::string& functionName)
+        {
+            PassthroughData.CurrentConditionInfo.CalledTimes++;
+            if(PassthroughData.Expected == OverrideData::ExpectedType::TRIGGERED)
+            {
+                if( PassthroughData.CurrentConditionInfo.Times >= 0 && 
+                    PassthroughData.CurrentConditionInfo.CalledTimes >
+                    PassthroughData.CurrentConditionInfo.Times)
+                {
+                    UnexpectedPassthroughFunctions.emplace_back(functionName);
+                }
+            }
+            else if(PassthroughData.Expected == OverrideData::ExpectedType::NOT_TRIGGERED)
+            {
+                if( PassthroughData.CurrentConditionInfo.Times == -1 && 
+                    PassthroughData.CurrentConditionInfo.CalledTimes > 0)
+                {
+                    UnexpectedPassthroughFunctions.emplace_back(functionName);
+                }
+            }
         }
 
         //------------------------------------------------------------------------------
@@ -283,11 +315,7 @@ namespace CppOverride
                                                     Args&... args)
         {
             functionName = ProcessFunctionName(functionName);
-            
-            Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                            dataIndex, 
-                                                            instance, 
-                                                            args...);
+            Internal_CallOverrideExpectedAction(functionName, dataIndex, instance, args...);
             return ReturnType();
         }
 
@@ -313,23 +341,24 @@ namespace CppOverride
             }
             
             std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
-            Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                            dataIndex, 
-                                                            instance, 
-                                                            args...);
+            Internal_CallOverrideExpectedAction(functionName, dataIndex, instance, args...);
             
             if(correctData.CurrentReturnDataInfo.DataSet)
                 return *static_cast<ReturnType*>(correctData.CurrentReturnDataInfo.Data.get());
             else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
             {
                 ReturnType returnRef;
+                TypedDataInfo returnDataInfo;
+                returnDataInfo.Data = &returnRef;
+                returnDataInfo.TypeHash = typeid(ReturnType).hash_code();
+                returnDataInfo.IsSet = true;
                 correctData.CurrentReturnDataActionInfo.DataAction( instance, 
                                                                     argumentsList, 
-                                                                    &returnRef);
+                                                                    returnDataInfo);
                 return returnRef;
             }
             
@@ -358,14 +387,11 @@ namespace CppOverride
             }
             
             std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
-            Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                            dataIndex, 
-                                                            instance, 
-                                                            args...);
+            Internal_CallOverrideExpectedAction(functionName, dataIndex, instance, args...);
 
             if(correctData.CurrentReturnDataInfo.DataSet)
             {
@@ -377,9 +403,13 @@ namespace CppOverride
             else if(correctData.CurrentReturnDataActionInfo.DataActionSet)
             {
                 INTERNAL_CO_UNREF(ReturnType)* returnRef;
+                TypedDataInfo returnDataInfo;
+                returnDataInfo.Data = &returnRef;
+                returnDataInfo.TypeHash = typeid(INTERNAL_CO_UNREF(ReturnType)*).hash_code();
+                returnDataInfo.IsSet = true;
                 correctData.CurrentReturnDataActionInfo.DataAction( instance, 
                                                                     argumentsList, 
-                                                                    &returnRef);
+                                                                    returnDataInfo);
                 return *returnRef;
             }
             
@@ -411,7 +441,7 @@ namespace CppOverride
             }
             
             std::vector<OverrideData>& currentDataList = CurrentOverrideDatas.at(functionName);
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             OverrideData& correctData = currentDataList.at(dataIndex);
@@ -434,18 +464,12 @@ namespace CppOverride
             if(correctData.Result != nullptr)
                 correctData.Result->AddStatus(overrideStatus);
             
-            if( performResultAction && 
-                overrideStatus == OverrideStatus::OVERRIDE_SUCCESS)
-            {
-                Internal_CallReturnOverrideResultExpectedAction(functionName, 
-                                                                dataIndex, 
-                                                                instance, 
-                                                                args...);
-            }
+            if(performResultAction && overrideStatus == OverrideStatus::OVERRIDE_SUCCESS)
+                Internal_CallOverrideExpectedAction(functionName, dataIndex, instance, args...);
         }
         
         //------------------------------------------------------------------------------
-        //Creating override info
+        //Modify override info
         //------------------------------------------------------------------------------
         
         #if CO_SHOW_OVERRIDE_LOG
@@ -472,14 +496,144 @@ namespace CppOverride
         inline void Internal_RemoveOverrideInfo(std::string functionName)
         {
             functionName = ProcessFunctionName(functionName);
-            
             if(CurrentOverrideDatas.find(functionName) != CurrentOverrideDatas.end())
                 CurrentOverrideDatas.erase(functionName);
         }
         
-        inline void ClearAllOverrideInfo()
+        inline OverridePassthroughInfoSetter Internal_CreateOverridePassthroughInfo()
+        {
+            return OverridePassthroughInfoSetter(*this);
+        }
+        
+        inline void Internal_ResetPassthroughOverrideData()
+        {
+            PassthroughData = OverrideData();
+            UnexpectedPassthroughFunctions.clear();
+        }
+        
+        inline void Internal_ClearAllOverrideInfo()
         {
             CurrentOverrideDatas.clear();
+            Internal_ResetPassthroughOverrideData();
+        }
+        
+        inline std::vector<FunctionName> Internal_GetFailedExpects()
+        {
+            std::vector<FunctionName> failedFunctions;
+            for(auto it = CurrentOverrideDatas.begin(); it != CurrentOverrideDatas.end(); ++it)
+            {
+                for(int i = 0; i < it->second.size(); ++i)
+                {
+                    if( it->second[i].Expected == OverrideData::ExpectedType::TRIGGERED && 
+                        it->second[i].Result)
+                    {
+                        if( it->second[i].CurrentConditionInfo.Times >= 0 && 
+                            it->second[i].CurrentConditionInfo.CalledTimes != 
+                            it->second[i].CurrentConditionInfo.Times)
+                        {
+                            failedFunctions.push_back(it->first);
+                            break;
+                        }
+                        
+                        if( it->second[i].CurrentConditionInfo.Times == -1 && 
+                            it->second[i].CurrentConditionInfo.CalledTimes == 0)
+                        {
+                            failedFunctions.push_back(it->first);
+                            break;
+                        }
+                    }
+                    else if(it->second[i].Expected == OverrideData::ExpectedType::NOT_TRIGGERED && 
+                            it->second[i].Result)
+                    {
+                        if( it->second[i].CurrentConditionInfo.Times >= 0 && 
+                            it->second[i].CurrentConditionInfo.CalledTimes == 
+                            it->second[i].CurrentConditionInfo.Times)
+                        {
+                            failedFunctions.push_back(it->first);
+                            break;
+                        }
+                        
+                        if( it->second[i].CurrentConditionInfo.Times == -1 && 
+                            it->second[i].CurrentConditionInfo.CalledTimes > 0)
+                        {
+                            failedFunctions.push_back(it->first);
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if(PassthroughData.Expected == OverrideData::ExpectedType::TRIGGERED)
+            {
+                if( PassthroughData.CurrentConditionInfo.Times >= 0 && 
+                    PassthroughData.CurrentConditionInfo.CalledTimes != 
+                    PassthroughData.CurrentConditionInfo.Times)
+                {
+                    #if 0
+                    const std::string msg = 
+                        std::string("Passthrough failed to reach times as instructed, ") +
+                        "Instructed Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
+                                                                                .Times) + ", " +
+                        "Called Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
+                                                                            .CalledTimes);
+                    failedFunctions.emplace_back(msg);
+                    #endif
+                    failedFunctions.emplace_back("Passthrough");
+                }
+                else if(PassthroughData.CurrentConditionInfo.Times == -1 && 
+                        PassthroughData.CurrentConditionInfo.CalledTimes == 0)
+                {
+                    #if 0
+                    failedFunctions.emplace_back(   "Passthrough function expected to be called at "
+                                                    "least once");
+                    #endif
+                    failedFunctions.emplace_back("Passthrough");
+                }
+            }
+            else if(PassthroughData.Expected == OverrideData::ExpectedType::NOT_TRIGGERED)
+            {
+                if( PassthroughData.CurrentConditionInfo.Times >= 0 && 
+                    PassthroughData.CurrentConditionInfo.CalledTimes == 
+                    PassthroughData.CurrentConditionInfo.Times)
+                {
+                    #if 0
+                    const std::string msg = 
+                        std::string("Passthrough failed to not reach times as instructed, ") +
+                        "Instructed Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
+                                                                                .Times) + ", " +
+                        "Called Times: " + std::to_string(PassthroughData   .CurrentConditionInfo
+                                                                            .CalledTimes);
+                    failedFunctions.emplace_back(msg);
+                    #endif
+                    failedFunctions.emplace_back("Passthrough");
+                }
+                else if(PassthroughData.CurrentConditionInfo.Times == -1 && 
+                        PassthroughData.CurrentConditionInfo.CalledTimes > 0)
+                {
+                    #if 0
+                    failedFunctions.emplace_back("Passthrough function expected not to be called");
+                    #endif
+                }
+            }
+            
+            for(int i = 0; i < UnexpectedPassthroughFunctions.size(); ++i)
+                failedFunctions.emplace_back(UnexpectedPassthroughFunctions[i] + " (Passthrough)");
+            
+            return failedFunctions;
+        }
+        
+        inline std::vector<ResultPtr> 
+        Internal_GetOverrideResults(const std::string& functionName)
+        {
+            std::vector<ResultPtr> results;
+            if(CurrentOverrideDatas.find(functionName) != CurrentOverrideDatas.end())
+            {
+                const std::vector<OverrideData>& overrideData = CurrentOverrideDatas.at(functionName);
+                for(int i = 0; i < overrideData.size(); ++i)
+                    results.push_back(overrideData[i].Result);
+            }
+            
+            return results;
         }
     };
 }

@@ -1252,15 +1252,15 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
             if((isConstructor || isDestructor) && !overrideConstructor)
                 useMacroOverrideMethodForThisFunc = false;
             
-            //CO_OVERRIDE_MEMBER_METHOD
+            //CO_INSERT_MEMBER_METHOD
             if(useMacroOverrideMethodForThisFunc)
             {
                 if(isConstructor)
-                    std::cout << "    CO_OVERRIDE_MEMBER_METHOD_CTOR(";
+                    std::cout << "    CO_INSERT_MEMBER_METHOD_CTOR(";
                 else if(isDestructor)
-                    std::cout << "    CO_OVERRIDE_MEMBER_METHOD_DTOR(";
+                    std::cout << "    CO_INSERT_MEMBER_METHOD_DTOR(";
                 else
-                    std::cout << "    CO_OVERRIDE_MEMBER_METHOD(";
+                    std::cout << "    CO_INSERT_MEMBER_METHOD(";
                 
                 //Override Instance
                 {
@@ -1379,7 +1379,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                 
                 std::cout << ")" << std::endl;
             }
-            //CO_OVERRIDE_MEMBER_IMPL
+            //CO_INSERT_MEMBER_IMPL
             else
             {
                 //Prepend
@@ -1464,14 +1464,14 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
                         if(isConstructor || isDestructor)
                         {
                             assert(overrideConstructor);
-                            std::cout << "    CO_OVERRIDE_MEMBER_IMPL_CTOR_DTOR(OverrideInstanceName, ";
+                            std::cout << "    CO_INSERT_MEMBER_IMPL_CTOR_DTOR(OverrideInstanceName, ";
                         }
                         else
                         {
                             if(globalInstance)
-                                std::cout << "    CO_OVERRIDE_MEMBER_IMPL(OverrideInstanceName, ";
+                                std::cout << "    CO_INSERT_MEMBER_IMPL(OverrideInstanceName, ";
                             else
-                                std::cout << "    CO_OVERRIDE_MEMBER_IMPL(*this, ";
+                                std::cout << "    CO_INSERT_MEMBER_IMPL(*this, ";
                             
                             //Return type
                             if(currentFunc.ReturnType.find(',') != std::string::npos)

@@ -21,8 +21,8 @@ namespace CppOverride
         inline OverrideInfoSetter& 
         ReturnsByAction(OverrideInfoSetter& infoSetter, 
                         std::function<void( void* instance,
-                                            const std::vector<void*>& args, 
-                                            void* out)> returnAction)
+                                            const std::vector<TypedDataInfo>& args, 
+                                            TypedDataInfo& out)> returnAction)
         {
             static_assert(  !std::is_same<ReturnType, Any>(), 
                             "You can't return nothing in return action");

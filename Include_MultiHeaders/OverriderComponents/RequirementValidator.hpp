@@ -37,7 +37,7 @@ namespace CppOverride
             if(INTERNAL_CO_LOG_IsCorrectDataInfo)
                 std::cout << std::endl << __func__ << " called" << std::endl;
 
-            std::vector<void*> argumentsList;
+            std::vector<TypedDataInfo> argumentsList;
             CurrentArgsValuesAppender.AppendArgsValues(argumentsList, args...);
             
             if(INTERNAL_CO_LOG_IsCorrectDataInfo)
@@ -103,8 +103,7 @@ namespace CppOverride
                 if(overrideDataToCheck.CurrentResultActionInfo.OtherwiseActionSet)
                 {
                     overrideDataToCheck .CurrentResultActionInfo
-                                        .OtherwiseAction(   instance, 
-                                                            argumentsList);
+                                        .OtherwiseAction(instance, argumentsList);
                 }
                 
                 return false;
