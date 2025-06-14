@@ -3,3 +3,10 @@
 {% block extrahead %}
     <meta name="google-site-verification" content="DbD9BorxRao-ddtExeVQxiQZgzMci9rCahyn_1yCcoY" />
 {% endblock %}
+
+{% block outdated %}
+  You're not viewing the latest version.
+  <a href="{{ '../' ~ base_url }}"> 
+    <strong>Click here to go to latest.</strong>
+  </a>
+{% endblock %}
