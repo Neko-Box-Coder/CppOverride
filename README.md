@@ -41,8 +41,8 @@ This framework is header only so you can just include it with
 Additionally, you can add the include directory with
 
 ``` cmake
-AddSubDirectory(CppOverride)
-TargetLinkLibrary(YourTarget CppOverride)
+add_subdirectory(CppOverride)
+target_link_libraries(YourTarget CppOverride)
 ```
 
 ---
