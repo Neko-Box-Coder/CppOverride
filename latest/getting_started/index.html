@@ -495,8 +495,8 @@ Feel free to check out the source code yourself.</p>
 <p>This framework is header only so you can just include it with</p>
 <p><code>CppOverride.hpp</code> in <code>Include_SingleHeader</code> or <code>Include_MultiHeader</code></p>
 <p>Additionally, you can add the include directory with</p>
-<div class="language-cmake highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">AddSubDirectory</span><span class="p">(</span><span class="s">CppOverride</span><span class="p">)</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">TargetLinkLibrary</span><span class="p">(</span><span class="s">YourTarget</span><span class="w"> </span><span class="s">CppOverride</span><span class="p">)</span>
+<div class="language-cmake highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">add_subdirectory</span><span class="p">(</span><span class="s">CppOverride</span><span class="p">)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">YourTarget</span><span class="w"> </span><span class="s">CppOverride</span><span class="p">)</span>
 </span></code></pre></div>
 <hr />
 <h2 id="2-override-behavior">2. Override Behavior</h2>
