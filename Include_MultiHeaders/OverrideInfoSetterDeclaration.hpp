@@ -21,8 +21,8 @@ namespace CppOverride
         std::string FunctionSignatureName;
         Overrider& CppOverrideObj;
         
-        OverrideInfoSetter( std::string functionSignatureName, 
-                            Overrider& SimpleOverrideObj) : 
+        inline OverrideInfoSetter(  std::string functionSignatureName, 
+                                    Overrider& SimpleOverrideObj) : 
             FunctionSignatureName(functionSignatureName),
             CppOverrideObj(SimpleOverrideObj)
         {}
@@ -87,7 +87,8 @@ namespace CppOverride
     {
         Overrider& CppOverrideObj;
         
-        OverridePassthroughInfoSetter(Overrider& SimpleOverrideObj) : CppOverrideObj(SimpleOverrideObj)
+        inline OverridePassthroughInfoSetter(Overrider& SimpleOverrideObj) : 
+            CppOverrideObj(SimpleOverrideObj)
         {}
         
         OverridePassthroughInfoSetter& Times(int times);

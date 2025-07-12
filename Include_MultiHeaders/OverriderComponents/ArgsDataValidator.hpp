@@ -128,8 +128,8 @@ namespace CppOverride
             return true;
         }
     
-        ArgsDataValidator(  ArgsValuesAppender& argsValuesAppender,
-                            ArgsTypeInfoAppender& argsTypeInfoAppender) :
+        inline ArgsDataValidator(   ArgsValuesAppender& argsValuesAppender,
+                                    ArgsTypeInfoAppender& argsTypeInfoAppender) :
             CurrentArgsValuesAppender(argsValuesAppender),
             CurrentArgsTypeInfoAppender(argsTypeInfoAppender)
         {}

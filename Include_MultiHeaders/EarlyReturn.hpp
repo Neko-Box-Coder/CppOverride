@@ -8,7 +8,7 @@ namespace CppOverride
 {
     template<   typename T,
                 typename std::enable_if<!std::is_reference<T>::value, bool>::type = true>
-    T EarlyReturn()
+    inline T EarlyReturn()
     {
         return T();
     }
@@ -23,7 +23,7 @@ namespace CppOverride
             bool
         >::type = true
     >
-    T EarlyReturn()
+    inline T EarlyReturn()
     {
         using NonRefT = typename std::remove_reference<T>::type;
         NonRefT temp;
@@ -40,7 +40,7 @@ namespace CppOverride
             bool
         >::type = true
     >
-    T EarlyReturn()
+    inline T EarlyReturn()
     {
         typename std::remove_reference<T>::type* dummy = nullptr;
         //throw std::runtime_error(   "Trying to return a reference for an fully overridden method but "

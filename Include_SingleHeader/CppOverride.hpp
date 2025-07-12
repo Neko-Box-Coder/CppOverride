@@ -2955,8 +2955,8 @@ namespace CppOverride
         std::string FunctionSignatureName;
         Overrider& CppOverrideObj;
         
-        OverrideInfoSetter( std::string functionSignatureName, 
-                            Overrider& SimpleOverrideObj) : 
+        inline OverrideInfoSetter(  std::string functionSignatureName, 
+                                    Overrider& SimpleOverrideObj) : 
             FunctionSignatureName(functionSignatureName),
             CppOverrideObj(SimpleOverrideObj)
         {}
@@ -3021,7 +3021,8 @@ namespace CppOverride
     {
         Overrider& CppOverrideObj;
         
-        OverridePassthroughInfoSetter(Overrider& SimpleOverrideObj) : CppOverrideObj(SimpleOverrideObj)
+        inline OverridePassthroughInfoSetter(Overrider& SimpleOverrideObj) : 
+            CppOverrideObj(SimpleOverrideObj)
         {}
         
         OverridePassthroughInfoSetter& Times(int times);
@@ -3049,7 +3050,7 @@ namespace CppOverride
         inline bool operator== (Any&) { return true;}
         inline bool operator!= (Any&) { return false; }
 
-        friend std::ostream& operator<<(std::ostream& os, const Any&)
+        inline friend std::ostream& operator<<(std::ostream& os, const Any&)
         {
             os << "Any";
             return os;
@@ -4898,8 +4899,8 @@ namespace CppOverride
             return true;
         }
     
-        ArgsDataValidator(  ArgsValuesAppender& argsValuesAppender,
-                            ArgsTypeInfoAppender& argsTypeInfoAppender) :
+        inline ArgsDataValidator(   ArgsValuesAppender& argsValuesAppender,
+                                    ArgsTypeInfoAppender& argsTypeInfoAppender) :
             CurrentArgsValuesAppender(argsValuesAppender),
             CurrentArgsTypeInfoAppender(argsTypeInfoAppender)
         {}
@@ -5080,7 +5081,7 @@ namespace CppOverride
 {
     template<   typename T,
                 typename std::enable_if<!std::is_reference<T>::value, bool>::type = true>
-    T EarlyReturn()
+    inline T EarlyReturn()
     {
         return T();
     }
@@ -5095,7 +5096,7 @@ namespace CppOverride
             bool
         >::type = true
     >
-    T EarlyReturn()
+    inline T EarlyReturn()
     {
         using NonRefT = typename std::remove_reference<T>::type;
         NonRefT temp;
@@ -5112,7 +5113,7 @@ namespace CppOverride
             bool
         >::type = true
     >
-    T EarlyReturn()
+    inline T EarlyReturn()
     {
         typename std::remove_reference<T>::type* dummy = nullptr;
         //throw std::runtime_error(   "Trying to return a reference for an fully overridden method but "

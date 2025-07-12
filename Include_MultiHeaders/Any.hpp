@@ -10,7 +10,7 @@ namespace CppOverride
         inline bool operator== (Any&) { return true;}
         inline bool operator!= (Any&) { return false; }
 
-        friend std::ostream& operator<<(std::ostream& os, const Any&)
+        inline friend std::ostream& operator<<(std::ostream& os, const Any&)
         {
             os << "Any";
             return os;
