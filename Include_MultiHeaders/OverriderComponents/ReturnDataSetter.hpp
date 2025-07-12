@@ -20,9 +20,12 @@ namespace CppOverride
         template<typename ReturnType>
         inline OverrideInfoSetter& 
         ReturnsByAction(OverrideInfoSetter& infoSetter, 
-                        std::function<void( void* instance,
-                                            const std::vector<TypedDataInfo>& args, 
-                                            TypedDataInfo& out)> returnAction)
+                        std::function
+                        <
+                            TypedDataInfo(  void* instance,
+                                            const std::vector<TypedDataInfo>& args,
+                                            const TypedInfo& returnInfo)
+                        > returnAction)
         {
             static_assert(  !std::is_same<ReturnType, Any>(), 
                             "You can't return nothing in return action");

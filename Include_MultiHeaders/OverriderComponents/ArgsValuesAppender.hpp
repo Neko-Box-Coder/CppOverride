@@ -15,11 +15,7 @@ namespace CppOverride
         template<typename T, typename RawType = INTERNAL_CO_RAW_TYPE(T), typename... Args>
         inline void AppendArgsValues(std::vector<TypedDataInfo>& argumentsList, T& arg, Args&... args)
         {
-            TypedDataInfo info;
-            info.Data = (RawType*)&arg;
-            info.TypeHash = typeid(RawType).hash_code();
-            info.IsSet = true;
-            argumentsList.push_back(info);
+            argumentsList.push_back(TypedDataInfo().CreateReference<RawType>((RawType*)&arg));
             AppendArgsValues(argumentsList, args...);
         }
     };

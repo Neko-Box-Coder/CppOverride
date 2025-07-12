@@ -113,13 +113,20 @@ void OverrideReturnsWithActionLambda()
                     ( 
                         []( void*, 
                             const std::vector<CppOverride::TypedDataInfo>& args, 
-                            CppOverride::TypedDataInfo& out)
+                            const CppOverride::TypedInfo& returnInfo) -> CppOverride::TypedDataInfo
                         { 
                             (void)args;
                             //Can access args with type safety if needed
                             //e.g., if(args.at(0).IsType<int>()) { ... }
-                            if(out.IsType<int>())
-                                *out.GetTypedDataPtr<int>() = 5;
+                            
+                            //When returning a value, you should use CreateValue<int>(int value)
+                            if(returnInfo.IsType<int>())
+                                return CppOverride::TypedDataInfo().CreateValue<int>(5);
+                            
+                            //When returning a reference, 
+                            //you should use CreateReference<int&>(int* valuePtr)
+                            
+                            return CppOverride::TypedDataInfo();
                         }
                     );
     

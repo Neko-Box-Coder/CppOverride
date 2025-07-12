@@ -83,74 +83,19 @@ To get the list of status:
 std::vector<OverrideStatus> statuses = result.GetAllStatuses();
 ```
 
-??? info "List of possible status"
+??? info "`OverrideResult.hpp`"
     ```cpp
-    enum class OverrideStatus
-    {
-        //Default status.
-        // Any matching override will modify the status to not be this value.
-        // If the status is not modified (i.e. staying in this value), 
-        // Could be one of these reasons:
-        // - Function name not matching
-        // - Argument types not matching
-        // - Return type not matching
-        NO_OVERRIDE,
-        
-        //The last override was successful. 
-        // Please reset the status to NO_OVERRIDE before every expected override. 
-        // If the status is not reset, it will not be modified if no matching override is found.
-        OVERRIDE_SUCCESS,
-        
-        MATCHING_CONDITION_VALUE_FAILED,
-        MATCHING_CONDITION_ACTION_FAILED,
-        MATCHING_OVERRIDE_TIMES_FAILED,
-        
-        //------------------------------------------
-        //Internal error
-        //------------------------------------------
-        INTERNAL_MISSING_CHECK_ERROR,
-        
-        //------------------------------------------
-        //Unsupported operation errors
-        //------------------------------------------
-        MODIFY_NON_ASSIGNABLE_ARG_ERROR,
-        MODIFY_CONST_ARG_ERROR,
-        CHECK_ARG_MISSING_INEQUAL_OPERATOR_ERROR,
-    };
+
+    --8<-- "Src/OverrideResult.hpp"
+
     ```
 
-Here are a list of helper functions to perform the most common actions:
-```cpp
-class OverrideResult
-{
-    //Returns true if status list is not empty and last one is OVERRIDE_SUCCESS
-    bool LastStatusSucceed();
+??? info "List of possible status `OverrideStatus.hpp`"
+    ```cpp
     
-    //Returns true if status list is not empty and last one is **NOT** OVERRIDE_SUCCESS
-    bool LastStatusFailed();
+    --8<-- "Src/OverrideStatus.hpp"
     
-    //Returns the last status if the status list is not empty, otherwise NO_OVERRIDE
-    OverrideStatus GetLastStatus();
-    
-    //Returns true if the status list contains said status
-    bool HasStatus(OverrideStatus status);
-    
-    //Returns the number of status in the status list
-    int GetStatusCount();
-    
-    //Returns the number of statuses that are OVERRIDE_SUCCESS
-    int GetSucceedCount();
-    
-    //Returns the number of statuses that are **NOT** OVERRIDE_SUCCESS
-    int GetFailedCount();
-    
-    //Removes all the status from the status list
-    void ClearStatuses()
-    
-    //Get a copy of the status list
-    std::vector<OverrideStatus> GetAllStatuses()
-};
-```
+    ```
 
 </br>
 

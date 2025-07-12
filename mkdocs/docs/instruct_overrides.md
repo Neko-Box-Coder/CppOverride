@@ -103,16 +103,29 @@ CO_CLEAR_ALL_INSTRUCTS(overrideInstance);
 
 </br>
 
+## Action Chaining
+
+Actions can be chained together in any order:
+
+```cpp
+CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
+               .WhenCalledWith(42, 3.14f)
+               .SetArgs<CO_ANY_TYPE, float&>(CO_DONT_SET, 2.71f)
+               .Returns<int>(100)
+               .Times(2)
+               .Expected();
+```
+
 ## Actions: Returns
 
-### Returns a specific value:
+### Returns a specific value (`Returns`):
 ```cpp
 .Returns<ReturnType>(value)
 ```
 
 </br>
 
-### Returns void (early return):
+### Returns void (early return) (`ReturnsVoid`):
 ```cpp
 .Returns<void>()
 //or
@@ -121,28 +134,26 @@ CO_CLEAR_ALL_INSTRUCTS(overrideInstance);
 
 </br>
 
-### Returns using a function:
+### Returns using a function (`ReturnsByAction`):
 ```cpp
-.ReturnsByAction<ReturnType>(std::function<void(void* instance, 
-                                                const std::vector<TypedDataInfo>& args, 
-                                                TypedDataInfo& returnValue)>)
+.ReturnsByAction<ReturnType>(std::function<TypedDataInfo(void* instance, 
+                                                         const std::vector<TypedDataInfo>& args, 
+                                                         cosnt TypedInfo& returnInfo)>)
 ```
 
-!!! warning "Returning Reference With Action (Corner Case)"
-    When the function you overrides returns a reference, the type inside the data info will be a 
-    pointer instead. So for example, if the return type is `#!cpp int&`, the type inside the data 
-    info will be `#!cpp int*`.
-
-    So you should be using 
+??? info "`TypedDataInfo.hpp`"
     ```cpp
-    returnValue.GetTypedDataPtr<int*>()
-    ```
-    instead of 
-    ```cpp
-    returnValue.GetTypedDataPtr<int&>()
+    
+    --8<-- "Src/TypedDataInfo.hpp"
+    
     ```
 
-
+??? info "`TypedInfo.hpp`"
+    ```cpp
+    
+    --8<-- "Src/TypedInfo.hpp"
+    
+    ```
 
 ???+ example
     ```cpp
@@ -160,11 +171,13 @@ CO_CLEAR_ALL_INSTRUCTS(overrideInstance);
                    (
                        [](void* instance, 
                           const std::vector<TypedDataInfo>& args, 
-                          TypedDataInfo& returnValue) 
+                          const TypedInfo& returnInfo) -> TypedDataInfo
                        {
                            //NOTE: instance can be nullptr if it is a free function
-                           if(returnValue.IsType<int>())
-                               *returnValue.GetTypedDataPtr<int>() = 100;
+                           if(returnInfo.IsType<int>())
+                               return TypeDataInfo().CreateValue<int>(100);
+                            
+                            return TypeDataInfo();
                        }
                    });
 
@@ -175,10 +188,12 @@ CO_CLEAR_ALL_INSTRUCTS(overrideInstance);
                    (
                        [&returnValue](void* instance, 
                                       const std::vector<TypedDataInfo>& args, 
-                                      TypedDataInfo& returnValue) 
-                       {                           
-                           if(returnValue.IsType<int*>())
-                               *returnValue.GetTypedDataPtr<int*>() = &returnValue;
+                                      const TypedInfo& returnInfo) -> TypedDataInfo
+                       {
+                           if(returnInfo.IsType<int&>())
+                               return TypeDataInfo().CreateReference<int&>(&returnValue);
+                            
+                            return TypeDataInfo();
                        }
                    });
     ```
@@ -187,14 +202,14 @@ CO_CLEAR_ALL_INSTRUCTS(overrideInstance);
 
 ## Actions: Arguments
 
-### Set specific argument values:
+### Set specific argument values (`SetArgs`):
 ```cpp
 .SetArgs<ArgType1, ArgType2, ...>(value1, value2, ...)
 ```
 
 </br>
 
-### Set arguments using a function:
+### Set arguments using a function (`SetArgsByAction`):
 ```cpp
 .SetArgsByAction<ArgType1, ArgType2, ...>(std::function<void(void* instance, 
                                                              std::vector<TypedDataInfo>& args)>)
@@ -235,14 +250,14 @@ Use `CO_ANY_TYPE` and `CO_DONT_SET` to skip certain arguments.
 
 ## Actions: Conditions
 
-### Match specific argument values:
+### Match specific argument values (`WhenCalledWith`):
 ```cpp
 .WhenCalledWith(value1, value2, ...)
 ```
 
 </br>
 
-### Custom condition using function:
+### Custom condition using function (`If`):
 ```cpp
 .If(std::function<bool(void* instance, const std::vector<TypedDataInfo>& args)>)
 ```
@@ -280,21 +295,21 @@ Use `CO_ANY` to match any value for specific arguments.
 
 ## Actions: Controls
 
-### Limit number of times override is triggered:
+### Limit number of times override is triggered (`Times`):
 ```cpp
 .Times(count)
 ```
 
 </br>
 
-### Match specific object instance (for member functions):
+### Match specific object instance (for member functions) (`MatchesObject`):
 ```cpp
 .MatchesObject(&objectInstance)
 ```
 
 </br>
 
-### Match any object instance:
+### Match any object instance (`MatchesAny`):
 ```cpp
 .MatchesAny()
 ```
@@ -317,14 +332,20 @@ Use `CO_ANY` to match any value for specific arguments.
 
 ## Actions: Callbacks
 
-### Execute code when override is triggered:
+### Execute code when override is triggered (`WhenCalledExpectedly_Do`):
 ```cpp
 .WhenCalledExpectedly_Do(std::function<void(void* instance, const std::vector<TypedDataInfo>& args)>)
 ```
 
 </br>
 
-### Execute code when override conditions are NOT met:
+### Execute code when override is NOT triggered (`Otherwise_Do`):
+
+An override can fail to trigger due to override conditions not met or having error while overriding.
+
+See [4. **Inspect** Override Expectations](inspect_overrides.md) on getting details regarding the
+failure of triggering override.
+
 ```cpp
 .Otherwise_Do(std::function<void(void* instance, const std::vector<TypedDataInfo>& args)>)
 ```
@@ -354,7 +375,7 @@ Use `CO_ANY` to match any value for specific arguments.
 
 ## Actions: Expectations And Results
 
-### Mark override as expected to satisfy all conditions:
+### Mark override as expected to satisfy all conditions (`Expected`):
 ```cpp
 .Expected()
 ```
@@ -366,7 +387,7 @@ Use `CO_ANY` to match any value for specific arguments.
 
 </br>
 
-### Mark override as expected NOT to satisfy all conditions:
+### Mark override as expected NOT to satisfy all conditions (`ExpectedNotSatisfy`):
 ```cpp
 .ExpectedNotSatisfy()
 ```
@@ -379,7 +400,7 @@ Use `CO_ANY` to match any value for specific arguments.
 
 </br>
 
-### Get override result:
+### Get override result (`AssignsResult`):
 ```cpp
 CppOverride::ResultPtr result; //using ResultPtr = std::shared_ptr<OverrideResult>;
 .AssignsResult(result)
@@ -417,23 +438,3 @@ CO_INSTRUCT_PASSTHROUGH(overrideInstance)
 ```
 
 </br>
-
-## Action Chaining
-
-Actions can be chained together in any order:
-
-```cpp
-CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
-               .WhenCalledWith(42, 3.14f)
-               .SetArgs<CO_ANY_TYPE, float&>(CO_DONT_SET, 2.71f)
-               .Returns<int>(100)
-               .Times(2)
-               .WhenCalledExpectedly_Do
-               (
-                   [](void*, const std::vector<TypedDataInfo>&) 
-                   {
-                       std::cout << "Override triggered!" << std::endl;
-                   }
-               )
-               .Expected();
-```

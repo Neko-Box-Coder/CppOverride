@@ -6,6 +6,7 @@
 #include "./TemplateTypeSpecifier.hpp"
 #include "./OverrideResult.hpp"
 #include "./TypedDataInfo.hpp"
+#include "./TypedInfo.hpp"
 
 #include <functional>
 #include <string>
@@ -56,9 +57,12 @@ namespace CppOverride
         OverrideInfoSetter& MatchesAny();
         
         template<typename ReturnType>
-        OverrideInfoSetter& ReturnsByAction(std::function<void( void* instance,
-                                                                const std::vector<TypedDataInfo>& args, 
-                                                                TypedDataInfo& out)> returnAction);
+        OverrideInfoSetter& ReturnsByAction(std::function
+                                            <
+                                                TypedDataInfo(  void* instance, 
+                                                                const std::vector<TypedDataInfo>& args,
+                                                                const TypedInfo& returnInfo)
+                                            > returnAction);
 
         template<typename ReturnType>
         OverrideInfoSetter& Returns(typename TypeSpecifier<ReturnType>::Type returnData);

@@ -97,11 +97,15 @@ int main(int argc, char** argv)
                             (
                                 [&](void*, 
                                     const std::vector<CppOverride::TypedDataInfo>&, 
-                                    CppOverride::TypedDataInfo& out)
+                                    const CppOverride::TypedInfo& returnInfo) -> CppOverride::TypedDataInfo
                                 {
-                                    //NOTE: Special case, reference is converted to pointer for return
-                                    if(out.IsType<int*>())
-                                        *out.GetTypedDataPtr<int*>() = &testNum;
+                                    if(returnInfo.IsType<int&>())
+                                    {
+                                        return CppOverride  ::TypedDataInfo()
+                                                            .CreateReference<int&>(&testNum);
+                                    }
+                                    
+                                    return CppOverride::TypedDataInfo();
                                 }
                             )
                             .Expected();
@@ -201,10 +205,11 @@ int main(int argc, char** argv)
                             (
                                 []( void*, 
                                     const std::vector<CppOverride::TypedDataInfo>&, 
-                                    CppOverride::TypedDataInfo& out)
+                                    const CppOverride::TypedInfo& returnInfo) -> CppOverride::TypedDataInfo
                                 {
-                                    if(out.IsType<int>())
-                                        *out.GetTypedDataPtr<int>() = 10;
+                                    if(returnInfo.IsType<int>())
+                                        return CppOverride::TypedDataInfo().CreateValue<int>(10);
+                                    return CppOverride::TypedDataInfo();
                                 }
                             )
                             .Expected();

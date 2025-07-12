@@ -392,8 +392,8 @@ int main(int argc, char** argv)
                                 (
                                     [](void*, std::vector<CppOverride::TypedDataInfo>& args)
                                     {
-                                        if(args.at(1).IsType<float>())
-                                            *args.at(1).GetTypedDataPtr<float>() = 5.f;
+                                        if(args.at(1).IsType<float&>())
+                                            *args.at(1).GetTypedDataPtr<float&>() = 5.f;
                                         if(args.at(2).IsType<float*>())
                                             **args.at(2).GetTypedDataPtr<float*>() = 3.f;
                                     }
