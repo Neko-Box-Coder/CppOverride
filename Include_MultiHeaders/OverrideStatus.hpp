@@ -19,14 +19,13 @@ namespace CppOverride
         //  - Return type not matching
         NO_OVERRIDE,
         
-        //The last override was successful. 
-        //  Please reset the status to NO_OVERRIDE before every expected override. 
-        //  If the status is not reset, it will not be modified if no matching override is found.
+        //The last override was successful
         OVERRIDE_SUCCESS,
         
         MATCHING_CONDITION_VALUE_FAILED,
         MATCHING_CONDITION_ACTION_FAILED,
         MATCHING_OVERRIDE_TIMES_FAILED,
+        RETURN_ACTION_TYPE_MISMATCH,
         
         //------------------------------------------
         //Internal error
@@ -48,7 +47,7 @@ namespace CppOverride
 
     inline std::string OverrideStatusToString(OverrideStatus status)
     {
-        static_assert((int)OverrideStatus::COUNT == 9, "");
+        static_assert((int)OverrideStatus::COUNT == 10, "");
         
         switch (status)
         {
@@ -62,6 +61,8 @@ namespace CppOverride
                 return "MATCHING_CONDITION_ACTION_FAILED";
             case OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED:
                 return "MATCHING_OVERRIDE_TIMES_FAILED";
+            case OverrideStatus::RETURN_ACTION_TYPE_MISMATCH:
+                return "RETURN_ACTION_TYPE_MISMATCH";
             case OverrideStatus::INTERNAL_MISSING_CHECK_ERROR:
                 return "INTERNAL_MISSING_CHECK_ERROR";
             case OverrideStatus::MODIFY_NON_ASSIGNABLE_ARG_ERROR:

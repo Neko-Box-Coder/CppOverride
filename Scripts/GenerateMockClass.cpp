@@ -1044,7 +1044,7 @@ void GenerateMockClass( const std::vector<ClassDetails>& classesDetails,
         int substrStartIndex = parentDirIndex == -1 ? 0 : parentDirIndex + 1;
         int substrLength =  extensionIndex == -1 ? 
                             (int)originalFileName.size() - substrStartIndex :
-                            extensionIndex - substrStartIndex - 1;
+                            extensionIndex - substrStartIndex;
         
         headerGuardName = std::string("MOCK_") + originalFileName.substr(substrStartIndex, substrLength);
         filenameWithoutDir = originalFileName.substr(substrStartIndex);

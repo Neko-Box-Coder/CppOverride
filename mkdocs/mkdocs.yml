@@ -35,13 +35,14 @@ theme:
         repo: fontawesome/brands/github
 
 nav:
-    -   index.md
-    -   getting_started.md
-    -   insert_overrides.md
-    -   instruct_overrides.md
-    -   inspect_overrides.md
-    -   mock_class_generator.md
-    -   override_external.md
+-   index.md
+-   getting_started.md
+-   insert_overrides.md
+-   instruct_overrides.md
+-   inspect_overrides.md
+-   mock_class_generator.md
+-   override_external.md
+-   example.md
 
 repo_url: https://github.com/Neko-Box-Coder/CppOverride
 repo_name: Neko-Box-Coder/CppOverride
@@ -50,16 +51,16 @@ repo_name: Neko-Box-Coder/CppOverride
 extra_css: [extra.css]
 markdown_extensions:
 -   admonition
-- pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-- pymdownx.inlinehilite
-- pymdownx.snippets
-- pymdownx.details
-- pymdownx.superfences
+-   pymdownx.highlight:
+        anchor_linenums: true
+        line_spans: __span
+        pygments_lang_class: true
+-   pymdownx.inlinehilite
+-   pymdownx.snippets
+-   pymdownx.details
+-   pymdownx.superfences
 -   toc:
-      toc_depth: 2
+        toc_depth: 2
 
 extra:
     version:

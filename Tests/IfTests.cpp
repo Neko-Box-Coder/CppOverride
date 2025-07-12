@@ -70,8 +70,8 @@ int main(int argc, char** argv)
                                             *args.at(0).GetTypedDataPtr<int>() == 1 &&
                                             args.at(1).IsType<float*>() && 
                                             **args.at(1).GetTypedDataPtr<float*>() == 2.f &&
-                                            args.at(2).IsType<std::string>() && 
-                                            *args.at(2).GetTypedDataPtr<std::string>() == 
+                                            args.at(2).IsType<std::string&>() && 
+                                            *args.at(2).GetTypedDataPtr<std::string&>() == 
                                             "Test String")
                                         {
                                             return true;

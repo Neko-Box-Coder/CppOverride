@@ -80,3 +80,77 @@ class YourClass : public CppOverride::Overridable
 
 In this case, you can just pass `*this` as the override instance, or the instance name you declared 
 for the class. 
+
+## 4. Quick Start
+
+### 💡 Override Free Function
+```cpp
+#include <iostream>
+
+//Define CO_NO_OVERRIDE to disable overriding
+//#define CO_NO_OVERRIDE
+#include "CppOverride.hpp"
+
+CO_DECLARE_INSTANCE(OverrideInstance);
+
+int FreeFunction(int value1)
+{
+    CO_INSERT_IMPL(OverrideInstance, int, (value1));
+    return value1 * 2;
+}
+
+//Or CO_INSERT_METHOD(OverrideInstance, int, FreeFunction, (int));
+
+int main()
+{
+    CO_INSTRUCT_REF(OverrideInstance, CO_GLOBAL, FreeFunction)
+                   .WhenCalledWith(5)
+                   .Times(1)
+                   .Returns<int>(1);
+    
+    //FreeFunction(0): 0
+    std::cout << "FreeFunction(0): " << FreeFunction(0) << std::endl;
+    
+    //FreeFunction(5): 1
+    std::cout << "FreeFunction(5): " << FreeFunction(5) << std::endl;
+    
+    //FreeFunction(5): 10
+    std::cout << "FreeFunction(5): " << FreeFunction(5) << std::endl;
+    
+    return 0;
+}
+```
+
+### ⚙️ Override Class Function
+```cpp
+class DummyMockClass : public CppOverride::Overridable
+{
+    public:
+        //int MemberFunction(int value1);
+        CO_INSERT_MEMBER_METHOD(*this, int, MemberFunction, (int))
+};
+
+int main()
+{
+    DummyMockClass dummyObject;
+    
+    CO_INSTRUCT_REF(dummyObject, DummyMockClass, MemberFunction)
+                   .WhenCalledWith(5)
+                   .Times(1)
+                   .Returns<int>(1);
+    
+    //dummyObject.MemberFunction(0): 0
+    std::cout << "dummyObject.MemberFunction(0): " << dummyObject.MemberFunction(0) << std::endl;
+    
+    //dummyObject.MemberFunction(5): 1
+    std::cout << "dummyObject.MemberFunction(5): " << dummyObject.MemberFunction(5) << std::endl;
+    
+    //dummyObject.MemberFunction(5): 5
+    std::cout << "dummyObject.MemberFunction(5): " << dummyObject.MemberFunction(5) << std::endl;
+    
+    return 0;
+}
+```
+
+This is just a quick taste on what it looks like. 
+There are many other things you can do. 

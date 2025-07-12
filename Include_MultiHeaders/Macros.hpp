@@ -190,15 +190,16 @@ namespace CppOverride
             \
             if(foundIndex != -1) \
             { \
+                bool previousOverrideSuccessful = true; \
                 if(overrideArgs) \
                 { \
-                    (overrideObjName)   .Internal_GetOverrideObject() \
-                                        .Internal_OverrideArgs( foundIndex, \
-                                                                __func__, \
-                                                                !overrideReturn, \
-                                                                (void*)instance \
-                                                                INTERNAL_CO_ARGS(args)); \
-                    \
+                    previousOverrideSuccessful = \
+                        (overrideObjName)   .Internal_GetOverrideObject() \
+                                            .Internal_OverrideArgs( foundIndex, \
+                                                                    __func__, \
+                                                                    !overrideReturn, \
+                                                                    (void*)instance \
+                                                                    INTERNAL_CO_ARGS(args)); \
                 } \
                 \
                 if(overrideReturn) \
@@ -208,19 +209,26 @@ namespace CppOverride
                     /* If we are not returning, we will need to call the result actions */ \
                     if(dontReturn) \
                     { \
-                        (overrideObjName)   .Internal_GetOverrideObject() \
-                                            .Internal_CallOverrideExpectedAction \
-                                            ( \
-                                                __func__, \
-                                                foundIndex, \
-                                                (void*)instance \
-                                                INTERNAL_CO_ARGS(args) \
-                                            ); \
+                        if(previousOverrideSuccessful) \
+                        { \
+                            (overrideObjName)   .Internal_GetOverrideObject() \
+                                                .Internal_CallOverrideExpectedAction \
+                                                ( \
+                                                    __func__, \
+                                                    foundIndex, \
+                                                    (void*)instance \
+                                                    INTERNAL_CO_ARGS(args) \
+                                                ); \
+                        } \
                     } \
                     else \
                     {
     
     #define INTERNAL_CO_IMPL_NORMAL_PART_2(overrideObjName, returnType, instance, args) \
+                        if(!previousOverrideSuccessful) \
+                        { \
+                            return CppOverride::EarlyReturn<MPT_REMOVE_PARENTHESIS(returnType)>(); \
+                        } \
                         /* If we are returning, the result action is called inside */ \
                         return (overrideObjName).Internal_GetOverrideObject() \
                                                 .Internal_OverrideReturn<MPT_REMOVE_PARENTHESIS(returnType)> \
@@ -232,6 +240,8 @@ namespace CppOverride
                                                 );
     
     #define INTERNAL_CO_IMPL_NO_RETURN_TYPE_PART_2(overrideObjName, instance, args) \
+                        if(!previousOverrideSuccessful) \
+                            return; \
                         /* If we are returning, the result action is called inside */ \
                         (overrideObjName)   .Internal_GetOverrideObject() \
                                             .Internal_OverrideReturn<MPT_REMOVE_PARENTHESIS(void)> \

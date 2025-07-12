@@ -62,9 +62,12 @@ namespace CppOverride
 
     template<typename ReturnType>
     inline OverrideInfoSetter&
-    OverrideInfoSetter::ReturnsByAction(std::function<void( void* instance,
-                                                            const std::vector<TypedDataInfo>& args, 
-                                                            TypedDataInfo& out)> returnAction)
+    OverrideInfoSetter::ReturnsByAction(std::function
+                                        <
+                                            TypedDataInfo(  void* instance, 
+                                                            const std::vector<TypedDataInfo>& args,
+                                                            const TypedInfo& returnInfo)
+                                        > returnAction)
     {
         return CppOverrideObj.CurrentReturnDataSetter.ReturnsByAction<ReturnType>(  *this, 
                                                                                     returnAction);
