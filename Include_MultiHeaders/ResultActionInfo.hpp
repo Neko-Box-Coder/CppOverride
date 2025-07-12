@@ -9,8 +9,8 @@ namespace CppOverride
 {
     struct ResultActionInfo
     {
-        std::function<void(void* instance, const std::vector<TypedDataInfo>& args)> OtherwiseAction;
-        std::function<void(void* instance, const std::vector<TypedDataInfo>& args)> CorrectAction;
+        std::function<void(void* instance, std::vector<TypedDataInfo>& args)> OtherwiseAction;
+        std::function<void(void* instance, std::vector<TypedDataInfo>& args)> CorrectAction;
         bool OtherwiseActionSet = false;
         bool CorrectActionSet = false;
     };

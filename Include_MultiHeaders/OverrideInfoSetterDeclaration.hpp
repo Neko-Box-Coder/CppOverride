@@ -44,11 +44,11 @@ namespace CppOverride
 
         OverrideInfoSetter& 
         Otherwise_Do(std::function<void(void* instance,
-                                        const std::vector<TypedDataInfo>& args)> action);
+                                        std::vector<TypedDataInfo>& args)> action);
 
         OverrideInfoSetter& 
         WhenCalledExpectedly_Do(std::function<void( void* instance,
-                                                    const std::vector<TypedDataInfo>& args)> action);
+                                                    std::vector<TypedDataInfo>& args)> action);
         
         OverrideInfoSetter& AssignsResult(ResultPtr& outResult);
         

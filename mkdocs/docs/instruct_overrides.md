@@ -334,7 +334,7 @@ Use `CO_ANY` to match any value for specific arguments.
 
 ### Execute code when override is triggered (`WhenCalledExpectedly_Do`):
 ```cpp
-.WhenCalledExpectedly_Do(std::function<void(void* instance, const std::vector<TypedDataInfo>& args)>)
+.WhenCalledExpectedly_Do(std::function<void(void* instance, std::vector<TypedDataInfo>& args)>)
 ```
 
 </br>
@@ -347,7 +347,7 @@ See [4. **Inspect** Override Expectations](inspect_overrides.md) on getting deta
 failure of triggering override.
 
 ```cpp
-.Otherwise_Do(std::function<void(void* instance, const std::vector<TypedDataInfo>& args)>)
+.Otherwise_Do(std::function<void(void* instance, std::vector<TypedDataInfo>& args)>)
 ```
 
 ??? example
@@ -356,15 +356,16 @@ failure of triggering override.
     CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
                    .WhenCalledWith(42)
                    .Returns<int>(100)
-                   .WhenCalledExpectedly_Do(
-                       [&wasCalled](void*, const std::vector<TypedDataInfo>&) 
+                   .WhenCalledExpectedly_Do
+                   (
+                       [&wasCalled](void*, std::vector<TypedDataInfo>&) 
                        {
                            wasCalled = true;
                        }
                    )
                    .Otherwise_Do
                    (
-                       [](void*, const std::vector<TypedDataInfo>&) 
+                       [](void*, std::vector<TypedDataInfo>&) 
                        {
                            std::cout << "Override condition not met!" << std::endl;
                        }

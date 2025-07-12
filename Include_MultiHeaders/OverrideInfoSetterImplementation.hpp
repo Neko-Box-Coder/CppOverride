@@ -32,7 +32,7 @@ namespace CppOverride
 
     inline OverrideInfoSetter& 
     OverrideInfoSetter::Otherwise_Do(std::function<void(void* instance,
-                                                        const std::vector<TypedDataInfo>& args)> action)
+                                                        std::vector<TypedDataInfo>& args)> action)
     {
         return CppOverrideObj.CurrentRequirementSetter.Otherwise_Do(*this, action);
     }
@@ -40,7 +40,7 @@ namespace CppOverride
     inline OverrideInfoSetter& 
     OverrideInfoSetter::
     WhenCalledExpectedly_Do(std::function<void( void* instance,
-                                                const std::vector<TypedDataInfo>& args)> action)
+                                                std::vector<TypedDataInfo>& args)> action)
     {
         return CppOverrideObj.CurrentRequirementSetter.WhenCalledExpectedly_Do(*this, action);
     }

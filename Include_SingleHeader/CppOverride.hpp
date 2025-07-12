@@ -3029,11 +3029,11 @@ namespace CppOverride
 
         OverrideInfoSetter& 
         Otherwise_Do(std::function<void(void* instance,
-                                        const std::vector<TypedDataInfo>& args)> action);
+                                        std::vector<TypedDataInfo>& args)> action);
 
         OverrideInfoSetter& 
         WhenCalledExpectedly_Do(std::function<void( void* instance,
-                                                    const std::vector<TypedDataInfo>& args)> action);
+                                                    std::vector<TypedDataInfo>& args)> action);
         
         OverrideInfoSetter& AssignsResult(ResultPtr& outResult);
         
@@ -3223,8 +3223,8 @@ namespace CppOverride
 {
     struct ResultActionInfo
     {
-        std::function<void(void* instance, const std::vector<TypedDataInfo>& args)> OtherwiseAction;
-        std::function<void(void* instance, const std::vector<TypedDataInfo>& args)> CorrectAction;
+        std::function<void(void* instance, std::vector<TypedDataInfo>& args)> OtherwiseAction;
+        std::function<void(void* instance, std::vector<TypedDataInfo>& args)> CorrectAction;
         bool OtherwiseActionSet = false;
         bool CorrectActionSet = false;
     };
@@ -3794,7 +3794,7 @@ namespace CppOverride
         inline OverrideInfoSetter& 
         Otherwise_Do(   OverrideInfoSetter& infoSetter, 
                         std::function<void( void* instance, 
-                                            const std::vector<TypedDataInfo>& args)> action)
+                                            std::vector<TypedDataInfo>& args)> action)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()
@@ -3810,7 +3810,7 @@ namespace CppOverride
         inline OverrideInfoSetter& 
         WhenCalledExpectedly_Do(OverrideInfoSetter& infoSetter, 
                                 std::function<void( void* instance, 
-                                                    const std::vector<TypedDataInfo>& args)> action)
+                                                    std::vector<TypedDataInfo>& args)> action)
         {
             CurrentOverrideDatas[infoSetter.GetFunctionSignatureName()] 
                                 .back()
@@ -5848,7 +5848,7 @@ namespace CppOverride
 
     inline OverrideInfoSetter& 
     OverrideInfoSetter::Otherwise_Do(std::function<void(void* instance,
-                                                        const std::vector<TypedDataInfo>& args)> action)
+                                                        std::vector<TypedDataInfo>& args)> action)
     {
         return CppOverrideObj.CurrentRequirementSetter.Otherwise_Do(*this, action);
     }
@@ -5856,7 +5856,7 @@ namespace CppOverride
     inline OverrideInfoSetter& 
     OverrideInfoSetter::
     WhenCalledExpectedly_Do(std::function<void( void* instance,
-                                                const std::vector<TypedDataInfo>& args)> action)
+                                                std::vector<TypedDataInfo>& args)> action)
     {
         return CppOverrideObj.CurrentRequirementSetter.WhenCalledExpectedly_Do(*this, action);
     }

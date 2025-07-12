@@ -55,7 +55,7 @@ int main(int argc, char** argv)
                                         [&destructInstance]
                                         (
                                             void* instance, 
-                                            const std::vector<CppOverride::TypedDataInfo>&
+                                            std::vector<CppOverride::TypedDataInfo>&
                                         )
                                         {
                                             destructInstance = instance;
