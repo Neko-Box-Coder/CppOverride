@@ -388,15 +388,15 @@ failure of triggering override.
 
 </br>
 
-### Mark override as expected NOT to satisfy all conditions (`ExpectedNotSatisfy`):
+### Mark override as expected NOT to satisfy all conditions (`ExpectedNotSatisfied`):
 ```cpp
-.ExpectedNotSatisfy()
+ExpectedNotSatisfied()
 ```
 
 !!! warning
-    `Expected` and `ExpectedNotSatisfy` are mutually exclusive. Only one of them is true. 
+    `Expected` and ExpectedNotSatisfied` are mutually exclusive. Only one of them is true. 
     
-    So if you have `Times(count)` condition, `ExpectedNotSatisfy` will be true if the override is 
+    So if you have `Times(count)` condition, ExpectedNotSatisfied` will be true if the override is 
     triggered not **EXACTLY** `count` times.
 
 </br>

@@ -84,6 +84,7 @@ namespace CppOverride
         OverrideInfoSetter& Expected();
         
         OverrideInfoSetter& ExpectedNotSatisfy();
+        OverrideInfoSetter& ExpectedNotSatisfied();
     };
 
     //NOTE: Subset of OverrideInfoSetter
@@ -100,6 +101,7 @@ namespace CppOverride
         OverridePassthroughInfoSetter& Expected();
         
         OverridePassthroughInfoSetter& ExpectedNotSatisfy();
+        OverridePassthroughInfoSetter& ExpectedNotSatisfied();
     };
 }
 

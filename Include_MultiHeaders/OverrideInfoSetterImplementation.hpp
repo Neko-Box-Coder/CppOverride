@@ -118,6 +118,11 @@ namespace CppOverride
         return CppOverrideObj.CurrentRequirementSetter.ExpectedNotSatisfy(*this);
     }
     
+    inline OverrideInfoSetter& OverrideInfoSetter::ExpectedNotSatisfied()
+    {
+        return CppOverrideObj.CurrentRequirementSetter.ExpectedNotSatisfy(*this);
+    }
+    
     inline OverridePassthroughInfoSetter& OverridePassthroughInfoSetter::Times(int times)
     {
         CppOverrideObj.PassthroughData.CurrentConditionInfo.Times = times;
@@ -131,6 +136,12 @@ namespace CppOverride
     }
     
     inline OverridePassthroughInfoSetter& OverridePassthroughInfoSetter::ExpectedNotSatisfy()
+    {
+        CppOverrideObj.PassthroughData.Expected = OverrideData::ExpectedType::NOT_TRIGGERED;
+        return *this;
+    }
+    
+    inline OverridePassthroughInfoSetter& OverridePassthroughInfoSetter::ExpectedNotSatisfied()
     {
         CppOverrideObj.PassthroughData.Expected = OverrideData::ExpectedType::NOT_TRIGGERED;
         return *this;
