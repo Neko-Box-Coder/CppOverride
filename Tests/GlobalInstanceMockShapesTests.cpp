@@ -67,7 +67,7 @@ int main(int argc, char** argv)
         );
         
         ssTEST_OUTPUT_ASSERT(createdInstance == destructInstance);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
 
     ssTEST("Object Should Be Overridable When Instance Is Specified")

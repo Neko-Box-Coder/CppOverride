@@ -35,7 +35,7 @@ int main(int argc, char** argv)
                             .Expected();
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
     };
     
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
     };
     
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
             ssTEST_OUTPUT_ASSERT(   "Try " + std::to_string(i), 
                                     CppOverrideTest::NonConst::NoArgsFunc() == 1);
             ssTEST_OUTPUT_ASSERT(   "Try " + std::to_string(i),
-                                    CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+                                    CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
         }
     };
     
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
             CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
 
         ssTEST_OUTPUT_SETUP
         (
@@ -170,7 +170,7 @@ int main(int argc, char** argv)
             CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
         
         ssTEST_OUTPUT_SETUP
         (
@@ -207,7 +207,7 @@ int main(int argc, char** argv)
                 CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
             );
             ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-            ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+            ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
         }
     };
     

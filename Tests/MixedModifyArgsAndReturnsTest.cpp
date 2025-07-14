@@ -43,7 +43,7 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_ASSERT(testArg == 5);
         ssTEST_OUTPUT_ASSERT(executeResult == 32);
         ssTEST_OUTPUT_ASSERT(calledCounter == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
         
         ssTEST_OUTPUT_EXECUTION
         (
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_ASSERT(testArg2 == 5);
         ssTEST_OUTPUT_ASSERT(executeResult == 32);
         ssTEST_OUTPUT_ASSERT(calledCounter == 2);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Multiple Matching Overrides Should Apply The First One")
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
         ssTEST_OUTPUT_ASSERT(testArg == 5);
         ssTEST_OUTPUT_ASSERT(executeResult == 32);
         ssTEST_OUTPUT_ASSERT(calledCounter == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Modify None With Action Result Should Perform Action")
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
         );
         
         ssTEST_OUTPUT_ASSERT(calledCounter == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST_END_TEST_GROUP();

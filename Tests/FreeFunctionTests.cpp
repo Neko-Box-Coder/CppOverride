@@ -41,7 +41,7 @@ int main(int argc, char** argv)
         
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionA(1) == 10);
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionB(1, 2) == 10);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     #ifdef FreeFunctionA

@@ -90,7 +90,7 @@ int main(int argc, char** argv)
                         .Returns<int>(1)
                         .Expected();
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::ArgsFunc(1, false, 2.f) == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Comparing Const Void Pointer Should Override If Match")
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
                             .Expected();
         );
         ssTEST_OUTPUT_ASSERT(CppOverrideTest::Const::ConstVoidPointerFunc(&testArg, 2) == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Pointer Type Argument Should Demote To Value Type For Comparison")
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
             CppOverrideTest::NonConst::ArgsToSetFunc(1, &assignFloat, assignString);
         );
         ssTEST_OUTPUT_ASSERT(assignString == "test");
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
         
         //TODO: Add test for not meeting conditions
     };

@@ -646,6 +646,29 @@ namespace CppOverride
             
             return results;
         }
+        
+        inline std::string Internal_GetFailedReport()
+        {
+            std::vector<FunctionName> failedFunctions = Internal_GetFailedExpects();
+            std::string returnStr;
+            for(int i = 0; i < failedFunctions.size(); ++i)
+            {
+                returnStr += failedFunctions[i] + "(): \n";
+                std::vector<ResultPtr> results = Internal_GetOverrideResults(failedFunctions[i]);
+                for(int j = 0; j < results.size(); ++j)
+                {
+                    returnStr += "    Instruct[" + std::to_string(j) + "]: \n";
+                    std::vector<OverrideStatus> statuses = results[j]->GetAllStatuses();
+                    for(int k = 0; k < statuses.size(); ++k)
+                    {
+                        returnStr +=    "        Status[" + std::to_string(k) + "]: " + 
+                                        OverrideStatusToString(statuses[k]) + "\n";
+                    }
+                }
+            }
+            
+            return returnStr;
+        }
     };
 }
 

@@ -30,7 +30,7 @@ int main(int argc, char** argv)
             CppOverrideTest::NonConst::ArgsToSetFunc(1, &testFloat, testString);
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 5);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
         
     ssTEST("Set Multiple Primitive Types Should Override")
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
         );
         ssTEST_OUTPUT_ASSERT(testFloat == 15);
         ssTEST_OUTPUT_ASSERT(testBool == false);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
 
     ssTEST("Set Non Pointer/Reference Arg Should Override")
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
             CppOverrideTest::NonConst::AssignArgInternallyFunc("Test 2", outString);
         );
         ssTEST_OUTPUT_ASSERT(outString == "Test");
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
 
     ssTEST("Set Void Pointer Should Override")
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
             int returnsResult = CppOverrideTest::NonConst::AddNumFromVoidPointerFunc(&TestArg2, 5);
         );
         ssTEST_OUTPUT_ASSERT(returnsResult == 7);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Set Object Should Override")
@@ -117,7 +117,7 @@ int main(int argc, char** argv)
             CppOverrideTest::NonConst::Object::SetObjectFunc(0, 0, "a", testClass);
         );
         ssTEST_OUTPUT_ASSERT(testClass == CppOverrideTest::TestClass(1, 2.0, "test"));
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Set Template Object Should Override")
@@ -153,7 +153,7 @@ int main(int argc, char** argv)
         );
         ssTEST_OUTPUT_ASSERT(testDummy == overrideDummy);
         ssTEST_OUTPUT_ASSERT(testDummy2 == overrideDummy2);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Set Begin Const Arg Should Fail With Status")
@@ -228,7 +228,7 @@ int main(int argc, char** argv)
         );
         ssTEST_OUTPUT_ASSERT(testArg2 == 4.f);
         ssTEST_OUTPUT_ASSERT(testArg3 == "Test");
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).size() == 1);
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).size() == 1);
         
         ssTEST_OUTPUT_EXECUTION
         (
@@ -236,7 +236,7 @@ int main(int argc, char** argv)
         );
         ssTEST_OUTPUT_ASSERT(testArg2 == 5.f);
         ssTEST_OUTPUT_ASSERT(testArg4 == 3.f);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Set Args For Member Function Should Override")
@@ -253,7 +253,7 @@ int main(int argc, char** argv)
         );
         ssTEST_OUTPUT_EXECUTION( rect.GetWidth(outWidth); );
         ssTEST_OUTPUT_ASSERT(outWidth == 2);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Don't Set Anything Should Modify Nothing")
@@ -275,7 +275,7 @@ int main(int argc, char** argv)
         );
         ssTEST_OUTPUT_ASSERT(testArg == 2.f);
         ssTEST_OUTPUT_ASSERT(testArg2 == "test");
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST_SKIP("Non Copy Assignable Object Should Fail To Compile")
@@ -335,7 +335,7 @@ int main(int argc, char** argv)
         );
         ssTEST_OUTPUT_ASSERT(testArg2 == 2.f);
         ssTEST_OUTPUT_ASSERT(testArg3 == "test");
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Set Object By Action Should Override")
@@ -366,7 +366,7 @@ int main(int argc, char** argv)
             CppOverrideTest::NonConst::Object::SetObjectFunc(0, 0, "a", testClass);
         );
         ssTEST_OUTPUT_ASSERT(testClass == CppOverrideTest::TestClass(1, 2.0, "test"));
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Set Args By Action For Overloaded Function Should Override")

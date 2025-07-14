@@ -5,12 +5,46 @@ expectations you set during the instruct phase.
 
 </br>
 
-## Check Failed Expectations
+## Get Report Of Failed Expectations, Results And Statuses
 
-Use `CO_GET_FAILED_EXPECTS` to get a list of functions that failed to meet their expectations:
+Use `CO_GET_FAILED_REPORT` to get a report string in the form of
+```
+FailedFunction1():
+    Instruct[0]:
+        Status[0]: <Instruct Attempt Status String>
+        Status[1]: <Instruct Attempt Status String>
+        Status[2]: <Instruct Attempt Status String>
+    Instruct[1]:
+        Status[0]: <Instruct Attempt Status String>
+        Status[1]: <Instruct Attempt Status String>
+        Status[2]: <Instruct Attempt Status String>
+FailedFunction2():
+    Instruct[0]:
+        Status[0]: <Instruct Attempt Status String>
+        Status[1]: <Instruct Attempt Status String>
+        Status[2]: <Instruct Attempt Status String>
+...
+```
 
 ```cpp
-std::vector<std::string> failedFunctions = CO_GET_FAILED_EXPECTS(overrideInstance);
+std::string reportString = CO_GET_FAILED_REPORT(overrideInstance);
+```
+
+where it prints all the functions that failed the expectations, then a list of the instructs commands
+for each of the functions, then a list of override attempts as override status for each of the 
+instructs commands.
+
+For getting each component (failed functions, instructs and statuses) of the report, see the next
+section and the one after.
+
+</br>
+
+## Get List Of Functions That Failed Expectations
+
+Use `CO_GET_FAILED_FUNCTIONS` to get a list of functions that failed to meet their expectations:
+
+```cpp
+std::vector<std::string> failedFunctions = CO_GET_FAILED_FUNCTIONS(overrideInstance);
 ```
 
 This returns a vector of function names (as strings) that
@@ -42,7 +76,7 @@ appended to the functions that contributes to the failure of the expectation.
     AnotherFunction();     //Called, but expected not to be called
     
     //Check for failed expectations
-    std::vector<std::string> failed = CO_GET_FAILED_EXPECTS(MyOverrideInstance);
+    std::vector<std::string> failed = CO_GET_FAILED_FUNCTIONS(MyOverrideInstance);
     
     if(!failed.empty())
     {
@@ -56,18 +90,9 @@ appended to the functions that contributes to the failure of the expectation.
 
 </br>
 
-## Debug Override Logs
+## Get Override Results For A Specific Function
 
-If for any reason, it is unclear why the override did not get triggered and the override result
-did not give any useful information. You can force CppOverride to output verbose logs by
-defining `CO_SHOW_OVERRIDE_LOG 1` before `#include "CppOverride.hpp"`. 
-
-This will show all the debug logs on each stage of selecting override data and what conditions 
-are not met.
-
-</br>
-
-## Override Result
+### Override Result
 
 `CppOverride::ResultPtr` is just a shared_ptr defined as this 
 
@@ -96,10 +121,6 @@ std::vector<OverrideStatus> statuses = result.GetAllStatuses();
     --8<-- "Src/OverrideStatus.hpp"
     
     ```
-
-</br>
-
-## Get Override Results For A Specific Function
 
 Use `CO_GET_OVERRIDE_RESULTS` to get detailed result information for a specific function:
 
@@ -149,3 +170,15 @@ containing detailed status information.
         }
     }
     ```
+
+</br>
+
+## Debug Override Logs
+
+If for any reason, it is unclear why the override did not get triggered and the override result
+did not give any useful information. You can force CppOverride to output verbose logs by
+defining `CO_SHOW_OVERRIDE_LOG 1` before `#include "CppOverride.hpp"`. 
+
+This will show all the debug logs on each stage of selecting override data and what conditions 
+are not met.
+

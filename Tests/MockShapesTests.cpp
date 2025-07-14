@@ -34,7 +34,7 @@ int main(int argc, char** argv)
         );
 
         ssTEST_OUTPUT_ASSERT("", width, 3.f);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(*mockSquare).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(*mockSquare).empty());
     };
     
     ssTEST("Return Reference In Mock Class Should Be Overridable")
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
         );
 
         ssTEST_OUTPUT_ASSERT(&thisRef == &mockSquare2);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(*mockSquare).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(*mockSquare).empty());
     };
     
     ssTEST("Argument Value In Mock Class Should Be Overridable")
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
         );
 
         ssTEST_OUTPUT_ASSERT("", width, 10.f);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(*mockSquare).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(*mockSquare).empty());
     };
     
     ssTEST("Template Function In Mock Class Should Be Overridable")

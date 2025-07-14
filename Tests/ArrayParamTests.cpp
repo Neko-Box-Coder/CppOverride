@@ -44,7 +44,7 @@ int main(int argc, char** argv)
         );
         
         ssTEST_OUTPUT_ASSERT(returnValue == 5);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST("Array Parameter Function Should Be Matchable As Pointer")
@@ -127,7 +127,7 @@ int main(int argc, char** argv)
         );
         
         ssTEST_OUTPUT_ASSERT(returnValue == 5);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_EXPECTS(OverrideObj).empty());
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
     ssTEST_END_TEST_GROUP();

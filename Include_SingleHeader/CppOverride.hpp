@@ -5808,6 +5808,29 @@ namespace CppOverride
             
             return results;
         }
+        
+        inline std::string Internal_GetFailedReport()
+        {
+            std::vector<FunctionName> failedFunctions = Internal_GetFailedExpects();
+            std::string returnStr;
+            for(int i = 0; i < failedFunctions.size(); ++i)
+            {
+                returnStr += failedFunctions[i] + "(): \n";
+                std::vector<ResultPtr> results = Internal_GetOverrideResults(failedFunctions[i]);
+                for(int j = 0; j < results.size(); ++j)
+                {
+                    returnStr += "    Instruct[" + std::to_string(j) + "]: \n";
+                    std::vector<OverrideStatus> statuses = results[j]->GetAllStatuses();
+                    for(int k = 0; k < statuses.size(); ++k)
+                    {
+                        returnStr +=    "        Status[" + std::to_string(k) + "]: " + 
+                                        OverrideStatusToString(statuses[k]) + "\n";
+                    }
+                }
+            }
+            
+            return returnStr;
+        }
     };
 }
 
@@ -6020,6 +6043,10 @@ namespace CppOverride
     Internal_GetOverrideResults(const std::string& functionName) const \
     { \
         return (OverrideObjName).Internal_GetOverrideResults(functionName); \
+    } \
+    inline std::string Internal_GetFailedReport() const \
+    { \
+        return (OverrideObjName).Internal_GetFailedReport(); \
     }
     
     #define INTERNAL_CO_POPULATE_ARGS_NAMES(argsTypes) \
@@ -6427,10 +6454,12 @@ namespace CppOverride
     //-------------------------------------------------------
     //Validate overrides results
     //-------------------------------------------------------
-    #define CO_GET_FAILED_EXPECTS(overrideObjName) \
+    #define CO_GET_FAILED_FUNCTIONS(overrideObjName) \
         static_cast<decltype(overrideObjName)>(overrideObjName).Internal_GetFailedExpects()
     #define CO_GET_OVERRIDE_RESULTS(overrideObjName, functionName) \
         static_cast<decltype(overrideObjName)>(overrideObjName).Internal_GetOverrideResults(functionName)
+    #define CO_GET_FAILED_REPORT(overrideObjName) \
+        static_cast<decltype(overrideObjName)>(overrideObjName).GetFailedReport()
     
     //NOTE: CO_INSTRUCT_* needs to be defined as there are chained actions.
     //      For CO_DECLARE_*, they need to be there such that things using them can be compiled
@@ -6458,8 +6487,9 @@ namespace CppOverride
         #undef CO_REMOVE_INSTRUCT_PASSTHROUGH
         #undef CO_CLEAR_ALL_INSTRUCTS
         
-        #undef CO_GET_FAILED_EXPECTS
+        #undef CO_GET_FAILED_FUNCTIONS
         #undef CO_GET_OVERRIDE_RESULTS
+        #undef CO_GET_FAILED_REPORT
 
         //Redefine the macros to noop
         
@@ -6484,8 +6514,9 @@ namespace CppOverride
         #define CO_REMOVE_INSTRUCT_PASSTHROUGH(...)
         #define CO_CLEAR_ALL_INSTRUCTS(...)
         
-        #define CO_GET_FAILED_EXPECTS(...) {}
+        #define CO_GET_FAILED_FUNCTIONS(...) {}
         #define CO_GET_OVERRIDE_RESULTS(...) {}
+        #define CO_GET_FAILED_REPORT(...) {}
     #endif
 }
 
