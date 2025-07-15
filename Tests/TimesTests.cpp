@@ -256,6 +256,72 @@ int main(int argc, char** argv)
                                 CppOverride::OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
     };
     
+    ssTEST("0 Time Expected Should Be Met When No Calls Are Made")
+    {
+        ssTEST_OUTPUT_SETUP
+        (
+            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
+                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                                .Times(0)
+                                .Expected();
+        );
+
+        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+    };
+    
+    ssTEST("0 Time Expected Should Not Be Met When Calls Are Made")
+    {
+        ssTEST_OUTPUT_SETUP
+        (
+            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
+                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                                .Times(0)
+                                .Expected();
+            float testFloat = 0.f;
+            std::string testString = "";
+        );
+
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
+
+        ssTEST_OUTPUT_ASSERT("", CO_GET_FAILED_FUNCTIONS(OverrideObj).size(), 1);
+    };
+    
+    ssTEST("0 Time Not Expected Should Be Met When Calls Are Made")
+    {
+        ssTEST_OUTPUT_SETUP
+        (
+            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
+                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                                .Times(0)
+                                .ExpectedNotSatisfied();
+            float testFloat = 0.f;
+            std::string testString = "";
+        );
+
+        ssTEST_OUTPUT_EXECUTION
+        (
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        );
+
+        ssTEST_OUTPUT_ASSERT("", CO_GET_FAILED_FUNCTIONS(OverrideObj).size(), 0);
+    };
+    
+    ssTEST("0 Time Not Expected Should Not Be Met When Calls Are Not Made")
+    {
+        ssTEST_OUTPUT_SETUP
+        (
+            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
+                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                                .Times(0)
+                                .ExpectedNotSatisfied();
+        );
+
+        ssTEST_OUTPUT_ASSERT("", CO_GET_FAILED_FUNCTIONS(OverrideObj).size(), 1);
+    };
+    
     ssTEST_END_TEST_GROUP();
     
     return 0;

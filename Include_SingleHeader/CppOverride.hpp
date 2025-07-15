@@ -5101,6 +5101,14 @@ namespace CppOverride
                                         .OtherwiseAction(instance, argumentsList);
                 }
 
+                //NOTE: Pretend we are calling this if there's an expectation so that 
+                //      that it can meet the expectations for 0 times
+                if( overrideDataToCheck.Expected != OverrideData::ExpectedType::NONE &&
+                    overrideDataToCheck.CurrentConditionInfo.Times == 0)
+                {
+                    ++overrideDataToCheck.CurrentConditionInfo.CalledTimes;
+                }
+
                 return false;
             }
             
