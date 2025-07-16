@@ -6464,7 +6464,7 @@ namespace CppOverride
     #define CO_GET_OVERRIDE_RESULTS(overrideObjName, functionName) \
         static_cast<decltype(overrideObjName)>(overrideObjName).Internal_GetOverrideResults(functionName)
     #define CO_GET_FAILED_REPORT(overrideObjName) \
-        static_cast<decltype(overrideObjName)>(overrideObjName).GetFailedReport()
+        static_cast<decltype(overrideObjName)>(overrideObjName).Internal_GetFailedReport()
     
     //NOTE: CO_INSTRUCT_* needs to be defined as there are chained actions.
     //      For CO_DECLARE_*, they need to be there such that things using them can be compiled
