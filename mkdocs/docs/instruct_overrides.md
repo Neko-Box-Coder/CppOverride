@@ -76,6 +76,30 @@ If you encountered one that you think it should work with `CO_INSTRUCT_REF`, ple
 
 </br>
 
+## Instructs Evaluation Order
+
+The order of your instructs are evaluated (and consumed) in the order you invoked, i.e. FIFO, 
+assuming the conditions of said instructs are satisfied.
+
+For example, if you have
+
+```cpp
+//int FreeFunction(int value1, float value2)
+CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, FreeFunction)
+               .Times(2)
+               .Returns<int>(1);
+CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, FreeFunction)
+               .Times(2)
+               .Returns<int>(2);
+CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, FreeFunction)
+               .Times(2)
+               .Returns<int>(3);
+```
+
+`FreeFunction` will return `1` 2 times, `2` 2 times and `3` 2 times in this order.
+
+</br>
+
 ## Instructing Passthrough
 
 Functions without explicit instructions are called passthrough, and is recorded everytime when it 
@@ -123,6 +147,10 @@ CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
 .Returns<ReturnType>(value)
 ```
 
+!!! important
+    All the values are evaluated immediately, if you need to return a dynamic value, use 
+    `ReturnsByAction` instead (See below).
+
 </br>
 
 ### Returns void (early return) (`ReturnsVoid`):
@@ -158,10 +186,12 @@ CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
 ???+ example
     ```cpp
     //Return a specific value
+    //int MyFunction()
     CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
                    .Returns<int>(42);
     
     //Return void early
+    //void MyVoidFunction()
     CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyVoidFunction)
                    .ReturnsVoid();
     
@@ -182,6 +212,7 @@ CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
                    });
 
     //Return a reference using lambda
+    //int& MyFunction()
     int returnValue = 0;
     CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
                    .ReturnsByAction<int&>
@@ -207,6 +238,16 @@ CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
 .SetArgs<ArgType1, ArgType2, ...>(value1, value2, ...)
 ```
 
+!!! important
+    `SetArgs()` expects argument values to be passed in instead of a reference, even if the types of 
+    the parameter you are trying to override are pointers or references.
+    
+    For example, if a function accepts `#!cpp int&` or `#!cpp int*` which it can modify, 
+    you are expected to pass an integer value like `5` which it will use to set.
+    
+    All the values are evaluated immediately, if you need to set a dynamic value, use 
+    `SetArgsByAction` instead (See below).
+
 </br>
 
 ### Set arguments using a function (`SetArgsByAction`):
@@ -223,7 +264,7 @@ Use `CO_ANY_TYPE` and `CO_DONT_SET` to skip certain arguments.
     ```cpp
     //Set specific values
     CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
-                   .SetArgs<int, float&>(42, 3.14f);
+                   .SetArgs<int*, float&>(42, 3.14f);
     
     //Skip first argument, set second
     CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
@@ -231,15 +272,15 @@ Use `CO_ANY_TYPE` and `CO_DONT_SET` to skip certain arguments.
     
     //Set using lambda
     CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, MyFunction)
-                   .SetArgsByAction<int, float&>
+                   .SetArgsByAction<int*, float&>
                    (
                        [](void* instance, std::vector<TypedDataInfo>& args) 
                        {
                            //NOTE: instance can be nullptr if it is a free function
                            (void)instance;
                            
-                           if(args[0].IsType<int>())
-                               *args[0].GetTypedDataPtr<int>() = 42;
+                           if(args[0].IsType<int*>())
+                               **args[0].GetTypedDataPtr<int*>() = 42;
                            if(args[1].IsType<float&>())
                                *args[1].GetTypedDataPtr<float&>() = 3.14f;
                        }
@@ -254,6 +295,10 @@ Use `CO_ANY_TYPE` and `CO_DONT_SET` to skip certain arguments.
 ```cpp
 .WhenCalledWith(value1, value2, ...)
 ```
+
+!!! important
+    All the values are evaluated immediately, if you need to set a dynamic value, use 
+    `If` instead (See below).
 
 </br>
 
@@ -306,6 +351,10 @@ Use `CO_ANY` to match any value for specific arguments.
 ```cpp
 .MatchesObject(&objectInstance)
 ```
+
+!!! important
+    The object pointer is evaluated immediately, if you need to set a dynamic value, use 
+    `If` instead (See above).
 
 </br>
 
@@ -386,6 +435,35 @@ failure of triggering override.
     triggered exactly `count` times. Otherwise, the override will be expected to be triggered at 
     least once.
 
+!!! important
+    If you want to create expectations for multiple instructs that have the conditions evaluate to 
+    the same thing (excluding `Times(count)`), you should add the expectation only on the last 
+    one but not on every one of them.
+    
+    For example
+    ```cpp
+    //int FreeFunction(int value1, float value2)
+    CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, FreeFunction)
+                   .WhenCalledWith<int, CO_ANY_TYPE>(1, CO_ANY)
+                   .Times(2)
+                   //This expect will fail the moment `FreeFunction` is called the 3rd time or more.
+                   //.Expected();
+                   .Returns<int>(1);
+    CO_INSTRUCT_REF(MyOverrideInstance, CO_GLOBAL, FreeFunction)
+                   .WhenCalledWith<int, CO_ANY_TYPE>(1, CO_ANY)
+                   .Times(2)
+                   .Returns<int>(2)
+                   .Expected();
+    ```
+    
+    The last expectation will be successful only when both of these instructs are satisfied, since
+    they are consumed in order, assuming both conditions evaluate to the same thing 
+    (excluding `Times(count)`).
+    
+    If you add `Expected()` to all of the instructs (with same conditions), only the last 
+    expectation would be filled and the previous ones would fail since the `Times(x)` requirement
+    expects exactly `Times(x)` to be called, not more.
+    
 </br>
 
 ### Mark override as expected NOT to satisfy all conditions (`ExpectedNotSatisfied`):
@@ -394,9 +472,9 @@ ExpectedNotSatisfied()
 ```
 
 !!! warning
-    `Expected` and ExpectedNotSatisfied` are mutually exclusive. Only one of them is true. 
+    `Expected` and `ExpectedNotSatisfied` are mutually exclusive. Only one of them is true. 
     
-    So if you have `Times(count)` condition, ExpectedNotSatisfied` will be true if the override is 
+    So if you have `Times(count)` condition, `ExpectedNotSatisfied` will be true if the override is 
     triggered not **EXACTLY** `count` times.
 
 </br>
