@@ -641,7 +641,10 @@ namespace CppOverride
             {
                 const std::vector<OverrideData>& overrideData = CurrentOverrideDatas.at(functionName);
                 for(int i = 0; i < overrideData.size(); ++i)
-                    results.push_back(overrideData[i].Result);
+                {
+                    if(overrideData[i].Result)
+                        results.push_back(overrideData[i].Result);
+                }
             }
             
             return results;

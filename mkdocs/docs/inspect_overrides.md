@@ -31,11 +31,20 @@ std::string reportString = CO_GET_FAILED_REPORT(overrideInstance);
 ```
 
 where it prints all the functions that failed the expectations, then a list of the instructs commands
-for each of the functions, then a list of override attempts as override status for each of the 
-instructs commands.
+in chronological order for each of the functions, then a list of override attempts as override status 
+for each of the instructs commands.
 
 For getting each component (failed functions, instructs and statuses) of the report, see the next
 section and the one after.
+
+!!! important
+    Remember, the main thing that determines if an instruct meets its expectation or not is the number
+    of times it overrides successfully or not. Each `OVERRIDE_SUCCESS` status under an instruct 
+    considers a successful override and anything else means it's not. 
+    
+    However, if you see `MATCHING_OVERRIDE_TIMES_FAILED` status, that means it didn't override but
+    also **FAILED** the expectation because the function was called more than the `Times(x)` you 
+    specified while passing the rest of the instruct conditions you set (if any).
 
 </br>
 
