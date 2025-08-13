@@ -40,8 +40,8 @@ nav:
 -   insert_overrides.md
 -   instruct_overrides.md
 -   inspect_overrides.md
--   mock_class_generator.md
 -   override_external.md
+-   mock_class_generator.md
 -   example.md
 
 repo_url: https://github.com/Neko-Box-Coder/CppOverride

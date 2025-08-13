@@ -465,6 +465,42 @@ namespace CppOverride
     #define CO_GET_FAILED_REPORT(overrideObjName) \
         static_cast<decltype(overrideObjName)>(overrideObjName).Internal_GetFailedReport()
     
+
+    //-------------------------------------------------------
+    //Helper macros for forwarding various types and functions
+    //-------------------------------------------------------
+    #define CO_FORWARD_TEMPLATE_TYPE(forwardNamespace, name) \
+        template<typename... Types> \
+        using name = forwardNamespace::name<Types...>
+
+    #define CO_FORWARD_TYPE(forwardNamespace, name) \
+        using name = forwardNamespace::name
+    
+    #define CO_FORWARD_STD_COUT() \
+        namespace { auto& cout = std::cout; }
+    
+    #define CO_FORWARD_STD_ENDL() \
+        template< class CharT, class Traits > \
+        inline std::basic_ostream<CharT, Traits>& endl( std::basic_ostream<CharT, Traits>& os ) \
+        { \
+            return std::endl(os); \
+        } 
+    
+    #define CO_FORWARD_STD_TO_STRING() \
+        template<typename T> \
+        inline std::string to_string(T val) \
+        { \
+            return std::to_string(val); \
+        }
+    
+    #define CO_FORWARD_STD_GET_LINE() \
+        template<typename T> \
+        inline std::istream& getline(std::istream& is, T& val) \
+        { \
+            return std::getline(is, val); \
+        }
+    
+    
     //NOTE: CO_INSTRUCT_* needs to be defined as there are chained actions.
     //      For CO_DECLARE_*, they need to be there such that things using them can be compiled
     #ifdef CO_NO_OVERRIDE
