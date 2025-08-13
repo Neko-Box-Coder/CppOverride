@@ -20,6 +20,8 @@ the "Insert, Instruct, Inspect" steps to setup and test your overridden function
 #### 🔌 Easy to setup and use
 #### 🔋 Batteries included, generate mock classes using the mock class generator
 
+You can find a basic example in [https://github.com/Neko-Box-Coder/CppOverride/blob/master/Example.cpp](https://github.com/Neko-Box-Coder/CppOverride/blob/master/Example.cpp)
+
 ---
 
 ### 📦️ Installation
