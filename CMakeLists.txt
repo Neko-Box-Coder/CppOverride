@@ -4,7 +4,8 @@ if(TARGET CppOverride)
     return()
 endif()
 
-set (CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # For Clang to do parsing
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
