@@ -1,328 +1,262 @@
 #include "CppOverride.hpp"
-#include "ssTest.hpp"
 #include "./Components/FileFunctions.hpp"
 #include "./Components/TestClasses.hpp"
+#include "DSResult/DSResult.hpp"
+#include <iostream>
 
 CppOverride::Overrider OverrideObj;
 
-int main(int argc, char** argv)
+DS::Result<void> TestMain()
 {
-    ssTEST_INIT_TEST_GROUP();
-    ssTEST_PARSE_ARGS(argc, argv);
-    ssTEST_COMMON_SETUP
+    auto setup = []()
     {
         OverrideObj = CppOverride::Overrider();
     };
     
-    ssTEST("Return With Zero Time Set Should Override")
+    //Return With Zero Time Set Should Override
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
+        setup();
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
+                        .Times(0)
+                        .Returns<int>(1);
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::NoArgsFunc(), -1);
+    }
+    
+    //Return With One Time Set Should Override
+    {
+        setup();
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
+                        .Times(1)
+                        .Returns<int>(1)
+                        .Expected();
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::NoArgsFunc(), 1);
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::NoArgsFunc(), -1);
+    }
+    
+    //Return With Two Times Set Should Override
+    {
+        setup();
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
+                        .Times(2)
+                        .Returns<int>(1)
+                        .Expected();
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::NoArgsFunc(), 1);
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::NoArgsFunc(), 1);
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::NoArgsFunc(), -1);
+    }
+    
+    //Return With No Time Set Should Override
+    {
+        setup();
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
+                        .Returns<int>(1)
+                        .Expected();
+        
+        for(int i = 0; i < 10; i++)
+        {
+            DS_ASSERT_EQ(CppOverrideTest::NonConst::NoArgsFunc(), 1);
+            DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+        }
+    }
+    
+    //Return Exceeding Times Set Should Set OverrideStatus To MATCHING_OVERRIDE_TIMES_FAILED
+    {
+        setup();
+        CppOverride::ResultPtr result;
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
+                        .Times(2)
+                        .Returns<int>(1)
+                        .AssignsResult(result);
+
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::NoArgsFunc(), 1);
+        DS_ASSERT_TRUE(result->LastStatusSucceed());
+        
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::NoArgsFunc(), 1);
+        DS_ASSERT_TRUE(result->LastStatusSucceed());
+
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::NoArgsFunc(), -1);
+        DS_ASSERT_EQ(   (int)result->GetLastStatus(),
+                        (int)CppOverride::OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
+    }
+    
+    //SetArgs With Zero Time Set Should Override
+    {
+        setup();
+        CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
                             .Times(0)
-                            .Returns<int>(1);
-        );
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
-    };
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test");
+        float testFloat = 0.f;
+        std::string testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        DS_ASSERT_EQ(testFloat, 0.f);
+        DS_ASSERT_TRUE(testString.empty());
+    }
     
-    ssTEST("Return With One Time Set Should Override")
+    //SetArgs With One Time Set Should Override
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
+        setup();
+        CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
                             .Times(1)
-                            .Returns<int>(1)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
                             .Expected();
-        );
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
-    };
+        float testFloat = 0.f;
+        std::string testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        DS_ASSERT_EQ(testFloat, 2.f);
+        DS_ASSERT_EQ(testString, "Test");
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+
+        testFloat = 0.f;
+        testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        DS_ASSERT_EQ(testFloat, 0.f);
+        DS_ASSERT_TRUE(testString.empty());
+    }
     
-    ssTEST("Return With Two Times Set Should Override")
+    //SetArgs With Two Times Set Should Override
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
+        setup();
+        CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
                             .Times(2)
-                            .Returns<int>(1)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
                             .Expected();
-        );
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
-    };
-    
-    ssTEST("Return With No Time Set Should Override")
-    {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
-                            .Returns<int>(1)
-                            .Expected();
-        );
+        float testFloat = 0.f;
+        std::string testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        DS_ASSERT_EQ(testFloat, 2.f);
+        DS_ASSERT_EQ(testString, "Test");
+
+        testFloat = 0.f;
+        testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        DS_ASSERT_EQ(testFloat, 2.f);
+        DS_ASSERT_EQ(testString, "Test");
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
         
+        testFloat = 0.f;
+        testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        DS_ASSERT_EQ(testFloat, 0.f);
+        DS_ASSERT_TRUE(testString.empty());
+    }
+    
+    //SetArgs With No Time Set Should Override
+    {
+        setup();
+        CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                            .Expected();
+        float testFloat = 0.f;
+        std::string testString = "";
+
         for(int i = 0; i < 10; i++)
         {
-            ssTEST_OUTPUT_ASSERT(   "Try " + std::to_string(i), 
-                                    CppOverrideTest::NonConst::NoArgsFunc() == 1);
-            ssTEST_OUTPUT_ASSERT(   "Try " + std::to_string(i),
-                                    CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+            testFloat = 0.f;
+            testString = "";
+            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+            DS_ASSERT_EQ(testFloat, 2.f);
+            DS_ASSERT_EQ(testString, "Test");
+            DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
         }
-    };
+    }
     
-    ssTEST("Return Exceeding Times Set Should Set OverrideStatus To MATCHING_OVERRIDE_TIMES_FAILED")
+    //SetArgs Exceeding Times Set Should Set OverrideStatus To MATCHING_OVERRIDE_TIMES_FAILED
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CppOverride::ResultPtr result;
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, NoArgsFunc)
+        setup();
+        CppOverride::ResultPtr result;
+        CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
                             .Times(2)
-                            .Returns<int>(1)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
                             .AssignsResult(result);
-        );
+        float testFloat = 0.f;
+        std::string testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        DS_ASSERT_EQ(testFloat, 2.f);
+        DS_ASSERT_EQ(testString, "Test");
+        DS_ASSERT_TRUE(result->LastStatusSucceed());
 
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
+        testFloat = 0.f;
+        testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        DS_ASSERT_EQ(testFloat, 2.f);
+        DS_ASSERT_EQ(testString, "Test");
+        DS_ASSERT_TRUE(result->LastStatusSucceed());
         
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == 1);
-        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
-
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::NonConst::NoArgsFunc() == -1);
-        ssTEST_OUTPUT_ASSERT(   result->GetLastStatus() == 
-                                CppOverride::OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
-    };
+        testFloat = 0.f;
+        testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
+        DS_ASSERT_EQ(testFloat, 0.f);
+        DS_ASSERT_TRUE(testString.empty());
+        DS_ASSERT_EQ(   (int)result->GetLastStatus(),
+                        (int)CppOverride::OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
+    }
     
-    ssTEST("SetArgs With Zero Time Set Should Override")
+    //0 Time Expected Should Be Met When No Calls Are Made
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
-                                .Times(0)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test");
-            float testFloat = 0.f;
-            std::string testString = "";
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT(testFloat == 0.f);
-        ssTEST_OUTPUT_ASSERT(testString.empty() == true);
-    };
+        setup();
+        CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                            .Times(0)
+                            .Expected();
+
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+    }
     
-    ssTEST("SetArgs With One Time Set Should Override")
+    //0 Time Expected Should Not Be Met When Calls Are Made
     {
+        setup();
+        CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                            .Times(0)
+                            .Expected();
+        float testFloat = 0.f;
+        std::string testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
 
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
-                                .Times(1)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .Expected();
-            float testFloat = 0.f;
-            std::string testString = "";
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-
-        ssTEST_OUTPUT_SETUP
-        (
-            testFloat = 0.f;
-            testString = "";
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT(testFloat == 0.f && testString.empty() == true);
-    };
+        DS_ASSERT_EQ(CO_GET_FAILED_FUNCTIONS(OverrideObj).size(), 1);
+    }
     
-    ssTEST("SetArgs With Two Times Set Should Override")
+    //0 Time Not Expected Should Be Met When Calls Are Made
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
-                                .Times(2)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .Expected();
-            float testFloat = 0.f;
-            std::string testString = "";
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
+        setup();
+        CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                            .Times(0)
+                            .ExpectedNotSatisfied();
+        float testFloat = 0.f;
+        std::string testString = "";
+        CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
 
-        ssTEST_OUTPUT_SETUP
-        (
-            testFloat = 0.f;
-            testString = "";
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-        
-        ssTEST_OUTPUT_SETUP
-        (
-            testFloat = 0.f;
-            testString = "";
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT(testFloat == 0.f && testString.empty() == true);
-    };
+        DS_ASSERT_EQ(CO_GET_FAILED_FUNCTIONS(OverrideObj).size(), 0);
+    }
     
-    ssTEST("SetArgs With No Time Set Should Override")
+    //0 Time Not Expected Should Not Be Met When Calls Are Not Made
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .Expected();
-            float testFloat = 0.f;
-            std::string testString = "";
-        );
+        setup();
+        CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
+                            .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
+                            .Times(0)
+                            .ExpectedNotSatisfied();
 
-        for(int i = 0; i < 10; i++)
-        {
-            ssTEST_OUTPUT_SETUP
-            (
-                testFloat = 0.f;
-                testString = "";
-            );
-            ssTEST_OUTPUT_EXECUTION
-            (
-                CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-            );
-            ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-            ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-        }
-    };
-    
-    ssTEST("SetArgs Exceeding Times Set Should Set OverrideStatus To MATCHING_OVERRIDE_TIMES_FAILED")
+        DS_ASSERT_EQ(CO_GET_FAILED_FUNCTIONS(OverrideObj).size(), 1);
+    }
+
+    return {};
+}
+
+int main(int, char**)
+{
+    try
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CppOverride::ResultPtr result;
-            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
-                                .Times(2)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .AssignsResult(result);
-            float testFloat = 0.f;
-            std::string testString = "";
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
-
-        ssTEST_OUTPUT_SETUP
-        (
-            testFloat = 0.f;
-            testString = "";
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT(testFloat == 2.f && testString == "Test");
-        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
-        
-        ssTEST_OUTPUT_SETUP
-        (
-            testFloat = 0.f;
-            testString = "";
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT(testFloat == 0.f && testString.empty() == true);
-        ssTEST_OUTPUT_ASSERT(   result->GetLastStatus() == 
-                                CppOverride::OverrideStatus::MATCHING_OVERRIDE_TIMES_FAILED);
-    };
-    
-    ssTEST("0 Time Expected Should Be Met When No Calls Are Made")
+        TestMain().DS_TRY_ACT(std::cout << DS_TMP_ERROR.ToString() << std::endl; return 1);
+        return 0;
+    }
+    catch(std::exception& ex)
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .Times(0)
-                                .Expected();
-        );
-
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-    };
-    
-    ssTEST("0 Time Expected Should Not Be Met When Calls Are Made")
-    {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .Times(0)
-                                .Expected();
-            float testFloat = 0.f;
-            std::string testString = "";
-        );
-
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-
-        ssTEST_OUTPUT_ASSERT("", CO_GET_FAILED_FUNCTIONS(OverrideObj).size(), 1);
-    };
-    
-    ssTEST("0 Time Not Expected Should Be Met When Calls Are Made")
-    {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .Times(0)
-                                .ExpectedNotSatisfied();
-            float testFloat = 0.f;
-            std::string testString = "";
-        );
-
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(0, &testFloat, testString);
-        );
-
-        ssTEST_OUTPUT_ASSERT("", CO_GET_FAILED_FUNCTIONS(OverrideObj).size(), 0);
-    };
-    
-    ssTEST("0 Time Not Expected Should Not Be Met When Calls Are Not Made")
-    {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
-                                .SetArgs<CO_ANY_TYPE, float*, std::string&>(CO_DONT_SET, 2.f, "Test")
-                                .Times(0)
-                                .ExpectedNotSatisfied();
-        );
-
-        ssTEST_OUTPUT_ASSERT("", CO_GET_FAILED_FUNCTIONS(OverrideObj).size(), 1);
-    };
-    
-    ssTEST_END_TEST_GROUP();
-    
-    return 0;
+        std::cout << ex.what() << std::endl;
+        return 1;
+    }
+    return 1;
 }

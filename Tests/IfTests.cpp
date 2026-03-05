@@ -1,36 +1,70 @@
 #include "CppOverride.hpp"
-#include "ssTest.hpp"
 #include "./Components/FileFunctions.hpp"
+#include "DSResult/DSResult.hpp"
+#include <iostream>
 
 CppOverride::Overrider OverrideObj;
 
-int main(int argc, char** argv)
+DS::Result<void> TestMain()
 {
-    ssTEST_INIT_TEST_GROUP();
-    ssTEST_PARSE_ARGS(argc, argv);
-    
-    ssTEST_COMMON_SETUP
+    auto setup = []()
     {
         OverrideObj = CppOverride::Overrider();
     };
     
-    ssTEST("If Condition Should Affect Return")
+    //If Condition Should Affect Return
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CppOverride::ResultPtr result;
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, ArgsFunc)
+        setup();
+        CppOverride::ResultPtr result;
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, ArgsFunc)
+                        .If
+                        (
+                            [] (void*, 
+                                const std::vector<CppOverride::TypedDataInfo>& args) -> bool
+                            {
+                                if( args.at(0).IsType<int>() && 
+                                    *args.at(0).GetTypedDataPtr<int>() == 1 &&
+                                    args.at(1).IsType<bool>() && 
+                                    *args.at(1).GetTypedDataPtr<bool>() == true &&
+                                    args.at(2).IsType<float>() && 
+                                    *args.at(2).GetTypedDataPtr<float>() == 2.f)
+                                {
+                                    return true;
+                                }
+                                
+                                return false;
+                            }
+                        )
+                        .Returns<int>(1)
+                        .AssignsResult(result);
+    
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::ArgsFunc(1, true, 2.f), 1);
+        DS_ASSERT_TRUE(result->LastStatusSucceed());
+        DS_ASSERT_NOT_EQ(CppOverrideTest::NonConst::ArgsFunc(2, false, 3.f), 1);
+        DS_ASSERT_EQ(   (int)result->GetLastStatus(),
+                        (int)CppOverride::OverrideStatus::MATCHING_CONDITION_ACTION_FAILED);
+    }
+    
+    //If Condition Should Affect Set Args
+    {
+        setup();
+        std::string testString = "";
+        float testFloat = 1.f;
+        
+        CppOverride::ResultPtr result;
+        CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
                             .If
                             (
-                                [] (void*, 
+                                []( void*, 
                                     const std::vector<CppOverride::TypedDataInfo>& args) -> bool
                                 {
                                     if( args.at(0).IsType<int>() && 
                                         *args.at(0).GetTypedDataPtr<int>() == 1 &&
-                                        args.at(1).IsType<bool>() && 
-                                        *args.at(1).GetTypedDataPtr<bool>() == true &&
-                                        args.at(2).IsType<float>() && 
-                                        *args.at(2).GetTypedDataPtr<float>() == 2.f)
+                                        args.at(1).IsType<float*>() && 
+                                        **args.at(1).GetTypedDataPtr<float*>() == 2.f &&
+                                        args.at(2).IsType<std::string&>() && 
+                                        *args.at(2).GetTypedDataPtr<std::string&>() == 
+                                        "Test String")
                                     {
                                         return true;
                                     }
@@ -38,78 +72,40 @@ int main(int argc, char** argv)
                                     return false;
                                 }
                             )
-                            .Returns<int>(1)
+                            .SetArgs<   CO_ANY_TYPE, 
+                                        CO_ANY_TYPE, 
+                                        std::string&>(  CO_DONT_SET, 
+                                                        CO_DONT_SET, 
+                                                        "Test String 2")
                             .AssignsResult(result);
-        );
-    
-        ssTEST_OUTPUT_ASSERT(   "Meet If Condition", 
-                                CppOverrideTest::NonConst::ArgsFunc(1, true, 2.f) == 1);
-        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
         
-        ssTEST_OUTPUT_ASSERT(   "Fail If Condition", 
-                                CppOverrideTest::NonConst::ArgsFunc(2, false, 3.f) != 1);
-        ssTEST_OUTPUT_ASSERT(   result->GetLastStatus() == 
-                                CppOverride::OverrideStatus::MATCHING_CONDITION_ACTION_FAILED);
-    };
+        CppOverrideTest::NonConst::ArgsToSetFunc(1, &testFloat, testString);
+        
+        DS_ASSERT_TRUE(testString.empty());
+        DS_ASSERT_EQ(   (int)result->GetLastStatus(),
+                        (int)CppOverride::OverrideStatus::MATCHING_CONDITION_ACTION_FAILED);
+        
+        testString = "Test String";
+        testFloat = 2.f;
+        CppOverrideTest::NonConst::ArgsToSetFunc(1, &testFloat, testString);
+        DS_ASSERT_EQ(testString, "Test String 2");
+        DS_ASSERT_TRUE(result->LastStatusSucceed());
+    }
     
-    ssTEST("If Condition Should Affect Set Args")
+    return {};
+}
+
+int main(int, char**)
+{
+    try
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            std::string testString = "";
-            float testFloat = 1.f;
-            
-            CppOverride::ResultPtr result;
-            CO_INSTRUCT_NO_REF  (OverrideObj, ArgsToSetFunc)
-                                .If
-                                (
-                                    []( void*, 
-                                        const std::vector<CppOverride::TypedDataInfo>& args) -> bool
-                                    {
-                                        if( args.at(0).IsType<int>() && 
-                                            *args.at(0).GetTypedDataPtr<int>() == 1 &&
-                                            args.at(1).IsType<float*>() && 
-                                            **args.at(1).GetTypedDataPtr<float*>() == 2.f &&
-                                            args.at(2).IsType<std::string&>() && 
-                                            *args.at(2).GetTypedDataPtr<std::string&>() == 
-                                            "Test String")
-                                        {
-                                            return true;
-                                        }
-                                        
-                                        return false;
-                                    }
-                                )
-                                .SetArgs<   CO_ANY_TYPE, 
-                                            CO_ANY_TYPE, 
-                                            std::string&>(  CO_DONT_SET, 
-                                                            CO_DONT_SET, 
-                                                            "Test String 2")
-                                .AssignsResult(result);
-        );
-        
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(1, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT("Fail If Condition", testString.empty());
-        ssTEST_OUTPUT_ASSERT(   result->GetLastStatus() == 
-                                CppOverride::OverrideStatus::MATCHING_CONDITION_ACTION_FAILED);
-        
-        ssTEST_OUTPUT_SETUP
-        (
-            testString = "Test String";
-            testFloat = 2.f;
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::ArgsToSetFunc(1, &testFloat, testString);
-        );
-        ssTEST_OUTPUT_ASSERT("Meet If Condition", testString == "Test String 2");
-        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
-    };
-    
-    ssTEST_END_TEST_GROUP();
-    
-    return 0;
+        TestMain().DS_TRY_ACT(std::cout << DS_TMP_ERROR.ToString() << std::endl; return 1);
+        return 0;
+    }
+    catch(std::exception& ex)
+    {
+        std::cout << ex.what() << std::endl;
+        return 1;
+    }
+    return 1;
 }

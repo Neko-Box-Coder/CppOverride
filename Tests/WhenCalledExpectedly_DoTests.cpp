@@ -1,64 +1,27 @@
 #include "CppOverride.hpp"
-#include "ssTest.hpp"
 #include "./Components/FileFunctions.hpp"
 #include "./Components/Shapes.hpp"
+#include "DSResult/DSResult.hpp"
+#include <iostream>
 
 CppOverride::Overrider OverrideObj;
 
-int main(int argc, char** argv)
+DS::Result<void> TestMain()
 {
-    ssTEST_INIT_TEST_GROUP();
-    ssTEST_PARSE_ARGS(argc, argv);
-    
-    ssTEST_COMMON_SETUP
+    auto setup = []()
     {
         OverrideObj = CppOverride::Overrider();
     };
     
-    ssTEST("Calling WhenCalledWith Correctly Should Call WhenCalledExpectedly_Do For Returns")
+    //Calling WhenCalledWith Correctly Should Call WhenCalledExpectedly_Do For Returns
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CppOverrideTest::Rectangle rect(1.5, 1.5);
-            bool calledExpectedly = false;
-            
-            CO_INSTRUCT_NO_REF  (rect, GetWidth)
-                                .WhenCalledWith(2.f)
-                                .Returns<float>(6.f)
-                                .WhenCalledExpectedly_Do
-                                (
-                                    [&calledExpectedly](...)
-                                    {
-                                        calledExpectedly = true;
-                                    }
-                                );
-        );
-        ssTEST_OUTPUT_EXECUTION
-        (
-            rect.GetWidth(3.f);
-        );
-        ssTEST_OUTPUT_ASSERT("Not Meeting WhenCalledWith", calledExpectedly == false);
+        setup();
+        CppOverrideTest::Rectangle rect(1.5, 1.5);
+        bool calledExpectedly = false;
         
-        ssTEST_OUTPUT_EXECUTION
-        (
-            rect.GetWidth(2.f);
-        );
-        ssTEST_OUTPUT_ASSERT("Meeting WhenCalledWith", calledExpectedly == true);
-    };
-    
-    ssTEST("Calling WhenCalledWith Correctly Should Call WhenCalledExpectedly_Do For SetArgs")
-    {
-        ssTEST_OUTPUT_SETUP
-        (
-            bool calledExpectedly = false;
-            
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::Const, ConstArgsAndArgsToSetFunc)
-                            .WhenCalledWith(1, 2.f, CO_ANY)
-                            .SetArgs<   CO_ANY_TYPE, 
-                                        CO_ANY_TYPE, 
-                                        std::string&>(  CO_DONT_SET, 
-                                                        CO_DONT_SET, 
-                                                        "test")
+        CO_INSTRUCT_NO_REF  (rect, GetWidth)
+                            .WhenCalledWith(2.f)
+                            .Returns<float>(6.f)
                             .WhenCalledExpectedly_Do
                             (
                                 [&calledExpectedly](...)
@@ -66,24 +29,56 @@ int main(int argc, char** argv)
                                     calledExpectedly = true;
                                 }
                             );
+        rect.GetWidth(3.f);
+        DS_ASSERT_FALSE(calledExpectedly);
+        
+        rect.GetWidth(2.f);
+        DS_ASSERT_TRUE(calledExpectedly);
+    }
+    
+    //Calling WhenCalledWith Correctly Should Call WhenCalledExpectedly_Do For SetArgs
+    {
+        setup();
+        bool calledExpectedly = false;
+        
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::Const, ConstArgsAndArgsToSetFunc)
+                        .WhenCalledWith(1, 2.f, CO_ANY)
+                        .SetArgs<   CO_ANY_TYPE, 
+                                    CO_ANY_TYPE, 
+                                    std::string&>(  CO_DONT_SET, 
+                                                    CO_DONT_SET, 
+                                                    "test")
+                        .WhenCalledExpectedly_Do
+                        (
+                            [&calledExpectedly](...)
+                            {
+                                calledExpectedly = true;
+                            }
+                        );
 
-            std::string testString;
-        );
+        std::string testString;
         
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::Const::ConstArgsAndArgsToSetFunc(2, 3.f, testString);
-        );
-        ssTEST_OUTPUT_ASSERT("Not Meeting WhenCalledWith", calledExpectedly == false);
+        CppOverrideTest::Const::ConstArgsAndArgsToSetFunc(2, 3.f, testString);
+        DS_ASSERT_FALSE(calledExpectedly);
         
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::Const::ConstArgsAndArgsToSetFunc(1, 2.f, testString);
-        );
-        ssTEST_OUTPUT_ASSERT("Meeting WhenCalledWith", calledExpectedly == true);
-    };
-    
-    ssTEST_END_TEST_GROUP();
-    
-    return 0;
+        CppOverrideTest::Const::ConstArgsAndArgsToSetFunc(1, 2.f, testString);
+        DS_ASSERT_TRUE(calledExpectedly);
+    }
+
+    return {};
+}
+
+int main(int, char**)
+{
+    try
+    {
+        TestMain().DS_TRY_ACT(std::cout << DS_TMP_ERROR.ToString() << std::endl; return 1);
+        return 0;
+    }
+    catch(std::exception& ex)
+    {
+        std::cout << ex.what() << std::endl;
+        return 1;
+    }
+    return 1;
 }

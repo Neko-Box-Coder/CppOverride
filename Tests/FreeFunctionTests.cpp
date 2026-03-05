@@ -1,48 +1,47 @@
 #include "CppOverride.hpp"
-#include "ssTest.hpp"
 
 #include "./Components/FreeFunctions.hpp"
 #include "./Components/MockFreeFunctions.hpp"
 
+#include "DSResult/DSResult.hpp"
+#include <iostream>
+
 // CppOverride::Overrider OverrideObj;
 CO_DECLARE_INSTANCE(OverrideObj);
 
-int main(int argc, char** argv)
+DS::Result<void> TestMain()
 {
-    ssTEST_INIT_TEST_GROUP();
-    ssTEST_PARSE_ARGS(argc, argv);
-    ssTEST_COMMON_SETUP
+    auto setup = []()
     {
         OverrideObj = CppOverride::Overrider();
     };
     
-    ssTEST("Free Functions Should Work")
+    //Free Functions Should Work
     {
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionA(1) == 1);
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionB(1, 2) == 3);
-    };
+        setup();
+        DS_ASSERT_EQ(CppOverrideTest::FreeFunctionA(1), 1);
+        DS_ASSERT_EQ(CppOverrideTest::FreeFunctionB(1, 2), 3);
+    }
     
     //#if !defined(CO_NO_OVERRIDE) || !CO_NO_OVERRIDE
         #define FreeFunctionA MockFreeFunctionA
         #define FreeFunctionB MockFreeFunctionB
     //#endif
     
-    ssTEST("Mock Free Functions Should Work")
+    //Mock Free Functions Should Work
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest, MockFreeFunctionA)
-                            .Returns<int>(10)
-                            .Expected();
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest, MockFreeFunctionB)
-                            .Returns<int>(10)
-                            .Expected();
-        );
+        setup();
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest, MockFreeFunctionA)
+                        .Returns<int>(10)
+                        .Expected();
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest, MockFreeFunctionB)
+                        .Returns<int>(10)
+                        .Expected();
         
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionA(1) == 10);
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionB(1, 2) == 10);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-    };
+        DS_ASSERT_EQ(CppOverrideTest::FreeFunctionA(1), 10);
+        DS_ASSERT_EQ(CppOverrideTest::FreeFunctionB(1, 2), 10);
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+    }
     
     #ifdef FreeFunctionA
         #undef FreeFunctionA
@@ -52,13 +51,27 @@ int main(int argc, char** argv)
         #undef FreeFunctionB
     #endif
     
-    ssTEST("Free Functions Should Work When After Mocking")
+    //Free Functions Should Work When After Mocking
     {
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionA(1) == 1);
-        ssTEST_OUTPUT_ASSERT(CppOverrideTest::FreeFunctionB(1, 2) == 3);
+        setup();
+        DS_ASSERT_EQ(CppOverrideTest::FreeFunctionA(1), 1);
+        DS_ASSERT_EQ(CppOverrideTest::FreeFunctionB(1, 2), 3);
     };
     
-    ssTEST_END_TEST_GROUP();
-    
-    return 0;
+    return {};
+}
+
+int main(int, char**)
+{
+    try
+    {
+        TestMain().DS_TRY_ACT(std::cout << DS_TMP_ERROR.ToString() << std::endl; return 1);
+        return 0;
+    }
+    catch(std::exception& ex)
+    {
+        std::cout << ex.what() << std::endl;
+        return 1;
+    }
+    return 1;
 }

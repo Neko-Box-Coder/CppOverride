@@ -1,132 +1,120 @@
 #include "CppOverride.hpp"
-#include "ssTest.hpp"
 #include "./Components/FileFunctions.hpp"
+#include "DSResult/DSResult.hpp"
+#include <iostream>
 
 CppOverride::Overrider OverrideObj;
 
-int main(int argc, char** argv)
+DS::Result<void> TestMain()
 {
-    ssTEST_INIT_TEST_GROUP();
-    ssTEST_PARSE_ARGS(argc, argv);
-    
-    ssTEST_COMMON_SETUP
+    auto setup = []()
     {
         OverrideObj = CppOverride::Overrider();
     };
     
-    ssTEST("Override Both Args And Return In One Statement Should Override Once")
+    //Override Both Args And Return In One Statement Should Override Once
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            int testArg = 1;
-            int testArg2 = 1;
-            int calledCounter = 0;
-            
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, AddNumFromNumPointerFunc)
-                            .SetArgs<int*, CO_ANY_TYPE>(5, CO_DONT_SET)
-                            .Returns<int>(32)
-                            .WhenCalledExpectedly_Do
-                            (
-                                [&calledCounter](...)
-                                {
-                                    ++calledCounter;
-                                }
-                            )
-                            .Expected();
-        );
+        setup();
+        int testArg = 1;
+        int testArg2 = 1;
+        int calledCounter = 0;
         
-        ssTEST_OUTPUT_EXECUTION
-        (
-            int executeResult = CppOverrideTest::NonConst::AddNumFromNumPointerFunc(&testArg, 2);
-        );
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, AddNumFromNumPointerFunc)
+                        .SetArgs<int*, CO_ANY_TYPE>(5, CO_DONT_SET)
+                        .Returns<int>(32)
+                        .WhenCalledExpectedly_Do
+                        (
+                            [&calledCounter](...)
+                            {
+                                ++calledCounter;
+                            }
+                        )
+                        .Expected();
         
-        ssTEST_OUTPUT_ASSERT(testArg == 5);
-        ssTEST_OUTPUT_ASSERT(executeResult == 32);
-        ssTEST_OUTPUT_ASSERT(calledCounter == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::AddNumFromNumPointerFunc(&testArg, 2), 32);
         
-        ssTEST_OUTPUT_EXECUTION
-        (
-            executeResult = CppOverrideTest::NonConst::AddNumFromNumPointerFunc(&testArg2, 2);
-        );
+        DS_ASSERT_EQ(testArg, 5);
+        DS_ASSERT_EQ(calledCounter, 1);
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
         
-        ssTEST_OUTPUT_ASSERT(testArg2 == 5);
-        ssTEST_OUTPUT_ASSERT(executeResult == 32);
-        ssTEST_OUTPUT_ASSERT(calledCounter == 2);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::AddNumFromNumPointerFunc(&testArg2, 2), 32);
+        DS_ASSERT_EQ(testArg2, 5);
+        DS_ASSERT_EQ(calledCounter, 2);
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+    }
+    
+    //Multiple Matching Overrides Should Apply The First One
+    {
+        setup();
+        int testArg = 1;
+        int calledCounter = 0;
+        
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, AddNumFromNumPointerFunc)
+                        .SetArgs<int*, CO_ANY_TYPE>(5, CO_DONT_SET)
+                        .Returns<int>(32)
+                        .WhenCalledExpectedly_Do
+                        (
+                            [&calledCounter](...)
+                            {
+                                ++calledCounter;
+                            }
+                        )
+                        .Expected();
+        
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, AddNumFromNumPointerFunc)
+                        .SetArgs<int*, CO_ANY_TYPE>(10, CO_DONT_SET)
+                        .WhenCalledExpectedly_Do
+                        (
+                            [&calledCounter](...)
+                            {
+                                ++calledCounter;
+                            }
+                        )
+                        .ExpectedNotSatisfied();
+        
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::AddNumFromNumPointerFunc(&testArg, 2), 32);
+        DS_ASSERT_EQ(testArg, 5);
+        DS_ASSERT_EQ(calledCounter, 1);
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
     };
     
-    ssTEST("Multiple Matching Overrides Should Apply The First One")
+    //Modify None With Action Result Should Perform Action
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            int testArg = 1;
-            int calledCounter = 0;
-            
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, AddNumFromNumPointerFunc)
-                            .SetArgs<int*, CO_ANY_TYPE>(5, CO_DONT_SET)
-                            .Returns<int>(32)
-                            .WhenCalledExpectedly_Do
-                            (
-                                [&calledCounter](...)
-                                {
-                                    ++calledCounter;
-                                }
-                            )
-                            .Expected();
-            
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, AddNumFromNumPointerFunc)
-                            .SetArgs<int*, CO_ANY_TYPE>(10, CO_DONT_SET)
-                            .WhenCalledExpectedly_Do
-                            (
-                                [&calledCounter](...)
-                                {
-                                    ++calledCounter;
-                                }
-                            )
-                            .ExpectedNotSatisfied();
-        );
+        setup();
+        int testArg = 1;
+        int calledCounter = 0;
         
-        ssTEST_OUTPUT_EXECUTION
-        (
-            int executeResult = CppOverrideTest::NonConst::AddNumFromNumPointerFunc(&testArg, 2);
-        );
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, AddNumFromNumPointerFunc)
+                        .WhenCalledExpectedly_Do
+                        (
+                            [&calledCounter](...)
+                            {
+                                ++calledCounter;
+                            }
+                        )
+                        .Times(1)
+                        .Expected();
         
-        ssTEST_OUTPUT_ASSERT(testArg == 5);
-        ssTEST_OUTPUT_ASSERT(executeResult == 32);
-        ssTEST_OUTPUT_ASSERT(calledCounter == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-    };
+        CppOverrideTest::NonConst::AddNumFromNumPointerFunc(&testArg, 2);
+        
+        DS_ASSERT_EQ(calledCounter, 1);
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+    }
     
-    ssTEST("Modify None With Action Result Should Perform Action")
+    return {};
+}
+
+int main(int, char**)
+{
+    try
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            int testArg = 1;
-            int calledCounter = 0;
-            
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, AddNumFromNumPointerFunc)
-                            .WhenCalledExpectedly_Do
-                            (
-                                [&calledCounter](...)
-                                {
-                                    ++calledCounter;
-                                }
-                            )
-                            .Times(1)
-                            .Expected();
-        );
-        
-        ssTEST_OUTPUT_EXECUTION
-        (
-            CppOverrideTest::NonConst::AddNumFromNumPointerFunc(&testArg, 2);
-        );
-        
-        ssTEST_OUTPUT_ASSERT(calledCounter == 1);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-    };
-    
-    ssTEST_END_TEST_GROUP();
-    
-    return 0;
+        TestMain().DS_TRY_ACT(std::cout << DS_TMP_ERROR.ToString() << std::endl; return 1);
+        return 0;
+    }
+    catch(std::exception& ex)
+    {
+        std::cout << ex.what() << std::endl;
+        return 1;
+    }
+    return 1;
 }
