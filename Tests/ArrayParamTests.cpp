@@ -1,134 +1,103 @@
 #include "CppOverride.hpp"
-#include "ssTest.hpp"
 #include "./Components/FileFunctions.hpp"
+
+#include "DSResult/DSResult.hpp"
+
+#include <iostream>
 
 CppOverride::Overrider OverrideObj;
 
-int main(int argc, char** argv)
+DS::Result<void> TestMain()
 {
-    ssTEST_INIT_TEST_GROUP();
-    ssTEST_PARSE_ARGS(argc, argv);
-    ssTEST_COMMON_SETUP
+    auto setup = []()
     {
         OverrideObj = CppOverride::Overrider();
     };
-
-    ssTEST("Array Parameter Function Should Be Overridable With Return")
-    {
-        ssTEST_OUTPUT_SETUP
-        (
-            int nums[4] = {0, 1, 2, 3};
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, IntArrayParameterFunc)
-                            .Returns<int>(5)
-                            .Expected();
-        );
-
-        ssTEST_OUTPUT_EXECUTION
-        (
-            int returnValue = CppOverrideTest::NonConst::IntArrayParameterFunc(nums);
-        );
-
-        ssTEST_OUTPUT_ASSERT(returnValue == 5);
-        
-        ssTEST_OUTPUT_SETUP
-        (
-            char chars[4] = "abc";
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, CharArrayParameterFunc)
-                            .Returns<int>(5)
-                            .Expected();
-        );
-        
-        ssTEST_OUTPUT_EXECUTION
-        (
-            returnValue = CppOverrideTest::NonConst::CharArrayParameterFunc(chars);
-        );
-        
-        ssTEST_OUTPUT_ASSERT(returnValue == 5);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-    };
     
-    ssTEST("Array Parameter Function Should Be Matchable As Pointer")
+    //Array Parameter Function Should Be Overridable With Return
     {
-        ssTEST_OUTPUT_SETUP
-        (
-            int nums[4] = {0, 1, 2, 3};
-            int nums2[4] = {0, 1, 2, 3};
-            CppOverride::ResultPtr result;
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, IntArrayParameterFunc)
-                            .WhenCalledWith(nums)
-                            .Returns<int>(5)
-                            .AssignsResult(result);
-        );
+        setup();
         
-        ssTEST_OUTPUT_EXECUTION
-        (
-            int returnValue = CppOverrideTest::NonConst::IntArrayParameterFunc(nums);
-        );
-        ssTEST_OUTPUT_ASSERT(returnValue == 5);
-        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
+        int nums[4] = {0, 1, 2, 3};
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, IntArrayParameterFunc)
+                        .Returns<int>(5)
+                        .Expected();
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::IntArrayParameterFunc(nums), 5);
         
-        ssTEST_OUTPUT_EXECUTION
-        (
-            returnValue = CppOverrideTest::NonConst::IntArrayParameterFunc(nums2);
-        );
-        ssTEST_OUTPUT_ASSERT(returnValue != 5);
-        ssTEST_OUTPUT_ASSERT(   result->GetLastStatus() == 
-                                CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
-        
-        ssTEST_OUTPUT_SETUP
-        (
-            char chars[4] = "abc";
-            char chars2[4] = "abc";
-            result = CppOverride::ResultPtr();
-            CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, CharArrayParameterFunc)
-                            .WhenCalledWith(chars)
-                            .Returns<int>(5)
-                            .AssignsResult(result);
-        );
-        
-        ssTEST_OUTPUT_EXECUTION
-        (
-            returnValue = CppOverrideTest::NonConst::CharArrayParameterFunc(chars);
-        );
-        ssTEST_OUTPUT_ASSERT(returnValue == 5);
-        ssTEST_OUTPUT_ASSERT(result->LastStatusSucceed());
-
-        ssTEST_OUTPUT_EXECUTION
-        (
-            returnValue = CppOverrideTest::NonConst::CharArrayParameterFunc(chars2);
-        );
-        ssTEST_OUTPUT_ASSERT(returnValue != 5);
-        ssTEST_OUTPUT_ASSERT(   "",
-                                static_cast<int>(result->GetLastStatus()),
-                                static_cast<int>(   CppOverride::
-                                                    OverrideStatus::
-                                                    MATCHING_CONDITION_VALUE_FAILED));
-    };
-
-    ssTEST("Array As Template Parameter Should Be Overridable")
-    {
-        ssTEST_OUTPUT_SETUP
-        (
-            char chars[4] = "abc";
-            CO_INSTRUCT_REF
-            (
-                OverrideObj, 
-                CppOverrideTest::NonConst::Template, 
-                TemplateArgRefFunc<char[]>
-            )
-            .WhenCalledWith(chars)
-            .Returns<int>(5)
-            .Expected();
-        );
-        
-        ssTEST_OUTPUT_EXECUTION
-        (
-            int returnValue = CppOverrideTest::NonConst::Template::TemplateArgRefFunc(chars);
-        );
-        
-        ssTEST_OUTPUT_ASSERT(returnValue == 5);
-        ssTEST_OUTPUT_ASSERT(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
-    };
+        char chars[4] = "abc";
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, CharArrayParameterFunc)
+                        .Returns<int>(5)
+                        .Expected();
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::CharArrayParameterFunc(chars), 5);
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+    }
     
-    ssTEST_END_TEST_GROUP();
+    //Array Parameter Function Should Be Matchable As Pointer
+    {
+        setup();
+        
+        int nums[4] = {0, 1, 2, 3};
+        int nums2[4] = {0, 1, 2, 3};
+        CppOverride::ResultPtr result;
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, IntArrayParameterFunc)
+                        .WhenCalledWith(nums)
+                        .Returns<int>(5)
+                        .AssignsResult(result);
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::IntArrayParameterFunc(nums), 5);
+        DS_ASSERT_TRUE(result->LastStatusSucceed());
+        
+        DS_ASSERT_NOT_EQ(CppOverrideTest::NonConst::IntArrayParameterFunc(nums2), 5);
+        DS_ASSERT_EQ(   (int)result->GetLastStatus(), 
+                        (int)CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
+        
+        char chars[4] = "abc";
+        char chars2[4] = "abc";
+        result = CppOverride::ResultPtr();
+        CO_INSTRUCT_REF (OverrideObj, CppOverrideTest::NonConst, CharArrayParameterFunc)
+                        .WhenCalledWith(chars)
+                        .Returns<int>(5)
+                        .AssignsResult(result);
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::CharArrayParameterFunc(chars), 5);
+        DS_ASSERT_TRUE(result->LastStatusSucceed());
+
+        DS_ASSERT_NOT_EQ(CppOverrideTest::NonConst::CharArrayParameterFunc(chars2), 5);
+        DS_ASSERT_EQ(   (int)result->GetLastStatus(), 
+                        (int)CppOverride::OverrideStatus::MATCHING_CONDITION_VALUE_FAILED);
+    }
+
+    //Array As Template Parameter Should Be Overridable
+    {
+        setup();
+        
+        char chars[4] = "abc";
+        CO_INSTRUCT_REF
+        (
+            OverrideObj, 
+            CppOverrideTest::NonConst::Template, 
+            TemplateArgRefFunc<char[]>
+        )
+        .WhenCalledWith(chars)
+        .Returns<int>(5)
+        .Expected();
+        
+        DS_ASSERT_EQ(CppOverrideTest::NonConst::Template::TemplateArgRefFunc(chars), 5);
+        DS_ASSERT_TRUE(CO_GET_FAILED_FUNCTIONS(OverrideObj).empty());
+    }
+    
+    return {};
+}
+
+int main(int, char**)
+{
+    try
+    {
+        TestMain().DS_TRY_ACT(std::cout << DS_TMP_ERROR.ToString() << std::endl; return 1);
+        return 0;
+    }
+    catch(std::exception& ex)
+    {
+        std::cout << ex.what() << std::endl;
+        return 1;
+    }
+    return 1;
 }
